@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, Tabs, Tab, Label } from 'react-bootstrap';
+import { Grid, Row, Col, Tabs, Tab, Label, Panel } from 'react-bootstrap';
 import Select from 'react-select';
 import regions from '../../assets/regions';
 import timePeriods from '../../assets/time-periods';
@@ -40,92 +40,100 @@ class App extends Component {
 
         <Row>
           <Col lg={2}>
-            <SelectorLabel>I am interested in information about projected climate change</SelectorLabel>
-            {/*<Label>Region</Label>*/}
-            <SelectorLabel>for the region of</SelectorLabel>
-            <RegionSelector
-              value={this.state.region}
-              onChange={this.handleChangeRegion}
-            />
+            <Panel>
+              <Panel.Body>
+                <SelectorLabel>I am interested in information about projected climate change</SelectorLabel>
+                {/*<Label>Region</Label>*/}
+                <SelectorLabel>for the region of</SelectorLabel>
+                <RegionSelector
+                  value={this.state.region}
+                  onChange={this.handleChangeRegion}
+                />
 
-            {/*<Label>Season</Label>*/}
-            <SelectorLabel>showing a typical season</SelectorLabel>
-            <SeasonSelector
-              value={this.state.season}
-              onChange={this.handleChangeSeason}
-            />
+                {/*<Label>Season</Label>*/}
+                <SelectorLabel>showing a typical season</SelectorLabel>
+                <SeasonSelector
+                  value={this.state.season}
+                  onChange={this.handleChangeSeason}
+                />
 
-            {/*<Label>Time Period</Label>*/}
-            <SelectorLabel>in the future time period</SelectorLabel>
-            <TimePeriodSelector
-              value={this.state.timePeriod}
-              onChange={this.handleChangeTimePeriod}
-            />
+                {/*<Label>Time Period</Label>*/}
+                <SelectorLabel>in the future time period</SelectorLabel>
+                <TimePeriodSelector
+                  value={this.state.timePeriod}
+                  onChange={this.handleChangeTimePeriod}
+                />
 
-            {/*<Label>Variable of Interest</Label>*/}
-            <SelectorLabel>I'd like to see maps and graphs giving details about</SelectorLabel>
-            <VariableSelector
-              value={this.state.variable}
-              onChange={this.handleChangeVariable}
-            />
+                {/*<Label>Variable of Interest</Label>*/}
+                <SelectorLabel>I'd like to see maps and graphs giving details about</SelectorLabel>
+                <VariableSelector
+                  value={this.state.variable}
+                  onChange={this.handleChangeVariable}
+                />
+              </Panel.Body>
+            </Panel>
           </Col>
 
           <Col lg={10}>
-            <Tabs
-              id={'main'}
-              defaultActiveKey={'Maps'}>
-              <Tab eventKey={'Summary'} title={'Summary'}>
-                Summary Content
-              </Tab>
-              <Tab eventKey={'Maps'} title={`Maps of Historical and Projected ${this.state.variable.label}`}>
-                <Row>
-                  <Col lg={12}>
-                    <h2>{`
-                      ${this.state.season.label}
-                      ${this.state.variable.label}
-                      for the ${this.state.region.label} region
-                    `}</h2>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={6}>
-                    <h3>Historical: 1961-1990</h3>
-                    <ValueMap
-                      {...this.state}
-                      timePeriod={{
-                        label: 'Baseline (1961-1990)'
-                      }}
-                    />
-                  </Col>
-                  <Col lg={6}>
-                    <h3>Projected: {this.state.timePeriod.label}</h3>
-                    <ValueMap
-                      {...this.state}
-                    />
-                  </Col>
-                </Row>
-              </Tab>
-              <Tab eventKey={'Graph'} title={`Graph of Change over Time of Projected ${this.state.variable.label}`}>
-                <Row>
-                  <Col lg={12}>
-                    <h2>{`
-                      Range of projected change in
-                      ${this.state.season.label}
-                      ${this.state.variable.label}
-                      for the ${this.state.region.label} region
-                    `}</h2>
-                  </Col>
-                  <Col lg={6}>
-                    <ChangeOverTimeGraph
-                      {...this.state}
-                    />
-                  </Col>
-                </Row>
-              </Tab>
-              <Tab eventKey={'Impacts'} title={'Impacts'}>
-                Impacts Content
-              </Tab>
-            </Tabs>
+            <Panel>
+              <Panel.Body>
+                <Tabs
+                  id={'main'}
+                  defaultActiveKey={'Maps'}>
+                  <Tab eventKey={'Summary'} title={'Summary'}>
+                    Summary Content
+                  </Tab>
+                  <Tab eventKey={'Impacts'} title={'Impacts'}>
+                    Impacts Content
+                  </Tab>
+                  <Tab eventKey={'Maps'} title={`Maps of Historical and Projected ${this.state.variable.label}`}>
+                    <Row>
+                      <Col lg={12}>
+                        <h2>{`
+                          ${this.state.season.label}
+                          ${this.state.variable.label}
+                          for the ${this.state.region.label} region
+                        `}</h2>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={6}>
+                        <h3>Historical: 1961-1990</h3>
+                        <ValueMap
+                          {...this.state}
+                          timePeriod={{
+                            label: 'Baseline (1961-1990)'
+                          }}
+                        />
+                      </Col>
+                      <Col lg={6}>
+                        <h3>Projected: {this.state.timePeriod.label}</h3>
+                        <ValueMap
+                          {...this.state}
+                        />
+                      </Col>
+                    </Row>
+                  </Tab>
+                  <Tab eventKey={'Graph'} title={`Graph of Change over Time of Projected ${this.state.variable.label}`}>
+                    <Row>
+                      <Col lg={12}>
+                        <h2>{`
+                          Range of projected change in
+                          ${this.state.season.label}
+                          ${this.state.variable.label}
+                          for the ${this.state.region.label} region
+                        `}</h2>
+                      </Col>
+                      <Col lg={6}>
+                        <ChangeOverTimeGraph
+                          {...this.state}
+                        />
+                      </Col>
+                    </Row>
+                  </Tab>
+                </Tabs>
+              </Panel.Body>
+            </Panel>
           </Col>
         </Row>
       </Grid>
