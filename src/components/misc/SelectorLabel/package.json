@@ -1,0 +1,6 @@
+{
+  "name": "SelectorLabel",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./SelectorLabel.js"
+}

@@ -10,6 +10,7 @@ import TimePeriodSelector from '../selectors/TimePeriodSelector';
 import SeasonSelector from '../selectors/SeasonSelector';
 import VariableSelector from '../selectors/VariableSelector';
 import ValueMap from '../data-displays/ValueMap';
+import SelectorLabel from '../misc/SelectorLabel';
 
 import styles from './App.css';
 import ChangeOverTimeGraph from '../data-displays/ChangeOverTimeGraph';
@@ -39,25 +40,30 @@ class App extends Component {
 
         <Row>
           <Col lg={2}>
-            <Label>Region</Label>
+            <SelectorLabel>I am interested in information about projected climate change</SelectorLabel>
+            {/*<Label>Region</Label>*/}
+            <SelectorLabel>for the region of</SelectorLabel>
             <RegionSelector
               value={this.state.region}
               onChange={this.handleChangeRegion}
             />
 
-            <Label>Time Period</Label>
-            <TimePeriodSelector
-              value={this.state.timePeriod}
-              onChange={this.handleChangeTimePeriod}
-            />
-
-            <Label>Season</Label>
+            {/*<Label>Season</Label>*/}
+            <SelectorLabel>showing a typical season</SelectorLabel>
             <SeasonSelector
               value={this.state.season}
               onChange={this.handleChangeSeason}
             />
 
-            <Label>Variable of Interest</Label>
+            {/*<Label>Time Period</Label>*/}
+            <SelectorLabel>in the future time period</SelectorLabel>
+            <TimePeriodSelector
+              value={this.state.timePeriod}
+              onChange={this.handleChangeTimePeriod}
+            />
+
+            {/*<Label>Variable of Interest</Label>*/}
+            <SelectorLabel>I'd like to see maps and graphs giving details about</SelectorLabel>
             <VariableSelector
               value={this.state.variable}
               onChange={this.handleChangeVariable}
@@ -71,7 +77,7 @@ class App extends Component {
               <Tab eventKey={'Summary'} title={'Summary'}>
                 Summary Content
               </Tab>
-              <Tab eventKey={'Maps'} title={`Projected ${this.state.variable.label}: Maps`}>
+              <Tab eventKey={'Maps'} title={`Maps of Historical and Projected ${this.state.variable.label}`}>
                 <Row>
                   <Col lg={12}>
                     <h2>{`
@@ -99,15 +105,17 @@ class App extends Component {
                   </Col>
                 </Row>
               </Tab>
-              <Tab eventKey={'Graph'} title={`Projected ${this.state.variable.label}: Change over Time`}>
+              <Tab eventKey={'Graph'} title={`Graph of Change over Time of Projected ${this.state.variable.label}`}>
                 <Row>
-                  <Col lg={6}>
+                  <Col lg={12}>
                     <h2>{`
                       Range of projected change in
                       ${this.state.season.label}
                       ${this.state.variable.label}
                       for the ${this.state.region.label} region
                     `}</h2>
+                  </Col>
+                  <Col lg={6}>
                     <ChangeOverTimeGraph
                       {...this.state}
                     />
@@ -118,11 +126,6 @@ class App extends Component {
                 Impacts Content
               </Tab>
             </Tabs>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col lg={12}>
           </Col>
         </Row>
       </Grid>
