@@ -5,7 +5,14 @@ import regions from '../../assets/regions';
 import timePeriods from '../../assets/time-periods';
 import seasons from '../../assets/seasons';
 import variables from '../../assets/variables';
+import RegionSelector from '../selectors/RegionSelector';
+import TimePeriodSelector from '../selectors/TimePeriodSelector';
+import SeasonSelector from '../selectors/SeasonSelector';
+import VariableSelector from '../selectors/VariableSelector';
+import ValueMap from '../data-displays/ValueMap';
+
 import styles from './App.css';
+import ChangeOverTimeGraph from '../data-displays/ChangeOverTimeGraph';
 
 class App extends Component {
   state = {
@@ -33,30 +40,25 @@ class App extends Component {
         <Row>
           <Col lg={2}>
             <Label>Region</Label>
-            <Select
-              isSearchable
-              options={regions}
+            <RegionSelector
               value={this.state.region}
               onChange={this.handleChangeRegion}
             />
 
             <Label>Time Period</Label>
-            <Select
-              options={timePeriods}
+            <TimePeriodSelector
               value={this.state.timePeriod}
               onChange={this.handleChangeTimePeriod}
             />
 
             <Label>Season</Label>
-            <Select
-              options={seasons}
+            <SeasonSelector
               value={this.state.season}
               onChange={this.handleChangeSeason}
             />
 
             <Label>Variable of Interest</Label>
-            <Select
-              options={variables}
+            <VariableSelector
               value={this.state.variable}
               onChange={this.handleChangeVariable}
             />
@@ -82,15 +84,18 @@ class App extends Component {
                 <Row>
                   <Col lg={6}>
                     <h3>Historical: 1961-1990</h3>
-                    <div className={'data'}>
-                      Map
-                    </div>
+                    <ValueMap
+                      {...this.state}
+                      timePeriod={{
+                        label: 'Baseline (1961-1990)'
+                      }}
+                    />
                   </Col>
                   <Col lg={6}>
                     <h3>Projected: {this.state.timePeriod.label}</h3>
-                    <div className={'data'}>
-                      Map
-                    </div>
+                    <ValueMap
+                      {...this.state}
+                    />
                   </Col>
                 </Row>
               </Tab>
@@ -103,9 +108,9 @@ class App extends Component {
                       ${this.state.variable.label}
                       for the ${this.state.region.label} region
                     `}</h2>
-                    <div className={'data'}>
-                      Graph
-                    </div>
+                    <ChangeOverTimeGraph
+                      {...this.state}
+                    />
                   </Col>
                 </Row>
               </Tab>
