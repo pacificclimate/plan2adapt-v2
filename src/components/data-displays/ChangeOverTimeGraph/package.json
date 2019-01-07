@@ -1,0 +1,6 @@
+{
+  "name": "ChangeOverTimeGraph",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ChangeOverTimeGraph.js"
+}
