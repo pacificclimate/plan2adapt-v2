@@ -1,0 +1,6 @@
+{
+  "name": "VariableSelector",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./VariableSelector.js"
+}
