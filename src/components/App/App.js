@@ -42,27 +42,29 @@ class App extends Component {
           <Col lg={2}>
             <Panel>
               <Panel.Body>
-                <SelectorLabel>I am interested in information about projected climate change</SelectorLabel>
+                <SelectorLabel>I am interested in information about projected climate change ...</SelectorLabel>
                 {/*<Label>Region</Label>*/}
-                <SelectorLabel>for the region of</SelectorLabel>
+                <SelectorLabel>... for the region of</SelectorLabel>
                 <RegionSelector
                   value={this.state.region}
                   onChange={this.handleChangeRegion}
                 />
 
+                {/*<Label>Time Period</Label>*/}
+                <SelectorLabel>... in the future time period</SelectorLabel>
+                <TimePeriodSelector
+                  value={this.state.timePeriod}
+                  onChange={this.handleChangeTimePeriod}
+                />
+
                 {/*<Label>Season</Label>*/}
-                <SelectorLabel>showing a typical season</SelectorLabel>
+                <SelectorLabel>... showing a typical (average) season</SelectorLabel>
                 <SeasonSelector
                   value={this.state.season}
                   onChange={this.handleChangeSeason}
                 />
 
-                {/*<Label>Time Period</Label>*/}
-                <SelectorLabel>in the future time period</SelectorLabel>
-                <TimePeriodSelector
-                  value={this.state.timePeriod}
-                  onChange={this.handleChangeTimePeriod}
-                />
+                <SelectorLabel>for that period.</SelectorLabel>
 
                 {/*<Label>Variable of Interest</Label>*/}
                 <SelectorLabel>I'd like to see maps and graphs giving details about</SelectorLabel>
