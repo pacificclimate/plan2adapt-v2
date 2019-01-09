@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Grid, Row, Col, Tabs, Tab, Label, Panel } from 'react-bootstrap';
+import {
+  Grid, Row, Col, Tabs, Tab, Label, Panel, Table
+} from 'react-bootstrap';
 import Select from 'react-select';
 import regions from '../../assets/regions';
 import timePeriods from '../../assets/time-periods';
@@ -81,13 +83,68 @@ class App extends Component {
               <Panel.Body>
                 <Tabs
                   id={'main'}
-                  defaultActiveKey={'Maps'}>
+                  defaultActiveKey={'Impacts'}
+                >
                   <Tab eventKey={'Summary'} title={'Summary'}>
                     Summary Content
                   </Tab>
+
                   <Tab eventKey={'Impacts'} title={'Impacts'}>
-                    Impacts Content
+                    <Row>
+                      <Col lg={12}>
+                        <Panel>
+                          <Panel.Body>
+                            <Tabs
+                              id={'impacts'}
+                              defaultActiveKey={'by-impact'}
+                            >
+                              <Tab eventKey={'by-impact'} title={'By Impact'}>
+                                <Table bordered hover>
+                                  <thead>
+                                  <tr>
+                                    <th>Impact</th>
+                                    <th>Affected Sectors</th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  {
+                                    [0, 1, 2].map(key => (
+                                      <tr key={key}>
+                                        <td>impact</td>
+                                        <td>sectors...</td>
+                                      </tr>
+                                    ))
+                                  }
+                                  </tbody>
+                                </Table>
+                              </Tab>
+                              <Tab eventKey={'by-sector'} title={'By Sector'}>
+                                <Table bordered hover>
+                                  <thead>
+                                  <tr>
+                                    <th>Sector</th>
+                                    <th>Impacts on Sector</th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  {
+                                    [0, 1, 2].map(key => (
+                                      <tr key={key}>
+                                        <td>sector</td>
+                                        <td>impacts...</td>
+                                      </tr>
+                                    ))
+                                  }
+                                  </tbody>
+                                </Table>
+                              </Tab>
+                            </Tabs>
+                          </Panel.Body>
+                        </Panel>
+                      </Col>
+                    </Row>
                   </Tab>
+
                   <Tab eventKey={'Maps'} title={`Maps of Historical and Projected ${this.state.variable.label}`}>
                     <Row>
                       <Col lg={12}>
@@ -116,6 +173,7 @@ class App extends Component {
                       </Col>
                     </Row>
                   </Tab>
+
                   <Tab eventKey={'Graph'} title={`Graph of Change over Time of Projected ${this.state.variable.label}`}>
                     <Row>
                       <Col lg={12}>
