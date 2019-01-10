@@ -16,6 +16,8 @@ import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
 
 import styles from './SketchA.css';
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
+import ImpactsByImpact from '../../data-displays/ImpactsByImpact';
+import ImpactsBySector from '../../data-displays/ImpactsBySector';
 
 export default class SketchA extends Component {
   state = {
@@ -99,44 +101,10 @@ export default class SketchA extends Component {
                               defaultActiveKey={'by-impact'}
                             >
                               <Tab eventKey={'by-impact'} title={'By Impact'}>
-                                <Table bordered hover>
-                                  <thead>
-                                  <tr>
-                                    <th>Impact</th>
-                                    <th>Affected Sectors</th>
-                                  </tr>
-                                  </thead>
-                                  <tbody>
-                                  {
-                                    [0, 1, 2].map(key => (
-                                      <tr key={key}>
-                                        <td>impact</td>
-                                        <td>sectors...</td>
-                                      </tr>
-                                    ))
-                                  }
-                                  </tbody>
-                                </Table>
+                                <ImpactsByImpact/>
                               </Tab>
                               <Tab eventKey={'by-sector'} title={'By Sector'}>
-                                <Table bordered hover>
-                                  <thead>
-                                  <tr>
-                                    <th>Sector</th>
-                                    <th>Impacts on Sector</th>
-                                  </tr>
-                                  </thead>
-                                  <tbody>
-                                  {
-                                    [0, 1, 2].map(key => (
-                                      <tr key={key}>
-                                        <td>sector</td>
-                                        <td>impacts...</td>
-                                      </tr>
-                                    ))
-                                  }
-                                  </tbody>
-                                </Table>
+                                <ImpactsBySector/>
                               </Tab>
                             </Tabs>
                           </Panel.Body>
