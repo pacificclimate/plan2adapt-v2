@@ -17,7 +17,7 @@ import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
 import styles from './SketchA.css';
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
 
-class App extends Component {
+export default class SketchA extends Component {
   state = {
     region: regions[0],
     timePeriod: timePeriods[0],
@@ -36,7 +36,7 @@ class App extends Component {
       <Grid fluid>
         <Row>
           <Col lg={12}>
-            <h1>Plan2Adapt v2</h1>
+            <h1>Plan2Adapt v2, Sketch A</h1>
           </Col>
         </Row>
 
@@ -200,5 +200,3 @@ class App extends Component {
     );
   }
 }
-
-export default App;
