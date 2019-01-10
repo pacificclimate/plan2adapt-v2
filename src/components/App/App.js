@@ -6,9 +6,11 @@ import { Route, Redirect, Switch } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import SketchA from '../sketches/SketchA';
+import SketchB from '../sketches/SketchB';
 
 const navSpec = [
   { label: 'Sketch A', path: 'SketchA', component: SketchA },
+  { label: 'Sketch B', path: 'SketchB', component: SketchB },
 ];
 
 
