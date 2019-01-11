@@ -18,6 +18,7 @@ import styles from './SketchB.css';
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import ImpactsByImpact from '../../data-displays/ImpactsByImpact';
 import ImpactsBySector from '../../data-displays/ImpactsBySector';
+import DataMap from '../../maps/DataMap';
 
 export default class SketchB extends Component {
   state = {
@@ -128,7 +129,7 @@ export default class SketchB extends Component {
                     <Row>
                       <Col lg={6}>
                         <h3>Historical: 1961-1990</h3>
-                        <ValueMap
+                        <DataMap
                           {...this.state}
                           timePeriod={{
                             label: 'Baseline (1961-1990)'
@@ -137,8 +138,11 @@ export default class SketchB extends Component {
                       </Col>
                       <Col lg={6}>
                         <h3>Projected: {this.state.timePeriod.label}</h3>
-                        <ValueMap
+                        <DataMap
                           {...this.state}
+                          timePeriod={{
+                            label: 'Baseline (1961-1990)'
+                          }}
                         />
                       </Col>
                     </Row>
