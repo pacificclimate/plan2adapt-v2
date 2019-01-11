@@ -4,7 +4,10 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "leaflet": "^1.4.0",
     "lodash": "^4.17.11",
+    "proj4": "^2.5.0",
+    "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.2",
     "react": "^16.7.0",
     "react-bootstrap": "^0.32.4",
