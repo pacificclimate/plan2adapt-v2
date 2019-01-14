@@ -81,7 +81,7 @@ export default class BCBaseMap extends PureComponent {
             >
                 <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                    url={'https://b.tile.pacificclimate.org/tilecache/tilecache.py' + '/1.0.0/bc_osm/{z}/{x}/{y}.png'}
+                    url={process.env.REACT_APP_TILECACHE_URL + '/1.0.0/bc_osm/{z}/{x}/{y}.png'}
                     subdomains={'abc'}
                     noWrap={true}
                     maxZoom={12}
