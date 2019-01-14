@@ -13,7 +13,7 @@ export default class DataMap extends React.Component {
 
   render() {
     return (
-      <BCBaseMap/>
+      <BCBaseMap {...this.props} />
     );
   }
 }
