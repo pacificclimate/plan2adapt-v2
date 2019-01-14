@@ -61,16 +61,23 @@ export default class BCBaseMap extends PureComponent {
     zoom: 2,
   };
 
+  static initialViewport = {
+    center: {
+      lat: 55.0,
+      lng: -125,
+    },
+    zoom: 2,
+  };
+
     render() {
-        const center = _.pick(BCBaseMap.initial, 'lat', 'lng');
         return (
             <Map
-                crs={crs}
-                center={center}
-                zoom={BCBaseMap.initial.zoom}
-                minZoom={0}   // ?
-                maxZoom={12}  // ? There are only 12 zoom levels defined
-                ref={this.props.mapRef}
+              crs={crs}
+              minZoom={0}   // ?
+              maxZoom={12}  // ? There are only 12 zoom levels defined
+              viewport={this.props.viewport}
+              onViewportChange={this.props.onViewportChange}
+              ref={this.props.mapRef}
             >
                 <TileLayer
                     attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
