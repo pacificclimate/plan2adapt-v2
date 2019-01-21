@@ -6,14 +6,15 @@ import { filter } from 'lodash/fp';
 import regions from '../../../assets/regions';
 import timePeriods from '../../../assets/time-periods';
 import seasons from '../../../assets/seasons';
-import variables from '../../../assets/meta';
+import variables from '../../../assets/variables';
+// import variables from '../../../assets/meta';
 import meta from '../../../assets/meta';
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
-import { TimePeriodSelector } from 'pcic-react-components';
-// import TimePeriodSelector from '../../selectors/TimePeriodSelector/TimePeriodSelector';
+// import { TimePeriodSelector } from 'pcic-react-components';
+import TimePeriodSelector from '../../selectors/TimePeriodSelector/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector/SeasonSelector';
-import { VariableSelector } from 'pcic-react-components';
-// import VariableSelector from '../../selectors/VariableSelector/VariableSelector';
+// import { VariableSelector } from 'pcic-react-components';
+import VariableSelector from '../../selectors/VariableSelector/VariableSelector';
 import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
 
 import styles from './SketchB.css';
@@ -25,14 +26,14 @@ import TwoDataMaps from '../../maps/TwoDataMaps';
 export default class SketchB extends Component {
   state = {
     region: regions[0],
-    timePeriod: timePeriods[0],
+    futureTimePeriod: timePeriods[0],
     season: seasons[0],
     variable: variables[0],
   };
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeRegion = this.handleChangeSelection.bind(this, 'region');
-  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'timePeriod');
+  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriod');
   handleChangeSeason = this.handleChangeSelection.bind(this, 'season');
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
 
@@ -60,8 +61,8 @@ export default class SketchB extends Component {
                 {/*<Label>Time Period</Label>*/}
                 <SelectorLabel>... in the future time period</SelectorLabel>
                 <TimePeriodSelector
-                  bases={filter(m => +m.start_date > 1990)(meta)}
-                  value={this.state.timePeriod}
+                  bases={filter(m => +m.start_date >= 2010)(meta)}
+                  value={this.state.futureTimePeriod}
                   onChange={this.handleChangeTimePeriod}
                 />
 
@@ -131,7 +132,14 @@ export default class SketchB extends Component {
                       </Col>
                     </Row>
                     <TwoDataMaps
-                      {...this.state}
+                      region={this.state.region.value}
+                      historicalTimePeriod={{
+                        start_date: 1961,
+                        end_date: 1990,
+                      }}
+                      futureTimePeriod={this.state.futureTimePeriod.value}
+                      season={this.state.season.value}
+                      variable={this.state.variable.value}
                     />
                   </Tab>
 
