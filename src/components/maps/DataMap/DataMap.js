@@ -4,6 +4,7 @@ import BCBaseMap from '../BCBaseMap';
 import { WMSTileLayer } from 'react-leaflet';
 import _ from 'lodash';
 import './DataMap.css';
+import LayerValuePopup from '../LayerValuePopup';
 
 
 export default class DataMap extends React.Component {
@@ -12,6 +13,8 @@ export default class DataMap extends React.Component {
     timePeriod: PropTypes.object,
     season: PropTypes.string,
     variable: PropTypes.string,
+    popup: PropTypes.object,
+    onPopupChange: PropTypes.func,
   };
 
   static wmsTileLayerStaticProps = {
@@ -57,6 +60,18 @@ export default class DataMap extends React.Component {
     });
   };
 
+  handleClickMap = (event) => {
+    this.props.onPopupChange({
+      ...this.props.popup,
+      isOpen: true,
+      position: event.latlng,
+    })
+  };
+
+  handleClosePopup = () => this.props.onPopupChange({
+    ...this.props.popup, isOpen: false,
+  });
+
   render() {
     const { viewport, onViewportChange } = this.props;
     // For CE (mismatch of base layer, argh)
@@ -76,11 +91,20 @@ export default class DataMap extends React.Component {
     // };
 
     return (
-      <BCBaseMap {...{ viewport, onViewportChange }}>
+      <BCBaseMap {...{ viewport, onViewportChange }}
+        onClick={this.handleClickMap}
+      >
         <WMSTileLayer
           url={process.env.REACT_APP_NCWMS_URL}
           {...DataMap.wmsTileLayerProps(this.props)}
         />
+        {
+          this.props.popup.isOpen &&
+          <LayerValuePopup
+            {...this.props.popup}
+            onClose={this.handleClosePopup}
+          />
+        }
       </BCBaseMap>
     );
   }

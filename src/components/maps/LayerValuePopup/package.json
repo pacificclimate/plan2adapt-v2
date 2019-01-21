@@ -1,0 +1,6 @@
+{
+  "name": "LayerValuePopup",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./LayerValuePopup.js"
+}

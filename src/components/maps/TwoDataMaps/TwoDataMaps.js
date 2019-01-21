@@ -17,12 +17,20 @@ export default class TwoDataMaps extends React.Component {
 
   state = {
     viewport: BCBaseMap.initialViewport,
+    popup: {
+      isOpen: true,
+      position: { lat: 50.0, lng: -123.0 },
+      value: 99,
+    },
   };
 
-  handleChangeViewport = viewport => {
-    console.log('handleChangeViewport', viewport)
-    this.setState({ viewport })
-  };
+  handleChangeSelection = (name, value) => this.setState({ [name]: value });
+  handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
+  handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
+  // handleChangeViewport = viewport => {
+  //   console.log('handleChangeViewport', viewport)
+  //   this.setState({ viewport })
+  // };
 
   render() {
     return (
@@ -36,6 +44,8 @@ export default class TwoDataMaps extends React.Component {
           <DataMap
             viewport={this.state.viewport}
             onViewportChange={this.handleChangeViewport}
+            popup={this.state.popup}
+            onPopupChange={this.handleChangePopup}
             region={this.props.region}
             season={this.props.season}
             variable={this.props.variable}
@@ -51,6 +61,8 @@ export default class TwoDataMaps extends React.Component {
           <DataMap
             viewport={this.state.viewport}
             onViewportChange={this.handleChangeViewport}
+            popup={this.state.popup}
+            onPopupChange={this.handleChangePopup}
             region={this.props.region}
             season={this.props.season}
             variable={this.props.variable}

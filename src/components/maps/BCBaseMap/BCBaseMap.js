@@ -77,6 +77,7 @@ export default class BCBaseMap extends PureComponent {
               maxZoom={12}  // ? There are only 12 zoom levels defined
               viewport={this.props.viewport}
               onViewportChange={this.props.onViewportChange}
+              onClick={this.props.onClick}
               ref={this.props.mapRef}
             >
                 <TileLayer
