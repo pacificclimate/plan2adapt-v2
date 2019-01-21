@@ -1,7 +1,7 @@
 export default [
   {
     label: 'Temperature',
-    value: 'tasmean',
+    value: 'tas',
   },
   {
     label: 'Precipitation',
@@ -9,18 +9,21 @@ export default [
   },
   {
     label: 'Snowfall',
-    value: 'snow',
+    value: 'pass',
   },
   {
     label: 'Growing Degree-Days',
     value: 'gdd',
+    isDisabled: true,
   },
   {
     label: 'Heating Degree-Days',
     value: 'hdd',
+    isDisabled: true,
   },
   {
     label: 'Frost-Free Days',
     value: 'ffd',
+    isDisabled: true,
   },
 ];
