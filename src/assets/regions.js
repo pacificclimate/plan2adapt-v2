@@ -9,23 +9,17 @@ export default [
       {
         label: 'Alberni-Clayoquot',
         value: 'Alberni-Clayoquot',
+        isDisabled: true,
       },
       {
         label: 'Bulkley-Nechako',
         value: 'Bulkley-Nechako',
-      },
-    ],
-  },
-  {
-    label: 'Etc',
-    options: [
-      {
-        label: 'Foo',
-        value: 'Foo',
+        isDisabled: true,
       },
       {
-        label: 'Bar',
-        value: 'Bar',
+        label: '...',
+        value: '...',
+        isDisabled: true,
       },
     ],
   },
