@@ -18,7 +18,13 @@ export default class LayerValuePopup extends React.Component {
         position={this.props.position}
         onClose={this.props.onClose}
       >
-        LayerValuePopup: {this.props.value}
+        {
+          this.props.error ?
+            `${this.props.error}` :
+            this.props.value === null ?
+              'Loading ...' :
+              `Value: ${this.props.value}`
+        }
       </Popup>
     );
   }

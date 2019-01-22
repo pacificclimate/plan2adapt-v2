@@ -3,24 +3,23 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
-import seasons from '../../../assets/seasons';
 
 
 export default class TwoDataMaps extends React.Component {
   static propTypes = {
-    region: PropTypes.object,
+    region: PropTypes.string,
     historicalTimePeriod: PropTypes.object,
     futureTimePeriod: PropTypes.object,
-    season: PropTypes.object,
-    variable: PropTypes.object,
+    season: PropTypes.string,
+    variable: PropTypes.string,
   };
 
   state = {
     viewport: BCBaseMap.initialViewport,
     popup: {
-      isOpen: true,
-      position: { lat: 50.0, lng: -123.0 },
-      value: 99,
+      isOpen: false,
+      // position: { lat: 50.0, lng: -123.0 },
+      // value: 99,
     },
   };
 
