@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import BCBaseMap from '../BCBaseMap';
+import { BCBaseMap } from 'pcic-react-leaflet-components';
 import { WMSTileLayer } from 'react-leaflet';
 import axios from 'axios';
 import { xml2js } from 'xml-js';
