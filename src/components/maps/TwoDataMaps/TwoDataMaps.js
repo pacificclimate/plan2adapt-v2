@@ -18,18 +18,12 @@ export default class TwoDataMaps extends React.Component {
     viewport: BCBaseMap.initialViewport,
     popup: {
       isOpen: false,
-      // position: { lat: 50.0, lng: -123.0 },
-      // value: 99,
     },
   };
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
-  // handleChangeViewport = viewport => {
-  //   console.log('handleChangeViewport', viewport)
-  //   this.setState({ viewport })
-  // };
 
   render() {
     return (

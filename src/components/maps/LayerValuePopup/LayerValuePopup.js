@@ -9,9 +9,6 @@ export default class LayerValuePopup extends React.Component {
     onClose: PropTypes.func,
   };
 
-  state = {
-  };
-
   render() {
     return (
       <Popup

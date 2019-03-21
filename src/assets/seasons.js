@@ -1,6 +1,6 @@
 export default [
   {
-    label: 'Annual',
+    label: 'Year',
     value: 'annual',
   },
   {
