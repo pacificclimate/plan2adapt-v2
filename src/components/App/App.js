@@ -1,53 +1,181 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Navbar, Nav, NavItem } from 'react-bootstrap';
-import { Route, Redirect, Switch } from 'react-router-dom';
-import { LinkContainer } from 'react-router-bootstrap';
+import React, { Component } from 'react';
+import {
+  Grid, Row, Col, Tabs, Tab, Label, Panel, Table
+} from 'react-bootstrap';
+import { filter } from 'lodash/fp';
+import regions from '../../assets/regions';
+import timePeriods from '../../assets/time-periods';
+import seasons from '../../assets/seasons';
+import variables from '../../assets/variables';
+// import variables from '../../../assets/meta';
+import meta from '../../assets/meta';
+import RegionSelector from '../selectors/RegionSelector/RegionSelector';
+// import { TimePeriodSelector } from 'pcic-react-components';
+import TimePeriodSelector from '../selectors/TimePeriodSelector/TimePeriodSelector';
+import SeasonSelector from '../selectors/SeasonSelector/SeasonSelector';
+// import { VariableSelector } from 'pcic-react-components';
+import VariableSelector from '../selectors/VariableSelector/VariableSelector';
+import SelectorLabel from '../misc/SelectorLabel/SelectorLabel';
 
-import SketchA from '../sketches/SketchA';
-import SketchB from '../sketches/SketchB';
+import styles from './App.css';
+import ChangeOverTimeGraph from '../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
+import ImpactsByImpact from '../data-displays/ImpactsByImpact/ImpactsByImpact';
+import ImpactsBySector from '../data-displays/ImpactsBySector/ImpactsBySector';
+import TwoDataMaps from '../maps/TwoDataMaps/TwoDataMaps';
 
-const navSpec = [
-  { label: 'Sketch A', path: 'SketchA', component: SketchA },
-  { label: 'Sketch B', path: 'SketchB', component: SketchB },
-];
-
-
-export default class Template extends React.Component {
-  static propTypes = {
-  };
-
+export default class App extends Component {
   state = {
+    region: regions[0],
+    futureTimePeriod: timePeriods[0],
+    season: seasons[0],
+    variable: variables[0],
   };
+
+  handleChangeSelection = (name, value) => this.setState({ [name]: value });
+  handleChangeRegion = this.handleChangeSelection.bind(this, 'region');
+  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriod');
+  handleChangeSeason = this.handleChangeSelection.bind(this, 'season');
+  handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
 
   render() {
     return (
-      <Router basename={'/#'}>
-        <div>
-          <Navbar fluid>
-            <Nav>
-              {
-                navSpec.map(({label, path}) => (
-                  <LinkContainer to={`/${path}`}>
-                    <NavItem eventKey={path}>
-                      {label}
-                    </NavItem>
-                  </LinkContainer>
-                ))
-              }
-            </Nav>
-          </Navbar>
+      <Grid fluid>
+        <Row>
+          <Col lg={12}>
+            <h1>Plan2Adapt</h1>
+          </Col>
+        </Row>
 
-          <Switch>
-            {
-              navSpec.map(({path, component}) => (
-                <Route path={`/${path}`} component={component}/>
-              ))
-            }
-          </Switch>
-        </div>
-      </Router>
+        <Row>
+          <Col lg={2}>
+            <Panel>
+              <Panel.Body>
+                <SelectorLabel>I am interested in information about projected climate change ...</SelectorLabel>
+                {/*<Label>Region</Label>*/}
+                <SelectorLabel>... for the region of</SelectorLabel>
+                <RegionSelector
+                  value={this.state.region}
+                  onChange={this.handleChangeRegion}
+                />
+
+                {/*<Label>Time Period</Label>*/}
+                <SelectorLabel>... in the future time period</SelectorLabel>
+                <TimePeriodSelector
+                  bases={filter(m => +m.start_date >= 2010)(meta)}
+                  value={this.state.futureTimePeriod}
+                  onChange={this.handleChangeTimePeriod}
+                />
+
+                {/*<Label>Season</Label>*/}
+                <SelectorLabel>... showing a typical (average) season</SelectorLabel>
+                <SeasonSelector
+                  value={this.state.season}
+                  onChange={this.handleChangeSeason}
+                />
+
+                <SelectorLabel>for that period.</SelectorLabel>
+              </Panel.Body>
+            </Panel>
+          </Col>
+
+          <Col lg={10}>
+            <Panel>
+              <Panel.Body>
+                <Tabs
+                  id={'main'}
+                  defaultActiveKey={'Maps'}
+                >
+                  <Tab eventKey={'Summary'} title={'Summary'}>
+                    Summary Content
+                  </Tab>
+
+                  <Tab eventKey={'Impacts'} title={'Impacts'}>
+                    <Row>
+                      <Col lg={12}>
+                        <Panel>
+                          <Panel.Body>
+                            <Tabs
+                              id={'impacts'}
+                              defaultActiveKey={'by-impact'}
+                            >
+                              <Tab eventKey={'by-impact'} title={'By Impact'}>
+                                <ImpactsByImpact/>
+                              </Tab>
+                              <Tab eventKey={'by-sector'} title={'By Sector'}>
+                                <ImpactsBySector/>
+                              </Tab>
+                            </Tabs>
+                          </Panel.Body>
+                        </Panel>
+                      </Col>
+                    </Row>
+                  </Tab>
+
+                  <Tab eventKey={'Maps'} title={`Maps`}>
+                    <Row>
+                      <Col lg={2}>
+                        <SelectorLabel>Show details about</SelectorLabel>
+                        <VariableSelector
+                          bases={meta}
+                          value={this.state.variable}
+                          onChange={this.handleChangeVariable}
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12}>
+                        <h2>{`
+                          ${this.state.season.label}
+                          ${this.state.variable.label}
+                          for the ${this.state.region.label} region
+                        `}</h2>
+                      </Col>
+                    </Row>
+                    <TwoDataMaps
+                      region={this.state.region.value}
+                      historicalTimePeriod={{
+                        start_date: 1961,
+                        end_date: 1990,
+                      }}
+                      futureTimePeriod={this.state.futureTimePeriod.value}
+                      season={this.state.season.value}
+                      variable={this.state.variable.value}
+                    />
+                  </Tab>
+
+                  <Tab eventKey={'Graph'} title={`Graph`}>
+                    <Row>
+                      <Col lg={2}>
+                        <SelectorLabel>Show details about</SelectorLabel>
+                        <VariableSelector
+                          bases={meta}
+                          value={this.state.variable}
+                          onChange={this.handleChangeVariable}
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12}>
+                        <h2>{`
+                          Range of projected change in
+                          ${this.state.season.label}
+                          ${this.state.variable.label}
+                          for the ${this.state.region.label} region
+                        `}</h2>
+                      </Col>
+                      <Col lg={6}>
+                        <ChangeOverTimeGraph
+                          {...this.state}
+                        />
+                      </Col>
+                    </Row>
+                  </Tab>
+                </Tabs>
+              </Panel.Body>
+            </Panel>
+          </Col>
+        </Row>
+      </Grid>
     );
   }
 }
