@@ -28,3 +28,18 @@ For more information on architecture and design, see
 
 ## [Project initialization](docs/Project-initialization.md)
 
+## Package dependencies security vulnerabilities
+
+Since npm@6, npm has included a tool,
+[`npm audit`](https://blog.npmjs.org/post/173719309445/npm-audit-identify-and-fix-insecure) 
+to protect code from known security risks in package dependencies.
+
+`npm audit` runs automatically whenever `npm install` is run, and can also
+be run independently from the command line.
+
+`npm audit` shows, at the time of this writing, 63 low-concern 
+vulnerabilities, all due to package `braces`. Given the low concern and the
+nature of the vulnerability, it is not worth addressing at this time.
+
+The output of `npm audit` should be heeded, and if other vulnerabilities 
+are flagged, they should be evaluated and addressed if necessary.
