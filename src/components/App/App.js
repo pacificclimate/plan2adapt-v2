@@ -1,27 +1,25 @@
 import React, { Component } from 'react';
 import {
-  Grid, Row, Col, Tabs, Tab, Label, Panel, Table
+  Grid, Row, Col, Tabs, Tab, Panel,
 } from 'react-bootstrap';
 import { filter } from 'lodash/fp';
 import regions from '../../assets/regions';
 import timePeriods from '../../assets/time-periods';
 import seasons from '../../assets/seasons';
 import variables from '../../assets/variables';
-// import variables from '../../../assets/meta';
 import meta from '../../assets/meta';
 import RegionSelector from '../selectors/RegionSelector/RegionSelector';
-// import { TimePeriodSelector } from 'pcic-react-components';
 import TimePeriodSelector from '../selectors/TimePeriodSelector/TimePeriodSelector';
 import SeasonSelector from '../selectors/SeasonSelector/SeasonSelector';
-// import { VariableSelector } from 'pcic-react-components';
 import VariableSelector from '../selectors/VariableSelector/VariableSelector';
 import SelectorLabel from '../misc/SelectorLabel/SelectorLabel';
 
-import styles from './App.css';
 import ChangeOverTimeGraph from '../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
 import ImpactsByImpact from '../data-displays/ImpactsByImpact/ImpactsByImpact';
 import ImpactsBySector from '../data-displays/ImpactsBySector/ImpactsBySector';
 import TwoDataMaps from '../maps/TwoDataMaps/TwoDataMaps';
+
+import styles from './App.css';
 
 export default class App extends Component {
   state = {
@@ -51,14 +49,12 @@ export default class App extends Component {
             <Panel>
               <Panel.Body>
                 <SelectorLabel>I am interested in information about projected climate change ...</SelectorLabel>
-                {/*<Label>Region</Label>*/}
                 <SelectorLabel>... for the region of</SelectorLabel>
                 <RegionSelector
                   value={this.state.region}
                   onChange={this.handleChangeRegion}
                 />
 
-                {/*<Label>Time Period</Label>*/}
                 <SelectorLabel>... in the future time period</SelectorLabel>
                 <TimePeriodSelector
                   bases={filter(m => +m.start_date >= 2010)(meta)}
@@ -66,8 +62,7 @@ export default class App extends Component {
                   onChange={this.handleChangeTimePeriod}
                 />
 
-                {/*<Label>Season</Label>*/}
-                <SelectorLabel>... showing a typical (average) season</SelectorLabel>
+                <SelectorLabel>... showing a typical (average)</SelectorLabel>
                 <SeasonSelector
                   value={this.state.season}
                   onChange={this.handleChangeSeason}
