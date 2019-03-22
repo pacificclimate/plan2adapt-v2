@@ -3,21 +3,22 @@ import {
   Grid, Row, Col, Tabs, Tab, Panel,
 } from 'react-bootstrap';
 import { filter } from 'lodash/fp';
-import regions from '../../assets/regions';
-import timePeriods from '../../assets/time-periods';
-import seasons from '../../assets/seasons';
-import variables from '../../assets/variables';
-import meta from '../../assets/meta';
-import RegionSelector from '../selectors/RegionSelector/RegionSelector';
-import TimePeriodSelector from '../selectors/TimePeriodSelector/TimePeriodSelector';
-import SeasonSelector from '../selectors/SeasonSelector/SeasonSelector';
-import VariableSelector from '../selectors/VariableSelector/VariableSelector';
-import SelectorLabel from '../misc/SelectorLabel/SelectorLabel';
+import regions from '../../../assets/regions';
+import timePeriods from '../../../assets/time-periods';
+import seasons from '../../../assets/seasons';
+import variables from '../../../assets/variables';
+import meta from '../../../assets/meta';
+import AppHeader from '../AppHeader';
+import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
+import TimePeriodSelector from '../../selectors/TimePeriodSelector/TimePeriodSelector';
+import SeasonSelector from '../../selectors/SeasonSelector/SeasonSelector';
+import VariableSelector from '../../selectors/VariableSelector/VariableSelector';
+import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
 
-import ChangeOverTimeGraph from '../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
-import ImpactsByImpact from '../data-displays/ImpactsByImpact/ImpactsByImpact';
-import ImpactsBySector from '../data-displays/ImpactsBySector/ImpactsBySector';
-import TwoDataMaps from '../maps/TwoDataMaps/TwoDataMaps';
+import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
+import ImpactsByImpact from '../../data-displays/ImpactsByImpact/ImpactsByImpact';
+import ImpactsBySector from '../../data-displays/ImpactsBySector/ImpactsBySector';
+import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
 
@@ -38,11 +39,7 @@ export default class App extends Component {
   render() {
     return (
       <Grid fluid>
-        <Row>
-          <Col lg={12}>
-            <h1>Plan2Adapt</h1>
-          </Col>
-        </Row>
+        <AppHeader/>
 
         <Row>
           <Col lg={2}>
