@@ -49,31 +49,39 @@ export default class App extends Component {
         <AppHeader/>
 
         <Row>
-          <Col lg={2}>
-            <SelectorLabel>I am interested in information about projected climate change ...</SelectorLabel>
-            <SelectorLabel>... for the region of</SelectorLabel>
-            <RegionSelector
-              value={this.state.region}
-              onChange={this.handleChangeRegion}
-            />
-
-            <SelectorLabel>... in the future time period</SelectorLabel>
-            <TimePeriodSelector
-              bases={filter(m => +m.start_date >= 2010)(meta)}
-              value={this.state.futureTimePeriod}
-              onChange={this.handleChangeTimePeriod}
-            />
-
-            <SelectorLabel>... showing a typical (average)</SelectorLabel>
-            <SeasonSelector
-              value={this.state.season}
-              onChange={this.handleChangeSeason}
-            />
-
-            <SelectorLabel>for that period.</SelectorLabel>
+          <Col xl={2} lg={12} md={12}>
+            <Row>
+              <Col>{`
+              I am interested in information about projected climate change ...
+              `}</Col>
+            </Row>
+            <Row>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`for an average`}</Col>
+              <Col xl={12} lg={2} md={3}>
+                <SeasonSelector
+                  value={this.state.season}
+                  onChange={this.handleChangeSeason}
+                />
+              </Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`in`}</Col>
+              <Col xl={12} lg={3} md={6}>
+                <RegionSelector
+                  value={this.state.region}
+                  onChange={this.handleChangeRegion}
+                />
+              </Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`during the`}</Col>
+              <Col xl={12} lg={3} md={4}>
+                <TimePeriodSelector
+                  bases={filter(m => +m.start_date >= 2010)(meta)}
+                  value={this.state.futureTimePeriod}
+                  onChange={this.handleChangeTimePeriod}
+                />
+              </Col>
+            </Row>
           </Col>
 
-          <Col lg={10}>
+          <Col xl={10} lg={12} md={12}>
             <Tabs
               id={'main'}
               defaultActiveKey={'Maps'}
