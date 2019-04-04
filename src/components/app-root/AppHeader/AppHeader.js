@@ -13,8 +13,8 @@ export default class AppHeader extends React.Component {
 
   render() {
     return (
-      <Row className={'AppHeader'}>
-        <Col lg={12}>
+      <Row className={'AppHeader justify-content-center'}>
+        <Col lg={'auto'} md={'auto'} sm={'auto'}>
           <a href='https://pacificclimate.org/' className={'logo'}>
             <img
               src={pcicLogo}
