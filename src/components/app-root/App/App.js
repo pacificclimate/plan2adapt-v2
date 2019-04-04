@@ -56,7 +56,7 @@ export default class App extends Component {
               `}</Col>
             </Row>
             <Row>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`for an average`}</Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`for a typical`}</Col>
               <Col xl={12} lg={2} md={3}>
                 <SeasonSelector
                   value={this.state.season}
@@ -87,7 +87,11 @@ export default class App extends Component {
               defaultActiveKey={'Maps'}
             >
               <Tab eventKey={'Summary'} title={'Summary'}>
-                Summary Content
+                <h2>{`
+                  Summary of Climate Change 
+                  for ${this.state.region.label} 
+                  in the ${this.state.futureTimePeriod.value.shorthand}
+                `}</h2>
               </Tab>
 
               <Tab eventKey={'Impacts'} title={'Impacts'}>
@@ -110,8 +114,10 @@ export default class App extends Component {
 
               <Tab eventKey={'Maps'} title={`Maps`}>
                 <Row>
-                  <Col lg={2}>
-                    <SelectorLabel>Show details about</SelectorLabel>
+                  <Col xs={'auto'} className='pr-0'>
+                    {`Show details about`}
+                  </Col>
+                  <Col sm={4} xs={6}>
                     <VariableSelector
                       bases={meta}
                       value={this.state.variable}

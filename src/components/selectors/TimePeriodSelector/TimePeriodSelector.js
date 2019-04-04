@@ -10,10 +10,14 @@ export default class TimePeriodSelector extends React.Component {
     onChange: PropTypes.func,
   };
 
+  static formatOptionLabel = ({ value: { shorthand, start_date, end_date } }) =>
+    `${shorthand} (${start_date}-${end_date})`;
+
   render() {
     return (
       <Select
         options={timePeriods}
+        formatOptionLabel={TimePeriodSelector.formatOptionLabel}
         value={this.props.value}
         onChange={this.props.onChange}
       />
