@@ -8,22 +8,18 @@ export const ExternalTextContext = React.createContext(
 );
 
 
-export const withExternalText = WrappedComponent => {
+export const withExternalText = loadTexts => WrappedComponent => {
   class ExternalTextEnhancedComponent extends React.Component {
-    static propTypes = {
-      loadTexts: PropTypes.func.isRequired,
+    state = {
+      texts: null,
     };
 
     setTexts = texts => {
       this.setState({ texts });
     };
 
-    state = {
-      texts: null,
-    };
-
     componentDidMount() {
-      this.props.loadTexts(this.setTexts);
+      loadTexts(this.setTexts);
     }
 
     render() {

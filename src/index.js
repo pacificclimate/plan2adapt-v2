@@ -5,8 +5,6 @@ import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
 import { withExternalText } from './utils/external-text';
 
-const EnhancedApp = withExternalText(App);
-
 const loadTexts = setTexts => {
   setTimeout(() => {
     setTexts({
@@ -15,8 +13,10 @@ const loadTexts = setTexts => {
   }, 3000);
 };
 
+const EnhancedApp = withExternalText(loadTexts)(App);
+
 ReactDOM.render(
-  <EnhancedApp loadTexts={loadTexts}/>,
+  <EnhancedApp/>,
   document.getElementById('root')
 );
 
