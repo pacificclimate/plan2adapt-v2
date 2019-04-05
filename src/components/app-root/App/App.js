@@ -15,7 +15,9 @@ import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
 import meta from '../../../assets/meta';
 
+import ExternalText from '../../../utils/external-text';
 import AppHeader from '../AppHeader';
+
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
 import TimePeriodSelector from '../../selectors/TimePeriodSelector/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector/SeasonSelector';
@@ -46,6 +48,12 @@ export default class App extends Component {
   render() {
     return (
       <Container fluid>
+        <Row>
+          <Col>
+            Greeting: <ExternalText item={'greeting'} context={{ name: 'Rod' }}/>
+          </Col>
+        </Row>
+
         <AppHeader/>
 
         <Row>

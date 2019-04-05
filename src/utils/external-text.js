@@ -3,12 +3,21 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 // Global variable that holds all current texts.
-let texts = null;
+let _texts = null;
 
 
-export const setTexts = t => {
-  texts = t;
+export const setTexts = texts => {
+  _texts = texts;
+  console.log('setTexts', _texts);
 };
+
+
+// HOC that injects `texts` into props of `WrappedComponent`.
+const withTexts = WrappedComponent => (
+  props => (
+    <WrappedComponent texts={_texts} {...props}/>
+  )
+);
 
 
 export function evaluateTemplateLiteral(s, context={}) {
@@ -22,22 +31,26 @@ export function evaluateTemplateLiteral(s, context={}) {
 }
 
 
-export default class ExternalText extends React.Component {
+class MarkdownText extends React.Component {
   static propTypes = {
+    texts: PropTypes.object,
     item: PropTypes.string,
     context: PropTypes.object,
   };
 
   render() {
-    const text = (texts && texts[this.props.item]) || `{{${this.props.item}}}`;
-    const source = evaluateTemplateLiteral(text, this.props.context);
+    const { texts, item, context } = this.props;
+    const text = (texts && texts[item]) || `{{${item}}}`;
+    const source = evaluateTemplateLiteral(text, context);
     return (
       <ReactMarkdown source={source}/>
     );
   }
 }
 
-// export {
-//   setTexts,
-//   ExternalText as default,
-// };
+
+const ExternalText = withTexts(MarkdownText);
+ExternalText.setTexts = setTexts;
+
+export default ExternalText;
+

@@ -32,7 +32,6 @@ describe("evaluateTemplateLiteral", () => {
   });
 });
 
-
 describe("ExternalText", () => {
   beforeAll(() => {
     setTexts({
@@ -54,6 +53,15 @@ First content.
 Second content.
       `
     });
+  });
+
+  it("renders the key when no such item exists", () => {
+    const tree = renderer.create(<ExternalText item={"foo"} />).toJSON();
+    expect(tree).toMatchInlineSnapshot(`
+<p>
+  {{foo}}
+</p>
+`);
   });
 
   it("handles a simple case", () => {
@@ -99,6 +107,29 @@ Array [
       
   </p>,
 ]
+`);
+  });
+
+  it("re-renders when texts are changed", () => {
+    const context = { name: "world" };
+
+    const component = renderer.create(
+      <ExternalText item={"greeting"} context={context} />
+    );
+    const tree1 = component.toJSON();
+    expect(tree1).toMatchInlineSnapshot(`
+<p>
+  Hello, world
+</p>
+`);
+
+    setTexts({ greeting: "Bonjour, ${name}" });
+
+    const tree2 = component.toJSON();
+    expect(tree2).toMatchInlineSnapshot(`
+<p>
+  Bonjour, world
+</p>
 `);
   });
 });
