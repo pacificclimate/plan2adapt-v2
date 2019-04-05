@@ -3,7 +3,40 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 
-export const ExternalTextContext = React.createContext(null);
+export const ExternalTextContext = React.createContext(
+  null
+);
+
+
+export const withExternalText = WrappedComponent => {
+  class ExternalTextEnhancedComponent extends React.Component {
+    static propTypes = {
+      loadTexts: PropTypes.func.isRequired,
+    };
+
+    setTexts = texts => {
+      this.setState({ texts });
+    };
+
+    state = {
+      texts: null,
+    };
+
+    componentDidMount() {
+      this.props.loadTexts(this.setTexts);
+    }
+
+    render() {
+      return (
+        <ExternalTextContext.Provider value={this.state.texts}>
+          <WrappedComponent {...this.props}/>
+        </ExternalTextContext.Provider>
+      );
+    }
+  }
+  ExternalTextEnhancedComponent.contextType = ExternalTextContext;  // ??
+  return ExternalTextEnhancedComponent;
+};
 
 
 export function evaluateTemplateLiteral(s, context={}) {
@@ -20,7 +53,7 @@ export function evaluateTemplateLiteral(s, context={}) {
 class ExternalText extends React.Component {
   static propTypes = {
     item: PropTypes.string,
-    context: PropTypes.object,
+    context: PropTypes.object,  // Context in which to evaluate item's text.
   };
 
   render() {

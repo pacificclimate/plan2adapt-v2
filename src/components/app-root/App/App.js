@@ -34,7 +34,6 @@ import ReactDOM from 'react-dom';
 
 export default class App extends Component {
   state = {
-    texts: null,
     region: regions[0],
     futureTimePeriod: timePeriods[0],
     season: seasons[0],
@@ -47,156 +46,146 @@ export default class App extends Component {
   handleChangeSeason = this.handleChangeSelection.bind(this, 'season');
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({
-        texts: { greeting: 'Hello, ${name}' },
-      });
-    }, 5000);
-  }
-
   render() {
     return (
-      <ExternalTextContext.Provider value={this.state.texts}>
-        <Container fluid>
-          <Row>
-            <Col>
-              Greeting: <ExternalText item={'greeting'} context={{ name: 'Rod' }}/>
-            </Col>
-          </Row>
+      <Container fluid>
+        <Row>
+          <Col>
+            Greeting: <ExternalText item={'greeting'} context={{ name: 'Rod' }}/>
+          </Col>
+        </Row>
 
-          <AppHeader/>
+        <AppHeader/>
 
-          <Row>
-            <Col xl={2} lg={12} md={12}>
-              <Row>
-                <Col>{`
-                I am interested in information about projected climate change ...
-                `}</Col>
-              </Row>
-              <Row>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`for a typical`}</Col>
-                <Col xl={12} lg={2} md={3}>
-                  <SeasonSelector
-                    value={this.state.season}
-                    onChange={this.handleChangeSeason}
-                  />
-                </Col>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`in`}</Col>
-                <Col xl={12} lg={3} md={6}>
-                  <RegionSelector
-                    value={this.state.region}
-                    onChange={this.handleChangeRegion}
-                  />
-                </Col>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`during the`}</Col>
-                <Col xl={12} lg={3} md={4}>
-                  <TimePeriodSelector
-                    bases={filter(m => +m.start_date >= 2010)(meta)}
-                    value={this.state.futureTimePeriod}
-                    onChange={this.handleChangeTimePeriod}
-                  />
-                </Col>
-              </Row>
-            </Col>
+        <Row>
+          <Col xl={2} lg={12} md={12}>
+            <Row>
+              <Col>{`
+              I am interested in information about projected climate change ...
+              `}</Col>
+            </Row>
+            <Row>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`for a typical`}</Col>
+              <Col xl={12} lg={2} md={3}>
+                <SeasonSelector
+                  value={this.state.season}
+                  onChange={this.handleChangeSeason}
+                />
+              </Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`in`}</Col>
+              <Col xl={12} lg={3} md={6}>
+                <RegionSelector
+                  value={this.state.region}
+                  onChange={this.handleChangeRegion}
+                />
+              </Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`during the`}</Col>
+              <Col xl={12} lg={3} md={4}>
+                <TimePeriodSelector
+                  bases={filter(m => +m.start_date >= 2010)(meta)}
+                  value={this.state.futureTimePeriod}
+                  onChange={this.handleChangeTimePeriod}
+                />
+              </Col>
+            </Row>
+          </Col>
 
-            <Col xl={10} lg={12} md={12}>
-              <Tabs
-                id={'main'}
-                defaultActiveKey={'Maps'}
-              >
-                <Tab eventKey={'Summary'} title={'Summary'}>
-                  <h2>{`
-                    Summary of Climate Change 
-                    for ${this.state.region.label} 
-                    in the ${this.state.futureTimePeriod.value.shorthand}
-                  `}</h2>
-                </Tab>
+          <Col xl={10} lg={12} md={12}>
+            <Tabs
+              id={'main'}
+              defaultActiveKey={'Maps'}
+            >
+              <Tab eventKey={'Summary'} title={'Summary'}>
+                <h2>{`
+                  Summary of Climate Change 
+                  for ${this.state.region.label} 
+                  in the ${this.state.futureTimePeriod.value.shorthand}
+                `}</h2>
+              </Tab>
 
-                <Tab eventKey={'Impacts'} title={'Impacts'}>
-                  <Row>
-                    <Col lg={12}>
-                      <Tabs
-                        id={'impacts'}
-                        defaultActiveKey={'by-impact'}
-                      >
-                        <Tab eventKey={'by-impact'} title={'By Impact'}>
-                          <ImpactsByImpact/>
-                        </Tab>
-                        <Tab eventKey={'by-sector'} title={'By Sector'}>
-                          <ImpactsBySector/>
-                        </Tab>
-                      </Tabs>
-                    </Col>
-                  </Row>
-                </Tab>
+              <Tab eventKey={'Impacts'} title={'Impacts'}>
+                <Row>
+                  <Col lg={12}>
+                    <Tabs
+                      id={'impacts'}
+                      defaultActiveKey={'by-impact'}
+                    >
+                      <Tab eventKey={'by-impact'} title={'By Impact'}>
+                        <ImpactsByImpact/>
+                      </Tab>
+                      <Tab eventKey={'by-sector'} title={'By Sector'}>
+                        <ImpactsBySector/>
+                      </Tab>
+                    </Tabs>
+                  </Col>
+                </Row>
+              </Tab>
 
-                <Tab eventKey={'Maps'} title={`Maps`}>
-                  <Row>
-                    <Col xs={'auto'} className='pr-0'>
-                      {`Show details about`}
-                    </Col>
-                    <Col sm={4} xs={6}>
-                      <VariableSelector
-                        bases={meta}
-                        value={this.state.variable}
-                        onChange={this.handleChangeVariable}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col lg={12}>
-                      <h2>{`
-                        ${this.state.season.label}
-                        ${this.state.variable.label}
-                        for the ${this.state.region.label} region
-                      `}</h2>
-                    </Col>
-                  </Row>
-                  <TwoDataMaps
-                    region={this.state.region.value}
-                    historicalTimePeriod={{
-                      start_date: 1961,
-                      end_date: 1990,
-                    }}
-                    futureTimePeriod={this.state.futureTimePeriod.value}
-                    season={this.state.season.value}
-                    variable={this.state.variable.value}
-                  />
-                </Tab>
+              <Tab eventKey={'Maps'} title={`Maps`}>
+                <Row>
+                  <Col xs={'auto'} className='pr-0'>
+                    {`Show details about`}
+                  </Col>
+                  <Col sm={4} xs={6}>
+                    <VariableSelector
+                      bases={meta}
+                      value={this.state.variable}
+                      onChange={this.handleChangeVariable}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg={12}>
+                    <h2>{`
+                      ${this.state.season.label}
+                      ${this.state.variable.label}
+                      for the ${this.state.region.label} region
+                    `}</h2>
+                  </Col>
+                </Row>
+                <TwoDataMaps
+                  region={this.state.region.value}
+                  historicalTimePeriod={{
+                    start_date: 1961,
+                    end_date: 1990,
+                  }}
+                  futureTimePeriod={this.state.futureTimePeriod.value}
+                  season={this.state.season.value}
+                  variable={this.state.variable.value}
+                />
+              </Tab>
 
-                <Tab eventKey={'Graph'} title={`Graph`}>
-                  <Row>
-                    <Col lg={2}>
-                      <SelectorLabel>Show details about</SelectorLabel>
-                      <VariableSelector
-                        bases={meta}
-                        value={this.state.variable}
-                        onChange={this.handleChangeVariable}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col lg={12}>
-                      <h2>{`
-                        Range of projected change in
-                        ${this.state.season.label}
-                        ${this.state.variable.label}
-                        for the ${this.state.region.label} region
-                      `}</h2>
-                    </Col>
-                    <Col lg={6}>
-                      <ChangeOverTimeGraph
-                        {...this.state}
-                      />
-                    </Col>
-                  </Row>
-                </Tab>
-              </Tabs>
-            </Col>
-          </Row>
-        </Container>
-      </ExternalTextContext.Provider>
+              <Tab eventKey={'Graph'} title={`Graph`}>
+                <Row>
+                  <Col lg={2}>
+                    <SelectorLabel>Show details about</SelectorLabel>
+                    <VariableSelector
+                      bases={meta}
+                      value={this.state.variable}
+                      onChange={this.handleChangeVariable}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg={12}>
+                    <h2>{`
+                      Range of projected change in
+                      ${this.state.season.label}
+                      ${this.state.variable.label}
+                      for the ${this.state.region.label} region
+                    `}</h2>
+                  </Col>
+                  <Col lg={6}>
+                    <ChangeOverTimeGraph
+                      {...this.state}
+                    />
+                  </Col>
+                </Row>
+              </Tab>
+            </Tabs>
+          </Col>
+        </Row>
+      </Container>
     );
   }
 }
