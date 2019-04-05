@@ -9,6 +9,7 @@
     "lodash": "^4.17.11",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.0.0",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git",
+    "prettier": "^1.16.4",
     "proj4": "^2.5.0",
     "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.2",
@@ -17,9 +18,14 @@
     "react-dom": "^16.8.6",
     "react-icons": "^3.5.0",
     "react-leaflet": "^2.1.4",
+    "react-markdown": "^4.0.6",
     "react-scripts": "^2.1.8",
     "react-select": "^2.3.0",
     "xml-js": "^1.6.9"
+  },
+  "devDependencies": {
+    "jest-each": "^24.7.1",
+    "react-test-renderer": "^16.8.6"
   },
   "scripts": {
     "start": "react-scripts start",
