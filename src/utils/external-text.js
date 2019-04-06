@@ -3,12 +3,12 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 
-export const ExternalTextContext = React.createContext(
+export const ExternalTextsContext = React.createContext(
   null
 );
 
 
-export const withExternalText = loadTexts => WrappedComponent => {
+export const withExternalTexts = loadTexts => WrappedComponent => {
   class ExternalTextEnhancedComponent extends React.Component {
     state = {
       texts: null,
@@ -24,18 +24,18 @@ export const withExternalText = loadTexts => WrappedComponent => {
 
     render() {
       return (
-        <ExternalTextContext.Provider value={this.state.texts}>
+        <ExternalTextsContext.Provider value={this.state.texts}>
           <WrappedComponent {...this.props}/>
-        </ExternalTextContext.Provider>
+        </ExternalTextsContext.Provider>
       );
     }
   }
-  ExternalTextEnhancedComponent.contextType = ExternalTextContext;  // ??
+  ExternalTextEnhancedComponent.contextType = ExternalTextsContext;  // ??
   return ExternalTextEnhancedComponent;
 };
 
 
-export function evaluateTemplateLiteral(s, context={}) {
+export function evaluateAsTemplateLiteral(s, context={}) {
   // Convert string `s` to a template literal and evaluate it in a context
   // where all the properties of object `context` are available as identifiers
   // at the top level. (E.g., if `context = { 'a': 1, 'b': 2 }`, then
@@ -56,12 +56,12 @@ class ExternalText extends React.Component {
     const texts = this.context;
     const { item, context } = this.props;
     const text = (texts && texts[item]) || `{{${item}}}`;
-    const source = evaluateTemplateLiteral(text, context);
+    const source = evaluateAsTemplateLiteral(text, context);
     return (
       <ReactMarkdown source={source}/>
     );
   }
 }
-ExternalText.contextType = ExternalTextContext;
+ExternalText.contextType = ExternalTextsContext;
 
 export default ExternalText;

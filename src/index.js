@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
-import { withExternalText } from './utils/external-text';
+import { withExternalTexts } from './utils/external-text';
 
 const loadTexts = setTexts => {
   setTimeout(() => {
@@ -13,7 +13,7 @@ const loadTexts = setTexts => {
   }, 3000);
 };
 
-const EnhancedApp = withExternalText(loadTexts)(App);
+const EnhancedApp = withExternalTexts(loadTexts)(App);
 
 ReactDOM.render(
   <EnhancedApp/>,

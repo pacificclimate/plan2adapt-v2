@@ -15,7 +15,7 @@ import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
 import meta from '../../../assets/meta';
 
-import ExternalText, { ExternalTextContext } from '../../../utils/external-text';
+import ExternalText from '../../../utils/external-text';
 import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';

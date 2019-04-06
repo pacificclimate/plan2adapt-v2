@@ -3,24 +3,24 @@ import renderer from "react-test-renderer";
 import each from "jest-each";
 
 import ExternalText, {
-  evaluateTemplateLiteral,
+  evaluateAsTemplateLiteral,
   setTexts
 } from "./external-text";
 
-describe("evaluateTemplateLiteral", () => {
+describe("evaluateAsTemplateLiteral", () => {
   it("works without interpolation", () => {
-    expect(evaluateTemplateLiteral("Hello")).toBe("Hello");
+    expect(evaluateAsTemplateLiteral("Hello")).toBe("Hello");
   });
 
   it("works with simple interpolation", () => {
-    expect(evaluateTemplateLiteral("Hello, ${name}", { name: "world" })).toBe(
+    expect(evaluateAsTemplateLiteral("Hello, ${name}", { name: "world" })).toBe(
       "Hello, world"
     );
   });
 
   it("works with complex interpolation", () => {
     expect(
-      evaluateTemplateLiteral(
+      evaluateAsTemplateLiteral(
         "${greeting}, ${name}. ${values.x} + ${values.y} = ${ values.x + values.y }",
         {
           greeting: "Bonjour",
