@@ -8,31 +8,35 @@ export const ExternalTextsContext = React.createContext(
 );
 
 
-export const withExternalTexts = loadTexts => WrappedComponent => {
-  class ExternalTextEnhancedComponent extends React.Component {
-    state = {
-      texts: null,
-    };
+export class WithExternalTexts extends React.Component {
+  static propTypes = {
+    texts: PropTypes.object,
+    loadTexts: PropTypes.func,
+  };
 
-    setTexts = texts => {
-      this.setState({ texts });
-    };
+  state = {
+    texts: null,
+  };
 
-    componentDidMount() {
-      loadTexts(this.setTexts);
-    }
+  setTexts = texts => {
+    this.setState({ texts });
+  };
 
-    render() {
-      return (
-        <ExternalTextsContext.Provider value={this.state.texts}>
-          <WrappedComponent {...this.props}/>
-        </ExternalTextsContext.Provider>
-      );
+  componentDidMount() {
+    this.setTexts(this.props.texts);
+    if (this.props.loadTexts) {
+      this.props.loadTexts(this.setTexts);
     }
   }
-  ExternalTextEnhancedComponent.contextType = ExternalTextsContext;  // ??
-  return ExternalTextEnhancedComponent;
-};
+
+  render() {
+    return (
+      <ExternalTextsContext.Provider value={this.state.texts}>
+        {this.props.children}
+      </ExternalTextsContext.Provider>
+    );
+  }
+}
 
 
 export function evaluateAsTemplateLiteral(s, context={}) {
