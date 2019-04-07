@@ -4,7 +4,7 @@ import each from "jest-each";
 
 import ExternalText, {
   evaluateAsTemplateLiteral,
-  setTexts
+  WithExternalTexts
 } from "./external-text";
 
 describe("evaluateAsTemplateLiteral", () => {
@@ -32,14 +32,53 @@ describe("evaluateAsTemplateLiteral", () => {
   });
 });
 
+class C {
+  constructor(value, loadValue) {
+    this.value = value;
+    loadValue(this.setValue);
+  }
+
+  setValue = v => { this.value = v; };
+}
+
+class AsyncLoader {
+  // Simulate an asynchronous loader, like an HTTP request or filesystem read.
+  // Basically, register a callback and call it back under program control.
+
+  // Register the callback.
+  loadValue = callback => {
+    this.callback = callback;
+  };
+
+  // Call the callback.
+  resolve(value) {
+    this.callback(value);
+  }
+}
+
+describe('async loading test helper', () => {
+  it('works in the sync case', () => {
+    const c = new C(0, set => set(1));
+    expect(c.value).toBe(1);
+  });
+
+  it('works in the (simulated) async case', () => {
+    const asyncLoader = new AsyncLoader(1);
+    const c = new C(0, asyncLoader.loadValue);
+    expect(c.value).toBe(0);
+    asyncLoader.resolve(1);
+    expect(c.value).toBe(1);
+  });
+});
+
+
 describe("ExternalText", () => {
-  beforeAll(() => {
-    setTexts({
-      greeting: "Hello, ${name}",
-      heading1: "# Heading 1",
-      heading2: "## Heading 2",
-      heading3: "### Heading 3",
-      composite: `
+  const texts = {
+    greeting: "Hello, ${name}",
+    heading1: "# Heading 1",
+    heading2: "## Heading 2",
+    heading3: "### Heading 3",
+    composite: `
 # Impressive Title
 
 An introductory remark.
@@ -51,12 +90,20 @@ First content.
 ## Second subtopic
 
 Second content.
-      `
-    });
-  });
+    `
+  };
+
+  const externalText = (item, context = undefined) => (
+    <WithExternalTexts texts={texts}>
+      <ExternalText item={item} context={context} />
+    </WithExternalTexts>
+  );
+
+  const externalTextTree = (item, context = undefined) =>
+    renderer.create(externalText(item, context)).toJSON();
 
   it("renders the key when no such item exists", () => {
-    const tree = renderer.create(<ExternalText item={"foo"} />).toJSON();
+    const tree = externalTextTree("foo");
     expect(tree).toMatchInlineSnapshot(`
 <p>
   {{foo}}
@@ -65,9 +112,7 @@ Second content.
   });
 
   it("handles a simple case", () => {
-    const tree = renderer
-      .create(<ExternalText item={"greeting"} context={{ name: "world" }} />)
-      .toJSON();
+    const tree = externalTextTree("greeting", { name: "world" });
     expect(tree).toMatchInlineSnapshot(`
 <p>
   Hello, world
@@ -76,15 +121,13 @@ Second content.
   });
 
   each([[1], [2], [3]]).it("handles heading level %d", level => {
-    const tree = renderer
-      .create(<ExternalText item={`heading${level}`} />)
-      .toJSON();
+    const tree = externalTextTree(`heading${level}`);
     expect(tree.type).toBe(`h${level}`);
     expect(tree.children).toEqual([`Heading ${level}`]);
   });
 
   it("handles a composite MD case", () => {
-    const tree = renderer.create(<ExternalText item={"composite"} />).toJSON();
+    const tree = externalTextTree("composite");
     expect(tree).toMatchInlineSnapshot(`
 Array [
   <h1>
@@ -104,7 +147,7 @@ Array [
   </h2>,
   <p>
     Second content.
-      
+    
   </p>,
 ]
 `);
@@ -113,8 +156,15 @@ Array [
   it("re-renders when texts are changed", () => {
     const context = { name: "world" };
 
+    const asyncLoader = new AsyncLoader();
+
     const component = renderer.create(
-      <ExternalText item={"greeting"} context={context} />
+      <WithExternalTexts
+        texts={{greeting: "Hello, ${name}"}}
+        loadTexts={asyncLoader.loadValue}
+      >
+        <ExternalText item={"greeting"} context={context} />
+      </WithExternalTexts>
     );
     const tree1 = component.toJSON();
     expect(tree1).toMatchInlineSnapshot(`
@@ -123,7 +173,7 @@ Array [
 </p>
 `);
 
-    setTexts({ greeting: "Bonjour, ${name}" });
+    asyncLoader.resolve({ greeting: "Bonjour, ${name}" });
 
     const tree2 = component.toJSON();
     expect(tree2).toMatchInlineSnapshot(`
@@ -133,3 +183,5 @@ Array [
 `);
   });
 });
+
+
