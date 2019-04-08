@@ -3,12 +3,12 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 
-export const ExternalTextsContext = React.createContext(
+export const ExternalTextContext = React.createContext(
   null
 );
 
 
-export class WithExternalTexts extends React.Component {
+export class Provider extends React.Component {
   static propTypes = {
     texts: PropTypes.object,
     loadTexts: PropTypes.func,
@@ -31,9 +31,9 @@ export class WithExternalTexts extends React.Component {
 
   render() {
     return (
-      <ExternalTextsContext.Provider value={this.state.texts}>
+      <ExternalTextContext.Provider value={this.state.texts}>
         {this.props.children}
-      </ExternalTextsContext.Provider>
+      </ExternalTextContext.Provider>
     );
   }
 }
@@ -66,6 +66,8 @@ class ExternalText extends React.Component {
     );
   }
 }
-ExternalText.contextType = ExternalTextsContext;
+ExternalText.contextType = ExternalTextContext;
+ExternalText.Provider = Provider;
+
 
 export default ExternalText;

@@ -2,10 +2,7 @@ import React from "react";
 import renderer from "react-test-renderer";
 import each from "jest-each";
 
-import ExternalText, {
-  evaluateAsTemplateLiteral,
-  WithExternalTexts
-} from "./external-text";
+import ExternalText, { evaluateAsTemplateLiteral } from "./external-text";
 
 describe("evaluateAsTemplateLiteral", () => {
   it("works without interpolation", () => {
@@ -94,9 +91,9 @@ Second content.
   };
 
   const externalText = (item, context = undefined) => (
-    <WithExternalTexts texts={texts}>
+    <ExternalText.Provider texts={texts}>
       <ExternalText item={item} context={context} />
-    </WithExternalTexts>
+    </ExternalText.Provider>
   );
 
   const externalTextTree = (item, context = undefined) =>
@@ -159,12 +156,12 @@ Array [
     const asyncLoader = new AsyncLoader();
 
     const component = renderer.create(
-      <WithExternalTexts
+      <ExternalText.Provider
         texts={{greeting: "Hello, ${name}"}}
         loadTexts={asyncLoader.loadValue}
       >
         <ExternalText item={"greeting"} context={context} />
-      </WithExternalTexts>
+      </ExternalText.Provider>
     );
     const tree1 = component.toJSON();
     expect(tree1).toMatchInlineSnapshot(`

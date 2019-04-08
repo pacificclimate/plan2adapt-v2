@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
-import { withExternalTexts, WithExternalTexts } from './utils/external-text';
+import ExternalText from './utils/external-text';
 
 const loadTexts = setTexts => {
   setTimeout(() => {
@@ -15,14 +15,14 @@ const loadTexts = setTexts => {
 
 ReactDOM.render(
   (
-    <WithExternalTexts
+    <ExternalText.Provider
       texts={{
         greeting: 'Bonjour, ${name}'
       }}
       loadTexts={loadTexts}
     >
       <App/>
-    </WithExternalTexts>
+    </ExternalText.Provider>
   ),
   document.getElementById('root')
 );
