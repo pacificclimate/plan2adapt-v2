@@ -4,23 +4,24 @@ import './index.css';
 import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
 import ExternalText from './utils/external-text';
+import axios from 'axios';
 
 const loadTexts = setTexts => {
-  setTimeout(() => {
-    setTexts({
-      greeting: 'Hello, ${name}',
-    });
-  }, 3000);
+  axios.get(
+    `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXTS}`,
+    {
+      responseType: 'json'
+    }
+  )
+  .then(response => response.data)
+  .then(setTexts)
+  .catch(error => { console.error(error); })
+  ;
 };
 
 ReactDOM.render(
   (
-    <ExternalText.Provider
-      texts={{
-        greeting: 'Bonjour, ${name}'
-      }}
-      loadTexts={loadTexts}
-    >
+    <ExternalText.Provider loadTexts={loadTexts}>
       <App/>
     </ExternalText.Provider>
   ),
