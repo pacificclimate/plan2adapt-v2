@@ -30,23 +30,26 @@ For more information on architecture and design, see
 
 This project is very text-heavy. We'd rather not release a new version every time we tweak some punctuation,
 so instead of embedding all the text in the app, we externalize it into a resource file and use the (PCIC-developed)
-`external-texts` package to provide the text content. `external-texts` processes Markdown, so the resource file can
+`external-text` package to provide the text content. `external-text` processes Markdown, so the resource file can
 contain Markdown for complex content, of which we have quite a bit in this app.
 
-The external texts file is loaded from the 
+The external text resource file is loaded from the project's
 [public folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder),
-from a file whose path within that directory is specified by the environment variable `REACT_APP_EXTERNAL_TEXTS`.
+from a file whose path within that folder is specified by the environment variable `REACT_APP_EXTERNAL_TEXTS`.
+The present setting for this path is `external-text/default.yaml`.
 
-The public folder is outside the module system managed by Webpack, and its contents are transferred when the app
-is built (`npm run build`) to `/build/static`. The content of `/build/static` can therefore be updated at any time,
-meaning that the external texts file can be changed after the application is built and deployed, and the updated
-external texts content will be uploaded whenever the app is refreshed or launched anew after that point.
+In a Create React App app (which this is), the
+public folder is outside the module system managed by Webpack, and its contents are transferred to `/build/static` 
+when the app is built (`npm run build`). 
+Being outside the module system, the content of `/build/static` can be updated at any time,
+meaning that the external texts file can be changed after the application is built and deployed. 
+The updated external text content will be used whenever the app is refreshed or launched anew after that point.
 
-We will keep a semi-up-to-date version of the external texts file in the `/public` folder of this project for the
+We keep a semi-up-to-date version of the external texts file in the `/public` folder of this project for the
 convenience of the developers. However the truly up-to-date content in the deployed app seen by our users is 
-managed in a separate repo (`plan2adapt-external-text`?).  
+managed in a separate repo (`plan2adapt-text`?).  
 When we wish to make between-release updates to the text content of the app, we update the separate repo and
-deploy its contents to `/build/static`.
+deploy its contents to `/build/static` (so, using the default file path, to `/build/static/external-text/default.yaml`.
 
 IMPORTANT: This means that 
 **we must [deploy](https://facebook.github.io/create-react-app/docs/deployment) this app 
