@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { get } from 'lodash/fp';
 
 
 export const ExternalTextContext = React.createContext(
@@ -61,7 +62,7 @@ class ExternalText extends React.Component {
   render() {
     const texts = this.context;
     const { item, context } = this.props;
-    const text = (texts && texts[item]) || `{{${item}}}`;
+    const text = (texts && get(item, texts)) || `{{${item}}}`;
     const source = evaluateAsTemplateLiteral(text, { $$: texts, ...context});
     return (
       <ReactMarkdown source={source}/>
