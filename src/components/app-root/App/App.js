@@ -5,7 +5,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import Card from 'react-bootstrap/Card';
 
 import { filter } from 'lodash/fp';
 
@@ -15,7 +14,7 @@ import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
 import meta from '../../../assets/meta';
 
-import ExternalText from '../../../utils/external-text';
+import T from '../../../utils/external-text';
 import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
@@ -30,7 +29,6 @@ import ImpactsBySector from '../../data-displays/ImpactsBySector/ImpactsBySector
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
-import ReactDOM from 'react-dom';
 
 export default class App extends Component {
   state = {
@@ -49,37 +47,37 @@ export default class App extends Component {
   render() {
     return (
       <Container fluid>
-        <Row>
-          <Col>
-            Greeting: <ExternalText item={'greeting'} context={{ name: 'Rod' }}/>
-          </Col>
-        </Row>
-
         <AppHeader/>
 
         <Row>
           <Col xl={2} lg={12} md={12}>
             <Row>
-              <Col>{`
-              I am interested in information about projected climate change ...
-              `}</Col>
+              <Col>
+                <T item='mainSelectors.prologue'/>
+              </Col>
             </Row>
             <Row>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`for a typical`}</Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                <T item='mainSelectors.yearPrefix'/>
+              </Col>
               <Col xl={12} lg={2} md={3}>
                 <SeasonSelector
                   value={this.state.season}
                   onChange={this.handleChangeSeason}
                 />
               </Col>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`in`}</Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                <T item='mainSelectors.regionPrefix'/>
+              </Col>
               <Col xl={12} lg={3} md={6}>
                 <RegionSelector
                   value={this.state.region}
                   onChange={this.handleChangeRegion}
                 />
               </Col>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>{`during the`}</Col>
+              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                <T item='mainSelectors.periodPrefix'/>
+              </Col>
               <Col xl={12} lg={3} md={4}>
                 <TimePeriodSelector
                   bases={filter(m => +m.start_date >= 2010)(meta)}
@@ -96,11 +94,10 @@ export default class App extends Component {
               defaultActiveKey={'Maps'}
             >
               <Tab eventKey={'Summary'} title={'Summary'}>
-                <h2>{`
-                  Summary of Climate Change 
-                  for ${this.state.region.label} 
-                  in the ${this.state.futureTimePeriod.value.shorthand}
-                `}</h2>
+                <T item='summary.title' context={{
+                  region: this.state.region.label,
+                  futureTimePeriod: this.state.futureTimePeriod.value.shorthand
+                }}/>
               </Tab>
 
               <Tab eventKey={'Impacts'} title={'Impacts'}>
@@ -124,7 +121,7 @@ export default class App extends Component {
               <Tab eventKey={'Maps'} title={`Maps`}>
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
-                    {`Show details about`}
+                    <T item='fragments.variablePrefix'/>
                   </Col>
                   <Col sm={4} xs={6}>
                     <VariableSelector
@@ -136,11 +133,11 @@ export default class App extends Component {
                 </Row>
                 <Row>
                   <Col lg={12}>
-                    <h2>{`
-                      ${this.state.season.label}
-                      ${this.state.variable.label}
-                      for the ${this.state.region.label} region
-                    `}</h2>
+                    <T item='maps.title' context={{
+                      season: this.state.season.label,
+                      variable: this.state.variable.label,
+                      region: this.state.region.label,
+                    }}/>
                   </Col>
                 </Row>
                 <TwoDataMaps
@@ -158,7 +155,7 @@ export default class App extends Component {
               <Tab eventKey={'Graph'} title={`Graph`}>
                 <Row>
                   <Col lg={2}>
-                    <SelectorLabel>Show details about</SelectorLabel>
+                    <T item='fragments.variablePrefix'/>
                     <VariableSelector
                       bases={meta}
                       value={this.state.variable}
@@ -168,12 +165,11 @@ export default class App extends Component {
                 </Row>
                 <Row>
                   <Col lg={12}>
-                    <h2>{`
-                      Range of projected change in
-                      ${this.state.season.label}
-                      ${this.state.variable.label}
-                      for the ${this.state.region.label} region
-                    `}</h2>
+                    <T item='graph.title' context={{
+                      season: this.state.season.label,
+                      variable: this.state.variable.label,
+                      region: this.state.region.label,
+                    }}/>
                   </Col>
                   <Col lg={6}>
                     <ChangeOverTimeGraph

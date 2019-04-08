@@ -1,1 +1,27 @@
-greeting: Hello, ${name}, from YAML.
+greeting: Hello, ${name}.
+
+mainSelectors:
+  prologue: I am interested in information about projected climate change ...
+  yearPrefix: for a typical
+  regionPrefix: in
+  periodPrefix: during the
+
+summary:
+  title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
+
+impacts:
+  title: "## Impacts"
+
+maps:
+  title: "## ${season} ${variable} for ${region}"
+  historical:
+    title: "### Historical: ${$$.fragments.period}"
+  projected:
+    title: "### Projected: ${$$.fragments.period}"
+
+graph:
+  title: "## Range of projected change in ${season} ${variable} for ${region}"
+
+fragments:
+  variablePrefix: Show details about
+  period: ${start_date}-${end_date}

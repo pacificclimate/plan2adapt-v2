@@ -12,6 +12,10 @@ h3 {
     text-align: center;
 }
 
+p {
+    margin: 0;
+}
+
 .data {
     margin-top: 1em;
     width: 100%;
