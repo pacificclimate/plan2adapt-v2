@@ -45,8 +45,10 @@ export function evaluateAsTemplateLiteral(s, context={}) {
   // at the top level. (E.g., if `context = { 'a': 1, 'b': 2 }`, then
   // the template literal can refer to `context.a` and `context.b`
   // as `${a}` and `${b}`, respectively.)
-  const evaluator = new Function(...Object.keys(context), 'return `' + s + '`');
-  return evaluator(...Object.values(context));
+  const evaluator = t => new Function(...Object.keys(context), 'return `' + t + '`');
+  const reevaluate = (prev, curr) =>
+    prev === curr ? curr : reevaluate(curr, evaluator(curr)(...Object.values(context)))
+  return reevaluate('', s);
 }
 
 
@@ -60,7 +62,7 @@ class ExternalText extends React.Component {
     const texts = this.context;
     const { item, context } = this.props;
     const text = (texts && texts[item]) || `{{${item}}}`;
-    const source = evaluateAsTemplateLiteral(text, context);
+    const source = evaluateAsTemplateLiteral(text, { $$: texts, ...context});
     return (
       <ReactMarkdown source={source}/>
     );

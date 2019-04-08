@@ -15,7 +15,7 @@ describe("evaluateAsTemplateLiteral", () => {
     );
   });
 
-  it("works with complex interpolation", () => {
+  it("works with context paths", () => {
     expect(
       evaluateAsTemplateLiteral(
         "${greeting}, ${name}. ${values.x} + ${values.y} = ${ values.x + values.y }",
@@ -27,6 +27,16 @@ describe("evaluateAsTemplateLiteral", () => {
       )
     ).toBe("Bonjour, world. 5 + 3 = 8");
   });
+
+  it("works with recursive content", () => {
+    expect(
+      evaluateAsTemplateLiteral("${greeting}", {
+        greeting: "Hello, ${name}",
+        name: "${who}",
+        who: "world"
+      })
+    ).toBe("Hello, world");
+  });
 });
 
 class C {
@@ -35,7 +45,9 @@ class C {
     loadValue(this.setValue);
   }
 
-  setValue = v => { this.value = v; };
+  setValue = v => {
+    this.value = v;
+  };
 }
 
 class AsyncLoader {
@@ -53,13 +65,13 @@ class AsyncLoader {
   }
 }
 
-describe('async loading test helper', () => {
-  it('works in the sync case', () => {
+describe("async loading test helper", () => {
+  it("works in the sync case", () => {
     const c = new C(0, set => set(1));
     expect(c.value).toBe(1);
   });
 
-  it('works in the (simulated) async case', () => {
+  it("works in the (simulated) async case", () => {
     const asyncLoader = new AsyncLoader(1);
     const c = new C(0, asyncLoader.loadValue);
     expect(c.value).toBe(0);
@@ -67,7 +79,6 @@ describe('async loading test helper', () => {
     expect(c.value).toBe(1);
   });
 });
-
 
 describe("ExternalText", () => {
   const texts = {
@@ -87,7 +98,8 @@ First content.
 ## Second subtopic
 
 Second content.
-    `
+    `,
+    internalRef: "${$$.greeting}, how are you?"
   };
 
   const externalText = (item, context = undefined) => (
@@ -150,6 +162,15 @@ Array [
 `);
   });
 
+  it("allows reference to the text base via $$", () => {
+    const tree = externalTextTree("internalRef", { name: "world" });
+    expect(tree).toMatchInlineSnapshot(`
+<p>
+  Hello, world, how are you?
+</p>
+`);
+  });
+
   it("re-renders when texts are changed", () => {
     const context = { name: "world" };
 
@@ -157,7 +178,7 @@ Array [
 
     const component = renderer.create(
       <ExternalText.Provider
-        texts={{greeting: "Hello, ${name}"}}
+        texts={{ greeting: "Hello, ${name}" }}
         loadTexts={asyncLoader.loadValue}
       >
         <ExternalText item={"greeting"} context={context} />
@@ -180,5 +201,3 @@ Array [
 `);
   });
 });
-
-
