@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
+    "js-yaml": "^3.13.1",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.11",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.0.0",
