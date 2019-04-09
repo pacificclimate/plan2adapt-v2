@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
-import { map, slice } from 'lodash/fp';
+import { map } from 'lodash/fp';
 
 
 const SeasonTds = ({ variable, season }) => [
@@ -38,25 +38,20 @@ export default class Summary extends React.Component {
         </thead>
         <tbody>
         {
-          map(item => ([
-              (
+          map(item =>
+            map(season => (
                 <tr>
-                  <td rowSpan={item.seasons.length}>
-                    {item.variable.label} ({item.variable.units})
-                  </td>
-                  <SeasonTds variable={item.variable} season={item.seasons[0]}/>
+                  {
+                    season === item.seasons[0] &&
+                    <td rowSpan={item.seasons.length}>
+                      {item.variable.label} ({item.variable.units})
+                    </td>
+                  }
+                  <SeasonTds variable={item.variable} season={season}/>
                 </tr>
-              ),
-              (
-                map(season => (
-                    <tr>
-                      <SeasonTds variable={item.variable} season={season}/>
-                    </tr>
-                  )
-                )(slice(1, item.seasons.length, item.seasons))
-              ),
-            ]
-          ))(this.props.summary)
+              )
+            )(item.seasons)
+          )(this.props.summary)
         }
         </tbody>
       </Table>
