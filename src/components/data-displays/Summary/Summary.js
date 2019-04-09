@@ -5,6 +5,8 @@ import { map } from 'lodash/fp';
 import T from '../../../utils/external-text';
 
 
+const format = number => `${number > 0 ? '+' : ''}${number}`;
+
 const unitsSuffix = units =>
   `${units.match(/^[A-Za-z]/) ? ' ' : ''}${units}`;
 
@@ -17,10 +19,11 @@ const SeasonTds = ({ variable, season }) => {
       {season.label}
     </td>,
     <td>
-      {season.ensembleMedian}{units}
+      {format(season.ensembleMedian)}{units}
     </td>,
     <td>
-      {season.range.min}{isLong(units) ? '' : units} to {season.range.max}{units}
+      {format(season.range.min)}{isLong(units) ? '' : units}{' to '}
+      {format(season.range.max)}{units}
     </td>,
   ];
 };
