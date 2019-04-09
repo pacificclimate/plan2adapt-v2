@@ -4,17 +4,25 @@ import Table from 'react-bootstrap/Table';
 import { map } from 'lodash/fp';
 
 
-const SeasonTds = ({ variable, season }) => [
-  <td>
-    {season.label}
-  </td>,
-  <td>
-    {season.ensembleMedian} {variable.units}
-  </td>,
-  <td>
-    {season.range.min} {variable.units} to {season.range.max}  {variable.units}
-  </td>,
-];
+const unitsSuffix = units =>
+  `${units.match(/^[A-Za-z]/) ? ' ' : ''}${units}`;
+
+const isLong = s => s.length > 2;
+
+const SeasonTds = ({ variable, season }) => {
+  const units = unitsSuffix(variable.units);
+  return [
+    <td className="text-center">
+      {season.label}
+    </td>,
+    <td>
+      {season.ensembleMedian}{units}
+    </td>,
+    <td>
+      {season.range.min}{isLong(units) ? '' : units} to {season.range.max}{units}
+    </td>,
+  ];
+};
 
 
 export default class Summary extends React.Component {
@@ -28,8 +36,12 @@ export default class Summary extends React.Component {
         <thead>
         <tr>
           <th rowSpan={2}>Climate Variable</th>
-          <th rowSpan={2}>Season </th>
-          <th colSpan={2}>Projected Change from 1961-1990 Baseline</th>
+          <th rowSpan={2} className="text-center">
+            Season
+          </th>
+          <th colSpan={2} className="text-center">
+            Projected Change from 1961-1990 Baseline
+          </th>
         </tr>
         <tr>
           <th>Ensemble Median</th>
