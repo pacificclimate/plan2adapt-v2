@@ -33,6 +33,11 @@ import styles from './App.css';
 import Table from 'react-bootstrap/Table';
 import Summary from '../../data-displays/Summary';
 
+const baselineTimePeriod = {
+  start_date: 1961,
+  end_date: 1990,
+};
+
 export default class App extends Component {
   state = {
     region: regions[0],
@@ -96,12 +101,21 @@ export default class App extends Component {
               id={'main'}
               defaultActiveKey={'Summary'}
             >
-              <Tab eventKey={'Summary'} title={<T as='string' item='summary.tab'/>}>
+              <Tab
+                eventKey={'Summary'}
+                title={<T as='string' item='summary.tab'/>}
+              >
                 <T item='summary.title' context={{
                   region: this.state.region.label,
                   futureTimePeriod: this.state.futureTimePeriod.value.shorthand
                 }}/>
                 <Summary summary={summary}/>
+                <T item='summary.notes.general' context={{
+                  region: this.state.region.label,
+                  futureTimePeriod: this.state.futureTimePeriod.value,
+                  baselineTimePeriod,
+                }}/>
+                <T item='summary.notes.derivedVars'/>
               </Tab>
 
               <Tab eventKey={'Impacts'} title={<T as='string' item='impacts.tab'/>}>

@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import { map } from 'lodash/fp';
+import T from '../../../utils/external-text';
 
 
 const unitsSuffix = units =>
@@ -28,24 +29,39 @@ const SeasonTds = ({ variable, season }) => {
 export default class Summary extends React.Component {
   static propTypes = {
     summary: PropTypes.array,
+    baseline: PropTypes.object,
   };
+
+  static defaultProps = {
+    baseline: {
+      start_date: 1961,
+      end_date: 1990,
+    }
+  }
 
   render() {
     return (
       <Table striped bordered>
         <thead>
         <tr>
-          <th rowSpan={2}>Climate Variable</th>
+          <th rowSpan={2}>
+            <T item='summary.table.heading.variable'/>
+          </th>
           <th rowSpan={2} className="text-center">
-            Season
+            <T item='summary.table.heading.season'/>
           </th>
           <th colSpan={2} className="text-center">
-            Projected Change from 1961-1990 Baseline
+            <T item='summary.table.heading.projectedChange'
+               context={this.props.baseline}/>
           </th>
         </tr>
         <tr>
-          <th>Ensemble Median</th>
-          <th>Range (10th to 90th percentile)</th>
+          <th>
+            <T item='summary.table.heading.ensembleMedian'/>
+          </th>
+          <th>
+            <T item='summary.table.heading.range'/>
+          </th>
         </tr>
         </thead>
         <tbody>
@@ -56,7 +72,7 @@ export default class Summary extends React.Component {
                   {
                     season === item.seasons[0] &&
                     <td rowSpan={item.seasons.length}>
-                      {item.variable.label} ({item.variable.units})
+                      {item.variable.label}{item.variable.derived ? '*' : ''} ({item.variable.units})
                     </td>
                   }
                   <SeasonTds variable={item.variable} season={season}/>
