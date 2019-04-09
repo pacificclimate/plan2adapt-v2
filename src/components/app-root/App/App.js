@@ -66,7 +66,7 @@ export default class App extends Component {
             </Row>
             <Row>
               <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                <T item='mainSelectors.yearPrefix'/>
+                <T item='mainSelectors.seasonPrefix'/>
               </Col>
               <Col xl={12} lg={2} md={3}>
                 <SeasonSelector

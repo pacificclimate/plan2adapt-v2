@@ -2,7 +2,7 @@ greeting: Hello, ${name}.
 
 mainSelectors:
   prologue: I am interested in information about projected climate change ...
-  yearPrefix: for a typical
+  seasonPrefix: for a typical
   regionPrefix: in
   periodPrefix: during the
 
@@ -29,8 +29,10 @@ summary:
       The ensemble median is a mid-point value, chosen from a PCIC standard
       set of Global Climate Model (GCM) projections (see the 'Notes' tab for more information).
       The range values represent the lowest and highest results within the set.
-      Please note that this summary table does not reflect the 'Season' choice made under the
-      'Region & Time' tab. However, this setting does affect results obtained under each variable tab.
+
+      Please note that this summary table does not depend on the choice of season
+       (*${$$.mainSelectors.seasonPrefix}...*) made at the left.
+       However, that setting does affect results on the other tabs.
     derivedVars: |
       &ast; These values are derived from temperature and precipitation.
       Please select the appropriate variable tab for more information.
