@@ -57,13 +57,27 @@ class ExternalText extends React.Component {
   static propTypes = {
     item: PropTypes.string,
     context: PropTypes.object,  // Context in which to evaluate item's text.
+    as: PropTypes.oneOf('raw string markup'.split()).isRequired,
+  };
+
+  static defaultProps = {
+    as: 'markup',
   };
 
   render() {
     const texts = this.context;
-    const { item, context } = this.props;
+    const { as, item, context } = this.props;
+
     const text = (texts && get(item, texts)) || `{{${item}}}`;
+    if (as === 'raw') {
+      return text;
+    }
+
     const source = evaluateAsTemplateLiteral(text, { $$: texts, ...context});
+    if (as === 'string') {
+      return source;
+    }
+
     return (
       <ReactMarkdown source={source}/>
     );
