@@ -6,13 +6,14 @@ import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 
-import { filter } from 'lodash/fp';
+import { map, filter, slice, curry } from 'lodash/fp';
 
 import regions from '../../../assets/regions';
 import timePeriods from '../../../assets/time-periods';
 import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
 import meta from '../../../assets/meta';
+import summary from '../../../assets/summary';
 
 import T from '../../../utils/external-text';
 import AppHeader from '../AppHeader';
@@ -29,6 +30,13 @@ import ImpactsBySector from '../../data-displays/ImpactsBySector/ImpactsBySector
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
+import Table from 'react-bootstrap/Table';
+import Summary from '../../data-displays/Summary';
+
+const baselineTimePeriod = {
+  start_date: 1961,
+  end_date: 1990,
+};
 
 export default class App extends Component {
   state = {
@@ -58,7 +66,7 @@ export default class App extends Component {
             </Row>
             <Row>
               <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                <T item='mainSelectors.yearPrefix'/>
+                <T item='mainSelectors.seasonPrefix'/>
               </Col>
               <Col xl={12} lg={2} md={3}>
                 <SeasonSelector
@@ -91,16 +99,26 @@ export default class App extends Component {
           <Col xl={10} lg={12} md={12}>
             <Tabs
               id={'main'}
-              defaultActiveKey={'Maps'}
+              defaultActiveKey={'Summary'}
             >
-              <Tab eventKey={'Summary'} title={'Summary'}>
-                <T item='summary.title' context={{
+              <Tab
+                eventKey={'Summary'}
+                title={<T as='string' item='summary.tab'/>}
+              >
+                {/*<T item='summary.title' context={{*/}
+                {/*  region: this.state.region.label,*/}
+                {/*  futureTimePeriod: this.state.futureTimePeriod.value.shorthand*/}
+                {/*}}/>*/}
+                <Summary summary={summary}/>
+                <T item='summary.notes.general' context={{
                   region: this.state.region.label,
-                  futureTimePeriod: this.state.futureTimePeriod.value.shorthand
+                  futureTimePeriod: this.state.futureTimePeriod.value,
+                  baselineTimePeriod,
                 }}/>
+                <T item='summary.notes.derivedVars'/>
               </Tab>
 
-              <Tab eventKey={'Impacts'} title={'Impacts'}>
+              <Tab eventKey={'Impacts'} title={<T as='string' item='impacts.tab'/>}>
                 <Row>
                   <Col lg={12}>
                     <Tabs
@@ -118,7 +136,7 @@ export default class App extends Component {
                 </Row>
               </Tab>
 
-              <Tab eventKey={'Maps'} title={`Maps`}>
+              <Tab eventKey={'Maps'} title={<T as='string' item='maps.tab'/>}>
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
                     <T item='fragments.variablePrefix'/>
@@ -152,7 +170,7 @@ export default class App extends Component {
                 />
               </Tab>
 
-              <Tab eventKey={'Graph'} title={`Graph`}>
+              <Tab eventKey={'Graph'} title={<T as='string' item='graph.tab'/>}>
                 <Row>
                   <Col lg={2}>
                     <T item='fragments.variablePrefix'/>

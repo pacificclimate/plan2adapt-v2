@@ -2,17 +2,47 @@ greeting: Hello, ${name}.
 
 mainSelectors:
   prologue: I am interested in information about projected climate change ...
-  yearPrefix: for a typical
+  seasonPrefix: for a typical
   regionPrefix: in
   periodPrefix: during the
 
 summary:
+  tab: Summary
   title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
+  # It's tempting to do this content as a Markdown table, but unfortunately MD doesn't
+  # let you span table rows or columns.
+  table:
+    heading:
+      variable: Climate Variable
+      season: Season
+      projectedChange: Projected Change from ${$$.fragments.period} Baseline
+      ensembleMedian: Ensemble Median
+      range: Range (10th to 90th percentile)
+
+  notes:
+    general: |
+      The table above shows projected changes in average (mean) temperature, precipitation and several
+      derived climate variables from the
+      baseline historical period (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+      to the ${futureTimePeriod.shorthand}
+      for the ${region} region.
+      The ensemble median is a mid-point value, chosen from a PCIC standard
+      set of Global Climate Model (GCM) projections (see the 'Notes' tab for more information).
+      The range values represent the lowest and highest results within the set.
+
+      Please note that this summary table does not depend on the choice of season
+       (*${$$.mainSelectors.seasonPrefix}...*) made at the left.
+       However, that setting does affect results on the other tabs.
+    derivedVars: |
+      &ast; These values are derived from temperature and precipitation.
+      Please select the appropriate variable tab for more information.
 
 impacts:
+  tab: Impacts
   title: "## Impacts"
 
 maps:
+  tab: Maps
   title: "## ${season} ${variable} for ${region}"
   historical:
     title: "### Historical: ${$$.fragments.period}"
@@ -20,8 +50,9 @@ maps:
     title: "### Projected: ${$$.fragments.period}"
 
 graph:
+  tab: Graph
   title: "## Range of projected change in ${season} ${variable} for ${region}"
 
 fragments:
-  variablePrefix: Show details about
   period: ${start_date}-${end_date}
+  variablePrefix: Show details about
