@@ -31,6 +31,7 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
 import Table from 'react-bootstrap/Table';
+import Summary from '../../data-displays/Summary';
 
 export default class App extends Component {
   state = {
@@ -47,18 +48,6 @@ export default class App extends Component {
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
 
   render() {
-    const seasonTds = (variable, season) => ([
-      <td>
-        {season.label}
-      </td>,
-      <td>
-        {season.ensembleMedian} {variable.units}
-      </td>,
-      <td>
-        {season.range.min} {variable.units} to {season.range.max}  {variable.units}
-      </td>,
-    ]);
-
     return (
       <Container fluid>
         <AppHeader/>
@@ -112,44 +101,7 @@ export default class App extends Component {
                   region: this.state.region.label,
                   futureTimePeriod: this.state.futureTimePeriod.value.shorthand
                 }}/>
-                <Table striped bordered>
-                  <thead>
-                  <tr>
-                    <th rowSpan={2}>Climate Variable</th>
-                    <th rowSpan={2}>Season </th>
-                    <th colSpan={2}>Projected Change from 1961-1990 Baseline</th>
-                  </tr>
-                  <tr>
-                    <th>Ensemble Median</th>
-                    <th>Range (10th to 90th percentile)</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {
-                    map(item => ([
-                      (
-                        <tr>
-                        <td rowSpan={item.seasons.length}>
-                          {item.variable.label} ({item.variable.units})
-                        </td>
-                          {
-                            seasonTds(item.variable, item.seasons[0])
-                          }
-                        </tr>
-                      ),
-                      (
-                        map(season => (
-                          <tr>
-                            {seasonTds(item.variable, season)}
-                          </tr>
-                          )
-                        )(slice(1, item.seasons.length, item.seasons))
-                      ),
-                      ]
-                    ))(summary)
-                  }
-                  </tbody>
-                </Table>
+                <Summary summary={summary}/>
               </Tab>
 
               <Tab eventKey={'Impacts'} title={<T as='string' item='impacts.tab'/>}>
