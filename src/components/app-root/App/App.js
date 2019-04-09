@@ -6,13 +6,14 @@ import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 
-import { filter } from 'lodash/fp';
+import { map, filter, slice, curry } from 'lodash/fp';
 
 import regions from '../../../assets/regions';
 import timePeriods from '../../../assets/time-periods';
 import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
 import meta from '../../../assets/meta';
+import summary from '../../../assets/summary';
 
 import T from '../../../utils/external-text';
 import AppHeader from '../AppHeader';
@@ -29,6 +30,7 @@ import ImpactsBySector from '../../data-displays/ImpactsBySector/ImpactsBySector
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
+import Table from 'react-bootstrap/Table';
 
 export default class App extends Component {
   state = {
@@ -45,6 +47,18 @@ export default class App extends Component {
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
 
   render() {
+    const seasonTds = (variable, season) => ([
+      <td>
+        {season.label}
+      </td>,
+      <td>
+        {season.ensembleMedian} {variable.units}
+      </td>,
+      <td>
+        {season.range.min} {variable.units} to {season.range.max}  {variable.units}
+      </td>,
+    ]);
+
     return (
       <Container fluid>
         <AppHeader/>
@@ -91,16 +105,54 @@ export default class App extends Component {
           <Col xl={10} lg={12} md={12}>
             <Tabs
               id={'main'}
-              defaultActiveKey={'Maps'}
+              defaultActiveKey={'Summary'}
             >
-              <Tab eventKey={'Summary'} title={'Summary'}>
+              <Tab eventKey={'Summary'} title={<T as='string' item='summary.tab'/>}>
                 <T item='summary.title' context={{
                   region: this.state.region.label,
                   futureTimePeriod: this.state.futureTimePeriod.value.shorthand
                 }}/>
+                <Table striped bordered>
+                  <thead>
+                  <tr>
+                    <th rowSpan={2}>Climate Variable</th>
+                    <th rowSpan={2}>Season </th>
+                    <th colSpan={2}>Projected Change from 1961-1990 Baseline</th>
+                  </tr>
+                  <tr>
+                    <th>Ensemble Median</th>
+                    <th>Range (10th to 90th percentile)</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {
+                    map(item => ([
+                      (
+                        <tr>
+                        <td rowSpan={item.seasons.length}>
+                          {item.variable.label} ({item.variable.units})
+                        </td>
+                          {
+                            seasonTds(item.variable, item.seasons[0])
+                          }
+                        </tr>
+                      ),
+                      (
+                        map(season => (
+                          <tr>
+                            {seasonTds(item.variable, season)}
+                          </tr>
+                          )
+                        )(slice(1, item.seasons.length, item.seasons))
+                      ),
+                      ]
+                    ))(summary)
+                  }
+                  </tbody>
+                </Table>
               </Tab>
 
-              <Tab eventKey={'Impacts'} title={'Impacts'}>
+              <Tab eventKey={'Impacts'} title={<T as='string' item='impacts.tab'/>}>
                 <Row>
                   <Col lg={12}>
                     <Tabs
@@ -118,7 +170,7 @@ export default class App extends Component {
                 </Row>
               </Tab>
 
-              <Tab eventKey={'Maps'} title={`Maps`}>
+              <Tab eventKey={'Maps'} title={<T as='string' item='maps.tab'/>}>
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
                     <T item='fragments.variablePrefix'/>
@@ -152,7 +204,7 @@ export default class App extends Component {
                 />
               </Tab>
 
-              <Tab eventKey={'Graph'} title={`Graph`}>
+              <Tab eventKey={'Graph'} title={<T as='string' item='graph.tab'/>}>
                 <Row>
                   <Col lg={2}>
                     <T item='fragments.variablePrefix'/>
