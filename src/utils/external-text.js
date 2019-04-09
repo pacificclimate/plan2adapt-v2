@@ -57,7 +57,7 @@ class ExternalText extends React.Component {
   static propTypes = {
     item: PropTypes.string,
     context: PropTypes.object,  // Context in which to evaluate item's text.
-    as: PropTypes.oneOf('raw string markup'.split()).isRequired,
+    as: PropTypes.oneOf(['raw', 'string', 'markup']).isRequired,
   };
 
   static defaultProps = {
