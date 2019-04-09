@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
+    "js-yaml": "^3.13.1",
     "leaflet": "^1.4.0",
     "lodash": "^4.17.11",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.0.0",
@@ -17,9 +18,15 @@
     "react-dom": "^16.8.6",
     "react-icons": "^3.5.0",
     "react-leaflet": "^2.1.4",
+    "react-markdown": "^4.0.6",
     "react-scripts": "^2.1.8",
     "react-select": "^2.3.0",
     "xml-js": "^1.6.9"
+  },
+  "devDependencies": {
+    "jest-each": "^24.7.1",
+    "prettier": "^1.16.4",
+    "react-test-renderer": "^16.8.6"
   },
   "scripts": {
     "start": "react-scripts start",

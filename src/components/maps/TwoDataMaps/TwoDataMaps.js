@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import T from '../../../utils/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 
@@ -29,11 +30,10 @@ export default class TwoDataMaps extends React.Component {
     return (
       <Row>
         <Col lg={6}>
-          <h3>{`
-            Historical:
-            ${this.props.historicalTimePeriod.start_date}-
-            ${this.props.historicalTimePeriod.end_date}
-            `}</h3>
+          <T item='maps.historical.title' context={{
+            start_date: this.props.historicalTimePeriod.start_date,
+            end_date: this.props.historicalTimePeriod.end_date
+          }}/>
           <DataMap
             viewport={this.state.viewport}
             onViewportChange={this.handleChangeViewport}
@@ -46,11 +46,10 @@ export default class TwoDataMaps extends React.Component {
           />
         </Col>
         <Col lg={6}>
-          <h3>{`
-            Projected:
-            ${this.props.futureTimePeriod.start_date}-
-            ${this.props.futureTimePeriod.end_date}
-          `}</h3>
+          <T item='maps.projected.title' context={{
+            start_date: this.props.futureTimePeriod.start_date,
+            end_date: this.props.futureTimePeriod.end_date
+          }}/>
           <DataMap
             viewport={this.state.viewport}
             onViewportChange={this.handleChangeViewport}
