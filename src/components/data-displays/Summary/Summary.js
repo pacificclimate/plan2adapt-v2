@@ -44,13 +44,13 @@ export default class Summary extends React.Component {
       <Table striped bordered>
         <thead>
         <tr>
-          <th rowSpan={2}>
+          <th rowSpan={2} className='align-middle'>
             <T item='summary.table.heading.variable'/>
           </th>
-          <th rowSpan={2} className="text-center">
+          <th rowSpan={2} className='align-middle text-center'>
             <T item='summary.table.heading.season'/>
           </th>
-          <th colSpan={2} className="text-center">
+          <th colSpan={2} className='text-center'>
             <T item='summary.table.heading.projectedChange'
                context={this.props.baseline}/>
           </th>
@@ -71,9 +71,13 @@ export default class Summary extends React.Component {
                 <tr>
                   {
                     season === item.seasons[0] &&
-                    <td rowSpan={item.seasons.length}>
-                      {item.variable.label}{item.variable.derived ? '*' : ''} ({item.variable.units})
-                    </td>
+                    <td
+                      rowSpan={item.seasons.length}
+                      className='align-middle'
+                    >{`
+                      ${item.variable.label}${item.variable.derived ? '*' : ''}
+                      (${item.variable.units})
+                    `}</td>
                   }
                   <SeasonTds variable={item.variable} season={season}/>
                 </tr>
