@@ -41,6 +41,7 @@ export default [
     variable: {
       label: 'Snowfall',
       units: '%',
+      derived: true,
     },
     seasons: [
       {
@@ -60,6 +61,7 @@ export default [
     variable: {
       label: 'Growing Degree Days',
       units: 'degree days',
+      derived: true,
     },
     seasons: [
       {
@@ -74,6 +76,7 @@ export default [
     variable: {
       label: 'Heating Degree Days',
       units: 'degree days',
+      derived: true,
     },
     seasons: [
       {
@@ -88,6 +91,7 @@ export default [
     variable: {
       label: 'Frost-Free Days',
       units: 'days',
+      derived: true,
     },
     seasons: [
       {
