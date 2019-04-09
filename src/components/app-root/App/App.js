@@ -105,10 +105,10 @@ export default class App extends Component {
                 eventKey={'Summary'}
                 title={<T as='string' item='summary.tab'/>}
               >
-                <T item='summary.title' context={{
-                  region: this.state.region.label,
-                  futureTimePeriod: this.state.futureTimePeriod.value.shorthand
-                }}/>
+                {/*<T item='summary.title' context={{*/}
+                {/*  region: this.state.region.label,*/}
+                {/*  futureTimePeriod: this.state.futureTimePeriod.value.shorthand*/}
+                {/*}}/>*/}
                 <Summary summary={summary}/>
                 <T item='summary.notes.general' context={{
                   region: this.state.region.label,
