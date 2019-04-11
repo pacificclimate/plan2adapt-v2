@@ -1,0 +1,17 @@
+.Rules table:not(.table) {
+    border: 1px solid #dee2e6;
+    color: #212529;
+    margin-bottom: 1em;
+}
+
+
+.Rules table:not(.table) th,
+.Rules table:not(.table) td
+{
+    padding: 0.25em 0.5em;
+    border: 1px solid #dee2e6;
+}
+
+.Rules table:not(.table) thead th {
+    border-bottom: 2px solid #dee2e6;
+}

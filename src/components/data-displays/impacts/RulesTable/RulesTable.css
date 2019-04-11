@@ -1,0 +1,7 @@
+.Rules-table tbody tr {
+    background: grey;
+}
+
+.Rules-table tbody tr.active-rule {
+    background: transparent;
+}
