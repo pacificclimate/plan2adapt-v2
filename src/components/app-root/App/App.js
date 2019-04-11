@@ -14,6 +14,8 @@ import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
 import meta from '../../../assets/meta';
 import summary from '../../../assets/summary';
+import rulebase from '../../../assets/rulebase';
+import ruleValues from '../../../assets/rule-results';
 
 import T from '../../../utils/external-text';
 import AppHeader from '../AppHeader';
@@ -25,8 +27,8 @@ import VariableSelector from '../../selectors/VariableSelector/VariableSelector'
 import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
 
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
-import ImpactsByImpact from '../../data-displays/ImpactsByImpact/ImpactsByImpact';
-import ImpactsBySector from '../../data-displays/ImpactsBySector/ImpactsBySector';
+import Impacts from '../../data-displays/impacts/Impacts';
+import Rules from '../../data-displays/impacts/Rules';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
@@ -59,51 +61,55 @@ export default class App extends Component {
 
         <Row>
           <Col xl={2} lg={12} md={12}>
-            <Row>
-              <Col>
-                <T item='mainSelectors.prologue'/>
-              </Col>
-            </Row>
-            <Row>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                <T item='mainSelectors.seasonPrefix'/>
-              </Col>
-              <Col xl={12} lg={2} md={3}>
-                <SeasonSelector
-                  value={this.state.season}
-                  onChange={this.handleChangeSeason}
-                />
-              </Col>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                <T item='mainSelectors.regionPrefix'/>
-              </Col>
-              <Col xl={12} lg={3} md={6}>
-                <RegionSelector
-                  value={this.state.region}
-                  onChange={this.handleChangeRegion}
-                />
-              </Col>
-              <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                <T item='mainSelectors.periodPrefix'/>
-              </Col>
-              <Col xl={12} lg={3} md={4}>
-                <TimePeriodSelector
-                  bases={filter(m => +m.start_date >= 2010)(meta)}
-                  value={this.state.futureTimePeriod}
-                  onChange={this.handleChangeTimePeriod}
-                />
-              </Col>
-            </Row>
+            {/* TODO: Extract this as a separate component? */}
+            <div className='MainSelectors'>
+              <Row>
+                <Col>
+                  <T item='mainSelectors.prologue'/>
+                </Col>
+              </Row>
+              <Row>
+                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                  <T item='mainSelectors.seasonPrefix'/>
+                </Col>
+                <Col xl={12} lg={2} md={3}>
+                  <SeasonSelector
+                    value={this.state.season}
+                    onChange={this.handleChangeSeason}
+                  />
+                </Col>
+                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                  <T item='mainSelectors.regionPrefix'/>
+                </Col>
+                <Col xl={12} lg={3} md={6}>
+                  <RegionSelector
+                    value={this.state.region}
+                    onChange={this.handleChangeRegion}
+                  />
+                </Col>
+                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                  <T item='mainSelectors.periodPrefix'/>
+                </Col>
+                <Col xl={12} lg={3} md={4}>
+                  <TimePeriodSelector
+                    bases={filter(m => +m.start_date >= 2010)(meta)}
+                    value={this.state.futureTimePeriod}
+                    onChange={this.handleChangeTimePeriod}
+                  />
+                </Col>
+              </Row>
+            </div>
           </Col>
 
           <Col xl={10} lg={12} md={12}>
             <Tabs
               id={'main'}
-              defaultActiveKey={'Summary'}
+              defaultActiveKey={'Impacts'}
             >
               <Tab
                 eventKey={'Summary'}
                 title={<T as='string' item='summary.tab'/>}
+                className='pt-2'
               >
                 {/*<T item='summary.title' context={{*/}
                 {/*  region: this.state.region.label,*/}
@@ -118,25 +124,70 @@ export default class App extends Component {
                 <T item='summary.notes.derivedVars'/>
               </Tab>
 
-              <Tab eventKey={'Impacts'} title={<T as='string' item='impacts.tab'/>}>
+              <Tab
+                eventKey={'Impacts'}
+                title={<T as='string' item='impacts.tab'/>}
+                className='pt-2'
+              >
                 <Row>
                   <Col lg={12}>
+                    <T item='impacts.prologue' context={{
+                      region: this.state.region.label,
+                      futureTimePeriod: this.state.futureTimePeriod.value,
+                      baselineTimePeriod,
+                    }}/>
                     <Tabs
                       id={'impacts'}
-                      defaultActiveKey={'by-impact'}
+                      defaultActiveKey={'rules'}
                     >
-                      <Tab eventKey={'by-impact'} title={'By Impact'}>
-                        <ImpactsByImpact/>
+                      <Tab
+                        eventKey={'by-category'}
+                        title={'By Category'}
+                        className='pt-2'
+                      >
+                        <Impacts
+                          rulebase={rulebase}
+                          ruleValues={ruleValues}
+                          groupKey='category'
+                          itemKey='sector'
+                          groupHeading='Impact Category'
+                          itemsHeading='Affected Sectors'
+                        />
                       </Tab>
-                      <Tab eventKey={'by-sector'} title={'By Sector'}>
-                        <ImpactsBySector/>
+                      <Tab
+                        eventKey={'by-sector'}
+                        title={'By Sector'}
+                        className='pt-2'
+                      >
+                        <Impacts
+                          rulebase={rulebase}
+                          ruleValues={ruleValues}
+                          groupKey='sector'
+                          itemKey='category'
+                          groupHeading='Affected Sector'
+                          itemsHeading='Impact Categories'
+                        />
+                      </Tab>
+                      <Tab
+                        eventKey={'rules'}
+                        title={'Rules Logic'}
+                        className='pt-2'
+                      >
+                        <Rules
+                          rulebase={rulebase}
+                          ruleValues={ruleValues}
+                        />
                       </Tab>
                     </Tabs>
                   </Col>
                 </Row>
               </Tab>
 
-              <Tab eventKey={'Maps'} title={<T as='string' item='maps.tab'/>}>
+              <Tab
+                eventKey={'Maps'}
+                title={<T as='string' item='maps.tab'/>}
+                className='pt-2'
+              >
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
                     <T item='fragments.variablePrefix'/>
@@ -170,7 +221,11 @@ export default class App extends Component {
                 />
               </Tab>
 
-              <Tab eventKey={'Graph'} title={<T as='string' item='graph.tab'/>}>
+              <Tab
+                eventKey={'Graph'}
+                title={<T as='string' item='graph.tab'/>}
+                className='pt-2'
+              >
                 <Row>
                   <Col lg={2}>
                     <T item='fragments.variablePrefix'/>
