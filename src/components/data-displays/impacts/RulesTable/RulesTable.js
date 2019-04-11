@@ -4,6 +4,7 @@ import { Table } from 'react-bootstrap';
 import { map } from 'lodash/fp';
 import ReactMarkdown from 'react-markdown';
 import classnames from 'classnames';
+import T from '../../../../utils/external-text';
 import './RulesTable.css';
 
 
@@ -18,12 +19,12 @@ export default class RulesTable extends React.Component {
       <Table bordered className='Rules-table'>
         <thead>
         <tr>
-          <th>Rule ID</th>
-          <th>Condition</th>
-          <th>Category</th>
-          <th>Sector</th>
-          <th>Effects</th>
-          <th>Management Implications</th>
+          <th><T item='impacts.rulesLogic.table.heading.ruleId'/></th>
+          <th><T item='impacts.rulesLogic.table.heading.condition'/></th>
+          <th><T item='impacts.rulesLogic.table.heading.category'/></th>
+          <th><T item='impacts.rulesLogic.table.heading.sector'/></th>
+          <th><T item='impacts.rulesLogic.table.heading.effects'/></th>
+          <th><T item='impacts.rulesLogic.table.heading.notes'/></th>
         </tr>
         </thead>
         <tbody>

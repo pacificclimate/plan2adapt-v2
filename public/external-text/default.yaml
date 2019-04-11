@@ -9,8 +9,8 @@ mainSelectors:
 summary:
   tab: Summary
   title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
-  # It's tempting to do this content as a Markdown table, but unfortunately MD doesn't
-  # let you span table rows or columns.
+  # It's tempting to do this content as a Markdown table, but unfortunately
+  # MD doesn't# let you span table rows or columns.
   table:
     heading:
       variable: Climate Variable
@@ -21,13 +21,15 @@ summary:
 
   notes:
     general: |
-      The table above shows projected changes in average (mean) temperature, precipitation and several
-      derived climate variables from the
-      baseline historical period (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+      The table above shows projected changes in average (mean) temperature,
+      precipitation and several derived climate variables from the
+      baseline historical period
+      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
       to the ${futureTimePeriod.shorthand}
       for the ${region} region.
       The ensemble median is a mid-point value, chosen from a PCIC standard
-      set of Global Climate Model (GCM) projections (see the 'Notes' tab for more information).
+      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
+      more information).
       The range values represent the lowest and highest results within the set.
 
       Please note that this summary table does not depend on the choice of season
@@ -39,7 +41,105 @@ summary:
 
 impacts:
   tab: Impacts
-  title: "## Impacts"
+  title: "## Potential Impacts for ${region} in the ${futureTimePeriod}"
+  prologue: |
+    Below, you can view a list of potential impacts that may affect ${region}
+    in the ${futureTimePeriod.shorthand}.
+    This is intended to provide a starting point for more detailed local
+    assessment of climate change impacts.
+    These are based on limited climate change information, as shown in the
+    detailed rules logic.
+    These rules were developed based on a workshop attended by climate
+    impacts experts and subsequent peer review.
+    Although quite comprehensive, the rules are a work in progress, and some
+    key impacts or management implications may be missing.
+    We welcome contributions and suggestions from users of Plan2Adapt.
+  rulesLogic:
+    prologue: |
+      The table below shows all of the rules used to determine whether to
+      display specific impacts and specific management implications in the
+      Impacts tab. This preliminary compilation of rules was developed based
+      on a workshop attended by climate impacts experts and subsequent peer
+      review. They are fairly technical and quite a bit of shorthand is used,
+      as described under terminology below. Although quite comprehensive,
+      the rules are a work in progress, and some key impacts or management
+      implications may be missing. We welcome contributions and suggestions
+      from users of Plan2Adapt.
+
+      There are two types of rules: internal rules and impacts rules.
+      The internal rules, listed first below, are used as part of the
+      conditions in many other rules, with additional information given
+      under the management implications column. The internal rule "snow",
+      for example, is true if a region has locations with hydrological regimes
+      that would be classified as snowfall-dominated based on the 1961-1990
+      climatology. This is determined by the condition of whether any
+      50km cells within the selected region have mean winter temperatures
+      below -6°C. The "hybrid" and "rain" rules are similar but for hybrid
+      and rain-dominated classifications. Note that a region may have
+      locations that meet multiple classifications.
+      The "future-..." internal rules make the same determination about the
+      region in the selected future time period.
+
+      The impacts rules display information directly in the Potential Impacts
+      table, and are also sometimes used as part of conditions for other rules.
+      Their IDs are classified by sector: For example, "2a-iv-bio", which
+      comes under the general impact of Reduced Water Supply, has management
+      implications that appear under the Biodiversity sector.
+      The rule, which is about the effect of a decrease in moisture
+      availability on habitat, displays based on the condition that at least
+      one season has a decrease in precipitation according to at least 75%
+      of the climate model projections (strong agreement) is met.
+
+      ### Notation
+
+      | Item | Meaning |
+      | - | - |
+      | s0p/s50p/s100p | Spatial minimum/median/maximum 0.5° grid box value in the region. |
+      | iastddev | Interannual standard deviation of the monthly, seasonal, or annual mean. |
+      | hist | CRU TS 2.1 1961-1990 historical baseline. |
+      | e25p/e75p | GCM ensemble 25th/75th percentile. This is always an interannual mean. |
+      | ann, djf, mam, jja, son | Annual, Dec/Jan/Feb, Mar/Apr/May, Jun/Jul/Aug, Sep/Oct/Nov. |
+      | anom | Value is an anomaly (not a percentage) from the baseline (i.e. future minus historical). |
+      | percent | Value is a percentage anomaly from the baseline. |
+      | rule_<rule-ID> | A reference to another rule. |
+      | region_oncoast | Whether the region is on the coast. |
+      | rule ? if_true : if_false | Checks whether a rule is true; if true, runs the clause represented by if_true; if false, runs the clause represented by if_false. |
+
+      ### Variables
+      
+      | Variable | Description | Units |
+      | - | - | - |
+      | temp | Mean Temperature | °C |
+      | prec | Total precipitation | mm/day |
+      | pass | Snowfall | mm snow water equivalent |
+      | dg05 | Growing DD (Degree-Days Above 5°C) | degree-days |
+      | dl18 | Heating DD (Degree-Days Below 18°C) | degree-days |
+      | nffd | Number of Frost-Free Days | days |
+
+      If not otherwise specified, values are an interannual and spatial mean,
+      and in the same units used on the maps (°C for temperatures, mm per day
+      for precipitation, etc.).
+
+      ### Rules
+
+      Given a set of projected climate data (determined by the period, region,
+      and time period you have selected), each rule evaluates to either true
+      or false. If the rule is true, then that means the effect it signals
+      is likely to occur in that scenario, and we say the rule is active.
+      The effects signalled by active rules are summarized for easy
+      interpretation in the By Category and By Sector tabs.
+
+      In the table below, active rules have a white background;
+      inactive rules have a grey background.
+
+    table:
+      heading:
+        ruleId: Rule ID
+        condition: Condition
+        category: Category
+        sector: Sector
+        effects: Effects
+        notes: Management Implications
 
 maps:
   tab: Maps
