@@ -132,7 +132,11 @@ impacts:
       In the table below, active rules have a white background;
       inactive rules have a grey background.
 
+
     table:
+      showInactiveRulesButton:
+        true: Hide Inactive Rules
+        false: Show Inactive Rules
       heading:
         ruleId: Rule ID
         condition: Condition
