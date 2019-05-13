@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Table } from 'react-bootstrap';
-import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs } from 'lodash/fp';
+import { Table, Accordion } from 'react-bootstrap';
+import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs, join } from 'lodash/fp';
 
 import ImpactIcon from '../ImpactIcon';
+import ReactMarkdown from 'react-markdown';
 
 
 const sort = sortBy(x => x);
@@ -54,6 +55,28 @@ export default class Impacts extends React.Component {
               <td>
                 <ImpactIcon kind={this.props.groupKey} icon={key}/>
                 {key}
+                <div>
+                  {
+                    flow(
+                      map(rule => rule.id),
+                      join(', ')
+                    )(rulesByGroupKey[key])
+                  }
+                </div>
+                <div>
+                  {
+                    map(rule => (
+                      <div>
+                        ({rule.id})
+                        <h2>
+                          <ImpactIcon kind={'sector'} icon={rule.sector}/>
+                          {rule.effects}
+                        </h2>
+                        <ReactMarkdown source={rule.notes} escapeHtml={false}/>
+                      </div>
+                    ))(rulesByGroupKey[key])
+                  }
+                </div>
               </td>
               <td>
                 {
