@@ -3,6 +3,8 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs } from 'lodash/fp';
 
+import ImpactIcon from '../ImpactIcon';
+
 
 const sort = sortBy(x => x);
 
@@ -49,8 +51,17 @@ export default class Impacts extends React.Component {
           map(([key, items]) => (
             key.length > 0 && items.length > 0 &&
             <tr>
-              <td>{key}</td>
-              <td>{items.join(', ')}</td>
+              <td>
+                <ImpactIcon kind={this.props.groupKey} icon={key}/>
+                {key}
+              </td>
+              <td>
+                {
+                  map(item => (
+                    <ImpactIcon kind={this.props.itemKey} icon={item}/>
+                  ))(items)
+                }
+              </td>
             </tr>
           ))(sortedActiveItemsByGroupKey)
         }
