@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Table, Accordion } from 'react-bootstrap';
+import { Table, Accordion, Card } from 'react-bootstrap';
 import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs, join } from 'lodash/fp';
-
-import ImpactIcon from '../ImpactIcon';
 import ReactMarkdown from 'react-markdown';
+import ImpactIcon from '../ImpactIcon';
+import './Impacts.css';
 
 
 const sort = sortBy(x => x);
@@ -40,7 +40,8 @@ export default class Impacts extends React.Component {
     )(activeItemsByGroupKey);
 
     return (
-      <Table bordered hover>
+      <Table bordered hover className='Impacts-table'>
+        <Accordion>
         <thead>
         <tr>
           <th>{this.props.groupHeading}</th>
@@ -48,47 +49,51 @@ export default class Impacts extends React.Component {
         </tr>
         </thead>
         <tbody>
-        {
-          map(([key, items]) => (
-            key.length > 0 && items.length > 0 &&
-            <tr>
-              <td>
-                <ImpactIcon kind={this.props.groupKey} icon={key}/>
-                {key}
-                <div>
-                  {
-                    flow(
-                      map(rule => rule.id),
-                      join(', ')
-                    )(rulesByGroupKey[key])
-                  }
-                </div>
-                <div>
-                  {
-                    map(rule => (
+          {
+            map(([key, items]) => (
+              key.length > 0 && items.length > 0 &&
+              <tr>
+                <td>
+                  <Card>
+                    <Accordion.Toggle as={Card.Header} eventKey={key}>
                       <div>
-                        ({rule.id})
-                        <h2>
-                          <ImpactIcon kind={'sector'} icon={rule.sector}/>
-                          {rule.effects}
-                        </h2>
-                        <ReactMarkdown source={rule.notes} escapeHtml={false}/>
+                        <ImpactIcon kind={this.props.groupKey} icon={key}/>
+                        {key}
                       </div>
-                    ))(rulesByGroupKey[key])
+                    </Accordion.Toggle>
+                    <Accordion.Collapse eventKey={key}>
+                      <Card.Body className='details'>
+                        {
+                          map(rule => (
+                            <div>
+                              ({rule.id})
+                              <h3>
+                                <ImpactIcon
+                                  kind={this.props.itemKey}
+                                  icon={rule[this.props.itemKey]}
+                                />
+                                {rule.effects}
+                              </h3>
+                              <ReactMarkdown source={rule.notes} escapeHtml={false}/>
+                            </div>
+                          ))(rulesByGroupKey[key])
+                        }
+                      </Card.Body>
+                    </Accordion.Collapse>
+                  </Card>
+                </td>
+                <td>
+                  {
+                    map(item => (
+                      <ImpactIcon kind={this.props.itemKey} icon={item}/>
+                    ))(items)
                   }
-                </div>
-              </td>
-              <td>
-                {
-                  map(item => (
-                    <ImpactIcon kind={this.props.itemKey} icon={item}/>
-                  ))(items)
-                }
-              </td>
-            </tr>
-          ))(sortedActiveItemsByGroupKey)
-        }
+                </td>
+              </tr>
+            ))(sortedActiveItemsByGroupKey)
+          }
         </tbody>
+        </Accordion>
       </Table>
     );
   }
