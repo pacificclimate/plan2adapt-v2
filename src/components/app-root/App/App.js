@@ -65,12 +65,12 @@ export default class App extends Component {
             <div className='MainSelectors'>
               <Row>
                 <Col>
-                  <T item='mainSelectors.prologue'/>
+                  <T path='mainSelectors.prologue'/>
                 </Col>
               </Row>
               <Row>
                 <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T item='mainSelectors.seasonPrefix'/>
+                  <T path='mainSelectors.seasonPrefix'/>
                 </Col>
                 <Col xl={12} lg={2} md={3}>
                   <SeasonSelector
@@ -79,7 +79,7 @@ export default class App extends Component {
                   />
                 </Col>
                 <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T item='mainSelectors.regionPrefix'/>
+                  <T path='mainSelectors.regionPrefix'/>
                 </Col>
                 <Col xl={12} lg={3} md={6}>
                   <RegionSelector
@@ -88,7 +88,7 @@ export default class App extends Component {
                   />
                 </Col>
                 <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T item='mainSelectors.periodPrefix'/>
+                  <T path='mainSelectors.periodPrefix'/>
                 </Col>
                 <Col xl={12} lg={3} md={4}>
                   <TimePeriodSelector
@@ -108,30 +108,30 @@ export default class App extends Component {
             >
               <Tab
                 eventKey={'Summary'}
-                title={<T as='string' item='summary.tab'/>}
+                title={<T as='string' path='summary.tab'/>}
                 className='pt-2'
               >
-                {/*<T item='summary.title' context={{*/}
+                {/*<T path='summary.title' data={{*/}
                 {/*  region: this.state.region.label,*/}
                 {/*  futureTimePeriod: this.state.futureTimePeriod.value.shorthand*/}
                 {/*}}/>*/}
                 <Summary summary={summary}/>
-                <T item='summary.notes.general' context={{
+                <T path='summary.notes.general' data={{
                   region: this.state.region.label,
                   futureTimePeriod: this.state.futureTimePeriod.value,
                   baselineTimePeriod,
                 }}/>
-                <T item='summary.notes.derivedVars'/>
+                <T path='summary.notes.derivedVars'/>
               </Tab>
 
               <Tab
                 eventKey={'Impacts'}
-                title={<T as='string' item='impacts.tab'/>}
+                title={<T as='string' path='impacts.tab'/>}
                 className='pt-2'
               >
                 <Row>
                   <Col lg={12}>
-                    <T item='impacts.prologue' context={{
+                    <T path='impacts.prologue' data={{
                       region: this.state.region.label,
                       futureTimePeriod: this.state.futureTimePeriod.value,
                       baselineTimePeriod,
@@ -185,12 +185,12 @@ export default class App extends Component {
 
               <Tab
                 eventKey={'Maps'}
-                title={<T as='string' item='maps.tab'/>}
+                title={<T as='string' path='maps.tab'/>}
                 className='pt-2'
               >
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
-                    <T item='fragments.variablePrefix'/>
+                    <T path='fragments.variablePrefix'/>
                   </Col>
                   <Col sm={4} xs={6}>
                     <VariableSelector
@@ -202,7 +202,7 @@ export default class App extends Component {
                 </Row>
                 <Row>
                   <Col lg={12}>
-                    <T item='maps.title' context={{
+                    <T path='maps.title' data={{
                       season: this.state.season.label,
                       variable: this.state.variable.label,
                       region: this.state.region.label,
@@ -223,12 +223,12 @@ export default class App extends Component {
 
               <Tab
                 eventKey={'Graph'}
-                title={<T as='string' item='graph.tab'/>}
+                title={<T as='string' path='graph.tab'/>}
                 className='pt-2'
               >
                 <Row>
                   <Col lg={2}>
-                    <T item='fragments.variablePrefix'/>
+                    <T path='fragments.variablePrefix'/>
                     <VariableSelector
                       bases={meta}
                       value={this.state.variable}
@@ -238,7 +238,7 @@ export default class App extends Component {
                 </Row>
                 <Row>
                   <Col lg={12}>
-                    <T item='graph.title' context={{
+                    <T path='graph.title' data={{
                       season: this.state.season.label,
                       variable: this.state.variable.label,
                       region: this.state.region.label,

@@ -48,22 +48,22 @@ export default class Summary extends React.Component {
         <thead>
         <tr>
           <th rowSpan={2} className='align-middle'>
-            <T item='summary.table.heading.variable'/>
+            <T path='summary.table.heading.variable'/>
           </th>
           <th rowSpan={2} className='align-middle text-center'>
-            <T item='summary.table.heading.season'/>
+            <T path='summary.table.heading.season'/>
           </th>
           <th colSpan={2} className='text-center'>
-            <T item='summary.table.heading.projectedChange'
-               context={this.props.baseline}/>
+            <T path='summary.table.heading.projectedChange'
+               data={this.props.baseline}/>
           </th>
         </tr>
         <tr>
           <th>
-            <T item='summary.table.heading.ensembleMedian'/>
+            <T path='summary.table.heading.ensembleMedian'/>
           </th>
           <th>
-            <T item='summary.table.heading.range'/>
+            <T path='summary.table.heading.range'/>
           </th>
         </tr>
         </thead>
