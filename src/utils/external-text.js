@@ -104,7 +104,7 @@ _.mixin({
 export { _ };
 
 
-export const ExternalTextContext = React.createContext(
+export const Context = React.createContext(
   null
 );
 
@@ -143,9 +143,9 @@ export class Provider extends React.Component {
 
   render() {
     return (
-      <ExternalTextContext.Provider value={this.state.texts}>
+      <Context.Provider value={this.state.texts}>
         {this.props.children}
-      </ExternalTextContext.Provider>
+      </Context.Provider>
     );
   }
 }
@@ -306,7 +306,8 @@ export function makeYamlLoader(url) {
 }
 
 
-ExternalText.contextType = ExternalTextContext;
+ExternalText.contextType = Context;
+ExternalText.Context = Context;
 ExternalText.Provider = Provider;
 ExternalText.get = get;
 ExternalText.Markdown = ReactMarkdown;
