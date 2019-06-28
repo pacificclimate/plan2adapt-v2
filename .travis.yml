@@ -7,4 +7,5 @@ cache:
 install:
   - npm install
 script:
+  - echo "hello world"
   - npm test
