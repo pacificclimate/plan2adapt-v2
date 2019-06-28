@@ -55,206 +55,218 @@ export default class App extends Component {
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
 
   render() {
+    // TODO: Extract various parts of this to components to reduce the nesting
+    // level. But not until we are pretty sure we have settled this arrangement,
+    // since extraction means introducing extra machinery for state-setting
+    // callbacks, etc.
     return (
-      <Container fluid>
-        <AppHeader/>
+      // We introduce a consumer for external texts context so we can use
+      // T.get easily (it needs the context (`texts`) as an argument).
+      <T.Context.Consumer>
+        {texts => (
+          <Container fluid>
+            <AppHeader/>
 
-        <Row>
-          <Col xl={2} lg={12} md={12}>
-            {/* TODO: Extract this as a separate component? */}
-            <div className='MainSelectors'>
-              <Row>
-                <Col>
-                  <T item='mainSelectors.prologue'/>
-                </Col>
-              </Row>
-              <Row>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T item='mainSelectors.seasonPrefix'/>
-                </Col>
-                <Col xl={12} lg={2} md={3}>
-                  <SeasonSelector
-                    value={this.state.season}
-                    onChange={this.handleChangeSeason}
-                  />
-                </Col>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T item='mainSelectors.regionPrefix'/>
-                </Col>
-                <Col xl={12} lg={3} md={6}>
-                  <RegionSelector
-                    value={this.state.region}
-                    onChange={this.handleChangeRegion}
-                  />
-                </Col>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T item='mainSelectors.periodPrefix'/>
-                </Col>
-                <Col xl={12} lg={3} md={4}>
-                  <TimePeriodSelector
-                    bases={filter(m => +m.start_date >= 2010)(meta)}
-                    value={this.state.futureTimePeriod}
-                    onChange={this.handleChangeTimePeriod}
-                  />
-                </Col>
-              </Row>
-            </div>
-          </Col>
+            <Row>
+              <Col xl={2} lg={12} md={12}>
+                {/* TODO: Extract this as a separate component? */}
+                <div className='MainSelectors'>
+                  <Row>
+                    <Col>
+                      <T path='mainSelectors.prologue'/>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='mainSelectors.seasonPrefix'/>
+                    </Col>
+                    <Col xl={12} lg={2} md={3}>
+                      <SeasonSelector
+                        value={this.state.season}
+                        onChange={this.handleChangeSeason}
+                      />
+                    </Col>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='mainSelectors.regionPrefix'/>
+                    </Col>
+                    <Col xl={12} lg={3} md={6}>
+                      <RegionSelector
+                        value={this.state.region}
+                        onChange={this.handleChangeRegion}
+                      />
+                    </Col>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='mainSelectors.periodPrefix'/>
+                    </Col>
+                    <Col xl={12} lg={3} md={4}>
+                      <TimePeriodSelector
+                        bases={filter(m => +m.start_date >= 2010)(meta)}
+                        value={this.state.futureTimePeriod}
+                        onChange={this.handleChangeTimePeriod}
+                      />
+                    </Col>
+                  </Row>
+                </div>
+              </Col>
 
-          <Col xl={10} lg={12} md={12}>
-            <Tabs
-              id={'main'}
-              defaultActiveKey={'Impacts'}
-            >
-              <Tab
-                eventKey={'Summary'}
-                title={<T as='string' item='summary.tab'/>}
-                className='pt-2'
-              >
-                {/*<T item='summary.title' context={{*/}
-                {/*  region: this.state.region.label,*/}
-                {/*  futureTimePeriod: this.state.futureTimePeriod.value.shorthand*/}
-                {/*}}/>*/}
-                <Summary summary={summary}/>
-                <T item='summary.notes.general' context={{
-                  region: this.state.region.label,
-                  futureTimePeriod: this.state.futureTimePeriod.value,
-                  baselineTimePeriod,
-                }}/>
-                <T item='summary.notes.derivedVars'/>
-              </Tab>
-
-              <Tab
-                eventKey={'Impacts'}
-                title={<T as='string' item='impacts.tab'/>}
-                className='pt-2'
-              >
-                <Row>
-                  <Col lg={12}>
-                    <T item='impacts.prologue' context={{
+              <Col xl={10} lg={12} md={12}>
+                <Tabs
+                  id={'main'}
+                  // Not sure why this doesn't work. Annoying.
+                  // defaultActiveKey={T.get(texts, 'app.tabs.defaultActiveKey')}
+                  defaultActiveKey='Summary'
+                >
+                  <Tab
+                    eventKey={T.get(texts, 'summary.tab')}
+                    title={<T as='string' path='summary.tab'/>}
+                    className='pt-2'
+                  >
+                    {/*<T path='summary.title' data={{*/}
+                    {/*  region: this.state.region.label,*/}
+                    {/*  futureTimePeriod: this.state.futureTimePeriod.value.shorthand*/}
+                    {/*}}/>*/}
+                    <Summary summary={summary}/>
+                    <T path='summary.notes.general' data={{
                       region: this.state.region.label,
                       futureTimePeriod: this.state.futureTimePeriod.value,
                       baselineTimePeriod,
                     }}/>
-                    <Tabs
-                      id={'impacts'}
-                      defaultActiveKey={'rules'}
-                    >
-                      <Tab
-                        eventKey={'by-category'}
-                        title={'By Category'}
-                        className='pt-2'
-                      >
-                        <Impacts
-                          rulebase={rulebase}
-                          ruleValues={ruleValues}
-                          groupKey='category'
-                          itemKey='sector'
-                          groupHeading='Impact Category'
-                          itemsHeading='Affected Sectors'
-                        />
-                      </Tab>
-                      <Tab
-                        eventKey={'by-sector'}
-                        title={'By Sector'}
-                        className='pt-2'
-                      >
-                        <Impacts
-                          rulebase={rulebase}
-                          ruleValues={ruleValues}
-                          groupKey='sector'
-                          itemKey='category'
-                          groupHeading='Affected Sector'
-                          itemsHeading='Impact Categories'
-                        />
-                      </Tab>
-                      <Tab
-                        eventKey={'rules'}
-                        title={'Rules Logic'}
-                        className='pt-2'
-                      >
-                        <Rules
-                          rulebase={rulebase}
-                          ruleValues={ruleValues}
-                        />
-                      </Tab>
-                    </Tabs>
-                  </Col>
-                </Row>
-              </Tab>
+                    <T path='summary.notes.derivedVars'/>
+                  </Tab>
 
-              <Tab
-                eventKey={'Maps'}
-                title={<T as='string' item='maps.tab'/>}
-                className='pt-2'
-              >
-                <Row>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T item='fragments.variablePrefix'/>
-                  </Col>
-                  <Col sm={4} xs={6}>
-                    <VariableSelector
-                      bases={meta}
-                      value={this.state.variable}
-                      onChange={this.handleChangeVariable}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={12}>
-                    <T item='maps.title' context={{
-                      season: this.state.season.label,
-                      variable: this.state.variable.label,
-                      region: this.state.region.label,
-                    }}/>
-                  </Col>
-                </Row>
-                <TwoDataMaps
-                  region={this.state.region.value}
-                  historicalTimePeriod={{
-                    start_date: 1961,
-                    end_date: 1990,
-                  }}
-                  futureTimePeriod={this.state.futureTimePeriod.value}
-                  season={this.state.season.value}
-                  variable={this.state.variable.value}
-                />
-              </Tab>
+                  <Tab
+                    eventKey={T.get(texts, 'impacts.tab')}
+                    title={<T as='string' path='impacts.tab'/>}
+                    className='pt-2'
+                  >
+                    <Row>
+                      <Col lg={12}>
+                        <T path='impacts.prologue' data={{
+                          region: this.state.region.label,
+                          futureTimePeriod: this.state.futureTimePeriod.value,
+                          baselineTimePeriod,
+                        }}/>
+                        <Tabs
+                          id={'impacts'}
+                          defaultActiveKey={'rules'}
+                        >
+                          <Tab
+                            eventKey={'by-category'}
+                            title={'By Category'}
+                            className='pt-2'
+                          >
+                            <Impacts
+                              rulebase={rulebase}
+                              ruleValues={ruleValues}
+                              groupKey='category'
+                              itemKey='sector'
+                              groupHeading='Impact Category'
+                              itemsHeading='Affected Sectors'
+                            />
+                          </Tab>
+                          <Tab
+                            eventKey={'by-sector'}
+                            title={'By Sector'}
+                            className='pt-2'
+                          >
+                            <Impacts
+                              rulebase={rulebase}
+                              ruleValues={ruleValues}
+                              groupKey='sector'
+                              itemKey='category'
+                              groupHeading='Affected Sector'
+                              itemsHeading='Impact Categories'
+                            />
+                          </Tab>
+                          <Tab
+                            eventKey={'rules'}
+                            title={'Rules Logic'}
+                            className='pt-2'
+                          >
+                            <Rules
+                              rulebase={rulebase}
+                              ruleValues={ruleValues}
+                            />
+                          </Tab>
+                        </Tabs>
+                      </Col>
+                    </Row>
+                  </Tab>
 
-              <Tab
-                eventKey={'Graph'}
-                title={<T as='string' item='graph.tab'/>}
-                className='pt-2'
-              >
-                <Row>
-                  <Col lg={2}>
-                    <T item='fragments.variablePrefix'/>
-                    <VariableSelector
-                      bases={meta}
-                      value={this.state.variable}
-                      onChange={this.handleChangeVariable}
+                  <Tab
+                    eventKey={T.get(texts, 'maps.tab')}
+                    title={<T as='string' path='maps.tab'/>}
+                    className='pt-2'
+                  >
+                    <Row>
+                      <Col xs={'auto'} className='pr-0'>
+                        <T path='fragments.variablePrefix'/>
+                      </Col>
+                      <Col sm={4} xs={6}>
+                        <VariableSelector
+                          bases={meta}
+                          value={this.state.variable}
+                          onChange={this.handleChangeVariable}
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12}>
+                        <T path='maps.title' data={{
+                          season: this.state.season.label,
+                          variable: this.state.variable.label,
+                          region: this.state.region.label,
+                        }}/>
+                      </Col>
+                    </Row>
+                    <TwoDataMaps
+                      region={this.state.region.value}
+                      historicalTimePeriod={{
+                        start_date: 1961,
+                        end_date: 1990,
+                      }}
+                      futureTimePeriod={this.state.futureTimePeriod.value}
+                      season={this.state.season.value}
+                      variable={this.state.variable.value}
                     />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={12}>
-                    <T item='graph.title' context={{
-                      season: this.state.season.label,
-                      variable: this.state.variable.label,
-                      region: this.state.region.label,
-                    }}/>
-                  </Col>
-                  <Col lg={6}>
-                    <ChangeOverTimeGraph
-                      {...this.state}
-                    />
-                  </Col>
-                </Row>
-              </Tab>
-            </Tabs>
-          </Col>
-        </Row>
-      </Container>
+                  </Tab>
+
+                  <Tab
+                    eventKey={T.get(texts, 'graph.tab')}
+                    title={<T as='string' path='graph.tab'/>}
+                    className='pt-2'
+                  >
+                    <Row>
+                      <Col lg={2}>
+                        <T path='fragments.variablePrefix'/>
+                        <VariableSelector
+                          bases={meta}
+                          value={this.state.variable}
+                          onChange={this.handleChangeVariable}
+                        />
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12}>
+                        <T path='graph.title' data={{
+                          season: this.state.season.label,
+                          variable: this.state.variable.label,
+                          region: this.state.region.label,
+                        }}/>
+                      </Col>
+                      <Col lg={6}>
+                        <ChangeOverTimeGraph
+                          {...this.state}
+                        />
+                      </Col>
+                    </Row>
+                  </Tab>
+                </Tabs>
+              </Col>
+            </Row>
+          </Container>
+        )}
+      </T.Context.Consumer>
     );
   }
 }

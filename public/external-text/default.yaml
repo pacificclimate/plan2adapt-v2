@@ -1,5 +1,11 @@
 greeting: Hello, ${name}.
 
+app:
+  tabs:
+    # Neither of these works in the code.
+    # defaultActiveKey: ${$$.summary.tab}
+    defaultActiveKey: Summary
+
 mainSelectors:
   prologue: I am interested in information about projected climate change ...
   seasonPrefix: for a typical
@@ -18,7 +24,14 @@ summary:
       projectedChange: Projected Change from ${$$.fragments.period} Baseline
       ensembleMedian: Ensemble Median
       range: Range (10th to 90th percentile)
-
+    rows:
+      variable: |
+        ${variable.label}${variable.derived ? '*': ''} (${variable.units})
+      season: ${season.label}
+      ensembleMedian: ${format(season.ensembleMedian)}${units}
+      range: |
+        ${format(season.range.min)}${isLong(units) ? '': units} to
+        ${format(season.range.max)}${units}
   notes:
     general: |
       The table above shows projected changes in average (mean) temperature,
@@ -131,7 +144,6 @@ impacts:
 
       In the table below, active rules have a white background;
       inactive rules have a grey background.
-
 
     table:
       showInactiveRulesButton:

@@ -14,16 +14,16 @@ const isLong = s => s.length > 2;
 
 const SeasonTds = ({ variable, season }) => {
   const units = unitsSuffix(variable.units);
+  const data = {variable, season, units, format, isLong};
   return [
     <td className="text-center">
-      {season.label}
+      <T path='summary.table.rows.season' data={data} as='string'/>
     </td>,
     <td>
-      {format(season.ensembleMedian)}{units}
+      <T path='summary.table.rows.ensembleMedian' data={data} as='string'/>
     </td>,
     <td>
-      {format(season.range.min)}{isLong(units) ? '' : units}{' to '}
-      {format(season.range.max)}{units}
+      <T path='summary.table.rows.range' data={data} as='string'/>
     </td>,
   ];
 };
@@ -48,22 +48,22 @@ export default class Summary extends React.Component {
         <thead>
         <tr>
           <th rowSpan={2} className='align-middle'>
-            <T item='summary.table.heading.variable'/>
+            <T path='summary.table.heading.variable' as='string'/>
           </th>
           <th rowSpan={2} className='align-middle text-center'>
-            <T item='summary.table.heading.season'/>
+            <T path='summary.table.heading.season' as='string'/>
           </th>
           <th colSpan={2} className='text-center'>
-            <T item='summary.table.heading.projectedChange'
-               context={this.props.baseline}/>
+            <T path='summary.table.heading.projectedChange'
+               data={this.props.baseline} as='string'/>
           </th>
         </tr>
         <tr>
           <th>
-            <T item='summary.table.heading.ensembleMedian'/>
+            <T path='summary.table.heading.ensembleMedian' as='string'/>
           </th>
           <th>
-            <T item='summary.table.heading.range'/>
+            <T path='summary.table.heading.range' as='string'/>
           </th>
         </tr>
         </thead>
@@ -77,10 +77,11 @@ export default class Summary extends React.Component {
                     <td
                       rowSpan={item.seasons.length}
                       className='align-middle'
-                    >{`
-                      ${item.variable.label}${item.variable.derived ? '*' : ''}
-                      (${item.variable.units})
-                    `}</td>
+                    >
+                      <T path='summary.table.rows.variable'
+                        data={item} as='string'
+                      />
+                    </td>
                   }
                   <SeasonTds variable={item.variable} season={season}/>
                 </tr>

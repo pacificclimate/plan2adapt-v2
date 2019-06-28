@@ -30,7 +30,7 @@ export default class TwoDataMaps extends React.Component {
     return (
       <Row>
         <Col lg={6}>
-          <T item='maps.historical.title' context={{
+          <T path='maps.historical.title' data={{
             start_date: this.props.historicalTimePeriod.start_date,
             end_date: this.props.historicalTimePeriod.end_date
           }}/>
@@ -46,7 +46,7 @@ export default class TwoDataMaps extends React.Component {
           />
         </Col>
         <Col lg={6}>
-          <T item='maps.projected.title' context={{
+          <T path='maps.projected.title' data={{
             start_date: this.props.futureTimePeriod.start_date,
             end_date: this.props.futureTimePeriod.end_date
           }}/>

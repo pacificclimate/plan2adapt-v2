@@ -13,7 +13,7 @@ export default class Rules extends React.Component {
   render() {
     return (
       <div className='Rules'>
-        <T item='impacts.rulesLogic.prologue'/>
+        <T path='impacts.rulesLogic.prologue'/>
         <RulesTable {...this.props}/>
       </div>
     );
