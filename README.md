@@ -1,5 +1,7 @@
 # Plan2Adapt Version 2
 
+[![Build Status](https://travis-ci.org/pacificclimate/plan2adapt-v2.svg?branch=master)](https://travis-ci.org/pacificclimate/plan2adapt-v2)
+
 Plan2Adapt Version 2 is an updated and improved version of the original
 [Plan2Adapt v1](https://pacificclimate.org/analysis-tools/plan2adapt) 
 with the following general requirements and goals:
