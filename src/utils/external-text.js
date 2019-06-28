@@ -82,6 +82,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import yaml from 'js-yaml';
 
+// TODO: This mixin should probably be done somewhere else.
 _.mixin({
   mapTraverse: (collection, iteratee) => {
     // Recursively traverse a collection and return a collection with the
@@ -94,7 +95,7 @@ _.mixin({
       return _.map(collection, traverseValue);
     }
     if (_.isPlainObject(collection)) {
-      return _.mapObject(collection, traverseValue);
+      return _.mapValues(collection, traverseValue);
     }
     return iteratee(collection);
   }
