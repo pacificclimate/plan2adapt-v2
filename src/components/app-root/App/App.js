@@ -261,6 +261,22 @@ export default class App extends Component {
                       </Col>
                     </Row>
                   </Tab>
+
+                  <Tab
+                    eventKey={T.get(texts, 'notes.tab')}
+                    title={<T as='string' path='notes.tab'/>}
+                    className='pt-2'
+                  >
+                    <T path='notes.content'/>
+                  </Tab>
+
+                  <Tab
+                    eventKey={T.get(texts, 'references.tab')}
+                    title={<T as='string' path='references.tab'/>}
+                    className='pt-2'
+                  >
+                    <T path='references.content'/>
+                  </Tab>
                 </Tabs>
               </Col>
             </Row>
