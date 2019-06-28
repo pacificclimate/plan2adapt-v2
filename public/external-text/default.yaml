@@ -169,6 +169,78 @@ graph:
   tab: Graph
   title: "## Range of projected change in ${season} ${variable} for ${region}"
 
+notes:
+  tab: Notes
+  content: |
+    ## Notes
+
+    1. Multiple projections information is drawn from a set of 30 GCM
+    projections based on results from 15 different Global Climate Models (GCMs),
+    each using one run of a high (A2) and a lower (B1) greenhouse gas emissions
+    scenario. By the end of the 21st century, these scenarios anticipate an atmospheric concentration of greenhouse gases of approximately 1250 ppm (A2) and 600 ppm (B1), expressed as carbon dioxide (CO2) equivalent. Neither scenario incorporates the effects of international agreements on the reduction of greenhouse gas emissions, though other socio-economic factors like population growth are modelled. Each GCM comes from a different modelling centre (e.g. the Hadley Centre (UK), National Centre for Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA), and Commonwealth Scientific and Industrial Research Organisation (Australia), etc.).
+
+    1. The single projection used for the maps is the CGCM3 A2 run 4.
+    CGCM3 is the Canadian Global Climate Model, developed and run by
+    Environment Canada's Canadian Centre for Climate Modelling and Analysis
+    at the University of Victoria. The A2 specification denotes a possible
+    future where emissions continue to rise alongside increases in human
+    population and economic growth. A2 is one emissions scenario amongst
+    several developed by the Intergovernmental Panel on Climate Change (IPCC)
+    and published in its Special Report on Emissions Scenarios (SRES)
+    (see 'References' tab).
+
+    1. High-resolution climate data is obtained by using the ClimateBC
+    empirical downscaling tool. ClimateBC uses interpolation, an elevation
+    correction on temperature, and the PRISM (Parameter-elevation Regressions
+    on Independent Slopes Model) 4 km high-resolution climatology derived
+    from a multiple regression of weather station data against topographical
+    features. This projected change from Global Climate Models (GCMs) is
+    applied to the high resolution past in order to obtain an estimate of
+    future climate at the same high resolution.
+
+    1. The 2020s, 2050s, and 2080s time periods are meant to be used as three
+    representative planning horizons over the 21st century. Results for these
+    three planning horizons are computed by averaging GCM projections over
+    the 2010-2039, 2040-2069, and 2070-2099 periods, respectively.
+
+    1. With the exception of temperature and precipitation, most variable
+    values shown here are not directly observed or obtained from the GCMs.
+    Instead, they are derived from temperature and/or precipitation using
+    methods described in Wang et al., 2006 (see 'References' tab).
+
+    ## Acknowledgements
+
+    Development of this tool has been made possible through funding and
+    support provided by the BC Ministry of Environment and the
+    BC Ministry of Forests and Range Forest Science Program and is a
+    project of Natural Resources Canada's British Columbia Regional
+    Adaptation Collaborative.
+
+references:
+  tab: References
+  content: |
+    British Columbia Ministry of Water, Land and Air Protection. 2002. _Indicators of Climate Change for British Columbia 2002_. Victoria, BC. 48 pp.
+
+    Bronaugh, D., T. Murdock. In review. _Developing Improved Degree-Day Regressions_. Pacific Climate Impacts Consortium report; 33 pp.
+
+    Cohen, Stewart. 2009. _Climate Change in the 21st Century - Understanding the World's Biggest Crisis_. McGill-Queen's University Press. 379 pp.
+
+    Daly, C., W.P. Gibson, G.H. Taylor, G.L. Johnson, and P. Pasteris. 2002. "A knowledge-based approach to the statistical mapping of climate", _Climate Research_, 22: 99-113. Details the PRISM 4km climatology.
+
+    Hamlet A.F., D.P. Lettenmaier. 2005. _Effects of Temperature and Precipitation Variability on Snowpack Trends in the Western U.S._ Journal of Climate, 18 (21): pp. 4545-4561.
+
+    Hamlet A.F., D.P. Lettenmaier. 2007. _Effects of 20th Century Warming and Climate Variability on Flood Risk in the Western U.S._ Water Resources Research, 43: W06427.doi:10.1029/2006WR005099.
+
+    Intergovernmental Panel on Climate Change. 2000. _Special Report on Emissions Scenarios_. Cambridge University Press. 570 pp. http://www.ipcc.ch/ipccreports/sres/emission/index.htm
+
+    Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
+
+    Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
+
+    Rodenhuis, D.R., Bennett, K.E., Werner, A.T., Murdock, T.Q., Bronaugh, D. Revised 2009. _Hydro-climatology and future climate impacts in British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria BC, 132 pp. Provides additional information on future climate projects in British Columbia.
+
+    Wang, T.L., Hamann, A., Spittlehouse, D.L. and Aitken, S.N., 2006. "Development of scale-free climate data for Western Canada for use in resource management", _International Journal of Climatology_, 26: 383-397. Details the ClimateBC empirical downscaling tool.
+
 fragments:
   period: ${start_date}-${end_date}
   variablePrefix: Show details about
