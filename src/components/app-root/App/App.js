@@ -6,13 +6,13 @@ import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 
-import { map, filter, slice, curry } from 'lodash/fp';
+import { map, filter, slice, curry, get } from 'lodash/fp';
 
+import { getMetadata } from '../../../data-services/metadata';
 import regions from '../../../assets/regions';
 import timePeriods from '../../../assets/time-periods';
 import seasons from '../../../assets/seasons';
 import variables from '../../../assets/variables';
-import meta from '../../../assets/meta';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 import ruleValues from '../../../assets/rule-results';
@@ -21,7 +21,8 @@ import T, { ExternalTextContext } from 'pcic-react-external-text';
 import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
-import TimePeriodSelector from '../../selectors/TimePeriodSelector/TimePeriodSelector';
+import TimePeriodSelector from '../../selectors/TimePeriodSelector';
+// import { TimePeriodSelector } from 'pcic-react-components';
 import SeasonSelector from '../../selectors/SeasonSelector/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector/VariableSelector';
 import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
@@ -42,11 +43,18 @@ const baselineTimePeriod = {
 
 export default class App extends Component {
   state = {
+    metadata: null,
     region: regions[0],
-    futureTimePeriod: timePeriods[0],
+    futureTimePeriod: undefined,
     season: seasons[0],
     variable: variables[0],
   };
+
+  componentDidMount() {
+    getMetadata()
+      .then(response => response.data)
+      .then(metadata => this.setState({ metadata }))
+  }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeRegion = this.handleChangeSelection.bind(this, 'region');
@@ -59,6 +67,13 @@ export default class App extends Component {
     // level. But not until we are pretty sure we have settled this arrangement,
     // since extraction means introducing extra machinery for state-setting
     // callbacks, etc.
+    if (this.state.metadata === null) {
+      console.log('Loading metadata...')
+      return (<h1>Loading metadata...</h1>);
+    }
+    console.log('Metadata loaded')
+    const futureTimePeriod =
+      get('futureTimePeriod.value.representative', this.state) || {};
     return (
       // We introduce a consumer for external texts context so we can use
       // T.get easily (it needs the context (`texts`) as an argument).
@@ -100,9 +115,10 @@ export default class App extends Component {
                     </Col>
                     <Col xl={12} lg={3} md={4}>
                       <TimePeriodSelector
-                        bases={filter(m => +m.start_date >= 2010)(meta)}
+                        bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
                         value={this.state.futureTimePeriod}
                         onChange={this.handleChangeTimePeriod}
+                        debug
                       />
                     </Col>
                   </Row>
@@ -121,14 +137,10 @@ export default class App extends Component {
                     title={<T as='string' path='summary.tab'/>}
                     className='pt-2'
                   >
-                    {/*<T path='summary.title' data={{*/}
-                    {/*  region: this.state.region.label,*/}
-                    {/*  futureTimePeriod: this.state.futureTimePeriod.value.shorthand*/}
-                    {/*}}/>*/}
                     <Summary summary={summary}/>
                     <T path='summary.notes.general' data={{
                       region: this.state.region.label,
-                      futureTimePeriod: this.state.futureTimePeriod.value,
+                      futureTimePeriod: futureTimePeriod,
                       baselineTimePeriod,
                     }}/>
                     <T path='summary.notes.derivedVars'/>
@@ -143,7 +155,7 @@ export default class App extends Component {
                       <Col lg={12}>
                         <T path='impacts.prologue' data={{
                           region: this.state.region.label,
-                          futureTimePeriod: this.state.futureTimePeriod.value,
+                          futureTimePeriod: futureTimePeriod,
                           baselineTimePeriod,
                         }}/>
                         <Tabs
@@ -209,7 +221,7 @@ export default class App extends Component {
                       </Col>
                       <Col sm={4} xs={6}>
                         <VariableSelector
-                          bases={meta}
+                          bases={this.state.metadata}
                           value={this.state.variable}
                           onChange={this.handleChangeVariable}
                         />
@@ -230,7 +242,7 @@ export default class App extends Component {
                         start_date: 1961,
                         end_date: 1990,
                       }}
-                      futureTimePeriod={this.state.futureTimePeriod.value}
+                      futureTimePeriod={futureTimePeriod}
                       season={this.state.season.value}
                       variable={this.state.variable.value}
                     />
@@ -245,7 +257,7 @@ export default class App extends Component {
                       <Col lg={2}>
                         <T path='fragments.variablePrefix'/>
                         <VariableSelector
-                          bases={meta}
+                          bases={this.state.metadata}
                           value={this.state.variable}
                           onChange={this.handleChangeVariable}
                         />
