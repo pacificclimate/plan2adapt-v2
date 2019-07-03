@@ -1,25 +1,39 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Select from 'react-select';
-import timePeriods from '../../../assets/time-periods';
+import { SimpleConstraintGroupingSelector } from 'pcic-react-components';
 
 
 export default class TimePeriodSelector extends React.Component {
   static propTypes = {
+    bases: PropTypes.array.isRequired,
+      // List of basis items the selector will build its options from.
+
+    constraint: PropTypes.object,
+      // Any option that does not have a context that matches this value
+      // is disabled. Replaces prop getOptionIsDisabled' in `GroupingSelector`.
+
     value: PropTypes.object,
     onChange: PropTypes.func,
   };
 
-  static formatOptionLabel = ({ value: { shorthand, start_date, end_date } }) =>
-    `${shorthand} (${start_date}-${end_date})`;
+  static getOptionRepresentative = ({ start_date, end_date }) => {
+    const decade = Math.floor((Number(start_date) + Number(end_date)) / 20 ) * 10;
+    return {
+      decade,
+      start_date: decade - 10,
+      end_date: decade + 20,
+    };
+  };
+
+  static getOptionLabel = ({ value: { representative: { decade, start_date, end_date } } }) =>
+    `${decade}s (${start_date}–${end_date})`;
 
   render() {
     return (
-      <Select
-        options={timePeriods}
-        formatOptionLabel={TimePeriodSelector.formatOptionLabel}
-        value={this.props.value}
-        onChange={this.props.onChange}
+      <SimpleConstraintGroupingSelector
+        getOptionRepresentative={TimePeriodSelector.getOptionRepresentative}
+        getOptionLabel={TimePeriodSelector.getOptionLabel}
+        {...this.props}
       />
     );
   }
