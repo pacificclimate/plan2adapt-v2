@@ -193,10 +193,15 @@ export default class App extends Component {
                     </Row>
                   </Tab>
 
+                  {/*
+                  <Tab mountOnEnter> prevents premature initialization of
+                  maps leading to incorrect appearance until window is resized.
+                  */}
                   <Tab
                     eventKey={T.get(texts, 'maps.tab')}
                     title={<T as='string' path='maps.tab'/>}
                     className='pt-2'
+                    mountOnEnter
                   >
                     <Row>
                       <Col xs={'auto'} className='pr-0'>
