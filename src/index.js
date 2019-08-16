@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
-import ExternalText from './utils/external-text';
+import ExternalText from 'pcic-react-external-text';
+import { makeYamlLoader } from './utils/external-text';
 
+console.log('index.js: App', App)
+console.log('index.js: ExternalText', ExternalText)
 
-const loadTexts = ExternalText.makeYamlLoader(
+const loadTexts = makeYamlLoader(
   `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXT}`
 );
 

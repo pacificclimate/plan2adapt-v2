@@ -17,7 +17,7 @@ import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 import ruleValues from '../../../assets/rule-results';
 
-import T from '../../../utils/external-text';
+import T, { ExternalTextContext } from 'pcic-react-external-text';
 import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
@@ -62,7 +62,7 @@ export default class App extends Component {
     return (
       // We introduce a consumer for external texts context so we can use
       // T.get easily (it needs the context (`texts`) as an argument).
-      <T.Context.Consumer>
+      <ExternalTextContext.Consumer>
         {texts => (
           <Container fluid>
             <AppHeader/>
@@ -287,7 +287,7 @@ export default class App extends Component {
             </Row>
           </Container>
         )}
-      </T.Context.Consumer>
+      </ExternalTextContext.Consumer>
     );
   }
 }

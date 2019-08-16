@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import { map } from 'lodash/fp';
-import T from '../../../utils/external-text';
+import T from 'pcic-react-external-text';
 
 
 const format = number => `${number > 0 ? '+' : ''}${number}`;
