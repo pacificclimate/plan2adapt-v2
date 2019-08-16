@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import RulesTable from '../RulesTable';
-import T from '../../../../utils/external-text';
+import T from 'pcic-react-external-text';
 import './Rules.css';
 
 export default class Rules extends React.Component {
