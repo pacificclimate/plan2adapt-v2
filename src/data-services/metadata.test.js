@@ -1,7 +1,7 @@
-import { normalize } from './metadata';
+import { standardize } from './metadata';
 import sortBy from 'lodash/fp/sortBy';
 
-describe('normalize', () => {
+describe('standardize', () => {
   const rest = i => ({
     x: `x${i}`,
     y: `y${i}`,
@@ -61,6 +61,6 @@ describe('normalize', () => {
   ];
 
   it('works', () => {
-    expect(sortBy('unique_id')(normalize(data))).toEqual(normalized);
+    expect(sortBy('unique_id')(standardize(data))).toEqual(normalized);
   });
 });
