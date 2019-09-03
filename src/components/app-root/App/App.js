@@ -47,7 +47,7 @@ export default class App extends Component {
     region: regions[0],
     futureTimePeriod: undefined,
     season: seasons[0],
-    variable: variables[0],
+    variable: undefined,
   };
 
   componentDidMount() {
@@ -231,7 +231,7 @@ export default class App extends Component {
                       <Col lg={12}>
                         <T path='maps.title' data={{
                           season: this.state.season.label,
-                          variable: this.state.variable.label,
+                          variable: get('label', this.state.variable),
                           region: this.state.region.label,
                         }}/>
                       </Col>
@@ -244,7 +244,8 @@ export default class App extends Component {
                       }}
                       futureTimePeriod={futureTimePeriod}
                       season={this.state.season.value}
-                      variable={this.state.variable.value}
+                      variable={get('value', this.state.variable)}
+                      metadata={this.state.metadata}
                     />
                   </Tab>
 
@@ -267,7 +268,7 @@ export default class App extends Component {
                       <Col lg={12}>
                         <T path='graph.title' data={{
                           season: this.state.season.label,
-                          variable: this.state.variable.label,
+                          variable: get('label', this.state.variable),
                           region: this.state.region.label,
                         }}/>
                       </Col>

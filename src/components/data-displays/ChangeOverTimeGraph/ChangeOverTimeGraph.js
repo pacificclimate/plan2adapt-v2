@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import get from 'lodash/fp/get';
 
 
 export default class ChangeOverTimeGraph extends React.Component {
@@ -20,7 +21,7 @@ export default class ChangeOverTimeGraph extends React.Component {
           Graph:
           ${this.props.region.label},
           ${this.props.season.label},
-          ${this.props.variable.label}
+          ${get('label', this.props.variable)}
           vs. Time period
         `}
       </div>
