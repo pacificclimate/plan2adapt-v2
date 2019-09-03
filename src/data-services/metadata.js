@@ -38,6 +38,7 @@ export function getMetadata() {
     {
       params: {
         ensemble_name: process.env.REACT_APP_ENSEMBLE_NAME,
+        model: process.env.REACT_APP_MODEL_ID,
       },
       transformResponse: [JSON.parse, standardize],
     },
