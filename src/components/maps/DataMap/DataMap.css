@@ -1,4 +1,6 @@
 .leaflet-container {
     height: 800px;
     width: 100%;
+    /* Set z-index of map so that it doesn't obscure selector option dropdowns */
+    z-index: 0;
 }
