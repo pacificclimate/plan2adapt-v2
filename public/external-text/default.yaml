@@ -38,7 +38,7 @@ summary:
       precipitation and several derived climate variables from the
       baseline historical period
       (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-      to the ${futureTimePeriod.shorthand}
+      to the ${futureTimePeriod.decade}s
       for the ${region} region.
       The ensemble median is a mid-point value, chosen from a PCIC standard
       set of Global Climate Model (GCM) projections (see the 'Notes' tab for
@@ -57,7 +57,7 @@ impacts:
   title: "## Potential Impacts for ${region} in the ${futureTimePeriod}"
   prologue: |
     Below, you can view a list of potential impacts that may affect ${region}
-    in the ${futureTimePeriod.shorthand}.
+    in the ${futureTimePeriod.decade}s.
     This is intended to provide a starting point for more detailed local
     assessment of climate change impacts.
     These are based on limited climate change information, as shown in the

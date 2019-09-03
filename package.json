@@ -23,6 +23,7 @@
     "react-markdown": "^4.0.6",
     "react-scripts": "^2.1.8",
     "react-select": "^2.3.0",
+    "url-join": "^4.0.0",
     "xml-js": "^1.6.9"
   },
   "devDependencies": {
@@ -35,7 +36,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "refresh": "rm -rf ./node_modules; npm install"
+    "reinstall": "rm -rf ./node_modules; npm install"
   },
   "eslintConfig": {
     "extends": "react-app"
