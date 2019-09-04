@@ -46,7 +46,7 @@ export default class App extends Component {
     metadata: null,
     region: regions[0],
     futureTimePeriod: undefined,
-    season: seasons[0],
+    season: undefined,
     variable: undefined,
   };
 
@@ -230,7 +230,7 @@ export default class App extends Component {
                     <Row>
                       <Col lg={12}>
                         <T path='maps.title' data={{
-                          season: this.state.season.label,
+                          season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
                           region: this.state.region.label,
                         }}/>
@@ -243,7 +243,7 @@ export default class App extends Component {
                         end_date: 1990,
                       }}
                       futureTimePeriod={futureTimePeriod}
-                      season={this.state.season.value}
+                      season={get('value', this.state.season)}
                       variable={get('value', this.state.variable)}
                       metadata={this.state.metadata}
                     />
@@ -267,7 +267,7 @@ export default class App extends Component {
                     <Row>
                       <Col lg={12}>
                         <T path='graph.title' data={{
-                          season: this.state.season.label,
+                          season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
                           region: this.state.region.label,
                         }}/>
