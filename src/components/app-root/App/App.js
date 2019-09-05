@@ -8,7 +8,7 @@ import Tab from 'react-bootstrap/Tab';
 
 import { map, filter, slice, curry, get } from 'lodash/fp';
 
-import { getMetadata } from '../../../data-services/metadata';
+import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import regions from '../../../assets/regions';
 import timePeriods from '../../../assets/time-periods';
 import seasons from '../../../assets/seasons';
@@ -51,8 +51,7 @@ export default class App extends Component {
   };
 
   componentDidMount() {
-    getMetadata()
-      .then(response => response.data)
+    fetchSummaryMetadata()
       .then(metadata => this.setState({ metadata }))
   }
 

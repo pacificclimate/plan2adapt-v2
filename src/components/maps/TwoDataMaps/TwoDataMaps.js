@@ -13,6 +13,7 @@ export default class TwoDataMaps extends React.Component {
     futureTimePeriod: PropTypes.object,
     season: PropTypes.string,
     variable: PropTypes.string,
+    metadata: PropTypes.array,
   };
 
   state = {
@@ -43,6 +44,7 @@ export default class TwoDataMaps extends React.Component {
             season={this.props.season}
             variable={this.props.variable}
             timePeriod={this.props.historicalTimePeriod}
+            metadata={this.props.metadata}
           />
         </Col>
         <Col lg={6}>
@@ -59,6 +61,7 @@ export default class TwoDataMaps extends React.Component {
             season={this.props.season}
             variable={this.props.variable}
             timePeriod={this.props.futureTimePeriod}
+            metadata={this.props.metadata}
           />
         </Col>
       </Row>
