@@ -6,13 +6,11 @@ import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 
-import { map, filter, slice, curry, get } from 'lodash/fp';
+import filter from 'lodash/fp/filter';
+import get from 'lodash/fp/get';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import regions from '../../../assets/regions';
-import timePeriods from '../../../assets/time-periods';
-import seasons from '../../../assets/seasons';
-import variables from '../../../assets/variables';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 import ruleValues from '../../../assets/rule-results';
@@ -22,18 +20,16 @@ import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
 import TimePeriodSelector from '../../selectors/TimePeriodSelector';
-// import { TimePeriodSelector } from 'pcic-react-components';
-import SeasonSelector from '../../selectors/SeasonSelector/SeasonSelector';
-import VariableSelector from '../../selectors/VariableSelector/VariableSelector';
-import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
+import SeasonSelector from '../../selectors/SeasonSelector';
+import VariableSelector from '../../selectors/VariableSelector';
+import SelectorLabel from '../../misc/SelectorLabel';
 
-import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
+import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import Impacts from '../../data-displays/impacts/Impacts';
 import Rules from '../../data-displays/impacts/Rules';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
-import Table from 'react-bootstrap/Table';
 import Summary from '../../data-displays/Summary';
 
 const baselineTimePeriod = {
