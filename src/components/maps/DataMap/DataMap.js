@@ -7,6 +7,7 @@ import _ from 'lodash';
 import isEqual from 'lodash/fp/isEqual';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
+import getOr from 'lodash/fp/getOr';
 import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
 import keys from 'lodash/fp/keys';
@@ -44,6 +45,8 @@ const wmsTileLayerStaticProps = {
   // srs: "EPSG:3005",
   transparent: true,
   version: '1.1.1',
+  abovemaxcolor: 'red',
+  belowmincolor: 'black',
 };
 // For CE (mismatch of base layer, argh)
 // const wmsTileLayerProps = {
@@ -65,27 +68,50 @@ const wmsTime = ({ fileMetadata, season }) => {
   return fileMetadata.times[timeIndex];
 };
 
-const wmsTileLayerProps = props => {
-  // For P2A v1
-  // const colorscalerange = {
-  //   tas: '249.15,289.15',
-  //   pr: '0,0.000347222222222222',
-  //   pass: '0,10000',
-  // }[variable];
-  // const styles = {
-  //   tas: 'boxfill/blue6_red4',
-  //   pr: 'boxfill/lightblue_darkblue_log_nc',
-  //   pass: 'boxfill/lightblue_darkblue_log_nc',
-  // }[variable];
-  const styles = 'default-scalar/seq-Greens';
 
+// TODO: Style and range should be part of config. But the configs
+//  are getting a bit more structured than env variables will accommodate.
+
+const variableId2WmsStyle = {
+  pr: 'seq-Greens',
+  tasmax: 'x-Occam',
+  tasmin: 'x-Occam',
+  fallback: 'seq-Oranges',
+};
+const wmsStyle = props => {
+  const palette = getOr(
+    variableId2WmsStyle.fallback,
+    props.variable.representative.variable_id,
+    variableId2WmsStyle
+  );
+  return `default-scalar/${palette}`
+};
+
+
+const variableId2ColourScaleRange = {
+  pr: { min: 0, max: 20 },
+  tasmax: { min: -30, max: 50 },
+  tasmin: { min: -40, max: 40 },
+  fallback: { min: -40, max: 50 },
+};
+const wmsColorScaleRange = props => {
+  const range = getOr(
+    variableId2ColourScaleRange.fallback,
+    props.variable.representative.variable_id,
+    variableId2ColourScaleRange
+  );
+  return `${range.min},${range.max}`
+};
+
+const wmsTileLayerProps = props => {
   return _.assign(
     {},
     wmsTileLayerStaticProps,
     {
-      styles,
       layers: wmsLayerName(props),
       time: wmsTime(props),
+      styles: wmsStyle(props),
+      colorscalerange: wmsColorScaleRange(props),
     }
   );
 };
@@ -169,17 +195,6 @@ class DataMapDisplay extends React.Component {
     ...this.props.popup, isOpen: false, value: null,
   });
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    console.log('### DataMap: cdu: prop changes',
-      flow(
-        keys,
-        filter(key => this.props[key] !== prevProps[key]),
-        map(key => [key, { prev: prevProps[key], curr: this.props[key]}]),
-        fromPairs,
-      )(prevProps)
-    )
-  }
-
   render() {
     // console.log(`### DataMap [${this.props.id}]: wmsTileLayerProps`,
     //   wmsTileLayerProps(this.props))
@@ -229,11 +244,9 @@ const loadFileMetadata = props => {
   return flow(
     metadataFilter(props),
     metadata => {
+      // TODO: Don't throw an error when metadata matching fails. Instead,
+      //   show an error message in the map.
       if (metadata.length === 0) {
-        console.error('No matching metadata: metadata =', props.metadata);
-        console.error('No matching metadata: timePeriod =', props.timePeriod);
-        console.error('No matching metadata: variable =', props.variable);
-        console.error('No matching metadata: season =', props.season);
         throw new Error('No matching metadata');
       }
       if (metadata.length > 1) {
