@@ -181,17 +181,14 @@ class DataMapDisplay extends React.Component {
   }
 
   render() {
-    console.log('### DataMap: count', count)
-    console.log('### DataMap: props', this.props)
-    if (count++ > 1000) {
-      throw new Error('DataMap: Too many renders')
-    }
-
-    const { viewport, onViewportChange } = this.props;
+    // console.log(`### DataMap [${this.props.id}]: wmsTileLayerProps`,
+    //   wmsTileLayerProps(this.props))
+    const { viewport, onViewportChange, onViewportChanged } = this.props;
 
     return (
-      <BCBaseMap {...{ viewport, onViewportChange }}
-                 onClick={this.handleClickMap}
+      <CanadaBaseMap
+        {...{ viewport, onViewportChange, onViewportChanged }}
+        onClick={this.handleClickMap}
       >
         <WMSTileLayer
           url={process.env.REACT_APP_NCWMS_URL}
@@ -204,7 +201,7 @@ class DataMapDisplay extends React.Component {
             onClose={this.handleClosePopup}
           />
         }
-      </BCBaseMap>
+      </CanadaBaseMap>
     );
   }
 }
