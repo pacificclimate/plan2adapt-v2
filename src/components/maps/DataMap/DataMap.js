@@ -7,16 +7,21 @@ import _ from 'lodash';
 import isEqual from 'lodash/fp/isEqual';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
-import pick from 'lodash/fp/pick';
+import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
+import keys from 'lodash/fp/keys';
+import fromPairs from 'lodash/fp/fromPairs';
 
 import { BCBaseMap } from 'pcic-react-leaflet-components';
+import CanadaBaseMap from '../CanadaBaseMap';
 import { WMSTileLayer } from 'react-leaflet';
 import LayerValuePopup from '../LayerValuePopup';
 import withAsyncData from '../../../HOCs/withAsyncData';
 
 import './DataMap.css';
 import { fetchFileMetadata } from '../../../data-services/metadata';
+export const mapValuesWithKey = mapValues.convert({ cap: false });
+export const filterWithKey = filter.convert({ cap: false });
 
 
 
@@ -105,6 +110,8 @@ const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
 };
 
 
+let count = 0;
+
 class DataMapDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
   // entire content of DataMap.
@@ -162,8 +169,23 @@ class DataMapDisplay extends React.Component {
     ...this.props.popup, isOpen: false, value: null,
   });
 
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log('### DataMap: cdu: prop changes',
+      flow(
+        keys,
+        filter(key => this.props[key] !== prevProps[key]),
+        map(key => [key, { prev: prevProps[key], curr: this.props[key]}]),
+        fromPairs,
+      )(prevProps)
+    )
+  }
+
   render() {
-    console.log('### DataMap', this.props)
+    console.log('### DataMap: count', count)
+    console.log('### DataMap: props', this.props)
+    if (count++ > 1000) {
+      throw new Error('DataMap: Too many renders')
+    }
 
     const { viewport, onViewportChange } = this.props;
 
