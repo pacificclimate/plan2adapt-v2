@@ -25,18 +25,9 @@ export const mapValuesWithKey = mapValues.convert({ cap: false });
 export const filterWithKey = filter.convert({ cap: false });
 
 
+// WMS tile layer props helpers
 
 const wmsTileLayerStaticProps = {
-  // elevation: 0,
-  // format: 'image/png',
-  // logscale: false,
-  // noWrap: true,
-  // numcolorbands: 254,
-  // opacity: 0.7,
-  // // srs: "EPSG:3005",
-  // styles: 'boxfill/blue6_red4',
-  // transparent: true,
-  // version: '1.1.1',
   format: 'image/png',
   logscale: false,
   noWrap: true,
@@ -48,17 +39,11 @@ const wmsTileLayerStaticProps = {
   abovemaxcolor: 'red',
   belowmincolor: 'black',
 };
-// For CE (mismatch of base layer, argh)
-// const wmsTileLayerProps = {
-//   numcolorbands: 249,
-//   // srs: "EPSG:4326",  // base map overrides, natch
-// };
 
 
 const wmsLayerName = ({ fileMetadata, variable }) =>
-{
-  return `${fileMetadata.unique_id}/${variable.representative.variable_id}`;
-};
+  `${fileMetadata.unique_id}/${variable.representative.variable_id}`;
+
 
 const wmsTime = ({ fileMetadata, season }) => {
   const timeIndexOffset = {
@@ -103,6 +88,7 @@ const wmsColorScaleRange = props => {
   return `${range.min},${range.max}`
 };
 
+
 const wmsTileLayerProps = props => {
   return _.assign(
     {},
@@ -116,6 +102,8 @@ const wmsTileLayerProps = props => {
   );
 };
 
+
+// Popup content getter
 
 const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
   return axios.get(
@@ -136,11 +124,12 @@ const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
 };
 
 
-let count = 0;
-
 class DataMapDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the
   // entire content of DataMap.
+  //
+  // It is wrapped with `withAsyncData` to inject the per-file metadata (prop
+  // `fileMetadata`) it needs to construct layer props. See below.
 
   static propTypes = {
     region: PropTypes.string,
@@ -222,25 +211,33 @@ class DataMapDisplay extends React.Component {
 }
 
 
+// The following code injects the per-file metadata required by the pure
+// component `DataMapDisplay`. By using the HOC `withAsyncData` to wrap
+// `DataMapDisplay`, the state management and lifecycle hook trickiness for
+// async data fetching is kept in a reliable, separate, single-purpose wrapper
+// component, independent of the complexities of the wrapped component
+// (`DataMapDisplay`). Separation of concerns.
+
 // This function returns a filter that filters the complete set of metadata
 // down to a single item that is the metadata for the layer to be displayed
 // in DataMap.
 const metadataFilter = props => {
   const criteria = {
-    ...mapValues(v => v.toString())(props.timePeriod),  // start_date, end_date
-    ...props.variable.representative,  // variable_id, variable_name, multi_year_mean
+    // start_date, end_date
+    ...mapValues(v => v.toString())(props.timePeriod),
+    // variable_id, variable_name, multi_year_mean
+    ...props.variable.representative,
     // This little gem calls into question whether the CE TimeOfYearSelector
     // is very well suited to our purposes here.
     timescale: props.season === 16 ? 'yearly' : 'seasonal',
   };
-  console.log('### metadataFilter criteria', criteria)
-  return filter(
-    criteria
-  )};
+  return filter(criteria)
+};
 
 
+// This function returns a promise for the file metadata needed by
+// `DataMapDisplay` for the given props.
 const loadFileMetadata = props => {
-  console.log('### loadFileMetadata')
   return flow(
     metadataFilter(props),
     metadata => {
@@ -256,22 +253,25 @@ const loadFileMetadata = props => {
       return metadata[0].unique_id;
     },
     fetchFileMetadata
-    // map('unique_id'),
-    // map(fetchFileMetadata),
   )(props.metadata);
 };
 
+
+// This function determines when new file metadata should be loaded.
+// Load when ...
 const shouldLoadFileMetadata = (prevProps, props) =>
-  // When props for loading have settled to defined values
+  // ... relevant props have settled to defined values
   props.timePeriod && props.season && props.variable &&
-  // and there are either no previous props, or there is a difference
-  // between previous and current props
+  // ... and there are either no previous props, or there is a difference
+  // between previous and current relevant props
   !(prevProps &&
     isEqual(prevProps.timePeriod, props.timePeriod) &&
     isEqual(prevProps.season, props.season) &&
     isEqual(prevProps.variable, props.variable)
   );
 
+
+// And now wrap with `withAsyncData`
 const WithFileMetadataDataMapDisplay = withAsyncData(
   loadFileMetadata, shouldLoadFileMetadata, 'fileMetadata'
 )(DataMapDisplay);
