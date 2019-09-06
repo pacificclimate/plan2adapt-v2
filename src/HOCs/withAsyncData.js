@@ -9,9 +9,7 @@
 // https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
 // This code is a fairly direct port of that example.
 //
-// Data fetching occurs when the value of `this.props[controlProp]` changes.
-// This is simpler, but adequate, special case of the general case that could
-// be handled by passing in a function that compares all relevant props.
+// Data fetching occurs when the value of `shouldLoadData()` is truthy.
 //
 // The fetched data is injected into the base component through a prop passed
 // to it named by `dataProp`.
@@ -21,9 +19,20 @@ import Loader from 'react-loader';
 
 
 export default function withAsyncData(
-  loadAsyncData,  // Async data fetcher. Returns a promise.
-  shouldLoadData, // Examines props to determine whether new data should be loaded
-  dataPropName    // Name of prop to pass data to base component through
+  // Async data fetcher. Returns a promise.
+  // Signature: `loadAsyncData(props)`.
+  // Invoked with props (`this.props`) passed to the component returned by
+  // this HOC.
+  loadAsyncData,
+
+  // Examines props to determine whether new data should be loaded.
+  // Signature: `shouldLoadData(prevProps, props)`.
+  // Invoked with previous and current props (`this.props`) passed to the
+  // component returned by this HOC.
+  shouldLoadData,
+
+  // Name of prop to pass data to base component through.
+  dataPropName
 ) {
   return function(BaseComponent) {
     return class extends React.Component {
