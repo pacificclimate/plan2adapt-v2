@@ -67,7 +67,7 @@ export function fetchSummaryMetadata() {
 }
 
 
-const normalizeFileMetadata =
+export const normalizeFileMetadata =
   // Transform the unnecessarily nested dict returned by the backend
   // `/metadata` endpoint to an object one level shallower and with an
   // explicit name for the single top-level key (unique_id). This will have
