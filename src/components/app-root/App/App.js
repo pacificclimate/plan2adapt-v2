@@ -6,13 +6,11 @@ import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
 
-import { map, filter, slice, curry, get } from 'lodash/fp';
+import filter from 'lodash/fp/filter';
+import get from 'lodash/fp/get';
 
-import { getMetadata } from '../../../data-services/metadata';
+import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import regions from '../../../assets/regions';
-import timePeriods from '../../../assets/time-periods';
-import seasons from '../../../assets/seasons';
-import variables from '../../../assets/variables';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 import ruleValues from '../../../assets/rule-results';
@@ -22,18 +20,16 @@ import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
 import TimePeriodSelector from '../../selectors/TimePeriodSelector';
-// import { TimePeriodSelector } from 'pcic-react-components';
-import SeasonSelector from '../../selectors/SeasonSelector/SeasonSelector';
-import VariableSelector from '../../selectors/VariableSelector/VariableSelector';
-import SelectorLabel from '../../misc/SelectorLabel/SelectorLabel';
+import SeasonSelector from '../../selectors/SeasonSelector';
+import VariableSelector from '../../selectors/VariableSelector';
+import SelectorLabel from '../../misc/SelectorLabel';
 
-import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph/ChangeOverTimeGraph';
+import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import Impacts from '../../data-displays/impacts/Impacts';
 import Rules from '../../data-displays/impacts/Rules';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
-import Table from 'react-bootstrap/Table';
 import Summary from '../../data-displays/Summary';
 
 const baselineTimePeriod = {
@@ -46,13 +42,12 @@ export default class App extends Component {
     metadata: null,
     region: regions[0],
     futureTimePeriod: undefined,
-    season: seasons[0],
+    season: undefined,
     variable: undefined,
   };
 
   componentDidMount() {
-    getMetadata()
-      .then(response => response.data)
+    fetchSummaryMetadata()
       .then(metadata => this.setState({ metadata }))
   }
 
@@ -230,7 +225,7 @@ export default class App extends Component {
                     <Row>
                       <Col lg={12}>
                         <T path='maps.title' data={{
-                          season: this.state.season.label,
+                          season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
                           region: this.state.region.label,
                         }}/>
@@ -243,7 +238,7 @@ export default class App extends Component {
                         end_date: 1990,
                       }}
                       futureTimePeriod={futureTimePeriod}
-                      season={this.state.season.value}
+                      season={get('value', this.state.season)}
                       variable={get('value', this.state.variable)}
                       metadata={this.state.metadata}
                     />
@@ -267,7 +262,7 @@ export default class App extends Component {
                     <Row>
                       <Col lg={12}>
                         <T path='graph.title' data={{
-                          season: this.state.season.label,
+                          season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
                           region: this.state.region.label,
                         }}/>

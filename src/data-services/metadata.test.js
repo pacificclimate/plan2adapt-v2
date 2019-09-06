@@ -1,12 +1,13 @@
-import { standardize } from './metadata';
+import { standardizeSummaryMetadata, normalizeFileMetadata } from './metadata';
 import sortBy from 'lodash/fp/sortBy';
 
-describe('standardize', () => {
-  const rest = i => ({
-    x: `x${i}`,
-    y: `y${i}`,
-  });
 
+const rest = i => ({
+  x: `x${i}`,
+  y: `y${i}`,
+});
+
+describe('standardizeSummaryMetadata', () => {
   const year = (i, j) => `2${i}0${j}`;
   const years = i => ({
     start_date: year(i, 1),
@@ -61,6 +62,24 @@ describe('standardize', () => {
   ];
 
   it('works', () => {
-    expect(sortBy('unique_id')(standardize(data))).toEqual(normalized);
+    expect(sortBy('unique_id')(standardizeSummaryMetadata(data))).toEqual(normalized);
+  });
+});
+
+
+describe('normalizeFileMetadata', () => {
+  const data = {
+    giraffe_elephant: {
+      ...rest(1)
+    }
+  };
+
+  const normalized = {
+    unique_id: 'giraffe_elephant',
+    ...rest(1)
+  };
+
+  it('works', () => {
+    expect(normalizeFileMetadata(data)).toEqual(normalized);
   });
 });

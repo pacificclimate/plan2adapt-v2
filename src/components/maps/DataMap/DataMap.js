@@ -1,15 +1,136 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { BCBaseMap } from 'pcic-react-leaflet-components';
-import { WMSTileLayer } from 'react-leaflet';
+
 import axios from 'axios';
 import { xml2js } from 'xml-js';
 import _ from 'lodash';
-import './DataMap.css';
+import isEqual from 'lodash/fp/isEqual';
+import flow from 'lodash/fp/flow';
+import filter from 'lodash/fp/filter';
+import getOr from 'lodash/fp/getOr';
+import map from 'lodash/fp/map';
+import mapValues from 'lodash/fp/mapValues';
+import keys from 'lodash/fp/keys';
+import fromPairs from 'lodash/fp/fromPairs';
+
+import { BCBaseMap } from 'pcic-react-leaflet-components';
+import CanadaBaseMap from '../CanadaBaseMap';
+import { WMSTileLayer } from 'react-leaflet';
 import LayerValuePopup from '../LayerValuePopup';
+import withAsyncData from '../../../HOCs/withAsyncData';
+
+import './DataMap.css';
+import { fetchFileMetadata } from '../../../data-services/metadata';
+export const mapValuesWithKey = mapValues.convert({ cap: false });
+export const filterWithKey = filter.convert({ cap: false });
 
 
-export default class DataMap extends React.Component {
+// WMS tile layer props helpers
+
+const wmsTileLayerStaticProps = {
+  format: 'image/png',
+  logscale: false,
+  noWrap: true,
+  numcolorbands: 249,
+  opacity: 0.7,
+  // srs: "EPSG:3005",
+  transparent: true,
+  version: '1.1.1',
+  abovemaxcolor: 'red',
+  belowmincolor: 'black',
+};
+
+
+const wmsLayerName = ({ fileMetadata, variable }) =>
+  `${fileMetadata.unique_id}/${variable.representative.variable_id}`;
+
+
+const wmsTime = ({ fileMetadata, season }) => {
+  const timeIndexOffset = {
+    'yearly': 16, 'seasonal': 12, 'monthly': 0
+  }[fileMetadata.timescale];
+  const timeIndex = (+season) - timeIndexOffset;
+  return fileMetadata.times[timeIndex];
+};
+
+
+// TODO: Style and range should be part of config. But the configs
+//  are getting a bit more structured than env variables will accommodate.
+
+const variableId2WmsStyle = {
+  pr: 'seq-Greens',
+  tasmax: 'x-Occam',
+  tasmin: 'x-Occam',
+  fallback: 'seq-Oranges',
+};
+const wmsStyle = props => {
+  const palette = getOr(
+    variableId2WmsStyle.fallback,
+    props.variable.representative.variable_id,
+    variableId2WmsStyle
+  );
+  return `default-scalar/${palette}`
+};
+
+
+const variableId2ColourScaleRange = {
+  pr: { min: 0, max: 20 },
+  tasmax: { min: -30, max: 50 },
+  tasmin: { min: -40, max: 40 },
+  fallback: { min: -40, max: 50 },
+};
+const wmsColorScaleRange = props => {
+  const range = getOr(
+    variableId2ColourScaleRange.fallback,
+    props.variable.representative.variable_id,
+    variableId2ColourScaleRange
+  );
+  return `${range.min},${range.max}`
+};
+
+
+const wmsTileLayerProps = props => {
+  return _.assign(
+    {},
+    wmsTileLayerStaticProps,
+    {
+      layers: wmsLayerName(props),
+      time: wmsTime(props),
+      styles: wmsStyle(props),
+      colorscalerange: wmsColorScaleRange(props),
+    }
+  );
+};
+
+
+// Popup content getter
+
+const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
+  return axios.get(
+    process.env.REACT_APP_NCWMS_URL,
+    {
+      params: {
+        request: 'GetFeatureInfo',
+        exceptions: 'application/vnd.ogc.se_xml',
+        ...xy,
+        info_format: 'text/xml', // f**k, only xml is available
+        query_layers: wmsLayerName(layerSpec),
+        time: wmsTime(layerSpec),
+        feature_count: 50,  // ??
+        version: '1.1.1',
+      },
+    },
+  );
+};
+
+
+class DataMapDisplay extends React.Component {
+  // This is a pure (state-free), controlled component that renders the
+  // entire content of DataMap.
+  //
+  // It is wrapped with `withAsyncData` to inject the per-file metadata (prop
+  // `fileMetadata`) it needs to construct layer props. See below.
+
   static propTypes = {
     region: PropTypes.string,
     timePeriod: PropTypes.object,
@@ -17,82 +138,14 @@ export default class DataMap extends React.Component {
     variable: PropTypes.string,
     popup: PropTypes.object,
     onPopupChange: PropTypes.func,
+    fileMetadata: PropTypes.object,
   };
 
-  static wmsTileLayerStaticProps = {
-    elevation: 0,
-    format: 'image/png',
-    logscale: false,
-    noWrap: true,
-    numcolorbands: 254,
-    opacity: 0.7,
-    // srs: "EPSG:3005",
-    styles: 'boxfill/blue6_red4',
-    transparent: true,
-    version: '1.1.1',
-  };
-  // For CE (mismatch of base layer, argh)
-  // const wmsTileLayerProps = {
-  //   numcolorbands: 249,
-  //   // srs: "EPSG:4326",  // base map overrides, natch
-  // };
-
-  static wmsLayerName = ({ timePeriod: { start_date, end_date }, variable }) =>
-  {
-    const rootLayerName =
-      +start_date < 2010 ?
-        `climatebc-hist-${variable}-run1` :
-        `climatebc-abs_a2-${variable}-cgcm3_4`;
-      return`${rootLayerName}-${start_date}-${end_date}/${variable}`
-  };
-
-  static wmsTime = ({ timePeriod: { start_date, end_date } }) => {
-    const middleYear =
-      +start_date < 2010 ?
-        Math.floor(((+start_date) + (+end_date)) / 2) :
-        Math.floor(((+start_date) + (+end_date) + 1) / 2);
-    return `${middleYear}-07-01T00:00:00Z`
-  };
-
-  static wmsTileLayerProps = ({ region, season, timePeriod, variable }) => {
-    // For P2A v1
-    const colorscalerange = {
-      tas: '249.15,289.15',
-      pr: '0,0.000347222222222222',
-      pass: '0,10000',
-    }[variable];
-    const styles = {
-      tas: 'boxfill/blue6_red4',
-      pr: 'boxfill/lightblue_darkblue_log_nc',
-      pass: 'boxfill/lightblue_darkblue_log_nc',
-    }[variable];
-
-    return _.assign({}, DataMap.wmsTileLayerStaticProps, {
-      colorscalerange,
-      styles,
-      layers: DataMap.wmsLayerName({ timePeriod, variable }),
-      time: DataMap.wmsTime({ timePeriod }),
-    });
-  };
-
-  static getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
-    return axios.get(
-      process.env.REACT_APP_NCWMS_URL,
-      {
-        params: {
-          request: 'GetFeatureInfo',
-          exceptions: 'application/vnd.ogc.se_xml',
-          ...xy,
-          info_format: 'text/xml', // f**k, only xml is available
-          query_layers: DataMap.wmsLayerName(layerSpec),
-          time: DataMap.wmsTime(layerSpec),
-          feature_count: 50,  // ??
-          version: '1.1.1',
-        },
-      },
-    );
-  };
-
+  // TODO: This code is currently disabled because the CE ncWMS does not allow
+  //  GetFeatureInfo requests, which are required to fill the popup with data.
+  //  ALSO, this code looks suspect to me; specifically, does it actually
+  //  implement a controlled component on props.popup, and fetch the relevant
+  //  data for each map (layer)?
   handleClickMap = (event) => {
     console.log('map click ', event)
     // Open popup on map
@@ -104,7 +157,7 @@ export default class DataMap extends React.Component {
     });
 
     // Get a value for it
-    DataMap.getLayerInfo({
+    getLayerInfo({
       layerSpec: this.props,
       xy: event.layerPoint,
     })
@@ -137,15 +190,20 @@ export default class DataMap extends React.Component {
   });
 
   render() {
-    const { viewport, onViewportChange } = this.props;
+    // console.log(`### DataMap [${this.props.id}]: wmsTileLayerProps`,
+    //   wmsTileLayerProps(this.props))
+    const { viewport, onViewportChange, onViewportChanged } = this.props;
 
     return (
-      <BCBaseMap {...{ viewport, onViewportChange }}
-        onClick={this.handleClickMap}
+      <CanadaBaseMap
+        {...{ viewport, onViewportChange, onViewportChanged }}
+        // FIXME: Popups are disabled because the CE ncWMS does not allow
+        //  GetFeatureInfo requests, which are required to fill the popup.
+        // onClick={this.handleClickMap}
       >
         <WMSTileLayer
           url={process.env.REACT_APP_NCWMS_URL}
-          {...DataMap.wmsTileLayerProps(this.props)}
+          {...wmsTileLayerProps(this.props)}
         />
         {
           this.props.popup.isOpen &&
@@ -154,7 +212,75 @@ export default class DataMap extends React.Component {
             onClose={this.handleClosePopup}
           />
         }
-      </BCBaseMap>
+      </CanadaBaseMap>
     );
   }
 }
+
+
+// The following code injects the per-file metadata required by the pure
+// component `DataMapDisplay`. By using the HOC `withAsyncData` to wrap
+// `DataMapDisplay`, the state management and lifecycle hook trickiness for
+// async data fetching is kept in a reliable, separate, single-purpose wrapper
+// component, independent of the complexities of the wrapped component
+// (`DataMapDisplay`). Separation of concerns.
+
+// This function returns a filter that filters the complete set of metadata
+// down to a single item that is the metadata for the layer to be displayed
+// in DataMap.
+const metadataFilter = props => {
+  const criteria = {
+    // start_date, end_date
+    ...mapValues(v => v.toString())(props.timePeriod),
+    // variable_id, variable_name, multi_year_mean
+    ...props.variable.representative,
+    // This little gem calls into question whether the CE TimeOfYearSelector
+    // is very well suited to our purposes here.
+    timescale: props.season === 16 ? 'yearly' : 'seasonal',
+  };
+  return filter(criteria)
+};
+
+
+// This function returns a promise for the file metadata needed by
+// `DataMapDisplay` for the given props.
+const loadFileMetadata = props => {
+  return flow(
+    metadataFilter(props),
+    metadata => {
+      // TODO: Don't throw an error when metadata matching fails. Instead,
+      //   show an error message in the map.
+      if (metadata.length === 0) {
+        throw new Error('No matching metadata');
+      }
+      if (metadata.length > 1) {
+        console.error('Too many matching metadata', metadata);
+        throw new Error('Too many matching metadata');
+      }
+      return metadata[0].unique_id;
+    },
+    fetchFileMetadata
+  )(props.metadata);
+};
+
+
+// This function determines when new file metadata should be loaded.
+// Load when ...
+const shouldLoadFileMetadata = (prevProps, props) =>
+  // ... relevant props have settled to defined values
+  props.timePeriod && props.season && props.variable &&
+  // ... and there are either no previous props, or there is a difference
+  // between previous and current relevant props
+  !(prevProps &&
+    isEqual(prevProps.timePeriod, props.timePeriod) &&
+    isEqual(prevProps.season, props.season) &&
+    isEqual(prevProps.variable, props.variable)
+  );
+
+
+// And now wrap with `withAsyncData`
+const WithFileMetadataDataMapDisplay = withAsyncData(
+  loadFileMetadata, shouldLoadFileMetadata, 'fileMetadata'
+)(DataMapDisplay);
+
+export default WithFileMetadataDataMapDisplay;

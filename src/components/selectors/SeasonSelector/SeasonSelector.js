@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Select from 'react-select';
-import seasons from '../../../assets/seasons';
+import { TimeOfYearSelector } from 'pcic-react-components';
 
 
 export default class SeasonSelector extends React.Component {
@@ -12,10 +11,9 @@ export default class SeasonSelector extends React.Component {
 
   render() {
     return (
-      <Select
-        options={seasons}
-        value={this.props.value}
-        onChange={this.props.onChange}
+      <TimeOfYearSelector
+        {...this.props}
+        monthly={false}
       />
     );
   }
