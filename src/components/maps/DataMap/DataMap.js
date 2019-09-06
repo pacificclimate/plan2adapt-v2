@@ -3,104 +3,20 @@ import React from 'react';
 
 import axios from 'axios';
 import { xml2js } from 'xml-js';
-import _ from 'lodash';
 import isEqual from 'lodash/fp/isEqual';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
-import getOr from 'lodash/fp/getOr';
-import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
-import keys from 'lodash/fp/keys';
-import fromPairs from 'lodash/fp/fromPairs';
 
 import { BCBaseMap } from 'pcic-react-leaflet-components';
 import CanadaBaseMap from '../CanadaBaseMap';
 import { WMSTileLayer } from 'react-leaflet';
 import LayerValuePopup from '../LayerValuePopup';
 import withAsyncData from '../../../HOCs/withAsyncData';
+import { fetchFileMetadata } from '../../../data-services/metadata';
+import { wmsLayerName, wmsTime, wmsTileLayerProps } from '../map-utils';
 
 import './DataMap.css';
-import { fetchFileMetadata } from '../../../data-services/metadata';
-export const mapValuesWithKey = mapValues.convert({ cap: false });
-export const filterWithKey = filter.convert({ cap: false });
-
-
-// WMS tile layer props helpers
-
-const wmsTileLayerStaticProps = {
-  format: 'image/png',
-  logscale: false,
-  noWrap: true,
-  numcolorbands: 249,
-  opacity: 0.7,
-  // srs: "EPSG:3005",
-  transparent: true,
-  version: '1.1.1',
-  abovemaxcolor: 'red',
-  belowmincolor: 'black',
-};
-
-
-const wmsLayerName = ({ fileMetadata, variable }) =>
-  `${fileMetadata.unique_id}/${variable.representative.variable_id}`;
-
-
-const wmsTime = ({ fileMetadata, season }) => {
-  const timeIndexOffset = {
-    'yearly': 16, 'seasonal': 12, 'monthly': 0
-  }[fileMetadata.timescale];
-  const timeIndex = (+season) - timeIndexOffset;
-  return fileMetadata.times[timeIndex];
-};
-
-
-// TODO: Style and range should be part of config. But the configs
-//  are getting a bit more structured than env variables will accommodate.
-
-const variableId2WmsStyle = {
-  pr: 'seq-Greens',
-  tasmax: 'x-Occam',
-  tasmin: 'x-Occam',
-  fallback: 'seq-Oranges',
-};
-const wmsStyle = props => {
-  const palette = getOr(
-    variableId2WmsStyle.fallback,
-    props.variable.representative.variable_id,
-    variableId2WmsStyle
-  );
-  return `default-scalar/${palette}`
-};
-
-
-const variableId2ColourScaleRange = {
-  pr: { min: 0, max: 20 },
-  tasmax: { min: -30, max: 50 },
-  tasmin: { min: -40, max: 40 },
-  fallback: { min: -40, max: 50 },
-};
-const wmsColorScaleRange = props => {
-  const range = getOr(
-    variableId2ColourScaleRange.fallback,
-    props.variable.representative.variable_id,
-    variableId2ColourScaleRange
-  );
-  return `${range.min},${range.max}`
-};
-
-
-const wmsTileLayerProps = props => {
-  return _.assign(
-    {},
-    wmsTileLayerStaticProps,
-    {
-      layers: wmsLayerName(props),
-      time: wmsTime(props),
-      styles: wmsStyle(props),
-      colorscalerange: wmsColorScaleRange(props),
-    }
-  );
-};
 
 
 // Popup content getter
