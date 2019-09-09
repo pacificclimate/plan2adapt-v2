@@ -39,7 +39,7 @@ export default class NcwmsColourbar extends React.Component {
     const range = wmsDataRange(this.props.variableSpec);
     return (
       <div>
-        <div className={styles.wrapper1}>
+        <div className={styles.wrapper}>
           <img
             className={styles.image}
             src={getColorbarURI(

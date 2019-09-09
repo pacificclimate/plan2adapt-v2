@@ -1,23 +1,11 @@
-.horizontal {
-    transform: rotate(90deg);
-    vertical-align: top;
-}
-
-.background {
-    width: 20px;
-    height: 300px;
-    border: 1px solid orange;
-    transform: rotate(90deg);
-}
-
-.wrapper1 {
+.wrapper {
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
     width: 320px;
 }
 
-.wrapper1 .image {
+.wrapper .image {
     transform: translate(-10px) rotate(90deg);
     transform-origin: bottom right;
     margin-top: -300px;
@@ -50,19 +38,3 @@
 .right {
     left: 100%;
 }
-
-.wrapper2 {
-    border: 1px solid orange;
-    transform: rotate(90deg);
-    transform-origin: bottom right;
-    width: 10px;
-}
-
-.wrapper2 .image {
-    border: 1px solid blue;
-    height: 300px;
-    width: 10px;
-    /*transform: rotate(90deg);*/
-    /*transform-origin: bottom right;*/
-}
-
