@@ -2,7 +2,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
-import { wmsNumcolorbands, wmsPalette } from '../map-utils';
+import {
+  wmsDataRange,
+  wmsNumcolorbands,
+  wmsPalette
+} from '../map-utils';
 
 
 const getColorbarURI = (variableSpec, width, height) =>
@@ -32,21 +36,22 @@ export default class NcwmsColourbar extends React.Component {
   };
 
   render() {
+    const range = wmsDataRange(this.props.variableSpec);
     return (
       <div>
         <div className={styles.wrapper1}>
           <img
             className={styles.image}
             src={getColorbarURI(
-              this.props.variable.representative,
+              this.props.variableSpec,
               this.props.width,
               this.props.height
             )}
           />
           <div className={styles.values}>
-            <span className={styles.left}>0</span>
-            <span className={styles.middle}>50</span>
-            <span className={styles.right}>100</span>
+            <span className={styles.left}>{range.min}</span>
+            <span className={styles.middle}>{(range.min + range.max) / 2}</span>
+            <span className={styles.right}>{range.max}</span>
           </div>
         </div>
       </div>
