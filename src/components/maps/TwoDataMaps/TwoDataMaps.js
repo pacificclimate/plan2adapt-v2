@@ -30,6 +30,7 @@ import { Row, Col } from 'react-bootstrap';
 import T from 'pcic-react-external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
+import NcwmsColourbar from '../NcwmsColourbar';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -55,44 +56,53 @@ export default class TwoDataMaps extends React.Component {
 
   render() {
     return (
-      <Row>
-        <Col lg={6}>
-          <T path='maps.historical.title' data={{
-            start_date: this.props.historicalTimePeriod.start_date,
-            end_date: this.props.historicalTimePeriod.end_date
-          }}/>
-          <DataMap
-            id={'historical'}
-            viewport={this.state.viewport}
-            onViewportChanged={this.handleChangeViewport}
-            popup={this.state.popup}
-            onPopupChange={this.handleChangePopup}
-            region={this.props.region}
-            season={this.props.season}
-            variable={this.props.variable}
-            timePeriod={this.props.historicalTimePeriod}
-            metadata={this.props.metadata}
-          />
-        </Col>
-        <Col lg={6}>
-          <T path='maps.projected.title' data={{
-            start_date: this.props.futureTimePeriod.start_date,
-            end_date: this.props.futureTimePeriod.end_date
-          }}/>
-          <DataMap
-            id={'projected'}
-            viewport={this.state.viewport}
-            onViewportChanged={this.handleChangeViewport}
-            popup={this.state.popup}
-            onPopupChange={this.handleChangePopup}
-            region={this.props.region}
-            season={this.props.season}
-            variable={this.props.variable}
-            timePeriod={this.props.futureTimePeriod}
-            metadata={this.props.metadata}
-          />
-        </Col>
-      </Row>
+      <React.Fragment>
+        <Row>
+          <Col lg={12}>
+            <NcwmsColourbar
+              {...this.props}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={6}>
+            <T path='maps.historical.title' data={{
+              start_date: this.props.historicalTimePeriod.start_date,
+              end_date: this.props.historicalTimePeriod.end_date
+            }}/>
+            <DataMap
+              id={'historical'}
+              viewport={this.state.viewport}
+              onViewportChanged={this.handleChangeViewport}
+              popup={this.state.popup}
+              onPopupChange={this.handleChangePopup}
+              region={this.props.region}
+              season={this.props.season}
+              variable={this.props.variable}
+              timePeriod={this.props.historicalTimePeriod}
+              metadata={this.props.metadata}
+            />
+          </Col>
+          <Col lg={6}>
+            <T path='maps.projected.title' data={{
+              start_date: this.props.futureTimePeriod.start_date,
+              end_date: this.props.futureTimePeriod.end_date
+            }}/>
+            <DataMap
+              id={'projected'}
+              viewport={this.state.viewport}
+              onViewportChanged={this.handleChangeViewport}
+              popup={this.state.popup}
+              onPopupChange={this.handleChangePopup}
+              region={this.props.region}
+              season={this.props.season}
+              variable={this.props.variable}
+              timePeriod={this.props.futureTimePeriod}
+              metadata={this.props.metadata}
+            />
+          </Col>
+        </Row>
+      </React.Fragment>
     );
   }
 }
