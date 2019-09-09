@@ -14,7 +14,7 @@ import ClimateLayer from '../ClimateLayer';
 import LayerValuePopup from '../LayerValuePopup';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchFileMetadata } from '../../../data-services/metadata';
-import { wmsLayerName, wmsTime, wmsTileLayerProps } from '../map-utils';
+import { wmsLayerName, wmsTime, wmsClimateLayerProps } from '../map-utils';
 
 import './DataMap.css';
 
@@ -50,8 +50,8 @@ class DataMapDisplay extends React.Component {
   static propTypes = {
     region: PropTypes.string,
     timePeriod: PropTypes.object,
-    season: PropTypes.string,
-    variable: PropTypes.string,
+    season: PropTypes.number,
+    variable: PropTypes.object,
     popup: PropTypes.object,
     onPopupChange: PropTypes.func,
     fileMetadata: PropTypes.object,
@@ -106,8 +106,8 @@ class DataMapDisplay extends React.Component {
   });
 
   render() {
-    // console.log(`### DataMap [${this.props.id}]: wmsTileLayerProps`,
-    //   wmsTileLayerProps(this.props))
+    // console.log(`### DataMap [${this.props.id}]: wmsClimateLayerProps`,
+    //   wmsClimateLayerProps(this.props))
     const { viewport, onViewportChange, onViewportChanged } = this.props;
 
     return (
@@ -117,7 +117,11 @@ class DataMapDisplay extends React.Component {
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
       >
-        <ClimateLayer {...this.props}/>
+        <ClimateLayer
+          fileMetadata={this.props.fileMetadata}
+          variableSpec={this.props.variable.representative}
+          season={this.props.season}
+        />
         {
           this.props.popup.isOpen &&
           <LayerValuePopup

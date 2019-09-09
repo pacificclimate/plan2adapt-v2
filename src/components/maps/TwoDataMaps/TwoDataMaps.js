@@ -38,8 +38,8 @@ export default class TwoDataMaps extends React.Component {
     region: PropTypes.string,
     historicalTimePeriod: PropTypes.object,
     futureTimePeriod: PropTypes.object,
-    season: PropTypes.string,
-    variable: PropTypes.string,
+    season: PropTypes.number,
+    variable: PropTypes.object,
     metadata: PropTypes.array,
   };
 

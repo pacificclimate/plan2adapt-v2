@@ -5,7 +5,7 @@ import { makeURI } from '../../../utils/uri';
 import { wmsNumcolorbands, wmsPalette } from '../map-utils';
 
 
-const getColorbarURI = (props, width, height) =>
+const getColorbarURI = (variableSpec, width, height) =>
   makeURI(
     process.env.REACT_APP_NCWMS_URL,
     {
@@ -13,7 +13,7 @@ const getColorbarURI = (props, width, height) =>
       colorbaronly: 'true',
       width,
       height,
-      palette: wmsPalette(props),
+      palette: wmsPalette(variableSpec),
       numcolorbands: wmsNumcolorbands,
     }
   );
@@ -21,6 +21,7 @@ const getColorbarURI = (props, width, height) =>
 
 export default class NcwmsColourbar extends React.Component {
   static propTypes = {
+    variableSpec: PropTypes.object,
     width: PropTypes.number,
     height: PropTypes.number,
   };
@@ -36,7 +37,11 @@ export default class NcwmsColourbar extends React.Component {
         <div className={styles.wrapper1}>
           <img
             className={styles.image}
-            src={getColorbarURI(this.props, this.props.width, this.props.height)}
+            src={getColorbarURI(
+              this.props.variable.representative,
+              this.props.width,
+              this.props.height
+            )}
           />
           <div className={styles.values}>
             <span className={styles.left}>0</span>

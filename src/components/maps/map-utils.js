@@ -11,11 +11,11 @@ export const generateResolutions = (maxRes, count) =>
 export const wmsNumcolorbands = 249;
 
 
-export const wmsLayerName = ({ fileMetadata, variable }) =>
-  `${fileMetadata.unique_id}/${variable.representative.variable_id}`;
+export const wmsLayerName = (fileMetadata, variableSpec) =>
+  `${fileMetadata.unique_id}/${variableSpec.variable_id}`;
 
 
-export const wmsTime = ({ fileMetadata, season }) => {
+export const wmsTime = (fileMetadata, season) => {
   const timeIndexOffset = {
     'yearly': 16, 'seasonal': 12, 'monthly': 0
   }[fileMetadata.timescale];
@@ -33,15 +33,16 @@ const variableId2WmsPalette = {
   tasmin: 'x-Occam',
   fallback: 'seq-Oranges',
 };
-export const wmsPalette = props =>
+export const wmsPalette = variableSpec =>
   getOr(
     variableId2WmsPalette.fallback,
-    props.variable.representative.variable_id,
+    variableSpec.variable_id,
     variableId2WmsPalette
   );
 
 
-export const wmsStyle = props => `default-scalar/${wmsPalette(props)}`;
+export const wmsStyle = variableSpec =>
+  `default-scalar/${wmsPalette(variableSpec)}`;
 
 
 const variableId2ColourScaleRange = {
@@ -50,17 +51,17 @@ const variableId2ColourScaleRange = {
   tasmin: { min: -40, max: 40 },
   fallback: { min: -40, max: 50 },
 };
-export const wmsColorScaleRange = props => {
+export const wmsColorScaleRange = variableSpec => {
   const range = getOr(
     variableId2ColourScaleRange.fallback,
-    props.variable.representative.variable_id,
+    variableSpec.variable_id,
     variableId2ColourScaleRange
   );
   return `${range.min},${range.max}`
 };
 
 
-export const wmsTileLayerProps = props => {
+export const wmsClimateLayerProps = (fileMetadata, variableSpec, season) => {
   return {
     format: 'image/png',
     logscale: false,
@@ -72,10 +73,10 @@ export const wmsTileLayerProps = props => {
     version: '1.1.1',
     abovemaxcolor: 'red',
     belowmincolor: 'black',
-    layers: wmsLayerName(props),
-    time: wmsTime(props),
-    styles: wmsStyle(props),
-    colorscalerange: wmsColorScaleRange(props),
+    layers: wmsLayerName(fileMetadata, variableSpec),
+    time: wmsTime(fileMetadata, season),
+    styles: wmsStyle(variableSpec),
+    colorscalerange: wmsColorScaleRange(variableSpec),
   }
 };
 
