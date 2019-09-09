@@ -29,8 +29,8 @@ export const wmsTime = (fileMetadata, season) => {
 
 const variableId2WmsPalette = {
   pr: 'seq-Greens',
-  tasmax: 'x-Occam',
-  tasmin: 'x-Occam',
+  tasmax: 'div-BuRd',
+  tasmin: 'div-BuRd',
   fallback: 'seq-Oranges',
 };
 export const wmsPalette = variableSpec =>
