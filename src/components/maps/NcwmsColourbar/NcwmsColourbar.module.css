@@ -2,13 +2,13 @@
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
-    width: 320px;
+    width: 320px;  /* for nominal 300px height */
 }
 
 .wrapper .image {
-    transform: translate(-10px) rotate(90deg);
+    transform: rotate(90deg);
     transform-origin: bottom right;
-    margin-top: -300px;
+    margin-top: -300px;  /* for nominal 300px height */
     margin-bottom: 0px;
 }
 

@@ -26,12 +26,11 @@ const getColorbarURI = (variableSpec, width, height) =>
 export default class NcwmsColourbar extends React.Component {
   static propTypes = {
     variableSpec: PropTypes.object,
-    width: PropTypes.number,
     height: PropTypes.number,
   };
 
   static defaultProps = {
-    width: 10,
+    width: 20,
     height: 300,
   };
 
@@ -39,9 +38,16 @@ export default class NcwmsColourbar extends React.Component {
     const range = wmsDataRange(this.props.variableSpec);
     return (
       <div>
-        <div className={styles.wrapper}>
+        <div
+          className={styles.wrapper}
+          style={{ width: this.props.height + 20 }}
+        >
           <img
             className={styles.image}
+            style={{
+              'margin-top': -this.props.height,
+              'margin-left': -this.props.width,
+            }}
             src={getColorbarURI(
               this.props.variableSpec,
               this.props.width,
