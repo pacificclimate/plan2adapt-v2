@@ -45,18 +45,22 @@ export const wmsStyle = variableSpec =>
   `default-scalar/${wmsPalette(variableSpec)}`;
 
 
-const variableId2ColourScaleRange = {
+const variableId2DataRange = {
   pr: { min: 0, max: 20 },
-  tasmax: { min: -30, max: 50 },
+  tasmax: { min: -30, max: 40 },
   tasmin: { min: -40, max: 40 },
   fallback: { min: -40, max: 50 },
 };
-export const wmsColorScaleRange = variableSpec => {
-  const range = getOr(
-    variableId2ColourScaleRange.fallback,
+export const wmsDataRange = variableSpec =>
+  getOr(
+    variableId2DataRange.fallback,
     variableSpec.variable_id,
-    variableId2ColourScaleRange
+    variableId2DataRange
   );
+
+
+export const wmsColorScaleRange = variableSpec => {
+  const range = wmsDataRange(variableSpec);
   return `${range.min},${range.max}`
 };
 
@@ -71,7 +75,7 @@ export const wmsClimateLayerProps = (fileMetadata, variableSpec, season) => {
     // srs: "EPSG:3005",
     transparent: true,
     version: '1.1.1',
-    abovemaxcolor: 'red',
+    abovemaxcolor: 'black',
     belowmincolor: 'black',
     layers: wmsLayerName(fileMetadata, variableSpec),
     time: wmsTime(fileMetadata, season),
