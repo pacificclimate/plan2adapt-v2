@@ -8,18 +8,7 @@ export const generateResolutions = (maxRes, count) =>
 
 // WMS tile layer props helpers
 
-const wmsTileLayerStaticProps = {
-  format: 'image/png',
-  logscale: false,
-  noWrap: true,
-  numcolorbands: 249,
-  opacity: 0.7,
-  // srs: "EPSG:3005",
-  transparent: true,
-  version: '1.1.1',
-  abovemaxcolor: 'red',
-  belowmincolor: 'black',
-};
+export const wmsNumcolorbands = 249;
 
 
 export const wmsLayerName = ({ fileMetadata, variable }) =>
@@ -38,20 +27,21 @@ export const wmsTime = ({ fileMetadata, season }) => {
 // TODO: Style and range should be part of config. But the configs
 //  are getting a bit more structured than env variables will accommodate.
 
-const variableId2WmsStyle = {
+const variableId2WmsPalette = {
   pr: 'seq-Greens',
   tasmax: 'x-Occam',
   tasmin: 'x-Occam',
   fallback: 'seq-Oranges',
 };
-export const wmsStyle = props => {
-  const palette = getOr(
-    variableId2WmsStyle.fallback,
+export const wmsPalette = props =>
+  getOr(
+    variableId2WmsPalette.fallback,
     props.variable.representative.variable_id,
-    variableId2WmsStyle
+    variableId2WmsPalette
   );
-  return `default-scalar/${palette}`
-};
+
+
+export const wmsStyle = props => `default-scalar/${wmsPalette(props)}`;
 
 
 const variableId2ColourScaleRange = {
@@ -75,7 +65,7 @@ export const wmsTileLayerProps = props => {
     format: 'image/png',
     logscale: false,
     noWrap: true,
-    numcolorbands: 249,
+    numcolorbands: wmsNumcolorbands,
     opacity: 0.7,
     // srs: "EPSG:3005",
     transparent: true,
@@ -87,16 +77,6 @@ export const wmsTileLayerProps = props => {
     styles: wmsStyle(props),
     colorscalerange: wmsColorScaleRange(props),
   }
-  // return _.assign(
-  //   {},
-  //   wmsTileLayerStaticProps,
-  //   {
-  //     layers: wmsLayerName(props),
-  //     time: wmsTime(props),
-  //     styles: wmsStyle(props),
-  //     colorscalerange: wmsColorScaleRange(props),
-  //   }
-  // );
 };
 
 
