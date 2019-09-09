@@ -60,7 +60,7 @@ export default class TwoDataMaps extends React.Component {
         <Row>
           <Col lg={12}>
             <NcwmsColourbar
-              {...this.props}
+              variableSpec={this.props.variable.representative}
             />
           </Col>
         </Row>
