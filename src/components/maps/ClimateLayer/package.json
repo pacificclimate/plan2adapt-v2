@@ -1,0 +1,6 @@
+{
+  "name": "ClimateLayer",
+  "version": "0.0.0",
+  "private": true,
+  "main": "ClimateLayer.js"
+}

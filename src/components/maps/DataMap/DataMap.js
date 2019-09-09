@@ -10,7 +10,7 @@ import mapValues from 'lodash/fp/mapValues';
 
 import { BCBaseMap } from 'pcic-react-leaflet-components';
 import CanadaBaseMap from '../CanadaBaseMap';
-import { WMSTileLayer } from 'react-leaflet';
+import ClimateLayer from '../ClimateLayer';
 import LayerValuePopup from '../LayerValuePopup';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchFileMetadata } from '../../../data-services/metadata';
@@ -117,10 +117,7 @@ class DataMapDisplay extends React.Component {
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
       >
-        <WMSTileLayer
-          url={process.env.REACT_APP_NCWMS_URL}
-          {...wmsTileLayerProps(this.props)}
-        />
+        <ClimateLayer {...this.props}/>
         {
           this.props.popup.isOpen &&
           <LayerValuePopup
