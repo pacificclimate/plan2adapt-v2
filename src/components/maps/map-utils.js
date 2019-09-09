@@ -48,7 +48,7 @@ export const wmsStyle = variableSpec =>
 const variableId2DataRange = {
   pr: { min: 0, max: 20 },
   tasmax: { min: -30, max: 40 },
-  tasmin: { min: -40, max: 40 },
+  tasmin: { min: -40, max: 30 },
   fallback: { min: -40, max: 50 },
 };
 export const wmsDataRange = variableSpec =>
@@ -56,6 +56,20 @@ export const wmsDataRange = variableSpec =>
     variableId2DataRange.fallback,
     variableSpec.variable_id,
     variableId2DataRange
+  );
+
+
+const variableId2Ticks = {
+  pr: [0, 5, 10, 15, 20],
+  tasmax: [-30, -20, -10, 0, 10, 20, 30, 40],
+  tasmin: [-40, -30, -20, -10, 0, 10, 20, 30],
+  fallback: [0, 10],
+};
+export const wmsTicks = variableSpec =>
+  getOr(
+    variableId2Ticks.fallback,
+    variableSpec.variable_id,
+    variableId2Ticks
   );
 
 

@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import map from 'lodash/fp/map';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
   wmsDataRange,
   wmsNumcolorbands,
-  wmsPalette
+  wmsPalette, wmsTicks
 } from '../map-utils';
 
 
@@ -22,10 +23,10 @@ const getColorbarURI = (variableSpec, width, height) =>
     }
   );
 
-
 export default class NcwmsColourbar extends React.Component {
   static propTypes = {
     variableSpec: PropTypes.object,
+    width: PropTypes.number,
     height: PropTypes.number,
   };
 
@@ -36,6 +37,8 @@ export default class NcwmsColourbar extends React.Component {
 
   render() {
     const range = wmsDataRange(this.props.variableSpec);
+    const span = range.max - range.min;
+    const ticks = wmsTicks(this.props.variableSpec);
     return (
       <div>
         <div
@@ -55,9 +58,19 @@ export default class NcwmsColourbar extends React.Component {
             )}
           />
           <div className={styles.values}>
-            <span className={styles.left}>{range.min}</span>
-            <span className={styles.middle}>{(range.min + range.max) / 2}</span>
-            <span className={styles.right}>{range.max}</span>
+            {
+              map(
+                tick => (
+                  <span
+                    style={{
+                      left: `${(tick - range.min) / span * 100}%`
+                    }}
+                  >
+                    {tick}
+                  </span>
+                )
+              )(ticks)
+            }
           </div>
         </div>
       </div>
