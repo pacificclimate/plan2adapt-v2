@@ -1,0 +1,68 @@
+.horizontal {
+    transform: rotate(90deg);
+    vertical-align: top;
+}
+
+.background {
+    width: 20px;
+    height: 300px;
+    border: 1px solid orange;
+    transform: rotate(90deg);
+}
+
+.wrapper1 {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    width: 320px;
+}
+
+.wrapper1 .image {
+    transform: translate(-10px) rotate(90deg);
+    transform-origin: bottom right;
+    margin-top: -300px;
+    margin-bottom: 0px;
+}
+
+.values {
+    position: relative;
+    height: 20px;
+}
+
+.values span {
+    font-size: 90%;
+    position: absolute;
+    top: -10px;
+    border-left: 1px solid darkgrey;
+    padding-left: 3px;
+    line-height: 0px;
+    padding-top: 10px;
+}
+
+.left {
+    left: 0%;
+}
+
+.middle {
+    left: 50%;
+}
+
+.right {
+    left: 100%;
+}
+
+.wrapper2 {
+    border: 1px solid orange;
+    transform: rotate(90deg);
+    transform-origin: bottom right;
+    width: 10px;
+}
+
+.wrapper2 .image {
+    border: 1px solid blue;
+    height: 300px;
+    width: 10px;
+    /*transform: rotate(90deg);*/
+    /*transform-origin: bottom right;*/
+}
+
