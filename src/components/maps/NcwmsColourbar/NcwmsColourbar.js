@@ -1,3 +1,27 @@
+// Render a colour bar indicating the meaning (i.e., data value) of colours
+// in a climate layer. The result is a colour scale with ticks showing data
+// values at various points along it.
+//
+// Notes:
+//
+//  - The colour bar graphic is retrieved from ncWMS. That graphic shows the
+//    color gradation varying vertically. For this app, we want it to be
+//    horizontal, and that requires a little trickiness with CSS to rotate and
+//    reposition it. Unchanging CSS is in NcwmsColourbar.module.css; computed
+//    CSS is in the code below.
+//
+//  - This component uses the same utilities used to set the colour scale
+//    in component ClimateLayer. This is convenient, in that it ensures that
+//    the colour bar is exactly right for the climate layers, but it's not
+//    generic. Some refactoring could make it so.
+//
+//  - At present the colour bar is rendered only horizontally (i.e., the
+//    colour variation runs horizontally, and the whole thing is wider than
+//    high.
+//
+//  - Props `width` and `height` are for the unrotated (vertical) graphic;
+//    so their meaning is reversed in the rendered graphic. Confusing, sorry.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import map from 'lodash/fp/map';
@@ -40,8 +64,7 @@ export default class NcwmsColourbar extends React.Component {
     const span = range.max - range.min;
     const ticks = wmsTicks(this.props.variableSpec);
     return (
-      <div>
-        <div
+      <div
           className={styles.wrapper}
           style={{ width: this.props.height + 20 }}
         >
@@ -57,8 +80,11 @@ export default class NcwmsColourbar extends React.Component {
               this.props.height
             )}
           />
-          <div className={styles.values}>
+          <div className={styles.ticks}>
             {
+              // <span>s containing tick labels are positioned relative to
+              // their enclosing div; a value of `left` in % makes it very
+              // easy to place them correctly.
               map(
                 tick => (
                   <span
@@ -73,7 +99,6 @@ export default class NcwmsColourbar extends React.Component {
             }
           </div>
         </div>
-      </div>
     );
   }
 }
