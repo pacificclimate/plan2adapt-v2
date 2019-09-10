@@ -1,0 +1,28 @@
+.wrapper {
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    width: 320px;  /* for nominal 300px height */
+}
+
+.wrapper .image {
+    transform: rotate(90deg);
+    transform-origin: bottom right;
+    margin-top: -300px;  /* for nominal 300px height */
+    margin-bottom: 0px;
+}
+
+.ticks {
+    position: relative;
+    height: 20px;
+}
+
+.ticks span {
+    font-size: 90%;
+    position: absolute;
+    top: -10px;
+    border-left: 1px solid darkgrey;
+    padding-left: 3px;
+    line-height: 0px;
+    padding-top: 10px;
+}
