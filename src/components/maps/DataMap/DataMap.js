@@ -57,11 +57,6 @@ class DataMapDisplay extends React.Component {
     fileMetadata: PropTypes.object,
   };
 
-  // TODO: This code is currently disabled because the CE ncWMS does not allow
-  //  GetFeatureInfo requests, which are required to fill the popup with data.
-  //  ALSO, this code looks suspect to me; specifically, does it actually
-  //  implement a controlled component on props.popup, and fetch the relevant
-  //  data for each map (layer)?
   handleClickMap = (event) => {
     console.log('map click ', event)
     // Open popup on map
@@ -113,9 +108,7 @@ class DataMapDisplay extends React.Component {
     return (
       <CanadaBaseMap
         {...{ viewport, onViewportChange, onViewportChanged }}
-        // FIXME: Popups are disabled because the CE ncWMS does not allow
-        //  GetFeatureInfo requests, which are required to fill the popup.
-        // onClick={this.handleClickMap}
+        onClick={this.handleClickMap}
       >
         <ClimateLayer
           fileMetadata={this.props.fileMetadata}
