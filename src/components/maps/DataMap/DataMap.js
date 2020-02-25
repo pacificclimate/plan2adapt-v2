@@ -30,8 +30,8 @@ const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
         exceptions: 'application/vnd.ogc.se_xml',
         ...xy,
         info_format: 'text/xml', // f**k, only xml is available
-        query_layers: wmsLayerName(layerSpec),
-        time: wmsTime(layerSpec),
+        query_layers: wmsLayerName(layerSpec.fileMetadata, layerSpec.variable),
+        time: wmsTime(layerSpec.fileMetadata, layerSpec.season),
         feature_count: 50,  // ??
         version: '1.1.1',
       },
