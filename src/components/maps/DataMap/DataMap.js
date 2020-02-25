@@ -130,7 +130,10 @@ class DataMapDisplay extends React.Component {
             onClose={this.handleClosePopup}
           />
         }
-        <SimpleGeoJSON data={this.props.region}/>
+        <SimpleGeoJSON
+          data={this.props.region}
+          fill={false}
+        />
       </CanadaBaseMap>
     );
   }

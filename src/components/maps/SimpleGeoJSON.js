@@ -25,7 +25,7 @@ const geometryType2Component = {
 };
 
 
-function GeoJSONFeature({ feature }) {
+function GeoJSONFeature({ feature, ...rest }) {
   const Component = geometryType2Component[feature.geometry.type];
   if (!Component) {
     console.log(`Unknown GeoJSON feature type:'${feature.geometry.type}'`)
@@ -36,15 +36,16 @@ function GeoJSONFeature({ feature }) {
       positions={geoJSONPositions2LeafletPositions(
         feature.geometry.coordinates
       )}
+      {...rest}
     />
   );
 }
 
-function geoJSON2Layers(geoJSON) {
+function geoJSON2Layers(geoJSON, rest) {
   switch (geoJSON && geoJSON.type) {
     case 'Feature':
       console.log('geoJSON2Layers: Feature');
-      return <GeoJSONFeature feature={geoJSON}/>;
+      return <GeoJSONFeature feature={geoJSON} {...rest}/>;
     case 'FeatureCollection':
       console.log('geoJSON2Layers: FeatureCollection');
       return geoJSON.features.map(geoJSON2Layers);
@@ -55,10 +56,10 @@ function geoJSON2Layers(geoJSON) {
 }
 
 
-export default function SimpleGeoJSON({ data }) {
+export default function SimpleGeoJSON({ data, ...rest }) {
   return (
     <React.Fragment>
-      {geoJSON2Layers(data)}
+      {geoJSON2Layers(data, rest)}
     </React.Fragment>
   );
 }
