@@ -40,7 +40,7 @@ const baselineTimePeriod = {
 export default class App extends Component {
   state = {
     metadata: null,
-    region: regions[0],
+    region: { label: 'British Columbia', value: null },
     futureTimePeriod: undefined,
     season: undefined,
     variable: undefined,
