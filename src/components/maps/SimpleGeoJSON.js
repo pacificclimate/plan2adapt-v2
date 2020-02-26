@@ -1,11 +1,11 @@
 // An ultrasimple component that transforms a (limited subset) GeoJSON object
 // to a list of React Leaflet vector layers (Path objects).
+// TODO: Extract this component to the package pcic-react-leaflet
 
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Polygon } from 'react-leaflet';
-
-import _ from 'lodash';
+import isArray from 'lodash/fp/isArray';
 
 
 const geoJSONPosition2LeafletPosition = (geoJSONPosition) =>
@@ -13,19 +13,18 @@ const geoJSONPosition2LeafletPosition = (geoJSONPosition) =>
 
 
 const geoJSONPositions2LeafletPositions = (geoJSONPositions) => {
-  if (_.isArray(geoJSONPositions[0])) {
+  if (isArray(geoJSONPositions[0])) {
     return geoJSONPositions.map(geoJSONPositions2LeafletPositions);
   }
   return geoJSONPosition2LeafletPosition(geoJSONPositions);
 };
 
-const geometryType2Component = {
-  Polygon: Polygon,
-  MultiPolygon: Polygon,
-};
-
 
 function GeoJSONFeature({ feature, ...rest }) {
+  const geometryType2Component = {
+    Polygon: Polygon,
+    MultiPolygon: Polygon,
+  };
   const Component = geometryType2Component[feature.geometry.type];
   if (!Component) {
     console.log(`Unknown GeoJSON feature type:'${feature.geometry.type}'`)
@@ -40,6 +39,7 @@ function GeoJSONFeature({ feature, ...rest }) {
     />
   );
 }
+
 
 function geoJSON2Layers(geoJSON, rest) {
   switch (geoJSON && geoJSON.type) {

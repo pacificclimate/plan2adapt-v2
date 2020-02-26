@@ -1,3 +1,10 @@
+// Region selector component. Selector contents are populated asynchronously
+// by a one-time fetch from a server via the regions data service module.
+//
+// To manage asynchronous data fetching, this component follows React best
+// practice:
+// https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import Select from 'react-select';
@@ -14,13 +21,20 @@ export default class RegionSelector extends React.Component {
     onChange: PropTypes.func,
   };
 
-
   state = {
     regions: null,
   };
 
   componentDidMount() {
     this._asyncRequest = fetchRegions().then(
+      // Transform GeoJSON response to options for React Select.
+      // Options are grouped in the selector by the value of each feature's
+      // `feature.properties.group`.
+      // Option labels (visible to user) are the name of the region.
+      // Option values (used by code) are the entire feature for each option,
+      // except for the case of the entirety of BC, which has a null feature
+      // to prevent unnecessary laborious subsetting of the data. This choice
+      // may prove unwise; it is extremely simple to remove.
       data => {
         this._asyncRequest = null;
         const regions = flow(
@@ -54,4 +68,4 @@ export default class RegionSelector extends React.Component {
       />
     );
   }
-};
+}

@@ -10,7 +10,6 @@ import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
-import regions from '../../../assets/regions';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 import ruleValues from '../../../assets/rule-results';
@@ -22,7 +21,6 @@ import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
 import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
-import SelectorLabel from '../../misc/SelectorLabel';
 
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import Impacts from '../../data-displays/impacts/Impacts';
