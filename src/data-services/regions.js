@@ -1,14 +1,8 @@
 import axios from 'axios';
-import tap from 'lodash/fp/tap';
-// TODO: Remove harcoded regions
-import regions from '../assets/regions';
 
 
 export function fetchRegions() {
   // Fetch GeoJSON describing BC regions.
-// TODO: Remove harcoded regions
-  return Promise.resolve(regions);
-  console.log('### fetchRegions')
   return axios.get(
     process.env.REACT_APP_REGIONS_SERVICE_URL,
     {
@@ -22,6 +16,5 @@ export function fetchRegions() {
       }
     }
   )
-  .then(tap(response => {console.log('### fetchRegions: done')}))
   .then(response => response.data)
 }
