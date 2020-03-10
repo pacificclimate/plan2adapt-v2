@@ -11,12 +11,12 @@
 // `onViewportChange` (no d) does.
 //
 // User experience would be smoother if we used the callback `onViewportChange`,
-// but viewport change events are generated at a very high rate during active
-// changes, and this swamps the UI. (This may also be because there is
+// but viewport change events are generated at a very high rate during panning,
+// and this swamps the UI. (This may also be because there is
 // some kind of compounding of events between the two maps. Debugging
 // code (now removed) showed that even after a single change to the
 // viewport (`state.viewport`), the second map calls back with a slightly
-// different viewport, which then updates the first map.)
+// different viewport, which then updates the first map. Ick.)
 //
 // Change events can easily be throttled (use `_.throttle`), but a wait time
 // of at least 100 ms is required to prevent event swamping. That leads to

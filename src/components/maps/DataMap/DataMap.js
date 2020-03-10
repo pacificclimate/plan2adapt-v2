@@ -12,6 +12,7 @@ import { BCBaseMap } from 'pcic-react-leaflet-components';
 import CanadaBaseMap from '../CanadaBaseMap';
 import ClimateLayer from '../ClimateLayer';
 import LayerValuePopup from '../LayerValuePopup';
+import SimpleGeoJSON from '../SimpleGeoJSON';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchFileMetadata } from '../../../data-services/metadata';
 import { wmsLayerName, wmsTime, wmsClimateLayerProps } from '../map-utils';
@@ -129,6 +130,10 @@ class DataMapDisplay extends React.Component {
             onClose={this.handleClosePopup}
           />
         }
+        <SimpleGeoJSON
+          data={this.props.region}
+          fill={false}
+        />
       </CanadaBaseMap>
     );
   }

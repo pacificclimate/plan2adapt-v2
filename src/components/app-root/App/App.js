@@ -10,7 +10,6 @@ import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
-import regions from '../../../assets/regions';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 import ruleValues from '../../../assets/rule-results';
@@ -22,7 +21,6 @@ import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
 import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
-import SelectorLabel from '../../misc/SelectorLabel';
 
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import Impacts from '../../data-displays/impacts/Impacts';
@@ -40,7 +38,7 @@ const baselineTimePeriod = {
 export default class App extends Component {
   state = {
     metadata: null,
-    region: regions[0],
+    region: undefined,
     futureTimePeriod: undefined,
     season: undefined,
     variable: undefined,
@@ -69,6 +67,7 @@ export default class App extends Component {
     console.log('Metadata loaded')
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
+    const region = get('region.value.label', this.state) || '';
     return (
       // We introduce a consumer for external texts context so we can use
       // T.get easily (it needs the context (`texts`) as an argument).
@@ -134,7 +133,7 @@ export default class App extends Component {
                   >
                     <Summary summary={summary}/>
                     <T path='summary.notes.general' data={{
-                      region: this.state.region.label,
+                      region: region,
                       futureTimePeriod: futureTimePeriod,
                       baselineTimePeriod,
                     }}/>
@@ -149,7 +148,7 @@ export default class App extends Component {
                     <Row>
                       <Col lg={12}>
                         <T path='impacts.prologue' data={{
-                          region: this.state.region.label,
+                          region: region,
                           futureTimePeriod: futureTimePeriod,
                           baselineTimePeriod,
                         }}/>
@@ -227,12 +226,12 @@ export default class App extends Component {
                         <T path='maps.title' data={{
                           season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
-                          region: this.state.region.label,
+                          region: get('label', this.state.region),
                         }}/>
                       </Col>
                     </Row>
                     <TwoDataMaps
-                      region={this.state.region.value}
+                      region={get('value', this.state.region)}
                       historicalTimePeriod={{
                         start_date: 1961,
                         end_date: 1990,
@@ -264,7 +263,7 @@ export default class App extends Component {
                         <T path='graph.title' data={{
                           season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
-                          region: this.state.region.label,
+                          region: get('label', this.state.region),
                         }}/>
                       </Col>
                       <Col lg={6}>
