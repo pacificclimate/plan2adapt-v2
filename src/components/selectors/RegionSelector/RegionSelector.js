@@ -7,7 +7,8 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import Select from 'react-select';
+// import Select from 'react-select';
+import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import { fetchRegions } from '../../../data-services/regions';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
@@ -31,10 +32,7 @@ export default class RegionSelector extends React.Component {
       // Options are grouped in the selector by the value of each feature's
       // `feature.properties.group`.
       // Option labels (visible to user) are the name of the region.
-      // Option values (used by code) are the entire feature for each option,
-      // except for the case of the entirety of BC, which has a null feature
-      // to prevent unnecessary laborious subsetting of the data. This choice
-      // may prove unwise; it is extremely simple to remove.
+      // Option values (used by code) are the entire feature for each option.
       data => {
         this._asyncRequest = null;
         const regions = flow(
@@ -44,9 +42,7 @@ export default class RegionSelector extends React.Component {
             options: map(
               feature => ({
                 label: feature.properties.english_na,
-                // 'bc-regions-polygon.1' is the whole province; we don't
-                // want a polygon for that.
-                value: feature.id === 'bc-regions-polygon.1' ? null : feature,
+                value: feature,
               })
             )(features)
           })),
@@ -56,15 +52,21 @@ export default class RegionSelector extends React.Component {
     )
   }
 
+  isInvalidValue = value => this.state.regions !== null && !value;
+
+  replaceInvalidValue = value => this.state.regions[0].options[0];
+
   render() {
     return (
       <Select
         isSearchable
         isLoading={this.state.regions === null}
-        // loadingMessage={'Loading...'}
+        loadingMessage={'Loading...'}
         options={this.state.regions || []}
         value={this.props.value}
         onChange={this.props.onChange}
+        isInvalidValue={this.isInvalidValue}
+        replaceInvalidValue={this.replaceInvalidValue}
       />
     );
   }

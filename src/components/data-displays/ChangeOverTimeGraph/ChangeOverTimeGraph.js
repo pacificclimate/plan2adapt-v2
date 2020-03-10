@@ -19,7 +19,7 @@ export default class ChangeOverTimeGraph extends React.Component {
       <div className={'data'}>
         {`
           Graph:
-          ${this.props.region.label},
+          ${get('label', this.state.region)},
           ${get('label', this.props.season)},
           ${get('label', this.props.variable)}
           vs. Time period
