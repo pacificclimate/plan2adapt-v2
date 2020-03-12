@@ -12,7 +12,6 @@ import get from 'lodash/fp/get';
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
-import ruleValues from '../../../assets/rule-results';
 
 import T, { ExternalTextContext } from 'pcic-react-external-text';
 import AppHeader from '../AppHeader';
@@ -161,6 +160,10 @@ export default class App extends Component {
                             title={'By Category'}
                             className='pt-2'
                           >
+                            {/* TODO: This should be abstracted as a component
+                            so that rules results can be injected just once,
+                            into it, instead of into 2 different components
+                            3 separate times. */}
                             <Impacts
                               rulebase={rulebase}
                               region={get('value', this.state.region)}
@@ -193,7 +196,8 @@ export default class App extends Component {
                           >
                             <Rules
                               rulebase={rulebase}
-                              ruleValues={ruleValues}
+                              region={get('value', this.state.region)}
+                              futureTimePeriod={futureTimePeriod}
                             />
                           </Tab>
                         </Tabs>
