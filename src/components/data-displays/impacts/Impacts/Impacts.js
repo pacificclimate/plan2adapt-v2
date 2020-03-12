@@ -3,16 +3,28 @@ import React from 'react';
 import { Table, Accordion, Card, CardGroup } from 'react-bootstrap';
 import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs, join } from 'lodash/fp';
 import ReactMarkdown from 'react-markdown';
+import withAsyncData from '../../../../HOCs/withAsyncData'
 import ImpactIcon from '../ImpactIcon';
 import './Impacts.css';
+import { fetchRulesResults } from '../../../../data-services/rules-engine';
+import isEqual from 'lodash/fp/isEqual';
 
 
 const sort = sortBy(x => x);
 
 
-export default class Impacts extends React.Component {
+class Impacts extends React.Component {
+  // This is a pure (state-free), controlled component that renders the entire
+  // content of Impacts.
+  //
+  // This component is wrapped with `withAsyncData` to inject the rule values
+  // (prop `ruleValues`) that are fetched asynchronously, according to the
+  // selected region and climatological time period.
+
   static propTypes = {
     rulebase: PropTypes.array.isRequired,
+    region: PropTypes.object.isRequired,
+    futureTimePeriod: PropTypes.object.isRequired,
     ruleValues: PropTypes.object.isRequired,
     groupKey: PropTypes.string.isRequired,
     itemKey: PropTypes.string.isRequired,
@@ -99,3 +111,25 @@ export default class Impacts extends React.Component {
       );
   }
 }
+
+
+const loadRulesResults = props => {
+  return fetchRulesResults(props.region, props.futureTimePeriod);
+};
+
+
+const shouldLoadRulesResults = (prevProps, props) =>
+  // ... relevant props have settled to defined values
+  props.region && props.futureTimePeriod &&
+  // ... and there are either no previous props, or there is a difference
+  // between previous and current relevant props
+  !(
+    prevProps &&
+    isEqual(prevProps.region, props.region) &&
+    isEqual(prevProps.futureTimePeriod, props.futureTimePeriod)
+  );
+
+
+export default withAsyncData(
+  loadRulesResults, shouldLoadRulesResults, 'ruleValues'
+)(Impacts);
