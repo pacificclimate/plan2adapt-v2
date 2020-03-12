@@ -153,7 +153,7 @@ export default class App extends Component {
                         }}/>
                         <Tabs
                           id={'impacts'}
-                          defaultActiveKey={'rules'}
+                          defaultActiveKey={'by-category'}
                         >
                           <Tab
                             eventKey={'by-category'}
