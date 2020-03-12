@@ -28,6 +28,7 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
 import Summary from '../../data-displays/Summary';
+import { middleDecade } from '../../../utils/time-periods';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -66,7 +67,7 @@ export default class App extends Component {
     console.log('Metadata loaded')
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
-    const region = get('region.value.label', this.state) || '';
+    const region = get('region.label', this.state) || '';
     return (
       // We introduce a consumer for external texts context so we can use
       // T.get easily (it needs the context (`texts`) as an argument).
@@ -133,8 +134,8 @@ export default class App extends Component {
                     <Summary summary={summary}/>
                     <T path='summary.notes.general' data={{
                       region: region,
-                      futureTimePeriod: futureTimePeriod,
-                      baselineTimePeriod,
+                      futureDecade: middleDecade(futureTimePeriod),
+                      baselineDecade: middleDecade(baselineTimePeriod),
                     }}/>
                     <T path='summary.notes.derivedVars'/>
                   </Tab>
@@ -148,8 +149,8 @@ export default class App extends Component {
                       <Col lg={12}>
                         <T path='impacts.prologue' data={{
                           region: region,
-                          futureTimePeriod: futureTimePeriod,
-                          baselineTimePeriod,
+                          futureDecade: middleDecade(futureTimePeriod),
+                          baselineDecade: middleDecade(baselineTimePeriod),
                         }}/>
                         <Tabs
                           id={'impacts'}

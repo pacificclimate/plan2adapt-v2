@@ -1,6 +1,7 @@
 import axios from 'axios';
 import urljoin from 'url-join';
 import mapKeys from 'lodash/fp/mapKeys';
+import { middleDecade } from '../utils/time-periods';
 
 
 const regionId = region => {
@@ -14,10 +15,9 @@ const regionId = region => {
 };
 
 
-const timePeriodId = ({start_date, end_date}) =>
+const timePeriodId = middleDecade;
   // Map frontend time period specifier to the time period id (middle decade)
   // used by the backend.
-  Math.floor((Number(start_date) + Number(end_date)) / 20 ) * 10;
 
 
 const normalizeRuleNames = mapKeys(key => key.substring(5));
