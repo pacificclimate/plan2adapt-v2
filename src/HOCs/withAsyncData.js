@@ -7,7 +7,7 @@
 // To manage asynchronous data fetching, this component follows React best
 // practice:
 // https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html#fetching-external-data-when-props-change
-// This code is a fairly direct port of that example.
+// This code is adapted from that example.
 //
 // Data fetching occurs when the value of `shouldLoadData()` is truthy.
 //
@@ -18,24 +18,31 @@ import React from 'react';
 import Loader from 'react-loader';
 
 
+const getDisplayName = WrappedComponent =>
+  WrappedComponent.displayName || WrappedComponent.name || 'Component';
+
+
 export default function withAsyncData(
+  loadAsyncData,
   // Async data fetcher. Returns a promise.
   // Signature: `loadAsyncData(props)`.
   // Invoked with props (`this.props`) passed to the component returned by
   // this HOC.
-  loadAsyncData,
 
+  shouldLoadData,
   // Examines props to determine whether new data should be loaded.
   // Signature: `shouldLoadData(prevProps, props)`.
   // Invoked with previous and current props (`this.props`) passed to the
   // component returned by this HOC.
-  shouldLoadData,
+  // When component mounts, it is invoked as `shouldLoadData(undefined, props)`.
+  // This prevents not loading initially due to the timing of
+  // `getDerivedStateFromProps`, which is invoked before `componentDidMount`.
 
-  // Name of prop to pass data to base component through.
   dataPropName
+  // Name of prop to pass data to base component through.
 ) {
   return function(BaseComponent) {
-    return class extends React.Component {
+    class WithAsyncData extends React.Component {
       state = {
         prevProps: undefined,
         externalData: null,
@@ -56,11 +63,16 @@ export default function withAsyncData(
       }
 
       componentDidMount() {
-        this._loadAsyncData(this.props);
+        if (shouldLoadData(undefined, this.props)) {
+          this._loadAsyncData(this.props);
+        }
       }
 
       componentDidUpdate(prevProps, prevState) {
-        if (this.state.externalData === null) {
+        if (
+          this.state.externalData === null &&
+          shouldLoadData(prevProps, this.props)
+        ) {
           this._loadAsyncData(this.props);
         }
       }
@@ -72,6 +84,7 @@ export default function withAsyncData(
       }
 
       _loadAsyncData(...args) {
+        console.log(`### ${WithAsyncData.displayName}._loadAsyncData`, ...args)
         this._asyncRequest = loadAsyncData(...args).then(
           externalData => {
             this._asyncRequest = null;
@@ -92,5 +105,8 @@ export default function withAsyncData(
         );
       }
     }
+    WithAsyncData.displayName =
+      `WithAsyncData(${getDisplayName(BaseComponent)})`;
+    return WithAsyncData;
   }
 }
