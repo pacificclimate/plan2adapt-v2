@@ -163,7 +163,8 @@ export default class App extends Component {
                           >
                             <Impacts
                               rulebase={rulebase}
-                              ruleValues={ruleValues}
+                              region={get('value', this.state.region)}
+                              futureTimePeriod={futureTimePeriod}
                               groupKey='category'
                               itemKey='sector'
                               groupHeading='Impact Category'
@@ -177,7 +178,8 @@ export default class App extends Component {
                           >
                             <Impacts
                               rulebase={rulebase}
-                              ruleValues={ruleValues}
+                              region={get('value', this.state.region)}
+                              futureTimePeriod={futureTimePeriod}
                               groupKey='sector'
                               itemKey='category'
                               groupHeading='Affected Sector'
