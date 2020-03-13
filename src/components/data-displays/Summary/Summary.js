@@ -1,8 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
-import { map } from 'lodash/fp';
+import capitalize from 'lodash/fp/capitalize';
+import flow from 'lodash/fp/flow';
+import find from 'lodash/fp/find';
+import keys from 'lodash/fp/keys';
+import map from 'lodash/fp/map';
+import zip from 'lodash/fp/zip';
+import tap from 'lodash/fp/tap';
 import T from 'pcic-react-external-text';
+import withAsyncData from '../../../HOCs/withAsyncData';
+import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
+import isEqual from 'lodash/fp/isEqual';
 
 
 const format = number => `${number > 0 ? '+' : ''}${number}`;
@@ -29,10 +38,87 @@ const SeasonTds = ({ variable, season }) => {
 };
 
 
-export default class Summary extends React.Component {
+// Define the contents of the table.
+// TODO: configure externally?
+const tableContents = [
+  {
+    variable: 'tasmean',
+    seasons: ['annual']
+  },
+  {
+    variable: 'pr',
+    seasons: ['annual', 'summer', 'winter']
+  },
+  {
+    variable: 'prsn',
+    seasons: ['winter', 'spring']
+  },
+  // {
+  //   variable: 'gdd',
+  //   seasons: ['annual']
+  // },
+  // {
+  //   variable: 'hdd',
+  //   seasons: ['annual']
+  // },
+  // {
+  //   variable: 'fdETCCDI',
+  //   seasons: ['annual']
+  // },
+];
+
+
+class Summary extends React.Component {
+  // This is a pure (state-free), controlled component that renders the entire
+  // content of Summary.
+  //
+  // This component is wrapped with `withAsyncData` to inject the summary
+  // statistics that are fetched asynchronously, according to the
+  // selected region and climatological time period
+  //
+  // The summary statistics, represented by the prop `summary`, are encoded
+  // in the following format. This is actually a specifier for the table
+  // rows rather than raw data from the backend. The data loader is
+  // (at present) responsible for making the transformation from raw data to
+  // row specifiers, using the value of `tableContents` to drive it.
+  //
+  // [
+  //   {
+  //     variable: {
+  //       label: 'Precipitation',
+  //       units: '%',
+  //     },
+  //     seasons: [
+  //       {
+  //         label: 'Annual',
+  //         ensembleMedian: 6,
+  //         range: { min: 2, max: 12, },
+  //       },
+  //       {
+  //         label: 'Summer',
+  //         ensembleMedian: -1,
+  //         range: { min: -8, max: 6, },
+  //       },
+  //       {
+  //         label: 'Winter',
+  //         ensembleMedian: 8,
+  //         range: { min: -2, max: 15, },
+  //       },
+  //       ...
+  //     ]
+  //   },
+  //   ...
+  // ]
+
+
   static propTypes = {
+    region: PropTypes.object.isRequired,
+    futureTimePeriod: PropTypes.object.isRequired,
     summary: PropTypes.array,
     baseline: PropTypes.object,
+    // TODO: Consider a refactoring that would make `tableContents` a prop of
+    //   Summary. Since `loadSummaryStatistics` is invoked with this.props, this
+    //   actually shouldn't be hard. Yay design.
   };
 
   static defaultProps = {
@@ -40,7 +126,7 @@ export default class Summary extends React.Component {
       start_date: 1961,
       end_date: 1990,
     }
-  }
+  };
 
   render() {
     return (
@@ -94,3 +180,135 @@ export default class Summary extends React.Component {
     );
   }
 }
+
+
+const percentiles = [10, 50, 90];
+
+
+// These functions convert the data we retrieve from the backend to the
+// format that Summary consumes. It's a bit tedious, but Summary already
+// works with hardcoded data in this format, and something very like this
+// would have to be done in any case. Let's reduce to an already solved problem!
+
+
+// There's a better way to do this with the Variable selector options, but
+// this is easy to implement and works.
+const toVariableLabel = variable => ({
+  'tasmean': 'Mean Temperature',
+  'pr': 'Precipitation',
+  'prsn': 'Snowfall',
+  'gdd': 'Growing Degree Days',
+  'hdd': 'Heating Degree Days',
+  'ffd': 'Frost-Free Days',
+}[variable]);
+
+
+const periodToTimescale = period => {
+  // Return the timescale (subannual period category) corresponding to the named
+  // subannual period.
+  switch (period) {
+    case 'annual':
+      return 'annual';
+    case 'spring':
+    case 'summer':
+    case 'fall':
+    case 'winter':
+      return 'seasonal';
+    default:
+      return 'monthly';
+  }
+};
+
+
+const periodToMonth = period => {
+  // Return the 2-character month number that matches the center month of
+  // any given subannual period.
+  return {
+    'annual': '07',
+    'winter': '01',
+    'spring': '04',
+    'summer': '07',
+    'fall': '10',
+    // We don't need months ... famous last words.
+  }[period];
+};
+
+
+const getPeriodPercentileValues = (data, period) => {
+  // Extract the percentile values from the "data" component of a summary
+  // statistics response. This means selecting the correct timescale, then
+  // the correct item (identified by centre date) from the timescale component.
+  // The correct item needs only to match the centre month. This makes this
+  // robust to little calendar and computational quirks that can vary the
+  // centre date by a day or two.
+  const periodItems = data[periodToTimescale(period)];
+  return flow(
+    keys,
+    find(key => key.substring(5, 7) === periodToMonth(period)),
+    dataKey => periodItems[dataKey],
+  )(periodItems);
+};
+
+
+const convertDataToSummarySpec = dataPerContent => {
+  // Convert the raw summary statistics data for each `tableContent` item to
+  // the objects consumed by Summary via its `summary` prop. See Summary
+  // for a spec of these objects.
+  console.log('### convertDataToSummarySpec', dataPerContent)
+  return flow(
+    zip(tableContents),
+    tap(x => console.log('### zipped', x)),
+    map(([content, data]) => ({
+      variable: {
+        label: toVariableLabel(content.variable),
+        units: data.units,
+      },
+      seasons: map(season => {
+        const seasonData = getPeriodPercentileValues(data.data, season);
+        return ({
+          label: capitalize(season),
+          ensembleMedian: seasonData[1],
+          range: {
+            min: seasonData[0],
+            max: seasonData[2],
+          }
+        })
+      })(content.seasons)
+    }))
+  )(dataPerContent);
+};
+
+
+const loadSummaryStatistics = props => {
+  // Return (a promise for) the summary statistics to be displayed in the
+  // Summary tab. This amounts to fetching the data for each variable from the
+  // backend, then processing it into the form consumed by Summary.
+  // Possibly the second step should be placed somewhere else, but here is
+  // pragmatic.
+  console.log('### loadSummaryStatistics', props)
+  return Promise.all(
+    map(
+      content => fetchSummaryStatistics(
+        props.region, props.futureTimePeriod, content.variable, percentiles
+      )
+    )(tableContents)
+  )
+    .then(convertDataToSummarySpec);
+};
+
+
+export const shouldLoadSummaryStatistics = (prevProps, props) =>
+  // ... relevant props have settled to defined values
+  props.region && props.futureTimePeriod &&
+  // ... and there are either no previous props, or there is a difference
+  // between previous and current relevant props
+  !(
+    prevProps &&
+    isEqual(prevProps.region, props.region) &&
+    isEqual(prevProps.futureTimePeriod, props.futureTimePeriod)
+  );
+
+
+export default withAsyncData(
+  loadSummaryStatistics, shouldLoadSummaryStatistics, 'summary'
+)(Summary);

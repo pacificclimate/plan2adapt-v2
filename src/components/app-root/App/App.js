@@ -130,7 +130,10 @@ export default class App extends Component {
                     title={<T as='string' path='summary.tab'/>}
                     className='pt-2'
                   >
-                    <Summary summary={summary}/>
+                    <Summary
+                      region={get('value', this.state.region)}
+                      futureTimePeriod={futureTimePeriod}
+                    />
                     <T path='summary.notes.general' data={{
                       region: region,
                       futureDecade: middleDecade(futureTimePeriod),
