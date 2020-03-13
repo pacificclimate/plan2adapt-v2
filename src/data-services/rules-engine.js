@@ -1,23 +1,8 @@
 import axios from 'axios';
 import urljoin from 'url-join';
 import mapKeys from 'lodash/fp/mapKeys';
+import { regionId } from '../utils/regions';
 import { middleDecade } from '../utils/time-periods';
-
-
-const regionId = region => {
-  // Map frontend region specifier to region id used by the backend.
-  const name = region.properties.english_na;
-  switch (name) {
-    case 'British Columbia': return 'bc';
-    case 'Mount Waddington': return 'mt_waddington';
-    default: return name.toLowerCase().replace(/\W+/g, '_');
-  }
-};
-
-
-const timePeriodId = middleDecade;
-  // Map frontend time period specifier to the time period id (middle decade)
-  // used by the backend.
 
 
 const normalizeRuleNames = mapKeys(key => key.substring(5));
@@ -35,7 +20,7 @@ export const fetchRulesResults = (region, timePeriod) => {
   return axios.get(
     urljoin(
       process.env.REACT_APP_RULES_ENGINE_URL,
-      `${regionId(region)}_${timePeriodId(timePeriod)}.json`
+      `${regionId(region)}_${middleDecade(timePeriod)}.json`
     )
   )
   .then(response => response.data)

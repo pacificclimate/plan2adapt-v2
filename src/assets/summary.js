@@ -1,104 +1,76 @@
-export default [
-  {
-    variable: {
-      label: 'Mean Temperature',
-      units: '°C',
-    },
-    seasons: [
-      {
-        label: 'Annual',
-        ensembleMedian: 1.8,
-        range: { min: 1.3, max: 2.7, },
+// Faked up summary stats
+// Follows new API
+// Outer dict is keyed by variable only; No regions, time periods, percentiles
+
+export default {
+  "tasmean": {
+    "units": "degC",
+    "percentiles": [10, 50, 90],
+    "region": "vancouver_island",
+    "climatology": 2020,
+    "variable": "tasmean",
+    "data": {
+      "annual": {
+        "2020-07-01T00:00:00Z": [1.6, 1.7, 1.9]
       },
-    ]
+      "seasonal":{
+        "2020-01-15T00:00:00Z": [-1.5, -1.3, -1.1],
+        "2020-04-15T00:00:00Z": [0.0, 0.6, 1.2],
+        "2020-07-15T00:00:00Z": [2.1, 2.4, 2.8,],
+        "2020-10-15T00:00:00Z": [-0.3, -0.2, -0.1],
+      },
+      "monthly": {
+        "2020-01-15T00:00:00Z": [-1.5, -1.4, -1.3],
+        "2020-02-15T00:00:00Z": [-0.6, -0.5, -0.3],
+        "2020-03-15T00:00:00Z": [0.0, 0.2, 0.3],
+        "2020-04-15T00:00:00Z": [0.3, 0.4, 0.6],
+        "2020-05-15T00:00:00Z": [0.7, 0.75, 0.8],
+        "2020-06-15T00:00:00Z": [1.8, 2.0, 2.4],
+        "2020-07-15T00:00:00Z": [3.3, 3.5, 3.6],
+        "2020-08-15T00:00:00Z": [1.6, 1.7, 1.8],
+        "2020-09-15T00:00:00Z": [0.0, 0.1, 0.2],
+        "2020-10-15T00:00:00Z": [-0.3, -0.1, 0.0],
+        "2020-11-15T00:00:00Z": [-0.5, -0.4, -0.3],
+        "2020-12-15T00:00:00Z": [-1.3, -1.25, -1.2]
+      }
+    }
   },
 
-  {
-    variable: {
-      label: 'Precipitation',
-      units: '%',
-    },
-    seasons: [
-      {
-        label: 'Annual',
-        ensembleMedian: 6,
-        range: { min: 2, max: 12, },
+  "pr": {
+    "units": "%",
+    "percentiles": [10, 50, 90],
+    "region": "vancouver_island",
+    "climatology": 2020,
+    "variable": "pr",
+    "data": {
+      "annual": {
+        "2020-07-01T00:00:00Z": [2, 6, 12]
       },
-      {
-        label: 'Summer',
-        ensembleMedian: -1,
-        range: { min: -8, max: 6, },
+      "seasonal":{
+        "2020-01-15T00:00:00Z": [2, 8, 15],
+        "2020-04-15T00:00:00Z": [3, 6, 9],
+        "2020-07-15T00:00:00Z": [-8, -1, 6],
+        "2020-10-15T00:00:00Z": [-4, 0, 4],
       },
-      {
-        label: 'Winter',
-        ensembleMedian: 8,
-        range: { min: -2, max: 15, },
-      },
-    ]
+    }
   },
 
-  {
-    variable: {
-      label: 'Snowfall',
-      units: '%',
-      derived: true,
-    },
-    seasons: [
-      {
-        label: 'Winter',
-        ensembleMedian: -10,
-        range: { min: -17, max: 2, },
+  "prsn": {
+    "units": "%",
+    "percentiles": [10, 50, 90],
+    "region": "vancouver_island",
+    "climatology": 2020,
+    "variable": "pr",
+    "data": {
+      "annual": {
+        "2020-07-01T00:00:00Z": [-40, -5, 6]
       },
-      {
-        label: 'Spring',
-        ensembleMedian: -58,
-        range: { min: -71, max: -14, },
+      "seasonal":{
+        "2020-01-15T00:00:00Z": [-17, -10, 2],
+        "2020-04-15T00:00:00Z": [-71, -58, -14],
+        "2020-07-15T00:00:00Z": [0,0,0],
+        "2020-10-15T00:00:00Z": [-10, -2, 4],
       },
-    ]
+    }
   },
-
-  {
-    variable: {
-      label: 'Growing Degree Days',
-      units: 'degree days',
-      derived: true,
-    },
-    seasons: [
-      {
-        label: 'Annual',
-        ensembleMedian: 283,
-        range: { min: 179, max: 429, },
-      },
-    ]
-  },
-
-  {
-    variable: {
-      label: 'Heating Degree Days',
-      units: 'degree days',
-      derived: true,
-    },
-    seasons: [
-      {
-        label: 'Annual',
-        ensembleMedian: -648,
-        range: { min: -952, max: -459, },
-      },
-    ]
-  },
-
-  {
-    variable: {
-      label: 'Frost-Free Days',
-      units: 'days',
-      derived: true,
-    },
-    seasons: [
-      {
-        label: 'Annual',
-        ensembleMedian: 20,
-        range: { min: 12, max: 29, },
-      },
-    ]
-  },
-]
+}
