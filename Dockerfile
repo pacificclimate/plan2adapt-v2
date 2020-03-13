@@ -5,6 +5,6 @@ WORKDIR /app
 
 RUN npm install --quiet
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD npm start
