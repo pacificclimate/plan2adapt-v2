@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { SimpleConstraintGroupingSelector } from 'pcic-react-components';
+import { middleDecade } from '../../../utils/time-periods';
 
 
 const getOptionRepresentative = ({ start_date, end_date }) =>
   ({ start_date, end_date });
 
 const getOptionLabel = ({ value: { representative: { start_date, end_date } } }) => {
-  const decade = Math.floor((Number(start_date) + Number(end_date)) / 20 ) * 10;
+  const decade = middleDecade({ start_date, end_date });
   return `${decade}s (${start_date}–${end_date})`;
 };
 

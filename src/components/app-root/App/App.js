@@ -12,7 +12,6 @@ import get from 'lodash/fp/get';
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
-import ruleValues from '../../../assets/rule-results';
 
 import T, { ExternalTextContext } from 'pcic-react-external-text';
 import AppHeader from '../AppHeader';
@@ -22,13 +21,13 @@ import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
+import Summary from '../../data-displays/Summary';
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
-import Impacts from '../../data-displays/impacts/Impacts';
-import Rules from '../../data-displays/impacts/Rules';
+import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
-import Summary from '../../data-displays/Summary';
+import { middleDecade } from '../../../utils/time-periods';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -67,7 +66,7 @@ export default class App extends Component {
     console.log('Metadata loaded')
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
-    const region = get('region.value.label', this.state) || '';
+    const region = get('region.label', this.state) || '';
     return (
       // We introduce a consumer for external texts context so we can use
       // T.get easily (it needs the context (`texts`) as an argument).
@@ -134,8 +133,8 @@ export default class App extends Component {
                     <Summary summary={summary}/>
                     <T path='summary.notes.general' data={{
                       region: region,
-                      futureTimePeriod: futureTimePeriod,
-                      baselineTimePeriod,
+                      futureDecade: middleDecade(futureTimePeriod),
+                      baselineDecade: middleDecade(baselineTimePeriod),
                     }}/>
                     <T path='summary.notes.derivedVars'/>
                   </Tab>
@@ -149,52 +148,14 @@ export default class App extends Component {
                       <Col lg={12}>
                         <T path='impacts.prologue' data={{
                           region: region,
-                          futureTimePeriod: futureTimePeriod,
-                          baselineTimePeriod,
+                          futureDecade: middleDecade(futureTimePeriod),
+                          baselineDecade: middleDecade(baselineTimePeriod),
                         }}/>
-                        <Tabs
-                          id={'impacts'}
-                          defaultActiveKey={'rules'}
-                        >
-                          <Tab
-                            eventKey={'by-category'}
-                            title={'By Category'}
-                            className='pt-2'
-                          >
-                            <Impacts
-                              rulebase={rulebase}
-                              ruleValues={ruleValues}
-                              groupKey='category'
-                              itemKey='sector'
-                              groupHeading='Impact Category'
-                              itemsHeading='Affected Sectors'
-                            />
-                          </Tab>
-                          <Tab
-                            eventKey={'by-sector'}
-                            title={'By Sector'}
-                            className='pt-2'
-                          >
-                            <Impacts
-                              rulebase={rulebase}
-                              ruleValues={ruleValues}
-                              groupKey='sector'
-                              itemKey='category'
-                              groupHeading='Affected Sector'
-                              itemsHeading='Impact Categories'
-                            />
-                          </Tab>
-                          <Tab
-                            eventKey={'rules'}
-                            title={'Rules Logic'}
-                            className='pt-2'
-                          >
-                            <Rules
-                              rulebase={rulebase}
-                              ruleValues={ruleValues}
-                            />
-                          </Tab>
-                        </Tabs>
+                        <ImpactsTab
+                          rulebase={rulebase}
+                          region={get('value', this.state.region)}
+                          futureTimePeriod={futureTimePeriod}
+                        />
                       </Col>
                     </Row>
                   </Tab>
