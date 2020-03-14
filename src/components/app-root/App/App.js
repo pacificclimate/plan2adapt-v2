@@ -21,12 +21,12 @@ import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
+import Summary from '../../data-displays/Summary';
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
-import Summary from '../../data-displays/Summary';
 import { middleDecade } from '../../../utils/time-periods';
 
 const baselineTimePeriod = {

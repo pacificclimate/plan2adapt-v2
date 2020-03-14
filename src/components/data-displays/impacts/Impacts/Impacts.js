@@ -1,7 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Table, Accordion, Card, CardGroup } from 'react-bootstrap';
-import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs, join } from 'lodash/fp';
+import { Accordion, Card, CardGroup } from 'react-bootstrap';
+import filter from 'lodash/fp/filter';
+import flow from 'lodash/fp/flow';
+import groupBy from 'lodash/fp/groupBy';
+import map from 'lodash/fp/map';
+import mapValues from 'lodash/fp/mapValues';
+import sortBy from 'lodash/fp/sortBy';
+import uniq from 'lodash/fp/uniq';
+import toPairs from 'lodash/fp/toPairs';
 import ReactMarkdown from 'react-markdown';
 import ImpactIcon from '../ImpactIcon';
 import './Impacts.css';
