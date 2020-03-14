@@ -22,8 +22,7 @@ import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
-import Impacts from '../../data-displays/impacts/Impacts';
-import Rules from '../../data-displays/impacts/Rules';
+import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import styles from './App.css';
@@ -152,56 +151,11 @@ export default class App extends Component {
                           futureDecade: middleDecade(futureTimePeriod),
                           baselineDecade: middleDecade(baselineTimePeriod),
                         }}/>
-                        <Tabs
-                          id={'impacts'}
-                          defaultActiveKey={'by-category'}
-                        >
-                          <Tab
-                            eventKey={'by-category'}
-                            title={'By Category'}
-                            className='pt-2'
-                          >
-                            {/* TODO: This should be abstracted as a component
-                            so that rules results can be injected just once,
-                            into it, instead of into 2 different components
-                            3 separate times. */}
-                            <Impacts
-                              rulebase={rulebase}
-                              region={get('value', this.state.region)}
-                              futureTimePeriod={futureTimePeriod}
-                              groupKey='category'
-                              itemKey='sector'
-                              groupHeading='Impact Category'
-                              itemsHeading='Affected Sectors'
-                            />
-                          </Tab>
-                          <Tab
-                            eventKey={'by-sector'}
-                            title={'By Sector'}
-                            className='pt-2'
-                          >
-                            <Impacts
-                              rulebase={rulebase}
-                              region={get('value', this.state.region)}
-                              futureTimePeriod={futureTimePeriod}
-                              groupKey='sector'
-                              itemKey='category'
-                              groupHeading='Affected Sector'
-                              itemsHeading='Impact Categories'
-                            />
-                          </Tab>
-                          <Tab
-                            eventKey={'rules'}
-                            title={'Rules Logic'}
-                            className='pt-2'
-                          >
-                            <Rules
-                              rulebase={rulebase}
-                              region={get('value', this.state.region)}
-                              futureTimePeriod={futureTimePeriod}
-                            />
-                          </Tab>
-                        </Tabs>
+                        <ImpactsTab
+                          rulebase={rulebase}
+                          region={get('value', this.state.region)}
+                          futureTimePeriod={futureTimePeriod}
+                        />
                       </Col>
                     </Row>
                   </Tab>

@@ -3,8 +3,6 @@ import React from 'react';
 import { Table, Accordion, Card, CardGroup } from 'react-bootstrap';
 import { filter, flow, groupBy, map, mapValues, sortBy, uniq, toPairs, join } from 'lodash/fp';
 import ReactMarkdown from 'react-markdown';
-import withAsyncData from '../../../../HOCs/withAsyncData';
-import { loadRulesResults, shouldLoadRulesResults } from '../common';
 import ImpactIcon from '../ImpactIcon';
 import './Impacts.css';
 
@@ -12,14 +10,7 @@ import './Impacts.css';
 const sort = sortBy(x => x);
 
 
-class Impacts extends React.Component {
-  // This is a pure (state-free), controlled component that renders the entire
-  // content of Impacts.
-  //
-  // This component is wrapped with `withAsyncData` to inject the rule values
-  // (prop `ruleValues`) that are fetched asynchronously, according to the
-  // selected region and climatological time period.
-
+export default class Impacts extends React.Component {
   static propTypes = {
     rulebase: PropTypes.array.isRequired,
     region: PropTypes.object.isRequired,
@@ -110,8 +101,3 @@ class Impacts extends React.Component {
       );
   }
 }
-
-
-export default withAsyncData(
-  loadRulesResults, shouldLoadRulesResults, 'ruleValues'
-)(Impacts);
