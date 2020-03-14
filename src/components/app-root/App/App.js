@@ -133,6 +133,32 @@ export default class App extends Component {
                     <Summary
                       region={get('value', this.state.region)}
                       futureTimePeriod={futureTimePeriod}
+                      tableContents={[
+                        {
+                          variable: 'tasmean',
+                          seasons: ['annual']
+                        },
+                        {
+                          variable: 'pr',
+                          seasons: ['annual', 'summer', 'winter']
+                        },
+                        {
+                          variable: 'prsn',
+                          seasons: ['winter', 'spring']
+                        },
+                        // {
+                        //   variable: 'gdd',
+                        //   seasons: ['annual']
+                        // },
+                        // {
+                        //   variable: 'hdd',
+                        //   seasons: ['annual']
+                        // },
+                        // {
+                        //   variable: 'fdETCCDI',
+                        //   seasons: ['annual']
+                        // },
+                      ]}
                     />
                     <T path='summary.notes.general' data={{
                       region: region,
