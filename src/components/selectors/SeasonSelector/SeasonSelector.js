@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { TimeOfYearSelector } from 'pcic-react-components';
+// import { TimeOfYearSelector } from 'pcic-react-components';
+import TimeOfYearSelector from '../TimeOfYearSelector';
 
 
 export default class SeasonSelector extends React.Component {
@@ -14,6 +15,7 @@ export default class SeasonSelector extends React.Component {
       <TimeOfYearSelector
         {...this.props}
         monthly={false}
+        hideDisabledOptions
       />
     );
   }
