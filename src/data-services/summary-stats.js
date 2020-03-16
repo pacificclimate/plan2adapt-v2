@@ -15,7 +15,7 @@ export const fetchSummaryStatistics = (
   // `variable` is a string identifying the variable (e.g., 'tasmean')
   // `percentiles` is an array of percentile values to be computed across
   //    the ensemble
-  // Returns
+  // Returns a promise for the summary statistics data.
 
   console.log('### fetchSummaryStatistics', region, timePeriod, variable, percentiles)
 

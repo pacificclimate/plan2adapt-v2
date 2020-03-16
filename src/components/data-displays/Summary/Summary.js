@@ -52,49 +52,74 @@ class Summary extends React.Component {
   //
   // This component is wrapped with `withAsyncData` to inject the summary
   // statistics that are fetched asynchronously, according to the
-  // selected region and climatological time period
-  //
-  // The summary statistics, represented by the prop `summary`, are encoded
-  // in the following format. This is actually a specifier for the table
-  // rows rather than raw data from the backend. The data loader is
-  // (at present) responsible for making the transformation from raw data to
-  // row specifiers, using the value of `tableContents` to drive it.
-  //
-  // [
-  //   {
-  //     variable: {
-  //       label: 'Precipitation',
-  //       units: '%',
-  //     },
-  //     seasons: [
-  //       {
-  //         label: 'Annual',
-  //         ensembleMedian: 6,
-  //         range: { min: 2, max: 12, },
-  //       },
-  //       {
-  //         label: 'Summer',
-  //         ensembleMedian: -1,
-  //         range: { min: -8, max: 6, },
-  //       },
-  //       {
-  //         label: 'Winter',
-  //         ensembleMedian: 8,
-  //         range: { min: -2, max: 15, },
-  //       },
-  //       ...
-  //     ]
-  //   },
-  //   ...
-  // ]
-
+  // selected region and climatological time period.
 
   static propTypes = {
     region: PropTypes.object.isRequired,
     futureTimePeriod: PropTypes.object.isRequired,
-    summary: PropTypes.array,
     baseline: PropTypes.object,
+
     tableContents: PropTypes.array.isRequired,
+    // Abstract specification of the summary table. Data is implicit in the
+    // variable and season specifications, and is fetched by the data loader
+    // to construct the concrete table specification. Rows are specified
+    // in order of display, "depth first" by variable then seasons.
+    //
+    // Example value of this prop:
+    //
+    // [
+    //   { variable: 'tasmean', seasons: ['annual'] },
+    //   { variable: 'pr', seasons: ['annual', 'summer', 'winter'] },
+    // ]
+
+    summary: PropTypes.array,
+    // Concrete specification of the summary table, explicitly including data
+    // fetched from the backend and some labelling. This is a holdover from
+    // an earlier, highly convenient format used when there was no backend
+    // API at all. It has however proved a good design to separate the abstract
+    // spec (`tableContents`) from the concrete one. It is not a perfect way
+    // to handle this (see TO-DO below), but it is quite usable.
+    //
+    // Table rows are specified in order of display, "depth first" by
+    // variable then seasons.
+    //
+    // Note: This prop is injected via `withAsyncData`. Users should not be
+    // specifying this prop directly, only `tableContents`.
+    //
+    // The data loader is (at present) responsible for making the transformation
+    // from backend data to these row specifiers, using the value of
+    // `tableContents` to direct it.
+    //
+    // Example value of this prop:
+    //
+    // [
+    //   {
+    //     variable: {
+    //       label: 'Precipitation',
+    //       units: '%',
+    //     },
+    //     seasons: [
+    //       {
+    //         label: 'Annual',
+    //         ensembleMedian: 6,
+    //         range: { min: 2, max: 12, },
+    //       },
+    //       {
+    //         label: 'Summer',
+    //         ensembleMedian: -1,
+    //         range: { min: -8, max: 6, },
+    //       },
+    //       {
+    //         label: 'Winter',
+    //         ensembleMedian: 8,
+    //         range: { min: -2, max: 15, },
+    //       },
+    //       ...
+    //     ]
+    //   },
+    //   ...
+    // ]
+
   };
 
   static defaultProps = {
@@ -162,6 +187,11 @@ class Summary extends React.Component {
 // format that Summary consumes. It's a bit tedious, but Summary already
 // works with hardcoded data in this format, and something very like this
 // would have to be done in any case. Let's reduce to an already solved problem!
+
+// TODO: This idea turned out to have strengths. It would be even better to
+//  eliminate `toVariableLabel` by placing this information in the
+//  `summary.table.contents` data structure. This will likely include a somewhat
+//  more general refactoring of what external text content drives Summary.
 
 
 // There's a better way to do this with the Variable selector options, but
