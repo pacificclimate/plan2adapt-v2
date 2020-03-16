@@ -32,6 +32,29 @@ summary:
       range: |
         ${format(season.range.min)}${isLong(units) ? '': units} to
         ${format(season.range.max)}${units}
+    contents:
+      - variable: tasmean
+        seasons:
+          - annual
+      - variable: pr
+        seasons:
+          - annual
+          - summer
+          - winter
+      - variable: prsn
+        seasons:
+          - winter
+          - spring
+# TODO: Uncomment when stats backend complete
+#      - variable: gdd
+#        seasons:
+#          - annual
+#      - variable: hdd
+#        seasons:
+#          - annual
+#      - variable: fdETCCDI
+#        seasons:
+#          - annual
   notes:
     general: |
       The table above shows projected changes in average (mean) temperature,
