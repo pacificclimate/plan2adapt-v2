@@ -13,7 +13,8 @@ import find from 'lodash/fp/find';
 import flow from 'lodash/fp/flow';
 import isNull from 'lodash/fp/isNull';
 import isUndefined from 'lodash/fp/isUndefined';
-import { SelectWithValueReplacement, fp } from 'pcic-react-components';
+import { SelectWithValueReplacement } from 'pcic-react-components';
+import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 
 // `isInvalidValue` examines the *current options list* to determine whether
 // the value is invalid (namely, that it matches an option that is disabled).
@@ -63,7 +64,7 @@ export default class TimeOfYearSelector extends React.Component {
       ...rest
     } = this.props;
     const options = flow(
-      fp.mapWithKey(
+      mapWithKey(
         (label, index) => ({
           label,
           value: index,
