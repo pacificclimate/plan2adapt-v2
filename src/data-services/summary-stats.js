@@ -1,8 +1,8 @@
 import axios from 'axios';
-import mapKeys from 'lodash/fp/mapKeys';
+import urljoin from 'url-join';
 import { regionId } from '../utils/regions';
 import { middleDecade } from '../utils/time-periods';
-import summary from '../assets/summary';
+import fake from '../assets/summary';
 
 
 export const fetchSummaryStatistics = (
@@ -18,10 +18,15 @@ export const fetchSummaryStatistics = (
   // Returns
 
   console.log('### fetchSummaryStatistics', region, timePeriod, variable, percentiles)
-  return Promise.resolve(summary[variable]);
 
+  // TODO: Remove fakery when backend available
+  if (process.env.REACT_APP_SUMMARY_STATISTICS_URL === 'fake') {
+    return Promise.resolve(fake[variable]);
+  }
   return axios.get(
-    process.env.REACT_APP_SUMMARY_STATISTICS_URL,
+    urljoin(process.env.REACT_APP_SUMMARY_STATISTICS_URL, 'tbd'),
+    // TODO: Replace with this when certain
+    // urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'tbd'),
     {
       params: {
         region: regionId(region),
