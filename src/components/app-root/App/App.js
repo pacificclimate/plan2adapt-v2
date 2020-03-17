@@ -59,8 +59,13 @@ export default class App extends Component {
     // level. But not until we are pretty sure we have settled this arrangement,
     // since extraction means introducing extra machinery for state-setting
     // callbacks, etc.
+
+    // TODO: Replace with About tab
+    console.log(`### Version: ${process.env.REACT_APP_VERSION}`);
+
     if (this.state.metadata === null) {
       console.log('Loading metadata...')
+      // TODO: Replace with spinner or something
       return (<h1>Loading metadata...</h1>);
     }
     console.log('Metadata loaded')
