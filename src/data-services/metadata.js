@@ -1,5 +1,6 @@
 import axios from 'axios';
 import urljoin from 'url-join';
+import includes from 'lodash/fp/includes';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
 import map from 'lodash/fp/map';
@@ -41,6 +42,9 @@ export function fetchSummaryMetadata() {
   // Fetch the summary metadata provided by the backend `/multimeta` endpoint.
 
   console.log('fetchSummaryMetadata()')
+  const emissionsScenarios =
+    process.env.REACT_APP_EMISSIONS_SCENARIOS.split(';');
+  console.log('### emissionsScenarios', emissionsScenarios)
   return axios.get(
     urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
     {
@@ -52,9 +56,10 @@ export function fetchSummaryMetadata() {
     },
   )
   .then(response => response.data)
-  .then(filter({
-    experiment: process.env.REACT_APP_EMISSIONS_SCENARIO,
-  }))
+  .then(filter(
+    metadatum =>  includes(metadatum.experiment, emissionsScenarios)
+    // metadatum => metadatum.experiment === process.env.REACT_APP_EMISSIONS_SCENARIO
+  ))
   .then(tap(metadata => {
     console.log('### Metadata loaded')
     console.log('### Models', groupBy('model_id')(metadata))
