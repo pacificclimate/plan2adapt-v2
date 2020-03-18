@@ -28,16 +28,152 @@ with the following general requirements and goals:
 For more information on architecture and design, see
 [Plan2Adapt v2 Architecture and Development Plan](https://pcic.uvic.ca/confluence/display/CSG/Plan2Adapt+v2+Architecture+and+Development+Plan)
 
+## Production
+
+### Docker
+
+We use Docker for production deployment.
+
+It can also be useful in development; for example, to test a proposed volume mounting for the container.
+
+#### Manual processes
+
+In general, PCIC DevOps automates Docker image building in our repositories. However, it can be useful
+to manually build and run a production Docker image.
+
+#### Building the docker image
+
+```bash
+docker build -t plan2adapt-v2-frontend \
+    --build-arg REACT_APP_VERSION="$(./generate-commitish.sh)" .
+```
+
+**IMPORTANT**: Setting the build arg `REACT_APP_VERSION` as above is the most reliable
+way to inject an accurate version id into the final app. This value can be overridden
+when the image is run (by specifying the environment variable of the same name), 
+but it is not recommended, as it invites error.
+
+#### Tag docker image
+
+For manual build procedures,
+[tagging with `latest` is not considered a good idea](https://medium.com/@mccode/the-misunderstood-docker-tag-latest-af3babfd6375).
+It is better (and easy and immediately obvious) to tag with version/release
+numbers. In this example, we will tag with version 1.2.3.
+
+TODO: Ensure this documentation matches the current DevOps process.
+
+1. Determine the recently built image's ID:
+
+   ```bash
+   $ docker images
+   REPOSITORY                            TAG                 IMAGE ID            CREATED             SIZE
+   plan2adapt-v2-frontend                latest              14cb66d3d145        22 seconds ago      867MB
+
+   ```
+
+1. Tag the image:
+
+   ```bash
+   $ docker tag 1040e7f07e5d docker-registry01.pcic.uvic.ca:5000/plan2adapt-v2-frontend:1.2.3
+   ```
+
+#### Push docker image to PCIC docker registry
+
+[PCIC maintains its own docker registry](https://pcic.uvic.ca/confluence/pages/viewpage.action?pageId=3506599). 
+We place manual builds in this registry:
+
+```bash
+docker push docker-registry01.pcic.uvic.ca:5000/plan2adapt-v2-frontend:1.2.3
+```
+
+#### Run docker image
+
+As described above, environment variables configure the app.
+All are given default development and production values in the files
+`.env`, `.env.development`, and `.env.production`.
+
+These can be overridden at run time by providing them in the `docker run` command (`-e` option),
+or, equivalently, in the appropriate `docker-compose.yaml` element.
+
+In addition, we mount configuration file(s) as volumes in the container.
+This enables us to update these files without rebuilding or redeploying the app.
+See the section below for details.
+
+Typical production run:
+
+```bash
+docker run --restart=unless-stopped -d \
+  -p <external port>:8080 \
+  --name plan2adapt-v2-frontend \
+  - v /path/to/external/external-texts/default.yaml:/app/build/external-text/default.yaml \
+  plan2adapt-v2-frontend:<tag>
+```
+
+### Updating configuration files
+
+Certain parts of Plan2Adapt are configured in external configuration files.
+These configuration files are stored in [the `public` folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder).
+The path to each configuration file inside this folder specified by an environment variable.
+Specifically:
+
+| Configuration     | Env variable                  | Default value                 |
+| ----------------- | ----------------------------- | ------------------------------|
+| External texts    | `REACT_APP_EXTERNAL_TEXT`     |  external-text/default.yaml   |
+
+For more details on external text, see the section "External text" below.
+
+During a build (`npm run build`),
+files in the `public` folder are copied directly, without bundling, to the build directory (normally, `./build`).
+Files in the `build` folder can be updated on the fly, so that changes to them can be made without creating
+a new release of Climate Explorer.
+
+When running the app in a production environment, we mount an external configuration file as a volume
+in the docker container. (See section above.)
+This external file can be modified, and the container restarted, to provide an updated version of the
+variable options file without needing to modify source code, create a new release, or rebuild the image.
+
+To change the configuration file without creating a new release of the app:
+
+* Update the configuration file in the external file system.
+* Restart the container (`docker restart plan2adapt-v2-frontend`)
+
+Alternatives:
+
+* Stop the app and start it again with a different value for the associated environment variable,
+  and a corresponding volume mount for this new file.
+
+To prevent tears, hair loss, and the cursing of your name down the generations,
+we **strongly recommend also updating** the source configuration files in the repo (in the `public` folder)
+with any changes made, so that they are in fact propagated to later versions. "Hot updates" should not be stored
+outside of the version control system.
+
+## Releasing
+
+To create a release version:
+
+1. Increment `version` in `package.json`
+2. Summarize the changes from the last version in `NEWS.md`
+3. Commit these changes, then tag the release:
+
+  ```bash
+git add package.json NEWS.md
+git commit -m"Bump to version x.x.x"
+git tag -a -m"x.x.x" x.x.x
+git push --follow-tags
+  ```
+
+## [Project initialization](docs/Project-initialization.md)
+
 ## Externalized text content
 
 This project is very text-heavy. We'd rather not release a new version every time we tweak some punctuation,
 so instead of embedding all the text in the app, we externalize it into a resource file and use the (PCIC-developed)
-`external-text` package to provide the text content. `external-text` processes Markdown, so the resource file can
-contain Markdown for complex content, of which we have quite a bit in this app.
+`pcic-react-external-text` package to provide the text content. `pcic-react-external-text` processes Markdown, 
+so the resource file can contain Markdown for complex content, of which we have quite a bit in this app.
 
 The external text resource file is loaded from the project's
 [public folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder),
-from a file whose path within that folder is specified by the environment variable `REACT_APP_EXTERNAL_TEXTS`.
+from a file whose path within that folder is specified by the environment variable `REACT_APP_EXTERNAL_TEXT`.
 The present setting for this path is `external-text/default.yaml`.
 
 In a Create React App app (which this is), the
@@ -47,38 +183,7 @@ Being outside the module system, the content of `/build/static` can be updated a
 meaning that the external texts file can be changed after the application is built and deployed. 
 The updated external text content will be used whenever the app is refreshed or launched anew after that point.
 
-We keep a semi-up-to-date version of the external texts file in the `/public` folder of this project for the
-convenience of the developers. However the truly up-to-date content in the deployed app seen by our users is 
-managed in a separate repo (`plan2adapt-text`?).  
-When we wish to make between-release updates to the text content of the app, we update the separate repo and
-deploy its contents to `/build/static` (so, using the default file path, to `/build/static/external-text/default.yaml`.
-
-IMPORTANT: This means that 
-**we must [deploy](https://facebook.github.io/create-react-app/docs/deployment) this app 
-as a [production build](https://facebook.github.io/create-react-app/docs/production-build)**, 
-and abandon our present lazy ways of just spinning up a development server with `npm start` for our production apps. 
-Fortunately, this is easy.
-
-This approach can be tested easily in a development environment:
-
-First, install `serve` (once, globally):
-
-```bash
-npm install -g serve
-```
-
-Then build the app and serve it:
-
-```bash
-npm run build
-serve -s build
-```
-
-Open this app in the browser. 
-You can change the content of the external text file in `/build/static` and refresh the app in the browser to see the
-changed content.
-
-## [Project initialization](docs/Project-initialization.md)
+During development, you can update the external text file and refresh the app to see the effect of the new content.
 
 ## Package dependencies security vulnerabilities
 
