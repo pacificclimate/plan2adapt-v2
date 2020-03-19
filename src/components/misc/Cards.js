@@ -6,11 +6,12 @@ import map from 'lodash/fp/map';
 import CardGroup from 'react-bootstrap/CardGroup';
 import CardColumns from 'react-bootstrap/CardColumns';
 
-export function Item({ header, body }) {
+export function Item({ header, title, body, bg }) {
   return (
-    <Card>
+    <Card bg={bg}>
+      {header && <Card.Header>{header}</Card.Header>}
       <Card.Body>
-        <Card.Title>{header}</Card.Title>
+        {title && <Card.Title>{title}</Card.Title>}
         <Card.Text>
           <T.Markdown source={body}/>
         </Card.Text>
