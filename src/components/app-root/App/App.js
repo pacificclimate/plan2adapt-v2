@@ -8,6 +8,7 @@ import Tab from 'react-bootstrap/Tab';
 
 import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
+import map from 'lodash/fp/map';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import summary from '../../../assets/summary';
@@ -25,6 +26,8 @@ import Summary from '../../data-displays/Summary';
 import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
 import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
+
+import Cards from '../../misc/Cards';
 
 import styles from './App.css';
 import { middleDecade } from '../../../utils/time-periods';
@@ -172,7 +175,7 @@ export default class App extends Component {
                   >
                     <Row>
                       <Col xs={'auto'} className='pr-0'>
-                        <T path='fragments.variablePrefix'/>
+                        <T path='components.variablePrefix'/>
                       </Col>
                       <Col sm={4} xs={6}>
                         <VariableSelector
@@ -220,7 +223,7 @@ export default class App extends Component {
                   >
                     <Row>
                       <Col xs={'auto'} className='pr-0'>
-                        <T path='fragments.variablePrefix'/>
+                        <T path='components.variablePrefix'/>
                       </Col>
                       <Col sm={4} xs={6}>
                         <VariableSelector
@@ -269,6 +272,33 @@ export default class App extends Component {
                     className='pt-2'
                   >
                     <T path='references.content'/>
+                  </Tab>
+
+                  <Tab
+                    eventKey={T.get(texts, 'about.tab')}
+                    title={<T as='string' path='about.tab'/>}
+                    className='pt-2'
+                  >
+                    <Tabs id={'about'} defaultActiveKey={'Plan2Adapt'}>
+                      {
+                        map(
+                          tab => (
+                            <Tab
+                              eventKey={tab.tab}
+                              title={tab.tab}
+                            >
+                              <T.Markdown source={tab.title}/>
+                              <Cards items={tab.cards}/>
+                            </Tab>
+                          )
+                        )(T.get(
+                            texts,
+                            'about.tabs',
+                            {version: process.env.REACT_APP_VERSION}
+                          )
+                        )
+                      }
+                    </Tabs>
                   </Tab>
                 </Tabs>
               </Col>
