@@ -91,15 +91,6 @@ export default class App extends Component {
                   </Row>
                   <Row>
                     <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='mainSelectors.seasonPrefix'/>
-                    </Col>
-                    <Col xl={12} lg={2} md={3}>
-                      <SeasonSelector
-                        value={this.state.season}
-                        onChange={this.handleChangeSeason}
-                      />
-                    </Col>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
                       <T path='mainSelectors.regionPrefix'/>
                     </Col>
                     <Col xl={12} lg={3} md={6}>
@@ -190,6 +181,15 @@ export default class App extends Component {
                           onChange={this.handleChangeVariable}
                         />
                       </Col>
+                      <Col xs={'auto'} className='pr-0'>
+                        <T path='mainSelectors.seasonPrefix'/>
+                      </Col>
+                      <Col lg={2} sm={4} xs={6}>
+                        <SeasonSelector
+                          value={this.state.season}
+                          onChange={this.handleChangeSeason}
+                        />
+                      </Col>
                     </Row>
                     <Row>
                       <Col lg={12}>
@@ -219,12 +219,23 @@ export default class App extends Component {
                     className='pt-2'
                   >
                     <Row>
-                      <Col lg={2}>
+                      <Col xs={'auto'} className='pr-0'>
                         <T path='fragments.variablePrefix'/>
+                      </Col>
+                      <Col sm={4} xs={6}>
                         <VariableSelector
                           bases={this.state.metadata}
                           value={this.state.variable}
                           onChange={this.handleChangeVariable}
+                        />
+                      </Col>
+                      <Col xs={'auto'} className='pr-0'>
+                        <T path='mainSelectors.seasonPrefix'/>
+                      </Col>
+                      <Col lg={2}  sm={4} xs={6}>
+                        <SeasonSelector
+                          value={this.state.season}
+                          onChange={this.handleChangeSeason}
                         />
                       </Col>
                     </Row>
