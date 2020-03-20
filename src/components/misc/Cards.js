@@ -3,12 +3,11 @@ import Card from 'react-bootstrap/Card';
 import T from 'pcic-react-external-text';
 import isArray from 'lodash/fp/isArray';
 import map from 'lodash/fp/map';
-import CardGroup from 'react-bootstrap/CardGroup';
 import CardColumns from 'react-bootstrap/CardColumns';
 
-export function Item({ header, title, body, bg }) {
+export function Item({ header, title, body, bg, border, text }) {
   return (
-    <Card bg={bg}>
+    <Card bg={bg} border={border} text={text}>
       {header && <Card.Header>{header}</Card.Header>}
       <Card.Body>
         {title && <Card.Title>{title}</Card.Title>}
@@ -29,12 +28,6 @@ export default function Cards({ items }) {
       { map(item => <Item {...item}/>)(items) }
     </CardColumns>
   );
-  return (
-    <CardGroup>
-      { map(item => <Item {...item}/>)(items) }
-    </CardGroup>
-  );
-  return map(item => <Item {...item}/>)(items);
 }
 
 Cards.Item = Item;
