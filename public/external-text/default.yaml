@@ -411,20 +411,15 @@ about:
     - tab: Team
       title: '## Team'
       cards:
-        - header: James Hiebert
-          href: https://pacificclimate.org/about-pcic/people/james-hiebert
+        - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
           body: Team lead.
-        - header: Lee Zeman
-          href: https://pacificclimate.org/about-pcic/people/lee-zeman
+        - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
           body: Backend engineer. Data wrangling.
-        - header: Nikola Radoš
-          href: https://pacificclimate.org/about-pcic/people/nikola-rados
-          body: DevOps engineer. Implementor of Impacts rules engine.
-        - header: Rod Glover
-          href: https://pacificclimate.org/about-pcic/people/rod-glover
+        - header: '[Nikola Radoš](https://pacificclimate.org/about-pcic/people/nikola-rados)'
+          body: DevOps specialist. Implementor of Impacts rules engine.
+        - header: '[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)'
           body: Front-end engineer. UI design and implementation.
-        - header: Matthew Benstead
-          href: https://pacificclimate.org/about-pcic/people/matthew-benstead
+        - header: '[Matthew Benstead](https://pacificclimate.org/about-pcic/people/matthew-benstead)'
           body: System administrator. Deployment and security.
 
 components:
