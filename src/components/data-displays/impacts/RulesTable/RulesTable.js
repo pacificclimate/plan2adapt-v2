@@ -4,7 +4,7 @@ import { Table } from 'react-bootstrap';
 import { map } from 'lodash/fp';
 import ReactMarkdown from 'react-markdown';
 import classnames from 'classnames';
-import T from 'pcic-react-external-text';
+import T from '../../../../temporary/external-text';
 import './RulesTable.css';
 import Button from 'react-bootstrap/Button';
 

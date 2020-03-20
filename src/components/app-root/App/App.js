@@ -13,7 +13,7 @@ import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 
-import T, { ExternalTextContext } from 'pcic-react-external-text';
+import T, { ExternalTextContext } from '../../../temporary/external-text';
 import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';

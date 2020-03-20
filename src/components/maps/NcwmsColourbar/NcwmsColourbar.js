@@ -25,6 +25,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import map from 'lodash/fp/map';
+import T from '../../../temporary/external-text';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
@@ -34,7 +35,7 @@ import {
 } from '../map-utils';
 
 
-const getColorbarURI = (variableSpec, width, height) =>
+const getColorbarURI = (displaySpec, variableSpec, width, height) =>
   makeURI(
     process.env.REACT_APP_NCWMS_URL,
     {
@@ -42,12 +43,14 @@ const getColorbarURI = (variableSpec, width, height) =>
       colorbaronly: 'true',
       width,
       height,
-      palette: wmsPalette(variableSpec),
+      palette: wmsPalette(displaySpec, variableSpec),
       numcolorbands: wmsNumcolorbands,
     }
   );
 
 export default class NcwmsColourbar extends React.Component {
+  static contextType = T.contextType;
+
   static propTypes = {
     variableSpec: PropTypes.object,
     width: PropTypes.number,
@@ -60,9 +63,10 @@ export default class NcwmsColourbar extends React.Component {
   };
 
   render() {
-    const range = wmsDataRange(this.props.variableSpec);
+    const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
+    const range = wmsDataRange(displaySpec, this.props.variableSpec);
     const span = range.max - range.min;
-    const ticks = wmsTicks(this.props.variableSpec);
+    const ticks = wmsTicks(displaySpec, this.props.variableSpec);
     return (
       <div
           className={styles.wrapper}
@@ -75,6 +79,7 @@ export default class NcwmsColourbar extends React.Component {
               'margin-left': -this.props.width,
             }}
             src={getColorbarURI(
+              displaySpec,
               this.props.variableSpec,
               this.props.width,
               this.props.height

@@ -1,4 +1,4 @@
-import flow from 'lodash/fp/flow';
+import curry from 'lodash/fp/curry';
 import getOr from 'lodash/fp/getOr';
 import map from 'lodash/fp/map';
 import range from 'lodash/fp/range';
@@ -24,62 +24,33 @@ export const wmsTime = (fileMetadata, season) => {
 };
 
 
-// TODO: Style and range should be part of config. But the configs
-//  are getting a bit more structured than env variables will accommodate.
+export const getDisplaySpecItem = curry(
+  // Extract the relevant item (e.g., 'palette') from a display spec, which
+  // is a configuration object retrieved from the external text file.
+  (item, displaySpec, variableSpec) => getOr(
+      displaySpec.fallback[item],
+      [variableSpec.variable_id, item],
+      displaySpec
+    )
+);
 
-const variableId2WmsPalette = {
-  pr: 'seq-Greens',
-  tasmax: 'div-BuRd',
-  tasmin: 'div-BuRd',
-  fallback: 'seq-Oranges',
-};
-export const wmsPalette = variableSpec =>
-  getOr(
-    variableId2WmsPalette.fallback,
-    variableSpec.variable_id,
-    variableId2WmsPalette
-  );
+export const wmsPalette = getDisplaySpecItem('palette');
+export const wmsDataRange = getDisplaySpecItem('range');
+export const wmsTicks = getDisplaySpecItem('ticks');
+export const wmsAboveMaxColor = getDisplaySpecItem('aboveMaxColor');
+export const wmsBelowMinColor = getDisplaySpecItem('belowMinColor');
 
-
-export const wmsStyle = variableSpec =>
-  `default-scalar/${wmsPalette(variableSpec)}`;
-
-
-const variableId2DataRange = {
-  pr: { min: 0, max: 20 },
-  tasmax: { min: -30, max: 40 },
-  tasmin: { min: -40, max: 30 },
-  fallback: { min: -40, max: 50 },
-};
-export const wmsDataRange = variableSpec =>
-  getOr(
-    variableId2DataRange.fallback,
-    variableSpec.variable_id,
-    variableId2DataRange
-  );
+export const wmsStyle = (displaySpec, variableSpec) =>
+  `default-scalar/${wmsPalette(displaySpec, variableSpec)}`;
 
 
-const variableId2Ticks = {
-  pr: [0, 5, 10, 15, 20],
-  tasmax: [-30, -20, -10, 0, 10, 20, 30, 40],
-  tasmin: [-40, -30, -20, -10, 0, 10, 20, 30],
-  fallback: [0, 10],
-};
-export const wmsTicks = variableSpec =>
-  getOr(
-    variableId2Ticks.fallback,
-    variableSpec.variable_id,
-    variableId2Ticks
-  );
-
-
-export const wmsColorScaleRange = variableSpec => {
-  const range = wmsDataRange(variableSpec);
+export const wmsColorScaleRange = (displaySpec, variableSpec) => {
+  const range = wmsDataRange(displaySpec, variableSpec);
   return `${range.min},${range.max}`
 };
 
 
-export const wmsClimateLayerProps = (fileMetadata, variableSpec, season) => {
+export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season) => {
   return {
     format: 'image/png',
     logscale: false,
@@ -89,13 +60,11 @@ export const wmsClimateLayerProps = (fileMetadata, variableSpec, season) => {
     // srs: "EPSG:3005",
     transparent: true,
     version: '1.1.1',
-    abovemaxcolor: 'black',
-    belowmincolor: 'black',
+    abovemaxcolor: wmsAboveMaxColor(displaySpec, variableSpec),
+    belowmincolor: wmsBelowMinColor(displaySpec, variableSpec),
     layers: wmsLayerName(fileMetadata, variableSpec),
     time: wmsTime(fileMetadata, season),
-    styles: wmsStyle(variableSpec),
-    colorscalerange: wmsColorScaleRange(variableSpec),
+    styles: wmsStyle(displaySpec, variableSpec),
+    colorscalerange: wmsColorScaleRange(displaySpec, variableSpec),
   }
 };
-
-

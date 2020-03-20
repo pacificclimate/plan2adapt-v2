@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
-import ExternalText from 'pcic-react-external-text';
+import ExternalText from './temporary/external-text';
 import { makeYamlLoader } from './utils/external-text';
 
 console.log('index.js: App', App)
