@@ -190,6 +190,8 @@ maps:
   displaySpec:
     fallback:
       palette: seq-Oranges
+      aboveMaxColor: black
+      belowMinColor: black
       range:
         min: -50
         max: 50

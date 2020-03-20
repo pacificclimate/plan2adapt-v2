@@ -37,6 +37,8 @@ export const getDisplaySpecItem = curry(
 export const wmsPalette = getDisplaySpecItem('palette');
 export const wmsDataRange = getDisplaySpecItem('range');
 export const wmsTicks = getDisplaySpecItem('ticks');
+export const wmsAboveMaxColor = getDisplaySpecItem('aboveMaxColor');
+export const wmsBelowMinColor = getDisplaySpecItem('belowMinColor');
 
 export const wmsStyle = (displaySpec, variableSpec) =>
   `default-scalar/${wmsPalette(displaySpec, variableSpec)}`;
@@ -58,8 +60,8 @@ export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, se
     // srs: "EPSG:3005",
     transparent: true,
     version: '1.1.1',
-    abovemaxcolor: 'black',
-    belowmincolor: 'black',
+    abovemaxcolor: wmsAboveMaxColor(displaySpec, variableSpec),
+    belowmincolor: wmsBelowMinColor(displaySpec, variableSpec),
     layers: wmsLayerName(fileMetadata, variableSpec),
     time: wmsTime(fileMetadata, season),
     styles: wmsStyle(displaySpec, variableSpec),
