@@ -21,7 +21,7 @@ summary:
     heading:
       variable: Climate Variable
       season: Season
-      projectedChange: Projected Change from ${$$.fragments.period} Baseline
+      projectedChange: Projected Change from ${$$.components.period} Baseline
       ensembleMedian: Ensemble Median
       range: Range (10th to 90th percentile)
     rows:
@@ -184,9 +184,9 @@ maps:
   tab: Maps
   title: "## ${season} ${variable} for ${region}"
   historical:
-    title: "### Historical: ${$$.fragments.period}"
+    title: "### Historical: ${$$.components.period}"
   projected:
-    title: "### Projected: ${$$.fragments.period}"
+    title: "### Projected: ${$$.components.period}"
   displaySpec:
     fallback:
       palette: seq-Oranges
@@ -270,14 +270,6 @@ notes:
     Instead, they are derived from temperature and/or precipitation using
     methods described in Wang et al., 2006 (see 'References' tab).
 
-    ## Acknowledgements
-
-    Development of this tool has been made possible through funding and
-    support provided by the BC Ministry of Environment and the
-    BC Ministry of Forests and Range Forest Science Program and is a
-    project of Natural Resources Canada's British Columbia Regional
-    Adaptation Collaborative.
-
 references:
   tab: References
   content: |
@@ -303,6 +295,154 @@ references:
 
     Wang, T.L., Hamann, A., Spittlehouse, D.L. and Aitken, S.N., 2006. "Development of scale-free climate data for Western Canada for use in resource management", _International Journal of Climatology_, 26: 383-397. Details the ClimateBC empirical downscaling tool.
 
-fragments:
+about:
+  tab: About
+  tabs:
+    - tab: Plan2Adapt
+      title: '## Plan2Adapt (Beta)'
+      cards:
+        - header: Beta Release
+          bg: info
+          text: light
+          body: |
+            This is a beta (pre-production) release. It demonstrates the capabilities of Plan2Adapt,
+            but not all features are present or in their final form. We welcome feedback from users (see Contact tab)
+            on any facet of this tool.
+
+        - header: Description
+          body: |
+            Plan2Adapt generates maps, plots, and data describing projected future climate conditions
+            for regions throughout British Columbia.
+            It is designed to help you assess climate change in your region based on a
+            standard set of climate model projections.
+
+            Plan2Adapt is similar to the [PCIC Climate Explorer](https://pacificclimate.org/analysis-tools/pcic-climate-explorer)
+            and uses the same data to generate its output.
+            With a simpler user interface and fewer configurable options Plan2Adapt is designed to
+            serve the needs of those involved in local and regional community planning.
+
+        - header: Version
+          body: ${version}
+
+        - header: Author
+          body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
+
+        - header: Terms of Use
+          body: |
+            In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
+            data set is subject to the terms of use of each source organization.
+            For further details please refer to:
+
+            * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
+            * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
+
+        - header: No Warranty
+          bg: warning
+          body: |
+            The data in this tool are provided by the Pacific Climate Impacts Consortium with an open licence on an
+            “AS IS” basis without any warranty or representation, express or implied, as to its accuracy or completeness.
+            Any reliance you place upon the information contained here is your sole responsibility and strictly at
+            your own risk. In no event will the Pacific Climate Impacts Consortium be liable for any loss or damage
+            whatsoever, including, without limitation, indirect or consequential loss or damage, arising from reliance
+            upon the data or derived information.
+
+    - tab: Credits
+      title: '## Credits and Acknowledgements'
+      cards:
+        - header: Sponsors
+          body: |
+            ### [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
+
+            ### [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+
+            ### [Natural Resources Canada](https://www.nrcan.gc.ca/home)
+
+            Development of this tool has been made possible through funding and
+            support provided by the BC Ministry of Environment & Climate Change Strategy
+            and the
+            BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development
+            Forest Science Program and is a
+            project of Natural Resources Canada's
+            [British Columbia Regional Adaptation Collaborative](https://www.fraserbasin.bc.ca/ccaq_bcrac.html).
+
+        - header: Data
+          body: |
+            ### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
+
+            We thank the Landscape Analysis and Applications section of the
+            Canadian Forest Service, Natural Resources Canada, for developing
+            and making available the Canada-wide historical daily gridded
+            climate dataset used as the downscaling target.
+
+            PCIC gratefully acknowledges support from
+            Environment and Climate Change Canada
+            for the development of the statistically downscaled GCM
+            scenarios on which much of the data presented here is based.
+
+            ### [World Climate Research Programme](https://www.wcrp-climate.org/)
+
+            We acknowledge the World Climate Research Programme’s
+            Working Group on Coupled Modelling, which is responsible for
+            CMIP5, and we thank the climate modeling groups for producing
+            and making available their GCM output.
+
+            ### [U.S. Department of Energy](https://www.energy.gov/)
+
+            For CMIP, the U.S. Department of Energy’s Program for
+            Climate Model Diagnosis and Intercomparison provides coordinating
+            support and led development of software infrastructure in
+            partnership with the Global Organization for
+            Earth System Science Portals.
+
+    - tab: Contact
+      title: '## Contact'
+      cards:
+        - header: Feedback on Application
+          body: |
+            Please address questions and suggestions on the functioning of this
+            tool (the application proper) to ${$$.components.contacts.csg.link}.
+        - header: Scientific Questions
+          body: |
+            Please address questions about science and interpretation of the
+            data presented in this tool to ${$$.components.contacts.science.link}.
+        - header: Pacific Climate Impacts Consortium
+          body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
+
+    - tab: Team
+      title: '## Team'
+      cards:
+        - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
+          body: Team lead.
+        - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
+          body: Backend engineer. Data wrangling.
+        - header: '[Nikola Radoš](https://pacificclimate.org/about-pcic/people/nikola-rados)'
+          body: DevOps specialist. Implementor of Impacts rules engine.
+        - header: '[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)'
+          body: Front-end engineer. UI design and implementation.
+        - header: '[Matthew Benstead](https://pacificclimate.org/about-pcic/people/matthew-benstead)'
+          body: System administrator. Deployment and security.
+
+components:
   period: ${start_date}-${end_date}
   variablePrefix: Show details about
+  climdexUrl: https://www.climdex.org/learn/indices
+  contacts:
+    csg:
+      name: Computational Support Group
+      email: climate@uvic.ca
+      link: '[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})'
+    science:
+      # For now, we are directing all inquiries to CSG, and will direct
+      # as necessary.
+      name: ${$$.components.contacts.csg.name}
+      email: ${$$.components.contacts.csg.email}
+      link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
+  gcmDefn: |
+    A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
+    a numerical model representing
+    physical processes in the atmosphere, ocean, cryosphere and land surface
+    of the Earth.
+    GCMs are the most advanced tools currently available for simulating the
+    response of the global climate system to increasing greenhouse gas
+    concentrations.
+
