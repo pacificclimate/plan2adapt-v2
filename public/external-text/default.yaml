@@ -301,6 +301,14 @@ about:
     - tab: Plan2Adapt
       title: '## Plan2Adapt (Beta)'
       cards:
+        - header: Beta Release
+          bg: info
+          text: light
+          body: |
+            This is a beta (pre-production) release. It demonstrates the capabilities of Plan2Adapt,
+            but not all features are present or in their final form. We welcome feedback from users (see Contact tab)
+            on any facet of this tool.
+
         - header: Description
           body: |
             Plan2Adapt generates maps, plots, and data describing projected future climate conditions
@@ -315,8 +323,10 @@ about:
 
         - header: Version
           body: ${version}
+
         - header: Author
           body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
+
         - header: Terms of Use
           body: |
             In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
@@ -406,13 +416,16 @@ about:
           body: Team lead.
         - header: Lee Zeman
           href: https://pacificclimate.org/about-pcic/people/lee-zeman
-          body: Backend engineer and data wrangler.
+          body: Backend engineer. Data wrangling.
+        - header: Nikola Radoš
+          href: https://pacificclimate.org/about-pcic/people/nikola-rados
+          body: DevOps engineer. Implementor of Impacts rules engine.
         - header: Rod Glover
           href: https://pacificclimate.org/about-pcic/people/rod-glover
-          body: Front-end engineer.
+          body: Front-end engineer. UI design and implementation.
         - header: Matthew Benstead
           href: https://pacificclimate.org/about-pcic/people/matthew-benstead
-          body: System administrator.
+          body: System administrator. Deployment and security.
 
 components:
   period: ${start_date}-${end_date}
