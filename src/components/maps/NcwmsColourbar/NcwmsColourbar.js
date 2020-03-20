@@ -25,6 +25,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import map from 'lodash/fp/map';
+import T from '../../../temporary/external-text';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
@@ -42,7 +43,7 @@ const getColorbarURI = (variableSpec, width, height) =>
       colorbaronly: 'true',
       width,
       height,
-      palette: wmsPalette(variableSpec),
+      palette: wmsPalette(displaySpec, variableSpec),
       numcolorbands: wmsNumcolorbands,
     }
   );
@@ -75,6 +76,7 @@ export default class NcwmsColourbar extends React.Component {
               'margin-left': -this.props.width,
             }}
             src={getColorbarURI(
+              displaySpec,
               this.props.variableSpec,
               this.props.width,
               this.props.height

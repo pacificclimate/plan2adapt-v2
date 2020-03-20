@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { WMSTileLayer } from 'react-leaflet';
+import T from '../../../temporary/external-text';
 import { wmsClimateLayerProps } from '../map-utils';
 
 

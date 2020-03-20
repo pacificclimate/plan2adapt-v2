@@ -8,7 +8,7 @@ import keys from 'lodash/fp/keys';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
 import tap from 'lodash/fp/tap';
-import T from 'pcic-react-external-text';
+import T from '../../../temporary/external-text';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
