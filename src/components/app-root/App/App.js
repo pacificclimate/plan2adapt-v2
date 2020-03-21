@@ -75,6 +75,8 @@ export default class App extends Component {
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
     const region = get('region.label', this.state) || '';
+    const variableSelectorDefault =
+      T.get(texts, 'selectors.variable.default', {}, 'raw');
     return (
       <Container fluid>
         <AppHeader/>
@@ -178,8 +180,7 @@ export default class App extends Component {
                     <VariableSelector
                       bases={this.state.metadata}
                       value={this.state.variable}
-                      // default={T.get(texts, 'selectors.variable.default', {}, 'raw')}
-                      default={'pr'}
+                      default={variableSelectorDefault}
                       onChange={this.handleChangeVariable}
                     />
                   </Col>
@@ -228,7 +229,7 @@ export default class App extends Component {
                     <VariableSelector
                       bases={this.state.metadata}
                       value={this.state.variable}
-                      // default={T.get(texts, 'selectors.variable.default', {}, 'raw')}
+                      default={variableSelectorDefault}
                       onChange={this.handleChangeVariable}
                     />
                   </Col>
