@@ -6,6 +6,22 @@ app:
     # defaultActiveKey: ${$$.summary.tab}
     defaultActiveKey: Summary
 
+selectors:
+  prologue: I am interested in information about projected climate change ...
+  region:
+    prefix: in
+  timePeriod:
+    prefix: during the
+    default: 2050
+  variable:
+    prefix: variable prefix
+    default: tasmax
+  season:
+    prefix: for a typical
+    postfix: period
+    default: annual
+
+# TODO: Replace with selectors content above
 mainSelectors:
   prologue: I am interested in information about projected climate change ...
   seasonPrefix: for a typical
