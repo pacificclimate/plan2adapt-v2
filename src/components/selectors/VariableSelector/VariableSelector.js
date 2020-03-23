@@ -1,10 +1,12 @@
+// TODO: DRY up selector defaulting; use a common option matcher for all
+//  selectors
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { VariableSelector } from 'pcic-react-components';
 import curry from 'lodash/fp/curry';
 import find from 'lodash/fp/find';
 import flow from 'lodash/fp/flow';
-import tap from 'lodash/fp/tap';
 import { flattenOptions } from 'pcic-react-components/dist/utils/select';
 
 

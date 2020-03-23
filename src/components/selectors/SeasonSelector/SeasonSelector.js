@@ -1,3 +1,6 @@
+// TODO: DRY up selector defaulting; use a common option matcher for all
+//  selectors
+
 import PropTypes from 'prop-types';
 import React from 'react';
 // import { TimeOfYearSelector } from 'pcic-react-components';

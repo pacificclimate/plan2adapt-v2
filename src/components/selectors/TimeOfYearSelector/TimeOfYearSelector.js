@@ -2,6 +2,8 @@
 // TODO: This is a modified copy of the component of the same name from
 //   pcic-react-components. This component extends the original backwards
 //   compatibly and should be merged back into it.
+// TODO: DRY up selector defaulting; use a common option matcher for all
+//  selectors
 
 import React from 'react';
 import PropTypes from 'prop-types';
