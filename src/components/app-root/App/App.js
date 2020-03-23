@@ -11,10 +11,9 @@ import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
-import summary from '../../../assets/summary';
 import rulebase from '../../../assets/rulebase';
 
-import T, { ExternalTextContext } from '../../../temporary/external-text';
+import T from '../../../temporary/external-text';
 import AppHeader from '../AppHeader';
 
 import RegionSelector from '../../selectors/RegionSelector/RegionSelector';
@@ -28,8 +27,6 @@ import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
-
-import styles from './App.css';
 import { middleDecade } from '../../../utils/time-periods';
 
 const baselineTimePeriod = {
@@ -68,15 +65,26 @@ export default class App extends Component {
     const texts = this.context;
     if (!texts || this.state.metadata === null) {
       // TODO: Replace with spinner or something
-      console.log('Loading ...')
+      console.log('### Loading ...')
       return (<h1>Loading ...</h1>);
     }
-    console.log('Loaded')
+    console.log('### Loaded')
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
     const region = get('region.label', this.state) || '';
-    const variableSelectorDefault =
-      T.get(texts, 'selectors.variable.default', {}, 'raw');
+    const variableSelectorProps = {
+      // Common to both VariableSelector instances
+      bases: this.state.metadata,
+      value: this.state.variable,
+      default: T.get(texts, 'selectors.variable.default', {}, 'raw'),
+      onChange: this.handleChangeVariable,
+    };
+    const seasonSelectorProps = {
+      // Common to both SeasonSelector instances
+      value: this.state.season,
+      default: T.get(texts, 'selectors.season.default', {}, 'raw'),
+      onChange: this.handleChangeSeason,
+    };
     return (
       <Container fluid>
         <AppHeader/>
@@ -178,10 +186,7 @@ export default class App extends Component {
                   </Col>
                   <Col sm={4} xs={6}>
                     <VariableSelector
-                      bases={this.state.metadata}
-                      value={this.state.variable}
-                      default={variableSelectorDefault}
-                      onChange={this.handleChangeVariable}
+                      {...variableSelectorProps}
                     />
                   </Col>
                   <Col xs={'auto'} className='pr-0'>
@@ -189,8 +194,7 @@ export default class App extends Component {
                   </Col>
                   <Col lg={2} sm={4} xs={6}>
                     <SeasonSelector
-                      value={this.state.season}
-                      onChange={this.handleChangeSeason}
+                      {...seasonSelectorProps}
                     />
                   </Col>
                 </Row>
@@ -227,10 +231,7 @@ export default class App extends Component {
                   </Col>
                   <Col sm={4} xs={6}>
                     <VariableSelector
-                      bases={this.state.metadata}
-                      value={this.state.variable}
-                      default={variableSelectorDefault}
-                      onChange={this.handleChangeVariable}
+                      {...variableSelectorProps}
                     />
                   </Col>
                   <Col xs={'auto'} className='pr-0'>
@@ -238,8 +239,7 @@ export default class App extends Component {
                   </Col>
                   <Col lg={2}  sm={4} xs={6}>
                     <SeasonSelector
-                      value={this.state.season}
-                      onChange={this.handleChangeSeason}
+                      {...seasonSelectorProps}
                     />
                   </Col>
                 </Row>

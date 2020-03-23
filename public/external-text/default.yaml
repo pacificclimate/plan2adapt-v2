@@ -19,7 +19,7 @@ selectors:
   season:
     prefix: for a typical
     postfix: period
-    default: annual
+    default: 16
 
 # TODO: Replace with selectors content above
 mainSelectors:
