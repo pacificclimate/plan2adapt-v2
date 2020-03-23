@@ -15,13 +15,12 @@ selectors:
     prefix: during the
     default: 2050
   variable:
-    prefix: variable prefix
+    prefix: ... with details about
     default: tasmax
   season:
     prefix: for a typical
     postfix: period
     default: 16
-
 
 summary:
   tab: Summary
