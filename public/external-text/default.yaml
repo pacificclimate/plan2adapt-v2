@@ -21,12 +21,6 @@ selectors:
     postfix: period
     default: 16
 
-# TODO: Replace with selectors content above
-mainSelectors:
-  prologue: I am interested in information about projected climate change ...
-  seasonPrefix: for a typical
-  regionPrefix: in
-  periodPrefix: during the
 
 summary:
   tab: Summary
@@ -85,7 +79,7 @@ summary:
       The range values represent the lowest and highest results within the set.
 
       Please note that this summary table does not depend on the choice of season
-       (*${$$.mainSelectors.seasonPrefix}...*) made at the left.
+       (*${$$.selectors.season.prefix}...*) made at the left.
        However, that setting does affect results on the other tabs.
     derivedVars: |
       &ast; These values are derived from temperature and precipitation.
@@ -440,7 +434,6 @@ about:
 
 components:
   period: ${start_date}-${end_date}
-  variablePrefix: Show details about
   climdexUrl: https://www.climdex.org/learn/indices
   contacts:
     csg:

@@ -91,16 +91,15 @@ export default class App extends Component {
 
         <Row>
           <Col xl={2} lg={12} md={12}>
-            {/* TODO: Extract this as a separate component? */}
             <div className='MainSelectors'>
               <Row>
                 <Col>
-                  <T path='mainSelectors.prologue'/>
+                  <T path='selectors.prologue'/>
                 </Col>
               </Row>
               <Row>
                 <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T path='mainSelectors.regionPrefix'/>
+                  <T path='selectors.region.prefix'/>
                 </Col>
                 <Col xl={12} lg={3} md={6}>
                   <RegionSelector
@@ -109,7 +108,7 @@ export default class App extends Component {
                   />
                 </Col>
                 <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T path='mainSelectors.periodPrefix'/>
+                  <T path='selectors.timePeriod.prefix'/>
                 </Col>
                 <Col xl={12} lg={3} md={4}>
                   <TimePeriodSelector
@@ -182,7 +181,7 @@ export default class App extends Component {
               >
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
-                    <T path='components.variablePrefix'/>
+                    <T path='selectors.variable.prefix'/>
                   </Col>
                   <Col sm={4} xs={6}>
                     <VariableSelector
@@ -190,12 +189,15 @@ export default class App extends Component {
                     />
                   </Col>
                   <Col xs={'auto'} className='pr-0'>
-                    <T path='mainSelectors.seasonPrefix'/>
+                    <T path='selectors.season.prefix'/>
                   </Col>
                   <Col lg={2} sm={4} xs={6}>
                     <SeasonSelector
                       {...seasonSelectorProps}
                     />
+                  </Col>
+                  <Col xs={'auto'} className='pr-0'>
+                    <T path='selectors.season.postfix'/>
                   </Col>
                 </Row>
                 <Row>
@@ -227,7 +229,7 @@ export default class App extends Component {
               >
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
-                    <T path='components.variablePrefix'/>
+                    <T path='selectors.variable.prefix'/>
                   </Col>
                   <Col sm={4} xs={6}>
                     <VariableSelector
@@ -235,7 +237,7 @@ export default class App extends Component {
                     />
                   </Col>
                   <Col xs={'auto'} className='pr-0'>
-                    <T path='mainSelectors.seasonPrefix'/>
+                    <T path='selectors.season.prefix'/>
                   </Col>
                   <Col lg={2}  sm={4} xs={6}>
                     <SeasonSelector
