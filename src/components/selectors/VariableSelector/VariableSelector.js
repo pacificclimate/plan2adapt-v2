@@ -18,6 +18,10 @@ const replaceInvalidValue = curry(
 );
 
 
+const getOptionLabel = ({ value: { representative: { variable_name }}}) =>
+  `${variable_name}`;
+
+
 export default class extends React.Component {
   static propTypes = {
     default: PropTypes.string,
@@ -31,6 +35,7 @@ export default class extends React.Component {
     return (
       <VariableSelector
         replaceInvalidValue={replaceInvalidValue(this.props.default)}
+        getOptionLabel={getOptionLabel}
         {...this.props}
       />
     );
