@@ -10,6 +10,7 @@ selectors:
   prologue: I am interested in information about projected climate change ...
   region:
     prefix: in
+    default: bc
   timePeriod:
     prefix: during the
     default: 2050

@@ -103,6 +103,7 @@ export default class App extends Component {
                 </Col>
                 <Col xl={12} lg={3} md={6}>
                   <RegionSelector
+                    default={T.get(texts, 'selectors.region.default', {}, 'raw')}
                     value={this.state.region}
                     onChange={this.handleChangeRegion}
                   />

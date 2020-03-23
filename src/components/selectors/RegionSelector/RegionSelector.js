@@ -10,14 +10,21 @@ import React from 'react';
 // import Select from 'react-select';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import { fetchRegions } from '../../../data-services/regions';
+import find from 'lodash/fp/find';
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import groupBy from 'lodash/fp/groupBy';
+import tap from 'lodash/fp/tap';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
+import { flattenOptions } from 'pcic-react-components/dist/utils/select';
+import { regionId } from '../../../utils/regions';
 
 
 export default class RegionSelector extends React.Component {
   static propTypes = {
+    default: PropTypes.string,
+    // Default value; specified by a region value (feature name, e.g., 'bc')
+
     value: PropTypes.object,
     onChange: PropTypes.func,
   };
@@ -54,7 +61,12 @@ export default class RegionSelector extends React.Component {
 
   isInvalidValue = value => this.state.regions !== null && !value;
 
-  replaceInvalidValue = value => this.state.regions[0].options[0];
+  replaceInvalidValue = value => {
+    return flow(
+      flattenOptions,
+      find(option => regionId(option.value) === this.props.default),
+    )(this.state.regions);
+  };
 
   render() {
     return (
