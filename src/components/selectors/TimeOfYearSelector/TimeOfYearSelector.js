@@ -2,6 +2,8 @@
 // TODO: This is a modified copy of the component of the same name from
 //   pcic-react-components. This component extends the original backwards
 //   compatibly and should be merged back into it.
+// TODO: DRY up selector defaulting; use a common option matcher for all
+//  selectors
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -16,24 +18,8 @@ import isUndefined from 'lodash/fp/isUndefined';
 import { SelectWithValueReplacement } from 'pcic-react-components';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 
-// `isInvalidValue` examines the *current options list* to determine whether
-// the value is invalid (namely, that it matches an option that is disabled).
-// This is slightly tricky, but it comes down to `SelectWithValueReplacement`
-// (like all `withValueReplacement` outputs) being agnostic about the set
-// of possible values, which in this case is a changing (enabled/disabled)
-// list of options.
-const isInvalidValue =
-    options => cond([
-        [isNull, constant(false)],  // null = no selection
-        [isUndefined, constant(true)],  // undefined = 'replace me'
-        [otherwise, option => find({ value: option.value })(options).isDisabled]
-      ]);
 
-// `replaceInvalidValue` returns the first enabled option in the options list,
-// or null (signifying no selection) if no such option exists.
-const replaceInvalidValue =
-  options => () => find({ isDisabled: false })(options) || null;
-
+// Base data for constructing options
 const labels = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
@@ -49,6 +35,8 @@ export default class TimeOfYearSelector extends React.Component {
     seasonal: PropTypes.bool, // Disable season options
     yearly: PropTypes.bool,   // Disable annual option
     hideDisabledOptions: PropTypes.bool,  // Hide disabled options
+    isInvalidValue: PropTypes.func,  // see SelectWithValueReplacement
+    replaceInvalidValue: PropTypes.func,  // see SelectWithValueReplacement
   };
 
   static defaultProps = {
@@ -56,11 +44,30 @@ export default class TimeOfYearSelector extends React.Component {
     seasonal: true,
     yearly: true,
     hideDisabledOptions: false,
+
+    // Examines the *current options list* to determine whether the value is
+    // invalid (namely, that it matches an option that is disabled).
+    // This is slightly tricky, but it comes down to
+    // `SelectWithValueReplacement` (like all `withValueReplacement` outputs) being agnostic about the set
+    // of possible values, which in this case is a changing (enabled/disabled)
+    // list of options.
+    isInvalidValue: options =>
+      cond([
+        [isNull, constant(false)],  // null = no selection
+        [isUndefined, constant(true)],  // undefined = 'replace me'
+        [otherwise, option => find({ value: option.value })(options).isDisabled]
+      ]),
+
+    // Returns the first enabled option in the options list,
+    // or null (signifying no selection) if no such option exists.
+    replaceInvalidValue: options =>
+      () => find({ isDisabled: false })(options) || null,
   };
 
   render() {
     const {
       value, onChange, monthly, seasonal, yearly, hideDisabledOptions,
+      isInvalidValue, replaceInvalidValue,
       ...rest
     } = this.props;
     const options = flow(
