@@ -7,7 +7,7 @@ import find from 'lodash/fp/find';
 import keys from 'lodash/fp/keys';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
-import tap from 'lodash/fp/tap';
+import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
@@ -259,6 +259,10 @@ const getPeriodPercentileValues = (response, display, period) => {
   // robust to little calendar and computational quirks that can vary the
   // centre date by a day or two. And it is independent of year.
 
+  if (isUndefined(response)) {
+    return [];  // Empty array -> undefined when subscripted
+  }
+
   // TODO: Remove when backend updated
   if (display === 'relative') {
     return [0, 0, 0];
@@ -275,6 +279,9 @@ const getPeriodPercentileValues = (response, display, period) => {
 
 
 const getUnits = (response, display) => {
+  if (isUndefined(response)) {
+    return '--';
+  }
   if (display === 'relative') {
     return '%';
   }
@@ -293,24 +300,30 @@ const tableContentsAndDataToSummarySpec =
   map(([content, data]) => {
     const { variable, precision, display, seasons } = content;
     const sigfigs = precision || 3;
-    const rep = value => expToFixed(value.toPrecision(sigfigs));
-    return ({
+    const rep = value => {
+      if (isUndefined(value)) {
+        return '(n/a)';
+      }
+      const displayValue = display === 'absolute' ? value : value * 100;
+      return expToFixed(displayValue.toPrecision(sigfigs));
+    };
+    return {
       variable: {
         label: toVariableLabel(variable),
         units: getUnits(data, display),
       },
       seasons: map(season => {
         const seasonData = getPeriodPercentileValues(data, display, season);
-        return ({
+        return {
           label: capitalize(season),
           ensembleMedian: rep(seasonData[1]),
           range: {
             min: rep(seasonData[0]),
             max: rep(seasonData[2]),
           }
-        })
+        };
       })(seasons)
-    })
+    };
   });
 
 
@@ -324,6 +337,12 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
       content => fetchSummaryStatistics(
         region, futureTimePeriod, content.variable, percentiles
       )
+      // Unavailable or otherwise problematic fetches are returned as undefined.
+      // Data display elements are responsible for showing a message.
+      .catch(err => {
+        console.error('Failed to fetch summary statistics:\n', err);
+        return undefined;
+      })
     )(tableContents)
   )
   .then(data => tableContentsAndDataToSummarySpec(zip(tableContents, data)));
