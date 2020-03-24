@@ -206,12 +206,16 @@ const toVariableLabel = variable => ({
 }[variable]);
 
 
+// TODO: Update for backend changes
+const displayToDataKey = display => 'data';
+
+
 const periodToTimescale = period => {
   // Return the timescale (subannual period category) corresponding to the named
   // subannual period.
   switch (period) {
     case 'annual':
-      return 'annual';
+      return 'yearly';
     case 'spring':
     case 'summer':
     case 'fall':
@@ -227,6 +231,7 @@ const periodToMonth = period => {
   // Return the 2-character month number that matches the center month of
   // any given subannual period.
   return {
+    'yearly': '07',
     'annual': '07',
     'winter': '01',
     'spring': '04',
@@ -237,13 +242,29 @@ const periodToMonth = period => {
 };
 
 
-const getPeriodPercentileValues = (data, period) => {
+const expToFixed = s => {
+  const match = s.match(/-?\d\.\d+e[+-]\d+/);
+  if (!match) {
+    return s;
+  }
+  return Number.parseFloat(match[0]).toString();
+};
+
+
+const getPeriodPercentileValues = (response, display, period) => {
   // Extract the percentile values from the "data" component of a summary
   // statistics response. This means selecting the correct timescale, then
   // the correct item (identified by centre date) from the timescale component.
   // The correct item needs only to match the centre month. This makes this
   // robust to little calendar and computational quirks that can vary the
   // centre date by a day or two. And it is independent of year.
+
+  // TODO: Remove when backend updated
+  if (display === 'relative') {
+    return [0, 0, 0];
+  }
+
+  const data = response[displayToDataKey(display)]
   const periodItems = data[periodToTimescale(period)];
   return flow(
     keys,
@@ -259,23 +280,28 @@ const tableContentsAndDataToSummarySpec =
   // for a spec of these objects.
   // Argument of this function is `tableContents` zipped with the
   // corresponding data fetched from the backend.
-  map(([content, data]) => ({
-    variable: {
-      label: toVariableLabel(content.variable),
-      units: data.units,
-    },
-    seasons: map(season => {
-      const seasonData = getPeriodPercentileValues(data.data, season);
-      return ({
-        label: capitalize(season),
-        ensembleMedian: seasonData[1],
-        range: {
-          min: seasonData[0],
-          max: seasonData[2],
-        }
-      })
-    })(content.seasons)
-  }));
+  map(([content, data]) => {
+    const { variable, precision, display, seasons } = content;
+    const sigfigs = precision || 3;
+    const rep = value => expToFixed(value.toPrecision(sigfigs));
+    return ({
+      variable: {
+        label: toVariableLabel(variable),
+        units: display === 'absolute' ? data.units : '%',
+      },
+      seasons: map(season => {
+        const seasonData = getPeriodPercentileValues(data, display, season);
+        return ({
+          label: capitalize(season),
+          ensembleMedian: rep(seasonData[1]),
+          range: {
+            min: rep(seasonData[0]),
+            max: rep(seasonData[2]),
+          }
+        })
+      })(seasons)
+    })
+  });
 
 
 const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
