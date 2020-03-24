@@ -17,7 +17,7 @@ import isEqual from 'lodash/fp/isEqual';
 const format = number => `${number > 0 ? '+' : ''}${number}`;
 
 const unitsSuffix = units =>
-  `${units.match(/^[A-Za-z]/) ? ' ' : ''}${units}`;
+  `${units.match(/^[%]/) ? '' : ' '}${units}`;
 
 const isLong = s => s.length > 2;
 
@@ -264,13 +264,23 @@ const getPeriodPercentileValues = (response, display, period) => {
     return [0, 0, 0];
   }
 
-  const data = response[displayToDataKey(display)]
+  const data = response[displayToDataKey(display)];
   const periodItems = data[periodToTimescale(period)];
   return flow(
     keys,
     find(key => key.substring(5, 7) === periodToMonth(period)),
     dataKey => periodItems[dataKey],
   )(periodItems);
+};
+
+
+const getUnits = (response, display) => {
+  if (display === 'relative') {
+    return '%';
+  }
+  return {
+      'degC': '°C',
+  }[response.units] || response.units;
 };
 
 
@@ -287,7 +297,7 @@ const tableContentsAndDataToSummarySpec =
     return ({
       variable: {
         label: toVariableLabel(variable),
-        units: display === 'absolute' ? data.units : '%',
+        units: getUnits(data, display),
       },
       seasons: map(season => {
         const seasonData = getPeriodPercentileValues(data, display, season);
