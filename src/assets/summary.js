@@ -10,7 +10,7 @@ export default {
     "climatology": 2020,
     "variable": "tasmean",
     "data": {
-      "annual": {
+      "yearly": {
         "2020-07-01T00:00:00Z": [1.6, 1.7, 1.9]
       },
       "seasonal":{
