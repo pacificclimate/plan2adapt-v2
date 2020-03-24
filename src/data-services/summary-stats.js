@@ -21,10 +21,12 @@ export const fetchSummaryStatistics = (
 
   // TODO: Remove fakery when backend available
   if (process.env.REACT_APP_SUMMARY_STATISTICS_URL === 'fake') {
-    return Promise.resolve(fake[variable]);
+    return new Promise(resolve => {
+      setTimeout(() => resolve(fake[variable]), 1000);
+    });
   }
   return axios.get(
-    urljoin(process.env.REACT_APP_SUMMARY_STATISTICS_URL, 'tbd'),
+    urljoin(process.env.REACT_APP_SUMMARY_STATISTICS_URL, 'percentileanomaly'),
     // TODO: Replace with this when certain
     // urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'tbd'),
     {
@@ -32,7 +34,7 @@ export const fetchSummaryStatistics = (
         region: regionId(region),
         climatology: middleDecade(timePeriod),
         variable,
-        percentiles: ','.join(percentiles)
+        percentile: percentiles.join(',')
       }
     }
   )
