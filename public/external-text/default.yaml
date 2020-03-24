@@ -45,7 +45,7 @@ summary:
     contents:
       - variable: tasmean
         display: absolute
-        precision: 3
+        precision: 2
         seasons:
           - annual
       - variable: pr
@@ -57,7 +57,7 @@ summary:
           - winter
       - variable: prsn
         display: relative
-        precision: 1
+        precision: 2
         seasons:
           - winter
           - spring
@@ -71,12 +71,11 @@ summary:
         precision: 3
         seasons:
           - annual
-  # TODO: Uncomment when stats backend complete
-#      - variable: fdETCCDI
-#        display: absolute
-#        precision: 4
-#        seasons:
-#          - annual
+      - variable: ffd
+        display: absolute
+        precision: 4
+        seasons:
+          - annual
   notes:
     general: |
       The table above shows projected changes in average (mean) temperature,
