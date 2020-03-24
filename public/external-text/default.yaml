@@ -16,7 +16,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: tasmax
+    default: pr
   season:
     prefix: for a typical
     postfix: period
@@ -44,25 +44,37 @@ summary:
         ${format(season.range.max)}${units}
     contents:
       - variable: tasmean
+        display: absolute
+        precision: 3
         seasons:
           - annual
       - variable: pr
+        display: relative
+        precision: 2
         seasons:
           - annual
           - summer
           - winter
       - variable: prsn
+        display: relative
+        precision: 1
         seasons:
           - winter
           - spring
-# TODO: Uncomment when stats backend complete
-#      - variable: gdd
-#        seasons:
-#          - annual
-#      - variable: hdd
-#        seasons:
-#          - annual
+      - variable: gdd
+        display: absolute
+        precision: 3
+        seasons:
+          - annual
+      - variable: hdd
+        display: absolute
+        precision: 3
+        seasons:
+          - annual
+  # TODO: Uncomment when stats backend complete
 #      - variable: fdETCCDI
+#        display: absolute
+#        precision: 4
 #        seasons:
 #          - annual
   notes:
