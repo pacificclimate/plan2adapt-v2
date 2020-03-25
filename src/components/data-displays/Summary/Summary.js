@@ -234,10 +234,25 @@ const periodToMonth = period => {
     'yearly': '07',
     'annual': '07',
     'winter': '01',
+    'djf': '01',
     'spring': '04',
+    'mam': '04',
     'summer': '07',
+    'jja': '07',
     'fall': '10',
-    // We don't need months ... famous last words.
+    'son': '10',
+    'jan': '01',
+    'feb': '02',
+    'mar': '03',
+    'apr': '04',
+    'may': '05',
+    'jun': '06',
+    'jul': '07',
+    'aug': '08',
+    'sep': '09',
+    'oct': '10',
+    'nov': '11',
+    'dec': '12',
   }[period];
 };
 
@@ -305,6 +320,7 @@ const getDisplayData = (response, period, display) => {
 };
 
 
+// TODO: Translate using configuration value
 const getUnits = (response, display) => {
   if (isUndefined(response)) {
     return '--';

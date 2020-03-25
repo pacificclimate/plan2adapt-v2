@@ -5,12 +5,14 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
+import Loader from 'react-loader';
 
 import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
+import { middleDecade } from '../../../utils/time-periods';
 import rulebase from '../../../assets/rulebase';
 
 import T from '../../../temporary/external-text';
@@ -27,7 +29,6 @@ import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
-import { middleDecade } from '../../../utils/time-periods';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -64,9 +65,8 @@ export default class App extends Component {
 
     const texts = this.context;
     if (!texts || this.state.metadata === null) {
-      // TODO: Replace with spinner or something
       console.log('### Loading ...')
-      return (<h1>Loading ...</h1>);
+      return <Loader/>;
     }
     console.log('### Loaded')
     const futureTimePeriod =

@@ -1,5 +1,3 @@
-greeting: Hello, ${name}.
-
 app:
   tabs:
     # Neither of these works in the code.
