@@ -146,7 +146,7 @@ export function get(texts, path, data = {}, as = 'string') {
   //  </div>
   // ```
 
-  const item = (texts && _.get(texts, path)) || `{{${path}}}`;
+  const item = (texts && _.has(texts, path)) ? _.get(texts, path) : `{{${path}}}`;
 
   const render = value => {
     if (as === 'raw') {

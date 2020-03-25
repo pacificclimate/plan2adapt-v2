@@ -69,22 +69,26 @@ export default class App extends Component {
       return <Loader/>;
     }
     console.log('### Loaded')
+    const getConfig = path => T.get(texts, path, {}, 'raw');
+
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
     const region = get('region.label', this.state) || '';
+
     const variableSelectorProps = {
       // Common to both VariableSelector instances
       bases: this.state.metadata,
       value: this.state.variable,
-      default: T.get(texts, 'selectors.variable.default', {}, 'raw'),
+      default: getConfig('selectors.variable.default'),
       onChange: this.handleChangeVariable,
     };
     const seasonSelectorProps = {
       // Common to both SeasonSelector instances
       value: this.state.season,
-      default: T.get(texts, 'selectors.season.default', {}, 'raw'),
+      default: getConfig('selectors.season.default'),
       onChange: this.handleChangeSeason,
     };
+
     return (
       <Container fluid>
         <AppHeader/>
@@ -127,13 +131,12 @@ export default class App extends Component {
           <Col xl={10} lg={12} md={12}>
             <Tabs
               id={'main'}
-              // Not sure why this doesn't work. Annoying.
-              // defaultActiveKey={T.get(texts, 'app.tabs.defaultActiveKey')}
-              defaultActiveKey='Summary'
+              defaultActiveKey={getConfig('app.tabs.default')}
             >
               <Tab
-                eventKey={T.get(texts, 'summary.tab')}
+                eventKey={'summary'}
                 title={<T as='string' path='summary.tab'/>}
+                disabled={getConfig('summary.disabled')}
                 className='pt-2'
               >
                 <Summary
@@ -150,8 +153,9 @@ export default class App extends Component {
               </Tab>
 
               <Tab
-                eventKey={T.get(texts, 'impacts.tab')}
+                eventKey={'impacts'}
                 title={<T as='string' path='impacts.tab'/>}
+                disabled={getConfig('impacts.disabled')}
                 className='pt-2'
               >
                 <Row>
@@ -175,8 +179,9 @@ export default class App extends Component {
               maps leading to incorrect appearance until window is resized.
               */}
               <Tab
-                eventKey={T.get(texts, 'maps.tab')}
+                eventKey={'maps'}
                 title={<T as='string' path='maps.tab'/>}
+                disabled={getConfig('maps.disabled')}
                 className='pt-2'
                 mountOnEnter
               >
@@ -224,8 +229,9 @@ export default class App extends Component {
               </Tab>
 
               <Tab
-                eventKey={T.get(texts, 'graph.tab')}
+                eventKey={'graph'}
                 title={<T as='string' path='graph.tab'/>}
+                disabled={getConfig('graph.disabled')}
                 className='pt-2'
               >
                 <Row>
@@ -263,24 +269,27 @@ export default class App extends Component {
               </Tab>
 
               <Tab
-                eventKey={T.get(texts, 'notes.tab')}
+                eventKey={'notes'}
                 title={<T as='string' path='notes.tab'/>}
+                disabled={getConfig('notes.disabled')}
                 className='pt-2'
               >
                 <T path='notes.content'/>
               </Tab>
 
               <Tab
-                eventKey={T.get(texts, 'references.tab')}
+                eventKey={'references'}
                 title={<T as='string' path='references.tab'/>}
+                disabled={getConfig('references.disabled')}
                 className='pt-2'
               >
                 <T path='references.content'/>
               </Tab>
 
               <Tab
-                eventKey={T.get(texts, 'about.tab')}
+                eventKey={'about'}
                 title={<T as='string' path='about.tab'/>}
+                disabled={getConfig('about.disabled')}
                 className='pt-2'
               >
                 <Tabs id={'about'} defaultActiveKey={'Plan2Adapt'}>

@@ -1,8 +1,6 @@
 app:
   tabs:
-    # Neither of these works in the code.
-    # defaultActiveKey: ${$$.summary.tab}
-    defaultActiveKey: Summary
+    default: summary
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -21,6 +19,7 @@ selectors:
     default: 16
 
 summary:
+  disabled: false
   tab: Summary
   title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
   # It's tempting to do this content as a Markdown table, but unfortunately
@@ -46,6 +45,8 @@ summary:
         precision: 2
         seasons:
           - annual
+          - summer
+          - winter
       - variable: pr
         display: relative
         precision: 2
@@ -57,6 +58,8 @@ summary:
         display: relative
         precision: 2
         seasons:
+          - annual
+          - fall
           - winter
           - spring
       - variable: gdd
@@ -91,6 +94,7 @@ summary:
       &ast; These values are derived from temperature and/or precipitation.
 
 impacts:
+  disabled: false
   tab: Impacts
   title: "## Potential Impacts for ${region} in the ${futureTimePeriod}"
   prologue: |
@@ -196,6 +200,7 @@ impacts:
         notes: Management Implications
 
 maps:
+  disabled: false
   tab: Maps
   title: "## ${season} ${variable} for ${region}"
   historical:
@@ -243,10 +248,12 @@ maps:
       ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
 
 graph:
-  tab: Graph
+  disabled: true
+  tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
 
 notes:
+  disabled: false
   tab: Notes
   content: |
     ## Notes
@@ -286,6 +293,7 @@ notes:
     methods described in Wang et al., 2006 (see 'References' tab).
 
 references:
+  disabled: false
   tab: References
   content: |
     British Columbia Ministry of Water, Land and Air Protection. 2002. _Indicators of Climate Change for British Columbia 2002_. Victoria, BC. 48 pp.
@@ -311,6 +319,7 @@ references:
     Wang, T.L., Hamann, A., Spittlehouse, D.L. and Aitken, S.N., 2006. "Development of scale-free climate data for Western Canada for use in resource management", _International Journal of Climatology_, 26: 383-397. Details the ClimateBC empirical downscaling tool.
 
 about:
+  disabled: false
   tab: About
   tabs:
     - tab: Plan2Adapt
