@@ -2,7 +2,6 @@ import axios from 'axios';
 import urljoin from 'url-join';
 import { regionId } from '../utils/regions';
 import { middleDecade } from '../utils/time-periods';
-import fake from '../assets/summary';
 
 
 export const fetchSummaryStatistics = (
@@ -16,23 +15,14 @@ export const fetchSummaryStatistics = (
   // `percentiles` is an array of percentile values to be computed across
   //    the ensemble
   // Returns a promise for the summary statistics data.
-
-  console.log('### fetchSummaryStatistics', region, timePeriod, variable, percentiles)
-
-  // TODO: Remove fakery when backend available
-  if (process.env.REACT_APP_SUMMARY_STATISTICS_URL === 'fake') {
-    return Promise.resolve(fake[variable]);
-  }
   return axios.get(
-    urljoin(process.env.REACT_APP_SUMMARY_STATISTICS_URL, 'tbd'),
-    // TODO: Replace with this when certain
-    // urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'tbd'),
+    urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'percentileanomaly'),
     {
       params: {
         region: regionId(region),
         climatology: middleDecade(timePeriod),
         variable,
-        percentiles: ','.join(percentiles)
+        percentile: percentiles.join(',')
       }
     }
   )

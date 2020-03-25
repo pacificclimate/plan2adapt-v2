@@ -1,3 +1,5 @@
+// TODO: This module is waaaaayyyy too long. Break it up.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
@@ -7,7 +9,7 @@ import find from 'lodash/fp/find';
 import keys from 'lodash/fp/keys';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
-import tap from 'lodash/fp/tap';
+import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
@@ -17,7 +19,7 @@ import isEqual from 'lodash/fp/isEqual';
 const format = number => `${number > 0 ? '+' : ''}${number}`;
 
 const unitsSuffix = units =>
-  `${units.match(/^[A-Za-z]/) ? ' ' : ''}${units}`;
+  `${units.match(/^[%]/) ? '' : ' '}${units}`;
 
 const isLong = s => s.length > 2;
 
@@ -196,13 +198,15 @@ class Summary extends React.Component {
 
 // There's a better way to do this with the Variable selector options, but
 // this is easy to implement and works.
+// TODO: Apply the asterisk, which indicates a derived variable,
+//   under control of a configuration value.
 const toVariableLabel = variable => ({
-  'tasmean': 'Mean Temperature',
+  'tasmean': 'Mean Temperature*',
   'pr': 'Precipitation',
-  'prsn': 'Snowfall',
-  'gdd': 'Growing Degree Days',
-  'hdd': 'Heating Degree Days',
-  'ffd': 'Frost-Free Days',
+  'prsn': 'Snowfall*',
+  'gdd': 'Growing Degree Days*',
+  'hdd': 'Heating Degree Days*',
+  'ffd': 'Frost-Free Days*',
 }[variable]);
 
 
@@ -211,7 +215,7 @@ const periodToTimescale = period => {
   // subannual period.
   switch (period) {
     case 'annual':
-      return 'annual';
+      return 'yearly';
     case 'spring':
     case 'summer':
     case 'fall':
@@ -227,29 +231,106 @@ const periodToMonth = period => {
   // Return the 2-character month number that matches the center month of
   // any given subannual period.
   return {
+    'yearly': '07',
     'annual': '07',
     'winter': '01',
+    'djf': '01',
     'spring': '04',
+    'mam': '04',
     'summer': '07',
+    'jja': '07',
     'fall': '10',
-    // We don't need months ... famous last words.
+    'son': '10',
+    'jan': '01',
+    'feb': '02',
+    'mar': '03',
+    'apr': '04',
+    'may': '05',
+    'jun': '06',
+    'jul': '07',
+    'aug': '08',
+    'sep': '09',
+    'oct': '10',
+    'nov': '11',
+    'dec': '12',
   }[period];
 };
 
 
-const getPeriodPercentileValues = (data, period) => {
-  // Extract the percentile values from the "data" component of a summary
-  // statistics response. This means selecting the correct timescale, then
-  // the correct item (identified by centre date) from the timescale component.
-  // The correct item needs only to match the centre month. This makes this
-  // robust to little calendar and computational quirks that can vary the
-  // centre date by a day or two. And it is independent of year.
-  const periodItems = data[periodToTimescale(period)];
+const expToFixed = s => {
+  // Convert a string representing a number in exponential notation to a string
+  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
+  // returns exponential notation frequently when we do not want it to. So
+  // we apply this.
+  const match = s.match(/-?\d\.\d+e[+-]\d+/);
+  if (!match) {
+    return s;
+  }
+  return Number.parseFloat(match[0]).toString();
+};
+
+
+const displayFormat = (value, sigfigs = 3) =>
+  // Convert a number value to a string in the display format we prefer.
+  expToFixed(value.toPrecision(sigfigs));
+
+
+const getPeriodData = (source, period) => {
+  // Extract the specific data item selected by `period` from `source`.
+  //
+  // `source` is either the "baseline" or "anomaly" component of a response
+  // from the `/percentileanomaly` backend.
+  //
+  // `period` is one of the period indicator strings, e.g., 'annual', 'winter',
+  // 'spring', ... 'jan', 'feb', ...
+  //
+  // `source` is keyed first by timescale (e.g., 'seasonal') and
+  // then within timescale by a timestamp centered on the period (e.g.,
+  // "2055-04-16 00:00:00" for period == 'spring'.
+  // The item is matched only to the centre *month* of the period.
+  // Therefore this function is robust to little calendar and computational
+  // quirks that can vary the centre date by a day or two. It is independent of
+  // year.
+  const timescaleItems = source[periodToTimescale(period)];
   return flow(
     keys,
     find(key => key.substring(5, 7) === periodToMonth(period)),
-    dataKey => periodItems[dataKey],
-  )(periodItems);
+    dataKey => timescaleItems[dataKey],
+  )(timescaleItems);
+};
+
+
+const getDisplayData = (response, period, display) => {
+  // Return the data to be displayed from the response, according to the
+  // selected period (e.g., 'spring') and display type ('absolute' or
+  // 'relative').
+
+  if (isUndefined(response)) {
+    return [];  // Empty array -> undefined when subscripted; possibly better to return undefined
+  }
+
+  const anomalyValues = getPeriodData(response.anomaly, period);
+  if (display === 'absolute') {
+    return anomalyValues;
+  }
+
+  // display === 'relative'
+  const baselineValue = getPeriodData(response.baseline, period);
+  return map(x => x/baselineValue)(anomalyValues);
+};
+
+
+// TODO: Translate using configuration value
+const getUnits = (response, display) => {
+  if (isUndefined(response)) {
+    return '--';
+  }
+  if (display === 'relative') {
+    return '%';
+  }
+  return {
+      'degC': '°C',
+  }[response.units] || response.units;
 };
 
 
@@ -259,23 +340,34 @@ const tableContentsAndDataToSummarySpec =
   // for a spec of these objects.
   // Argument of this function is `tableContents` zipped with the
   // corresponding data fetched from the backend.
-  map(([content, data]) => ({
-    variable: {
-      label: toVariableLabel(content.variable),
-      units: data.units,
-    },
-    seasons: map(season => {
-      const seasonData = getPeriodPercentileValues(data.data, season);
-      return ({
-        label: capitalize(season),
-        ensembleMedian: seasonData[1],
-        range: {
-          min: seasonData[0],
-          max: seasonData[2],
-        }
-      })
-    })(content.seasons)
-  }));
+  map(([content, data]) => {
+    const { variable, precision, display, seasons } = content;
+    const sigfigs = precision || 3;
+    const rep = value => {
+      if (isUndefined(value)) {
+        return '(n/a)';
+      }
+      const displayValue = display === 'absolute' ? value : value * 100;
+      return displayFormat(displayValue, sigfigs);
+    };
+    return {
+      variable: {
+        label: toVariableLabel(variable),
+        units: getUnits(data, display),
+      },
+      seasons: map(season => {
+        const displayData = getDisplayData(data, season, display);
+        return {
+          label: capitalize(season),
+          ensembleMedian: rep(displayData[1]),
+          range: {
+            min: rep(displayData[0]),
+            max: rep(displayData[2]),
+          }
+        };
+      })(seasons)
+    };
+  });
 
 
 const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
@@ -288,6 +380,12 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
       content => fetchSummaryStatistics(
         region, futureTimePeriod, content.variable, percentiles
       )
+      // Unavailable or otherwise problematic fetches are returned as undefined.
+      // Data display elements are responsible for showing a message.
+      .catch(err => {
+        console.error('Failed to fetch summary statistics:\n', err);
+        return undefined;
+      })
     )(tableContents)
   )
   .then(data => tableContentsAndDataToSummarySpec(zip(tableContents, data)));

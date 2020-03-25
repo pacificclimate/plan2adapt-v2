@@ -1,5 +1,3 @@
-greeting: Hello, ${name}.
-
 app:
   tabs:
     # Neither of these works in the code.
@@ -16,7 +14,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: tasmax
+    default: pr
   season:
     prefix: for a typical
     postfix: period
@@ -44,27 +42,38 @@ summary:
         ${format(season.range.max)}${units}
     contents:
       - variable: tasmean
+        display: absolute
+        precision: 2
         seasons:
           - annual
       - variable: pr
+        display: relative
+        precision: 2
         seasons:
           - annual
           - summer
           - winter
       - variable: prsn
+        display: relative
+        precision: 2
         seasons:
           - winter
           - spring
-# TODO: Uncomment when stats backend complete
-#      - variable: gdd
-#        seasons:
-#          - annual
-#      - variable: hdd
-#        seasons:
-#          - annual
-#      - variable: fdETCCDI
-#        seasons:
-#          - annual
+      - variable: gdd
+        display: absolute
+        precision: 3
+        seasons:
+          - annual
+      - variable: hdd
+        display: absolute
+        precision: 3
+        seasons:
+          - annual
+      - variable: ffd
+        display: absolute
+        precision: 4
+        seasons:
+          - annual
   notes:
     general: |
       The table above shows projected changes in average (mean) temperature,
@@ -78,12 +87,8 @@ summary:
       more information).
       The range values represent the lowest and highest results within the set.
 
-      Please note that this summary table does not depend on the choice of season
-       (*${$$.selectors.season.prefix}...*) made at the left.
-       However, that setting does affect results on the other tabs.
     derivedVars: |
-      &ast; These values are derived from temperature and precipitation.
-      Please select the appropriate variable tab for more information.
+      &ast; These values are derived from temperature and/or precipitation.
 
 impacts:
   tab: Impacts
