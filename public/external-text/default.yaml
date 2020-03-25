@@ -50,14 +50,14 @@ summary:
           - annual
       - variable: pr
         display: relative
-        precision: 2
+        precision: 3
         seasons:
           - annual
           - summer
           - winter
       - variable: prsn
         display: relative
-        precision: 2
+        precision: 3
         seasons:
           - winter
           - spring
