@@ -198,13 +198,15 @@ class Summary extends React.Component {
 
 // There's a better way to do this with the Variable selector options, but
 // this is easy to implement and works.
+// TODO: Apply the asterisk, which indicates a derived variable,
+//   under control of a configuration value.
 const toVariableLabel = variable => ({
-  'tasmean': 'Mean Temperature',
+  'tasmean': 'Mean Temperature*',
   'pr': 'Precipitation',
-  'prsn': 'Snowfall',
-  'gdd': 'Growing Degree Days',
-  'hdd': 'Heating Degree Days',
-  'ffd': 'Frost-Free Days',
+  'prsn': 'Snowfall*',
+  'gdd': 'Growing Degree Days*',
+  'hdd': 'Heating Degree Days*',
+  'ffd': 'Frost-Free Days*',
 }[variable]);
 
 
@@ -299,7 +301,7 @@ const getDisplayData = (response, period, display) => {
 
   // display === 'relative'
   const baselineValue = getPeriodData(response.baseline, period);
-  return map(x => (x - baselineValue)/baselineValue)(anomalyValues);
+  return map(x => x/baselineValue)(anomalyValues);
 };
 
 
