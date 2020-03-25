@@ -1,3 +1,5 @@
+// TODO: This module is waaaaayyyy too long. Break it up.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
@@ -243,6 +245,10 @@ const periodToMonth = period => {
 
 
 const expToFixed = s => {
+  // Convert a string representing a number in exponential notation to a string
+  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
+  // returns exponential notation frequently when we do not want it to. So
+  // we apply this.
   const match = s.match(/-?\d\.\d+e[+-]\d+/);
   if (!match) {
     return s;
@@ -251,30 +257,53 @@ const expToFixed = s => {
 };
 
 
-const getPeriodPercentileValues = (response, display, period) => {
-  // Extract the percentile values from the "data" component of a summary
-  // statistics response. This means selecting the correct timescale, then
-  // the correct item (identified by centre date) from the timescale component.
-  // The correct item needs only to match the centre month. This makes this
-  // robust to little calendar and computational quirks that can vary the
-  // centre date by a day or two. And it is independent of year.
+const displayFormat = (value, sigfigs = 3) =>
+  // Convert a number value to a string in the display format we prefer.
+  expToFixed(value.toPrecision(sigfigs));
 
-  if (isUndefined(response)) {
-    return [];  // Empty array -> undefined when subscripted
-  }
 
-  // TODO: Remove when backend updated
-  if (display === 'relative') {
-    return [0, 0, 0];
-  }
-
-  const data = response[displayToDataKey(display)];
-  const periodItems = data[periodToTimescale(period)];
+const getPeriodData = (source, period) => {
+  // Extract the specific data item selected by `period` from `source`.
+  //
+  // `source` is either the "baseline" or "anomaly" component of a response
+  // from the `/percentileanomaly` backend.
+  //
+  // `period` is one of the period indicator strings, e.g., 'annual', 'winter',
+  // 'spring', ... 'jan', 'feb', ...
+  //
+  // `source` is keyed first by timescale (e.g., 'seasonal') and
+  // then within timescale by a timestamp centered on the period (e.g.,
+  // "2055-04-16 00:00:00" for period == 'spring'.
+  // The item is matched only to the centre *month* of the period.
+  // Therefore this function is robust to little calendar and computational
+  // quirks that can vary the centre date by a day or two. It is independent of
+  // year.
+  const timescaleItems = source[periodToTimescale(period)];
   return flow(
     keys,
     find(key => key.substring(5, 7) === periodToMonth(period)),
-    dataKey => periodItems[dataKey],
-  )(periodItems);
+    dataKey => timescaleItems[dataKey],
+  )(timescaleItems);
+};
+
+
+const getDisplayData = (response, period, display) => {
+  // Return the data to be displayed from the response, according to the
+  // selected period (e.g., 'spring') and display type ('absolute' or
+  // 'relative').
+
+  if (isUndefined(response)) {
+    return [];  // Empty array -> undefined when subscripted; possibly better to return undefined
+  }
+
+  const anomalyValues = getPeriodData(response.anomaly, period);
+  if (display === 'absolute') {
+    return anomalyValues;
+  }
+
+  // display === 'relative'
+  const baselineValue = getPeriodData(response.baseline, period);
+  return map(x => (x - baselineValue)/baselineValue)(anomalyValues);
 };
 
 
@@ -305,7 +334,7 @@ const tableContentsAndDataToSummarySpec =
         return '(n/a)';
       }
       const displayValue = display === 'absolute' ? value : value * 100;
-      return expToFixed(displayValue.toPrecision(sigfigs));
+      return displayFormat(displayValue, sigfigs);
     };
     return {
       variable: {
@@ -313,13 +342,13 @@ const tableContentsAndDataToSummarySpec =
         units: getUnits(data, display),
       },
       seasons: map(season => {
-        const seasonData = getPeriodPercentileValues(data, display, season);
+        const displayData = getDisplayData(data, season, display);
         return {
           label: capitalize(season),
-          ensembleMedian: rep(seasonData[1]),
+          ensembleMedian: rep(displayData[1]),
           range: {
-            min: rep(seasonData[0]),
-            max: rep(seasonData[2]),
+            min: rep(displayData[0]),
+            max: rep(displayData[2]),
           }
         };
       })(seasons)
