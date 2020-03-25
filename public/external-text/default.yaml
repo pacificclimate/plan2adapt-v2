@@ -50,14 +50,14 @@ summary:
           - annual
       - variable: pr
         display: relative
-        precision: 3
+        precision: 2
         seasons:
           - annual
           - summer
           - winter
       - variable: prsn
         display: relative
-        precision: 3
+        precision: 2
         seasons:
           - winter
           - spring
@@ -89,12 +89,8 @@ summary:
       more information).
       The range values represent the lowest and highest results within the set.
 
-      Please note that this summary table does not depend on the choice of season
-       (*${$$.selectors.season.prefix}...*) made at the left.
-       However, that setting does affect results on the other tabs.
     derivedVars: |
-      &ast; These values are derived from temperature and precipitation.
-      Please select the appropriate variable tab for more information.
+      &ast; These values are derived from temperature and/or precipitation.
 
 impacts:
   tab: Impacts
