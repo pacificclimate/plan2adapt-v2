@@ -208,10 +208,6 @@ const toVariableLabel = variable => ({
 }[variable]);
 
 
-// TODO: Update for backend changes
-const displayToDataKey = display => 'data';
-
-
 const periodToTimescale = period => {
   // Return the timescale (subannual period category) corresponding to the named
   // subannual period.
