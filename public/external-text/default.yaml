@@ -202,7 +202,11 @@ impacts:
 maps:
   disabled: false
   tab: Maps
-  title: "## ${season} ${variable} for ${region}"
+  colourScale:
+    label: |
+      ${variable} (${units})
+
+      Note: Colour scale is common to both maps.
   historical:
     title: "### Historical: ${$$.components.period}"
   projected:
@@ -469,3 +473,20 @@ components:
     response of the global climate system to increasing greenhouse gas
     concentrations.
 
+variables:
+  tasmax:
+    units: °C
+  tasmin:
+    units: °C
+  tasmean:
+    units: °C
+  pr:
+    units: mm/d
+  prsn:
+    units: ??
+  gdd:
+    units: degree days
+  hdd:
+    units: degree days
+  ffd:
+    units: days
