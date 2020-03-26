@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: summary
+    default: about
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -334,7 +334,6 @@ about:
   tab: About
   tabs:
     - tab: Plan2Adapt
-      title: '## Plan2Adapt (Beta)'
       cards:
         - header: Beta Release
           bg: info
@@ -382,7 +381,6 @@ about:
             upon the data or derived information.
 
     - tab: Credits
-      title: '## Credits and Acknowledgements'
       cards:
         - header: Sponsors
           body: |
@@ -430,7 +428,6 @@ about:
             Earth System Science Portals.
 
     - tab: Contact
-      title: '## Contact'
       cards:
         - header: Feedback on Application
           body: |
@@ -444,7 +441,6 @@ about:
           body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
 
     - tab: Team
-      title: '## Team'
       cards:
         - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
           body: Team lead.

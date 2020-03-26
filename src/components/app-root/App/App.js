@@ -291,7 +291,6 @@ export default class App extends Component {
                           eventKey={tab.tab}
                           title={tab.tab}
                         >
-                          <T.Markdown source={tab.title}/>
                           <Cards items={tab.cards}/>
                         </Tab>
                       )
