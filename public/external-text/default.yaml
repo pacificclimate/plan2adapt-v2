@@ -79,7 +79,7 @@ summary:
           - annual
   notes:
     general: |
-      The table above shows projected changes in average (mean) temperature,
+      The table below shows projected changes in average (mean) temperature,
       precipitation and several derived climate variables from the
       baseline historical period
       (${baselineDecade}s)

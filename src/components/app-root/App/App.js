@@ -139,16 +139,16 @@ export default class App extends Component {
                 disabled={getConfig('summary.disabled')}
                 className='pt-2'
               >
-                <Summary
-                  region={get('value', this.state.region)}
-                  futureTimePeriod={futureTimePeriod}
-                  tableContents={T.get(texts, 'summary.table.contents')}
-                />
                 <T path='summary.notes.general' data={{
                   region: region,
                   futureDecade: middleDecade(futureTimePeriod),
                   baselineDecade: middleDecade(baselineTimePeriod),
                 }}/>
+                <Summary
+                  region={get('value', this.state.region)}
+                  futureTimePeriod={futureTimePeriod}
+                  tableContents={T.get(texts, 'summary.table.contents')}
+                />
                 <T path='summary.notes.derivedVars'/>
               </Tab>
 
