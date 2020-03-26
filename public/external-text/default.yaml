@@ -384,11 +384,11 @@ about:
       cards:
         - header: Sponsors
           body: |
-            ### [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
+            #### [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
 
-            ### [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+            #### [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
 
-            ### [Natural Resources Canada](https://www.nrcan.gc.ca/home)
+            #### [Natural Resources Canada](https://www.nrcan.gc.ca/home)
 
             Development of this tool has been made possible through funding and
             support provided by the BC Ministry of Environment & Climate Change Strategy
@@ -400,7 +400,7 @@ about:
 
         - header: Data
           body: |
-            ### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
+            #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
 
             We thank the Landscape Analysis and Applications section of the
             Canadian Forest Service, Natural Resources Canada, for developing
@@ -412,14 +412,14 @@ about:
             for the development of the statistically downscaled GCM
             scenarios on which much of the data presented here is based.
 
-            ### [World Climate Research Programme](https://www.wcrp-climate.org/)
+            #### [World Climate Research Programme](https://www.wcrp-climate.org/)
 
             We acknowledge the World Climate Research Programme’s
             Working Group on Coupled Modelling, which is responsible for
             CMIP5, and we thank the climate modeling groups for producing
             and making available their GCM output.
 
-            ### [U.S. Department of Energy](https://www.energy.gov/)
+            #### [U.S. Department of Energy](https://www.energy.gov/)
 
             For CMIP, the U.S. Department of Energy’s Program for
             Climate Model Diagnosis and Intercomparison provides coordinating
