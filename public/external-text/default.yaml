@@ -208,9 +208,9 @@ maps:
 
       Note: Colour scale is common to both maps.
   historical:
-    title: "### Historical: ${$$.components.period}"
+    title: "#### Historical: ${$$.components.period}"
   projected:
-    title: "### Projected: ${$$.components.period}"
+    title: "#### Projected: ${$$.components.period}"
   displaySpec:
     fallback:
       palette: seq-Oranges
