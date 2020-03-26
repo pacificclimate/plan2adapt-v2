@@ -262,20 +262,24 @@ notes:
   content: |
     ## Notes
 
-    1. Multiple projections information is drawn from a set of 30 GCM
-    projections based on results from 15 different Global Climate Models (GCMs),
-    each using one run of a high (A2) and a lower (B1) greenhouse gas emissions
-    scenario. By the end of the 21st century, these scenarios anticipate an atmospheric concentration of greenhouse gases of approximately 1250 ppm (A2) and 600 ppm (B1), expressed as carbon dioxide (CO2) equivalent. Neither scenario incorporates the effects of international agreements on the reduction of greenhouse gas emissions, though other socio-economic factors like population growth are modelled. Each GCM comes from a different modelling centre (e.g. the Hadley Centre (UK), National Centre for Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA), and Commonwealth Scientific and Industrial Research Organisation (Australia), etc.).
+    1. Information for the Summary and Impacts tabs is drawn from a set of ?? GCM
+    projections based on results from 12 different Global Climate Models (GCMs),
+    each using one run of the RCP 8.5 (business as usual) greenhouse gas
+    emissions scenario. These projections are referred to as the "ensemble."
+    By the end of the 21st century, the RCP 8.5 scenario anticipates an atmospheric
+    concentration of greenhouse gases, expressed as
+    carbon dioxide (CO2) equivalent, of approximately 950 ppm CO2. The scenario does not incorporate the
+    effects of international agreements on the reduction of greenhouse gas
+    emissions, though other socio-economic factors like population growth are
+    modelled. Each GCM comes from a different modelling centre (e.g. the
+    Hadley Centre (UK), National Centre for Atmospheric Research (USA),
+    Geophysical Fluid Dynamics Laboratory (USA), and
+    Commonwealth Scientific and Industrial Research Organisation (Australia),
+    etc.).
 
-    1. The single projection used for the maps is the CGCM3 A2 run 4.
-    CGCM3 is the Canadian Global Climate Model, developed and run by
-    Environment Canada's Canadian Centre for Climate Modelling and Analysis
-    at the University of Victoria. The A2 specification denotes a possible
-    future where emissions continue to rise alongside increases in human
-    population and economic growth. A2 is one emissions scenario amongst
-    several developed by the Intergovernmental Panel on Climate Change (IPCC)
-    and published in its Special Report on Emissions Scenarios (SRES)
-    (see 'References' tab).
+    1. The Maps tab shows high-resolution overlays of an ensemble average (mean)
+    value of the selected variable.
+    (example layer: pr_aClimMean_BCCAQv2_PCIC12_historical-rcp85_rXi1p1_20400101-20691230_Canada)
 
     1. High-resolution climate data is obtained by using the ClimateBC
     empirical downscaling tool. ClimateBC uses interpolation, an elevation
