@@ -206,15 +206,6 @@ export default class App extends Component {
                     <T path='selectors.season.postfix'/>
                   </Col>
                 </Row>
-                <Row>
-                  <Col lg={12}>
-                    <T path='maps.title' data={{
-                      season: get('label', this.state.season),
-                      variable: get('label', this.state.variable),
-                      region: get('label', this.state.region),
-                    }}/>
-                  </Col>
-                </Row>
                 <TwoDataMaps
                   region={get('value', this.state.region)}
                   historicalTimePeriod={{
