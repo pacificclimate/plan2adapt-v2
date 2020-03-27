@@ -34,6 +34,7 @@ export const getDisplaySpecItem = curry(
     )
 );
 
+export const wmsLogscale = getDisplaySpecItem('logscale');
 export const wmsPalette = getDisplaySpecItem('palette');
 export const wmsDataRange = getDisplaySpecItem('range');
 export const wmsTicks = getDisplaySpecItem('ticks');
@@ -53,7 +54,7 @@ export const wmsColorScaleRange = (displaySpec, variableSpec) => {
 export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season) => {
   return {
     format: 'image/png',
-    logscale: false,
+    logscale: wmsLogscale(displaySpec, variableSpec),
     noWrap: true,
     numcolorbands: wmsNumcolorbands,
     opacity: 0.7,
