@@ -1,6 +1,6 @@
 app:
   tabs:
-    default:
+    default: references
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -318,6 +318,12 @@ references:
     Intergovernmental Panel on Climate Change. 2000. _Special Report on Emissions Scenarios_. Cambridge University Press. 570 pp. http://www.ipcc.ch/ipccreports/sres/emission/index.htm
 
     Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
+
+    Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
+    https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
+
+    Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
+    https://cran.r-project.org/web/packages/climdex.pcic/index.html
 
     Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
 
