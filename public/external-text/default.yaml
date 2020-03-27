@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: about
+    default:
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -82,8 +82,9 @@ summary:
       The table below shows projected changes in average (mean) temperature,
       precipitation and several derived climate variables from the
       baseline historical period
-      (${baselineDecade}s)
-      to the ${futureDecade}s
+      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+      to the
+      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
       for the ${region} region.
       The ensemble median is a mid-point value, chosen from a PCIC standard
       set of Global Climate Model (GCM) projections (see the 'Notes' tab for
@@ -427,7 +428,7 @@ about:
         - header: Feedback on Application
           body: |
             Please address questions and suggestions on the functioning of this
-            tool (the application proper) to ${$$.components.contacts.csg.link}.
+            tool (the application proper) to ${$$.components.contacts.support.link}.
         - header: Scientific Questions
           body: |
             Please address questions about science and interpretation of the

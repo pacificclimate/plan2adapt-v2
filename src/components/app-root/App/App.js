@@ -141,6 +141,8 @@ export default class App extends Component {
               >
                 <T path='summary.notes.general' data={{
                   region: region,
+                  baselineTimePeriod,
+                  futureTimePeriod,
                   futureDecade: middleDecade(futureTimePeriod),
                   baselineDecade: middleDecade(baselineTimePeriod),
                 }}/>
