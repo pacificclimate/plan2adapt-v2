@@ -384,20 +384,13 @@ about:
 
     - tab: Credits
       cards:
-        - header: Sponsors
+        - header: Development
           body: |
-            #### [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
-
-            #### [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
-
-            #### [Natural Resources Canada](https://www.nrcan.gc.ca/home)
-
             Development of this tool has been made possible through funding and
-            support provided by the BC Ministry of Environment & Climate Change Strategy
-            and the
-            BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development
-            Forest Science Program and is a
-            project of Natural Resources Canada's
+            support provided by the [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
+            and the [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+            Forest Science Program, and
+            Natural Resources Canada's
             [British Columbia Regional Adaptation Collaborative](https://www.fraserbasin.bc.ca/ccaq_bcrac.html).
 
         - header: Data
