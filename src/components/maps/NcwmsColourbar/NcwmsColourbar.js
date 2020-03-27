@@ -24,6 +24,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import T from '../../../temporary/external-text';
 import styles from './NcwmsColourbar.module.css';
@@ -35,6 +36,7 @@ import {
 } from '../map-utils';
 
 
+// TODO: Move to data-services.
 const getColorbarURI = (displaySpec, variableSpec, width, height) =>
   makeURI(
     process.env.REACT_APP_NCWMS_URL,
@@ -47,6 +49,7 @@ const getColorbarURI = (displaySpec, variableSpec, width, height) =>
       numcolorbands: wmsNumcolorbands,
     }
   );
+
 
 export default class NcwmsColourbar extends React.Component {
   static contextType = T.contextType;
@@ -62,6 +65,13 @@ export default class NcwmsColourbar extends React.Component {
     height: 300,
   };
 
+  getConfig = path => T.get(this.context, path, {}, 'raw');
+  getUnits = variableSpec =>
+    get(
+      [get('variable_id', variableSpec), 'units'],
+      this.getConfig('variables')
+    );
+
   render() {
     const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
     const range = wmsDataRange(displaySpec, this.props.variableSpec);
@@ -72,6 +82,15 @@ export default class NcwmsColourbar extends React.Component {
           className={styles.wrapper}
           style={{ width: this.props.height + 20 }}
         >
+          <T
+            path='colourScale.label'
+            data={{
+              variable: get('variable_name', this.props.variableSpec),
+              units: this.getUnits(this.props.variableSpec)
+            }}
+             placeholder={null}
+             className={styles.label}
+          />
           <img
             className={styles.image}
             style={{
@@ -103,6 +122,11 @@ export default class NcwmsColourbar extends React.Component {
               )(ticks)
             }
           </div>
+          <T
+            path={'colourScale.note'}
+            placeholder={null}
+            className={styles.note}
+          />
         </div>
     );
   }

@@ -202,11 +202,6 @@ impacts:
 maps:
   disabled: false
   tab: Maps
-  colourScale:
-    label: |
-      ${variable} (${units})
-
-      Note: Colour scale is common to both maps.
   historical:
     title: "#### Historical: ${$$.components.period}"
   projected:
@@ -475,6 +470,10 @@ components:
     GCMs are the most advanced tools currently available for simulating the
     response of the global climate system to increasing greenhouse gas
     concentrations.
+
+colourScale:
+  label: ${variable} (${units})
+  note: '*Note: This colour scale applies to both maps.*'
 
 variables:
   tasmax:

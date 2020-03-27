@@ -5,6 +5,11 @@
     width: 320px;  /* for nominal 300px height */
 }
 
+.wrapper .label {
+    text-align: center;
+    margin-bottom: -0.4rem;
+}
+
 .wrapper .image {
     transform: rotate(90deg);
     transform-origin: bottom right;
@@ -25,4 +30,10 @@
     padding-left: 3px;
     line-height: 0px;
     padding-top: 10px;
+}
+
+.wrapper .note {
+    font-size: 80%;
+    text-align: center;
+    margin-top: -0.75rem;
 }
