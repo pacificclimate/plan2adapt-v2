@@ -463,6 +463,10 @@ components:
       name: ${$$.components.contacts.csg.name}
       email: ${$$.components.contacts.csg.email}
       link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
+    support:
+      name: PCIC Support
+      email: pcic.support@uvic.ca
+      link: '[${$$.components.contacts.support.name}](mailto:${$$.components.contacts.support.email})'
   gcmDefn: |
     A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
     a numerical model representing
