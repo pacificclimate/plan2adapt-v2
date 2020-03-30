@@ -57,6 +57,7 @@ class DataMapDisplay extends React.Component {
     popup: PropTypes.object,
     onPopupChange: PropTypes.func,
     fileMetadata: PropTypes.object,
+    range: PropTypes.object,
   };
 
   // TODO: This code is currently disabled because the CE ncWMS does not allow
@@ -123,6 +124,7 @@ class DataMapDisplay extends React.Component {
           fileMetadata={this.props.fileMetadata}
           variableSpec={this.props.variable.representative}
           season={this.props.season}
+          range={this.props.range}
         />
         {
           this.props.popup.isOpen &&

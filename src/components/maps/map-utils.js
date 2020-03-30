@@ -51,7 +51,7 @@ export const wmsColorScaleRange = (displaySpec, variableSpec) => {
 };
 
 
-export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season) => {
+export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season, range) => {
   return {
     format: 'image/png',
     logscale: wmsLogscale(displaySpec, variableSpec),
@@ -66,6 +66,7 @@ export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, se
     layers: wmsLayerName(fileMetadata, variableSpec),
     time: wmsTime(fileMetadata, season),
     styles: wmsStyle(displaySpec, variableSpec),
-    colorscalerange: wmsColorScaleRange(displaySpec, variableSpec),
+    // colorscalerange: wmsColorScaleRange(displaySpec, variableSpec),
+    colorscalerange: `${range.min},${range.max}`,
   }
 };
