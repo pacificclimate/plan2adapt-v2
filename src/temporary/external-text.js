@@ -210,4 +210,7 @@ export default class ExternalText extends React.Component {
 ExternalText.contextType = ExternalTextContext;
 ExternalText.Provider = Provider;
 ExternalText.get = get;
+ExternalText.getRaw = _.curry(
+  (texts, path) => get(texts, path, {}, 'raw', undefined)
+);
 ExternalText.Markdown = ReactMarkdown;
