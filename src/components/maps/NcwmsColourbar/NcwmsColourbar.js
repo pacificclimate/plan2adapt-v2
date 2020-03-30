@@ -71,13 +71,6 @@ export default class NcwmsColourbar extends React.Component {
     height: 300,
   };
 
-  getConfig = path => T.get(this.context, path, {}, 'raw');
-  getUnits = variableSpec =>
-    get(
-      [get('variable_id', variableSpec), 'units'],
-      this.getConfig('variables')
-    );
-
   render() {
     const { variableSpec, width, height, range } = this.props;
     const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
@@ -89,15 +82,6 @@ export default class NcwmsColourbar extends React.Component {
           className={styles.wrapper}
           style={{ width: this.props.height + 20 }}
         >
-          <T
-            path='colourScale.label'
-            data={{
-              variable: get('variable_name', variableSpec),
-              units: this.getUnits(variableSpec)
-            }}
-             placeholder={null}
-             className={styles.label}
-          />
           <img
             className={styles.image}
             style={{
@@ -134,11 +118,6 @@ export default class NcwmsColourbar extends React.Component {
               )(ticks)
             }
           </div>
-          <T
-            path={'colourScale.note'}
-            placeholder={null}
-            className={styles.note}
-          />
         </div>
     );
   }
