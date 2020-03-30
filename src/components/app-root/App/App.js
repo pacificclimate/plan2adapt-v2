@@ -30,6 +30,8 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
 
+import 'react-input-range/lib/css/index.css';
+
 const baselineTimePeriod = {
   start_date: 1961,
   end_date: 1990,
