@@ -12,6 +12,7 @@ export default class ClimateLayer extends React.Component {
     fileMetadata: PropTypes.object,
     variableSpec: PropTypes.object,
     season: PropTypes.number,
+    range: PropTypes.object,
   };
 
   render() {
@@ -23,7 +24,8 @@ export default class ClimateLayer extends React.Component {
           this.props.fileMetadata,
           displaySpec,
           this.props.variableSpec,
-          this.props.season
+          this.props.season,
+          this.props.range,
         )}
       />
     );

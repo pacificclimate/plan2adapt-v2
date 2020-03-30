@@ -101,10 +101,6 @@ export default class TwoDataMaps extends React.Component {
       <React.Fragment>
         <Row>
           <Col lg={12}>
-            <p className={'text-center'}>
-              min: {this.state.range.min} {', '}
-              max: {this.state.range.max}
-            </p>
             <InputRange
               minValue={rangeConfig.min}
               maxValue={rangeConfig.max}
@@ -136,6 +132,7 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
+              range={this.state.range}
             />
           </Col>
           <Col lg={6}>
@@ -154,6 +151,7 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
+              range={this.state.range}
             />
           </Col>
         </Row>
