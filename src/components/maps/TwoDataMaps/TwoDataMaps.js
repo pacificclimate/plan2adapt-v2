@@ -32,6 +32,14 @@ import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
+import InputRange from 'react-input-range';
+
+
+const getVariableConfig = (texts, variable, path) =>
+  get(
+    [get('representative.variable_id', variable), path],
+    T.getRaw(texts, 'maps.displaySpec')
+  );
 
 
 export default class TwoDataMaps extends React.Component {
@@ -47,21 +55,62 @@ export default class TwoDataMaps extends React.Component {
   };
 
   state = {
+    range: getVariableConfig(this.context, this.props.variable, 'range'),
     viewport: BCBaseMap.initialViewport,
     popup: {
       isOpen: false,
     },
   };
 
+
+  // Updating the state in getDerivedStateFromProps is preferable, but we can't
+  // access context there (at least I don't know how to do that) since it is
+  // a static method. Therefore do it in componentDidUpdate.
+  //
+  // static getDerivedStateFromProps(props, state) {
+  //   return null;
+  //   // TODO: See if this can be done with memoization instead
+  //   const range = getVariableConfig(this.context, props.variable, 'range');
+  //   console.log('### TwoDataMaps.getDerivedStateFromProps: range', range)
+  //   return {
+  //     range,
+  //   };
+  // }
+  //
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // Reset state.range to the default for the variable.
+    if (prevProps.variable !== this.props.variable) {
+      const range = getVariableConfig(this.context, this.props.variable, 'range');
+      console.log('### TwoDataMaps.componentDidUpdate', range)
+      this.handleChangeRange(range);
+    }
+  }
+
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
+  handleChangeRange = this.handleChangeSelection.bind(this, 'range');
   handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
+  getConfig = T.getRaw(this.context);
+
   render() {
+    console.log('### TwoDataMaps.render')
+    const rangeConfig =
+      getVariableConfig(this.context, this.props.variable, 'range');
     return (
       <React.Fragment>
         <Row>
           <Col lg={12}>
+            <p className={'text-center'}>
+              min: {this.state.range.min} {', '}
+              max: {this.state.range.max}
+            </p>
+            <InputRange
+              minValue={rangeConfig.min}
+              maxValue={rangeConfig.max}
+              value={this.state.range}
+              onChange={this.handleChangeRange}
+            />
             <NcwmsColourbar
               variableSpec={this.props.variable.representative}
               width={20}
