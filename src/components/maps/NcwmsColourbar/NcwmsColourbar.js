@@ -63,6 +63,7 @@ export default class NcwmsColourbar extends React.Component {
     variableSpec: PropTypes.object,
     width: PropTypes.number,
     height: PropTypes.number,
+    range: PropTypes.object,
   };
 
   static defaultProps = {
@@ -78,11 +79,11 @@ export default class NcwmsColourbar extends React.Component {
     );
 
   render() {
+    const { variableSpec, width, height, range } = this.props;
     const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
-    const logscale = wmsLogscale(displaySpec, this.props.variableSpec);
-    const range = wmsDataRange(displaySpec, this.props.variableSpec);
+    const logscale = wmsLogscale(displaySpec, variableSpec);
     const span = range.max - range.min;
-    const ticks = wmsTicks(displaySpec, this.props.variableSpec);
+    const ticks = wmsTicks(displaySpec, variableSpec);
     return (
       <div
           className={styles.wrapper}
@@ -91,8 +92,8 @@ export default class NcwmsColourbar extends React.Component {
           <T
             path='colourScale.label'
             data={{
-              variable: get('variable_name', this.props.variableSpec),
-              units: this.getUnits(this.props.variableSpec)
+              variable: get('variable_name', variableSpec),
+              units: this.getUnits(variableSpec)
             }}
              placeholder={null}
              className={styles.label}
@@ -100,14 +101,14 @@ export default class NcwmsColourbar extends React.Component {
           <img
             className={styles.image}
             style={{
-              'margin-top': -this.props.height,
-              'margin-left': -this.props.width,
+              'margin-top': -height,
+              'margin-left': -width,
             }}
             src={getColorbarURI(
               displaySpec,
-              this.props.variableSpec,
-              this.props.width,
-              this.props.height
+              variableSpec,
+              width,
+              height,
             )}
           />
           <div className={styles.ticks}>

@@ -115,6 +115,7 @@ export default class TwoDataMaps extends React.Component {
               variableSpec={this.props.variable.representative}
               width={20}
               height={600}
+              range={this.state.range}
             />
           </Col>
         </Row>
