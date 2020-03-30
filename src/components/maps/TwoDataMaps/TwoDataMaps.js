@@ -33,6 +33,7 @@ import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
 import InputRange from 'react-input-range';
+import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
 
 
 const getVariableConfig = (texts, variable, path) =>
@@ -91,27 +92,53 @@ export default class TwoDataMaps extends React.Component {
   handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
-  getConfig = T.getRaw(this.context);
+  getConfig = path => T.get(this.context, path, {}, 'raw');
+  getUnits = variableSpec =>
+    get(
+      [get('variable_id', variableSpec), 'units'],
+      this.getConfig('variables')
+    );
 
   render() {
     console.log('### TwoDataMaps.render')
     const rangeConfig =
       getVariableConfig(this.context, this.props.variable, 'range');
+    const variableSpec = this.props.variable.representative;
     return (
       <React.Fragment>
         <Row>
           <Col lg={12}>
+            <T
+              path='colourScale.label'
+              data={{
+                variable: get('variable_name', variableSpec),
+                units: this.getUnits(variableSpec)
+              }}
+              placeholder={null}
+              className={styles.label}
+            />
             <InputRange
               minValue={rangeConfig.min}
               maxValue={rangeConfig.max}
+              step={rangeConfig.step}
               value={this.state.range}
               onChange={this.handleChangeRange}
             />
+            <T
+              path={'colourScale.rangeLabel'}
+              placeholder={null}
+              className={styles.note}
+            />
             <NcwmsColourbar
-              variableSpec={this.props.variable.representative}
+              variableSpec={variableSpec}
               width={20}
               height={600}
               range={this.state.range}
+            />
+            <T
+              path={'colourScale.note'}
+              placeholder={null}
+              className={styles.note}
             />
           </Col>
         </Row>
