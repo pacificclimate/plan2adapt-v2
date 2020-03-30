@@ -12,7 +12,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: pr
+    default: tasmax
   season:
     prefix: for a typical
     postfix: period
@@ -79,11 +79,12 @@ summary:
           - annual
   notes:
     general: |
-      The table above shows projected changes in average (mean) temperature,
+      The table below shows projected changes in average (mean) temperature,
       precipitation and several derived climate variables from the
       baseline historical period
-      (${baselineDecade}s)
-      to the ${futureDecade}s
+      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+      to the
+      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
       for the ${region} region.
       The ensemble median is a mid-point value, chosen from a PCIC standard
       set of Global Climate Model (GCM) projections (see the 'Notes' tab for
@@ -105,7 +106,7 @@ impacts:
     These are based on limited climate change information, as shown in the
     detailed rules logic.
     These rules were developed based on a workshop attended by climate
-    impacts experts and subsequent peer review.
+    impacts experts and subsequent review.
     Although quite comprehensive, the rules are a work in progress, and some
     key impacts or management implications may be missing.
     We welcome contributions and suggestions from users of Plan2Adapt.
@@ -202,49 +203,77 @@ impacts:
 maps:
   disabled: false
   tab: Maps
-  title: "## ${season} ${variable} for ${region}"
   historical:
-    title: "### Historical: ${$$.components.period}"
+    title: "#### Historical: ${$$.components.period}"
   projected:
-    title: "### Projected: ${$$.components.period}"
+    title: "#### Projected: ${$$.components.period}"
   displaySpec:
     fallback:
       palette: seq-Oranges
+      logscale: false
       aboveMaxColor: black
       belowMinColor: black
       range:
         min: -50
         max: 50
+        step: 5
       ticks: [-50, 0, 50]
-    gdd:
-      palette: seq-Oranges
+    fdd:
+      palette: x-Occam
       range:
         min: 0
         max: 4000
+        step: 500
+      ticks: [0, 1000, 2000, 3000, 4000]
+    gdd:
+      palette: x-Occam
+      range:
+        min: 0
+        max: 4000
+        step: 500
       ticks: [0, 1000, 2000, 3000, 4000]
     hdd:
-      palette: seq-Oranges
+      palette: x-Occam
       range:
         min: 0
         max: 10000
+        step: 500
       ticks: [0, 2000, 4000, 6000, 8000, 10000]
     pr:
       palette: seq-Greens
+      logscale: true
       range:
-        min: 0
+        min: 0.1
         max: 20
-      ticks: [0, 5, 10, 15, 20]
+        step: 0.1
+      ticks: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+    prsn:
+      palette: x-Occam
+      logscale: true
+      range:
+        min: 0.1
+        max: 20
+      ticks: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
     tasmax:
-      palette: div-BuRd
+      palette: x-Occam
       range:
         min: -40
         max: 40
+        step: 5
       ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
     tasmin:
-      palette: div-BuRd
+      palette: x-Occam
       range:
         min: -40
         max: 40
+        step: 5
+      ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
+    tasmean:
+      palette: x-Occam
+      range:
+        min: -40
+        max: 40
+        step: 5
       ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
 
 graph:
@@ -258,20 +287,24 @@ notes:
   content: |
     ## Notes
 
-    1. Multiple projections information is drawn from a set of 30 GCM
-    projections based on results from 15 different Global Climate Models (GCMs),
-    each using one run of a high (A2) and a lower (B1) greenhouse gas emissions
-    scenario. By the end of the 21st century, these scenarios anticipate an atmospheric concentration of greenhouse gases of approximately 1250 ppm (A2) and 600 ppm (B1), expressed as carbon dioxide (CO2) equivalent. Neither scenario incorporates the effects of international agreements on the reduction of greenhouse gas emissions, though other socio-economic factors like population growth are modelled. Each GCM comes from a different modelling centre (e.g. the Hadley Centre (UK), National Centre for Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA), and Commonwealth Scientific and Industrial Research Organisation (Australia), etc.).
+    1. Information for the Summary and Impacts tabs is drawn from a set of ?? GCM
+    projections based on results from 12 different Global Climate Models (GCMs),
+    each using one run of the RCP 8.5 (business as usual) greenhouse gas
+    emissions scenario. These projections are referred to as the "ensemble."
+    By the end of the 21st century, the RCP 8.5 scenario anticipates an atmospheric
+    concentration of greenhouse gases, expressed as
+    carbon dioxide (CO2) equivalent, of approximately 950 ppm CO2. The scenario does not incorporate the
+    effects of international agreements on the reduction of greenhouse gas
+    emissions, though other socio-economic factors like population growth are
+    modelled. Each GCM comes from a different modelling centre (e.g. the
+    Hadley Centre (UK), National Centre for Atmospheric Research (USA),
+    Geophysical Fluid Dynamics Laboratory (USA), and
+    Commonwealth Scientific and Industrial Research Organisation (Australia),
+    etc.).
 
-    1. The single projection used for the maps is the CGCM3 A2 run 4.
-    CGCM3 is the Canadian Global Climate Model, developed and run by
-    Environment Canada's Canadian Centre for Climate Modelling and Analysis
-    at the University of Victoria. The A2 specification denotes a possible
-    future where emissions continue to rise alongside increases in human
-    population and economic growth. A2 is one emissions scenario amongst
-    several developed by the Intergovernmental Panel on Climate Change (IPCC)
-    and published in its Special Report on Emissions Scenarios (SRES)
-    (see 'References' tab).
+    1. The Maps tab shows high-resolution overlays of an ensemble average (mean)
+    value of the selected variable.
+    (example layer: pr_aClimMean_BCCAQv2_PCIC12_historical-rcp85_rXi1p1_20400101-20691230_Canada)
 
     1. High-resolution climate data is obtained by using the ClimateBC
     empirical downscaling tool. ClimateBC uses interpolation, an elevation
@@ -296,6 +329,9 @@ references:
   disabled: false
   tab: References
   content: |
+    **NOTE:** Some of references are out of date for the present version of the
+    application and will be updated shortly.
+
     British Columbia Ministry of Water, Land and Air Protection. 2002. _Indicators of Climate Change for British Columbia 2002_. Victoria, BC. 48 pp.
 
     Bronaugh, D., T. Murdock. In review. _Developing Improved Degree-Day Regressions_. Pacific Climate Impacts Consortium report; 33 pp.
@@ -312,6 +348,12 @@ references:
 
     Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
 
+    Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
+    https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
+
+    Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
+    https://cran.r-project.org/web/packages/climdex.pcic/index.html
+
     Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
 
     Rodenhuis, D.R., Bennett, K.E., Werner, A.T., Murdock, T.Q., Bronaugh, D. Revised 2009. _Hydro-climatology and future climate impacts in British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria BC, 132 pp. Provides additional information on future climate projects in British Columbia.
@@ -323,7 +365,6 @@ about:
   tab: About
   tabs:
     - tab: Plan2Adapt
-      title: '## Plan2Adapt (Beta)'
       cards:
         - header: Beta Release
           bg: info
@@ -371,27 +412,19 @@ about:
             upon the data or derived information.
 
     - tab: Credits
-      title: '## Credits and Acknowledgements'
       cards:
-        - header: Sponsors
+        - header: Development
           body: |
-            ### [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
-
-            ### [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
-
-            ### [Natural Resources Canada](https://www.nrcan.gc.ca/home)
-
             Development of this tool has been made possible through funding and
-            support provided by the BC Ministry of Environment & Climate Change Strategy
-            and the
-            BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development
-            Forest Science Program and is a
-            project of Natural Resources Canada's
+            support provided by the [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
+            and the [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+            Forest Science Program, and
+            Natural Resources Canada's
             [British Columbia Regional Adaptation Collaborative](https://www.fraserbasin.bc.ca/ccaq_bcrac.html).
 
         - header: Data
           body: |
-            ### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
+            #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
 
             We thank the Landscape Analysis and Applications section of the
             Canadian Forest Service, Natural Resources Canada, for developing
@@ -403,14 +436,14 @@ about:
             for the development of the statistically downscaled GCM
             scenarios on which much of the data presented here is based.
 
-            ### [World Climate Research Programme](https://www.wcrp-climate.org/)
+            #### [World Climate Research Programme](https://www.wcrp-climate.org/)
 
             We acknowledge the World Climate Research Programme’s
             Working Group on Coupled Modelling, which is responsible for
             CMIP5, and we thank the climate modeling groups for producing
             and making available their GCM output.
 
-            ### [U.S. Department of Energy](https://www.energy.gov/)
+            #### [U.S. Department of Energy](https://www.energy.gov/)
 
             For CMIP, the U.S. Department of Energy’s Program for
             Climate Model Diagnosis and Intercomparison provides coordinating
@@ -419,12 +452,11 @@ about:
             Earth System Science Portals.
 
     - tab: Contact
-      title: '## Contact'
       cards:
         - header: Feedback on Application
           body: |
             Please address questions and suggestions on the functioning of this
-            tool (the application proper) to ${$$.components.contacts.csg.link}.
+            tool (the application proper) to ${$$.components.contacts.support.link}.
         - header: Scientific Questions
           body: |
             Please address questions about science and interpretation of the
@@ -433,7 +465,6 @@ about:
           body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
 
     - tab: Team
-      title: '## Team'
       cards:
         - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
           body: Team lead.
@@ -460,6 +491,10 @@ components:
       name: ${$$.components.contacts.csg.name}
       email: ${$$.components.contacts.csg.email}
       link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
+    support:
+      name: PCIC Support
+      email: pcic.support@uvic.ca
+      link: '[${$$.components.contacts.support.name}](mailto:${$$.components.contacts.support.email})'
   gcmDefn: |
     A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
     a numerical model representing
@@ -469,3 +504,25 @@ components:
     response of the global climate system to increasing greenhouse gas
     concentrations.
 
+colourScale:
+  label: ${variable} (${units})
+  rangeLabel: Minimum and maximum data values for colour scale
+  note: '*Note: This colour scale applies to both maps.*'
+
+variables:
+  tasmax:
+    units: °C
+  tasmin:
+    units: °C
+  tasmean:
+    units: °C
+  pr:
+    units: mm/d
+  prsn:
+    units: ??
+  gdd:
+    units: degree days
+  hdd:
+    units: degree days
+  ffd:
+    units: days

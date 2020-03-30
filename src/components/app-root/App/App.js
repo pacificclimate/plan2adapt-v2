@@ -30,6 +30,8 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
 
+import 'react-input-range/lib/css/index.css';
+
 const baselineTimePeriod = {
   start_date: 1961,
   end_date: 1990,
@@ -139,16 +141,18 @@ export default class App extends Component {
                 disabled={getConfig('summary.disabled')}
                 className='pt-2'
               >
+                <T path='summary.notes.general' data={{
+                  region: region,
+                  baselineTimePeriod,
+                  futureTimePeriod,
+                  futureDecade: middleDecade(futureTimePeriod),
+                  baselineDecade: middleDecade(baselineTimePeriod),
+                }}/>
                 <Summary
                   region={get('value', this.state.region)}
                   futureTimePeriod={futureTimePeriod}
                   tableContents={T.get(texts, 'summary.table.contents')}
                 />
-                <T path='summary.notes.general' data={{
-                  region: region,
-                  futureDecade: middleDecade(futureTimePeriod),
-                  baselineDecade: middleDecade(baselineTimePeriod),
-                }}/>
                 <T path='summary.notes.derivedVars'/>
               </Tab>
 
@@ -204,15 +208,6 @@ export default class App extends Component {
                   </Col>
                   <Col xs={'auto'} className='pr-0'>
                     <T path='selectors.season.postfix'/>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={12}>
-                    <T path='maps.title' data={{
-                      season: get('label', this.state.season),
-                      variable: get('label', this.state.variable),
-                      region: get('label', this.state.region),
-                    }}/>
                   </Col>
                 </Row>
                 <TwoDataMaps
@@ -300,7 +295,6 @@ export default class App extends Component {
                           eventKey={tab.tab}
                           title={tab.tab}
                         >
-                          <T.Markdown source={tab.title}/>
                           <Cards items={tab.cards}/>
                         </Tab>
                       )

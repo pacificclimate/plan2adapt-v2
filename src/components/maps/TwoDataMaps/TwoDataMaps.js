@@ -27,13 +27,25 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import get from 'lodash/fp/get';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
+import InputRange from 'react-input-range';
+import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
+
+
+const getVariableConfig = (texts, variable, path) =>
+  get(
+    [get('representative.variable_id', variable), path],
+    T.getRaw(texts, 'maps.displaySpec')
+  );
 
 
 export default class TwoDataMaps extends React.Component {
+  static contextType = T.contextType;
+
   static propTypes = {
     region: PropTypes.string,
     historicalTimePeriod: PropTypes.object,
@@ -44,25 +56,89 @@ export default class TwoDataMaps extends React.Component {
   };
 
   state = {
+    range: getVariableConfig(this.context, this.props.variable, 'range'),
     viewport: BCBaseMap.initialViewport,
     popup: {
       isOpen: false,
     },
   };
 
+
+  // Updating the state in getDerivedStateFromProps is preferable, but we can't
+  // access context there (at least I don't know how to do that) since it is
+  // a static method. Therefore do it in componentDidUpdate.
+  //
+  // static getDerivedStateFromProps(props, state) {
+  //   return null;
+  //   // TODO: See if this can be done with memoization instead
+  //   const range = getVariableConfig(this.context, props.variable, 'range');
+  //   console.log('### TwoDataMaps.getDerivedStateFromProps: range', range)
+  //   return {
+  //     range,
+  //   };
+  // }
+  //
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // Reset state.range to the default for the variable.
+    if (prevProps.variable !== this.props.variable) {
+      const range = getVariableConfig(this.context, this.props.variable, 'range');
+      console.log('### TwoDataMaps.componentDidUpdate', range)
+      this.handleChangeRange(range);
+    }
+  }
+
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
+  handleChangeRange = this.handleChangeSelection.bind(this, 'range');
   handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
+  getConfig = path => T.get(this.context, path, {}, 'raw');
+  getUnits = variableSpec =>
+    get(
+      [get('variable_id', variableSpec), 'units'],
+      this.getConfig('variables')
+    );
+
   render() {
+    console.log('### TwoDataMaps.render')
+    const rangeConfig =
+      getVariableConfig(this.context, this.props.variable, 'range');
+    const variableSpec = this.props.variable.representative;
     return (
       <React.Fragment>
         <Row>
           <Col lg={12}>
+            <T
+              path='colourScale.label'
+              data={{
+                variable: get('variable_name', variableSpec),
+                units: this.getUnits(variableSpec)
+              }}
+              placeholder={null}
+              className={styles.label}
+            />
+            <InputRange
+              minValue={rangeConfig.min}
+              maxValue={rangeConfig.max}
+              step={rangeConfig.step}
+              value={this.state.range}
+              onChange={this.handleChangeRange}
+            />
+            <T
+              path={'colourScale.rangeLabel'}
+              placeholder={null}
+              className={styles.note}
+            />
             <NcwmsColourbar
-              variableSpec={this.props.variable.representative}
+              variableSpec={variableSpec}
               width={20}
               height={600}
+              range={this.state.range}
+            />
+            <T
+              path={'colourScale.note'}
+              placeholder={null}
+              className={styles.note}
             />
           </Col>
         </Row>
@@ -83,6 +159,7 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
+              range={this.state.range}
             />
           </Col>
           <Col lg={6}>
@@ -101,6 +178,7 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
+              range={this.state.range}
             />
           </Col>
         </Row>

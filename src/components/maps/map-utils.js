@@ -34,6 +34,7 @@ export const getDisplaySpecItem = curry(
     )
 );
 
+export const wmsLogscale = getDisplaySpecItem('logscale');
 export const wmsPalette = getDisplaySpecItem('palette');
 export const wmsDataRange = getDisplaySpecItem('range');
 export const wmsTicks = getDisplaySpecItem('ticks');
@@ -50,10 +51,10 @@ export const wmsColorScaleRange = (displaySpec, variableSpec) => {
 };
 
 
-export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season) => {
+export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season, range) => {
   return {
     format: 'image/png',
-    logscale: false,
+    logscale: wmsLogscale(displaySpec, variableSpec),
     noWrap: true,
     numcolorbands: wmsNumcolorbands,
     opacity: 0.7,
@@ -65,6 +66,7 @@ export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, se
     layers: wmsLayerName(fileMetadata, variableSpec),
     time: wmsTime(fileMetadata, season),
     styles: wmsStyle(displaySpec, variableSpec),
-    colorscalerange: wmsColorScaleRange(displaySpec, variableSpec),
+    // colorscalerange: wmsColorScaleRange(displaySpec, variableSpec),
+    colorscalerange: `${range.min},${range.max}`,
   }
 };
