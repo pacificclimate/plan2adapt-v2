@@ -217,12 +217,12 @@ maps:
         min: -50
         max: 50
       ticks: [-50, 0, 50]
-    fdd:
+    ffd:
       palette: x-Occam
       range:
         min: 0
-        max: 4000
-      ticks: [0, 1000, 2000, 3000, 4000]
+        max: 366
+      ticks: [0, 100, 200, 300, 365]
     gdd:
       palette: x-Occam
       range:
