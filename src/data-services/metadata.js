@@ -38,10 +38,10 @@ export const standardizeSummaryMetadata =
   );
 
 
-export function fetchSummaryMetadata() {
+export function fetchSummaryMetadataForModel(model) {
   // Fetch the summary metadata provided by the backend `/multimeta` endpoint.
 
-  console.log('fetchSummaryMetadata()')
+  console.log('fetchSummaryMetadataForModel', model)
   const emissionsScenarios =
     process.env.REACT_APP_EMISSIONS_SCENARIOS.split(';');
   console.log('### emissionsScenarios', emissionsScenarios)
@@ -50,18 +50,15 @@ export function fetchSummaryMetadata() {
     {
       params: {
         ensemble_name: process.env.REACT_APP_ENSEMBLE_NAME,
-        model: process.env.REACT_APP_MODEL_ID,
+        model: model,
       },
-      transformResponse: [JSON.parse, standardizeSummaryMetadata],
+      // transformResponse: [JSON.parse, standardizeSummaryMetadata],
     },
   )
   .then(response => response.data)
-  .then(filter(
-    metadatum =>  includes(metadatum.experiment, emissionsScenarios)
-    // metadatum => metadatum.experiment === process.env.REACT_APP_EMISSIONS_SCENARIO
-  ))
+  .then(standardizeSummaryMetadata)
   .then(tap(metadata => {
-    console.log('### Metadata loaded')
+    console.log('### Metadata loaded for', model)
     console.log('### Models', groupBy('model_id')(metadata))
     console.log('### Scenario', groupBy('experiment')(metadata))
     console.log('### Variables', groupBy('variable_id')(metadata))
@@ -69,6 +66,30 @@ export function fetchSummaryMetadata() {
     console.log('### Period', groupBy(m => `${m.start_date}-${m.end_date}`)(metadata))
     console.log('### Timescale', groupBy('timescale')(metadata))
   }))
+  .then(filter(
+    metadatum =>  includes(metadatum.experiment, emissionsScenarios)
+    // metadatum => metadatum.experiment === process.env.REACT_APP_EMISSIONS_SCENARIO
+  ))
+}
+
+
+export function fetchSummaryMetadata() {
+  const models =
+    process.env.REACT_APP_MODEL_ID.split(';');
+  console.log('### fetchSummaryMetadata: models', models)
+  return flow(
+    map(fetchSummaryMetadataForModel),
+    tap(x => console.log('### fetchSummaryMetadata: promises', x)),
+    // Why can't I just say `Promise.all` here?? Goddamn it.
+    promises => {
+      return Promise.all(promises)
+    },
+    promise => {
+      console.log('### fetchSummaryMetadata: promise (all)', promise)
+      // Concatenate all the metadata sets into one.
+      return promise.then(flatten)
+    },
+  )(models);
 }
 
 
