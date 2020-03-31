@@ -22,6 +22,9 @@
 //  - Props `width` and `height` are for the unrotated (vertical) graphic;
 //    so their meaning is reversed in the rendered graphic. Confusing, sorry.
 
+// TODO: Configuration should be obtained outside this component and passed in;
+//  no use of ExternalText here.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import get from 'lodash/fp/get';
@@ -31,8 +34,10 @@ import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
   wmsDataRange,
+  wmsLogscale,
   wmsNumcolorbands,
-  wmsPalette, wmsTicks
+  wmsPalette,
+  wmsTicks
 } from '../map-utils';
 
 
@@ -74,6 +79,7 @@ export default class NcwmsColourbar extends React.Component {
 
   render() {
     const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
+    const logscale = wmsLogscale(displaySpec, this.props.variableSpec);
     const range = wmsDataRange(displaySpec, this.props.variableSpec);
     const span = range.max - range.min;
     const ticks = wmsTicks(displaySpec, this.props.variableSpec);
@@ -110,15 +116,20 @@ export default class NcwmsColourbar extends React.Component {
               // their enclosing div; a value of `left` in % makes it very
               // easy to place them correctly.
               map(
-                tick => (
-                  <span
-                    style={{
-                      left: `${(tick - range.min) / span * 100}%`
-                    }}
-                  >
-                    {tick}
-                  </span>
-                )
+                tick => {
+                  const position = logscale ?
+                    Math.log(tick/range.min) / Math.log(range.max/range.min) :
+                    (tick - range.min) / span;
+                  return (
+                    <span
+                      style={{
+                        left: `${position * 100}%`
+                      }}
+                    >
+                      {tick}
+                    </span>
+                  )
+                }
               )(ticks)
             }
           </div>
