@@ -7,6 +7,7 @@ import isEqual from 'lodash/fp/isEqual';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
 import mapValues from 'lodash/fp/mapValues';
+import tap from 'lodash/fp/tap';
 
 import { BCBaseMap } from 'pcic-react-leaflet-components';
 import CanadaBaseMap from '../CanadaBaseMap';
