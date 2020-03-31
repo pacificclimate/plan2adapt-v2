@@ -12,7 +12,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: tasmax
+    default: pr
   season:
     prefix: for a typical
     postfix: period

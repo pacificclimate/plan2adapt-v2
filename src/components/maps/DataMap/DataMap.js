@@ -154,6 +154,7 @@ class DataMapDisplay extends React.Component {
 // down to a single item that is the metadata for the layer to be displayed
 // in DataMap.
 const metadataFilter = props => {
+  console.log('### metadataFilter: props', props)
   const criteria = {
     // start_date, end_date
     ...mapValues(v => v.toString())(props.timePeriod),
@@ -163,6 +164,7 @@ const metadataFilter = props => {
     // is very well suited to our purposes here.
     timescale: props.season === 16 ? 'yearly' : 'seasonal',
   };
+  console.log('### metadataFilter: criteria', criteria)
   return filter(criteria)
 };
 
@@ -171,11 +173,17 @@ const metadataFilter = props => {
 // `DataMapDisplay` for the given props.
 const loadFileMetadata = props => {
   return flow(
+    tap(x => console.log('### loadFileMetadata: metadata', x)),
     metadataFilter(props),
+    tap(x => console.log('### loadFileMetadata: filtered', x)),
     metadata => {
+      console.log('### loadFileMetadata: next', metadata)
+      console.log('### loadFileMetadata: next', metadata.length)
       // TODO: Don't throw an error when metadata matching fails. Instead,
       //   show an error message in the map.
       if (metadata.length === 0) {
+        console.log('### loadFileMetadata: fuck: props', props)
+        console.log('### loadFileMetadata: fuck: props', metadata)
         throw new Error('No matching metadata');
       }
       if (metadata.length > 1) {
