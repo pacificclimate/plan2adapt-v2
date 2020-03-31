@@ -79,16 +79,10 @@ export function fetchSummaryMetadata() {
   console.log('### fetchSummaryMetadata: models', models)
   return flow(
     map(fetchSummaryMetadataForModel),
-    tap(x => console.log('### fetchSummaryMetadata: promises', x)),
+    // tap(x => console.log('### fetchSummaryMetadata: promises', x)),
     // Why can't I just say `Promise.all` here?? Goddamn it.
-    promises => {
-      return Promise.all(promises)
-    },
-    promise => {
-      console.log('### fetchSummaryMetadata: promise (all)', promise)
-      // Concatenate all the metadata sets into one.
-      return promise.then(flatten)
-    },
+    promises => Promise.all(promises),
+    promise => promise.then(flatten),
   )(models);
 }
 
