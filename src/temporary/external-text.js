@@ -111,7 +111,14 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 }
 
 
-export function get(texts, path, data = {}, as = 'string') {
+export function get(
+  texts,
+  path,
+  data = {},
+  as = 'string',
+  placeholder = '{{${$path}}}',
+  props,
+) {
   // This is the core of `ExternalText`.
   //
   // It gets the object selected by `path` from `texts` and maps
@@ -146,7 +153,7 @@ export function get(texts, path, data = {}, as = 'string') {
   //  </div>
   // ```
 
-  const item = (texts && _.has(texts, path)) ? _.get(texts, path) : `{{${path}}}`;
+  const item = (texts && _.has(texts, path)) ? _.get(texts, path) : placeholder;
 
   const render = value => {
     if (as === 'raw') {
@@ -154,12 +161,12 @@ export function get(texts, path, data = {}, as = 'string') {
     }
     const source = evaluateAsTemplateLiteral(
       _.toString(value),
-      { $$: texts, ...data }
+      { $$: texts, $path: path, ...data }
     );
     if (as === 'string') {
       return source;
     }
-    return (<ReactMarkdown escapeHtml={false} source={source}/>);
+    return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
   };
 
   return _.mapDeep(item, render, { leavesOnly: true });
@@ -184,16 +191,19 @@ export default class ExternalText extends React.Component {
     // Data context in which to evaluate item's text.
     as: PropTypes.oneOf(['raw', 'string', 'markdown']),
     // How to render the item's text.
+    placeholder: PropTypes.string,
+    // What to render when path is not found in texts.
   };
 
   static defaultProps = {
     as: 'markdown',
+    placeholder: '{{${$path}}}',
   };
 
   render() {
     const texts = this.context;
-    const { path, data, as } = this.props;
-    return get(texts, path, data, as);
+    const { path, data, as, placeholder, ...rest } = this.props;
+    return get(texts, path, data, as, placeholder, rest);
   }
 }
 

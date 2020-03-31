@@ -27,6 +27,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import get from 'lodash/fp/get';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
@@ -34,6 +35,8 @@ import NcwmsColourbar from '../NcwmsColourbar';
 
 
 export default class TwoDataMaps extends React.Component {
+  static contextType = T.contextType;
+
   static propTypes = {
     region: PropTypes.string,
     historicalTimePeriod: PropTypes.object,
