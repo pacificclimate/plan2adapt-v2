@@ -27,13 +27,12 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
+import union from 'lodash/fp/union';
 import T from '../../../temporary/external-text';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
-  wmsDataRange,
   wmsLogscale,
   wmsNumcolorbands,
   wmsPalette,
@@ -76,7 +75,10 @@ export default class NcwmsColourbar extends React.Component {
     const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
     const logscale = wmsLogscale(displaySpec, variableSpec);
     const span = range.max - range.min;
-    const ticks = wmsTicks(displaySpec, variableSpec);
+    const ticks = union(
+      wmsTicks(displaySpec, variableSpec),
+      [range.min, range.max]
+    );
     return (
       <div
           className={styles.wrapper}
