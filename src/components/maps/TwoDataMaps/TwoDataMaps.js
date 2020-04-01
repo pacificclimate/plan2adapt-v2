@@ -103,6 +103,8 @@ export default class TwoDataMaps extends React.Component {
     console.log('### TwoDataMaps.render')
     const rangeConfig =
       getVariableConfig(this.context, this.props.variable, 'range');
+    const csLength = this.getConfig('colourScale.length');
+    const csBreadth = this.getConfig('colourScale.breadth');
     const variableSpec = this.props.variable.representative;
     return (
       <React.Fragment>
@@ -131,8 +133,8 @@ export default class TwoDataMaps extends React.Component {
             />
             <NcwmsColourbar
               variableSpec={variableSpec}
-              width={20}
-              height={600}
+              width={csBreadth}
+              height={csLength}
               range={this.state.range}
             />
             <T

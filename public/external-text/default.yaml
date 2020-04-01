@@ -12,7 +12,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: pr
+    default: tasmean
   season:
     prefix: for a typical
     postfix: period
@@ -74,7 +74,7 @@ summary:
           - annual
       - variable: ffd
         display: absolute
-        precision: 4
+        precision: 2
         seasons:
           - annual
   notes:
@@ -222,7 +222,8 @@ maps:
       palette: x-Occam
       range:
         min: 0
-        max: 366
+        max: 365
+        step: 5
       ticks: [0, 100, 200, 300, 365]
     gdd:
       palette: x-Occam
@@ -504,6 +505,8 @@ components:
     concentrations.
 
 colourScale:
+  length: 1200
+  breadth: 20
   label: ${variable} (${units})
   rangeLabel: Minimum and maximum data values for colour scale
   note: '*Note: This colour scale applies to both maps.*'
@@ -518,7 +521,7 @@ variables:
   pr:
     units: mm/d
   prsn:
-    units: ??
+    units: kg/m<sup>2</sup>/d
   gdd:
     units: degree days
   hdd:
