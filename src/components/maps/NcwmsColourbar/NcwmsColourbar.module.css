@@ -1,30 +1,43 @@
-.wrapper {
-    margin-left: auto;
-    margin-right: auto;
-    padding: 10px;
-    width: 320px;  /* for nominal 300px height */
+.all {
+    overflow: hidden;
+    text-align: center;
 }
 
-.wrapper .image {
+.allColours {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.image {
+    display: inline-block;
+    position: relative;
+    top: 5px;
     transform: rotate(90deg);
     transform-origin: bottom right;
-    margin-top: -300px;  /* for nominal 300px height */
     margin-bottom: 0px;
+}
+
+.belowabove {
+    display: inline-block;
 }
 
 .ticks {
     position: relative;
     height: 20px;
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .ticks span {
     font-size: 90%;
     position: absolute;
-    top: -10px;
+    top: 0px;
     border-left: 1px solid darkgrey;
     padding-left: 3px;
     line-height: 0px;
     padding-top: 10px;
+    padding-bottom: 0px;
 }
 
 .label {

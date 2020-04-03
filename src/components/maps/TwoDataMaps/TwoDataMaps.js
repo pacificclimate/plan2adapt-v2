@@ -34,6 +34,7 @@ import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
 import InputRange from 'react-input-range';
 import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
+import { wmsAboveMaxColor, wmsBelowMinColor } from '../map-utils';
 
 
 const getVariableConfig = (texts, variable, path) =>
@@ -101,10 +102,14 @@ export default class TwoDataMaps extends React.Component {
 
   render() {
     console.log('### TwoDataMaps.render')
+    const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
     const rangeConfig =
       getVariableConfig(this.context, this.props.variable, 'range');
-    const csLength = this.getConfig('colourScale.length');
-    const csBreadth = this.getConfig('colourScale.breadth');
+    const belowMinColor = wmsBelowMinColor(displaySpec, this.props.variable);
+    const aboveMaxColor = wmsAboveMaxColor(displaySpec, this.props.variable);
+    const length = this.getConfig('colourScale.length');
+    const breadth = this.getConfig('colourScale.breadth');
+    const belowAboveLength = this.getConfig('colourScale.belowAboveLength');
     const variableSpec = this.props.variable.representative;
     return (
       <React.Fragment>
@@ -133,9 +138,12 @@ export default class TwoDataMaps extends React.Component {
             />
             <NcwmsColourbar
               variableSpec={variableSpec}
-              width={csBreadth}
-              height={csLength}
+              breadth={breadth}
+              length={length}
               range={this.state.range}
+              belowAboveLength={belowAboveLength}
+              belowMinColor={belowMinColor}
+              aboveMaxColor={aboveMaxColor}
             />
             <T
               path={'colourScale.note'}

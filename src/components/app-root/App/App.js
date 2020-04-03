@@ -31,6 +31,7 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 import Cards from '../../misc/Cards';
 
 import 'react-input-range/lib/css/index.css';
+import DevColourbar from '../../data-displays/DevColourbar';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -135,6 +136,39 @@ export default class App extends Component {
               id={'main'}
               defaultActiveKey={getConfig('app.tabs.default')}
             >
+              <Tab
+                eventKey={'dev'}
+                title={'Dev'}
+                className='pt-2'
+                mountOnEnter
+              >
+                <Row>
+                  <Col xs={'auto'} className='pr-0'>
+                    <T path='selectors.variable.prefix'/>
+                  </Col>
+                  <Col sm={4} xs={6}>
+                    <VariableSelector
+                      {...variableSelectorProps}
+                    />
+                  </Col>
+                  <Col xs={'auto'} className='pr-0'>
+                    <T path='selectors.season.prefix'/>
+                  </Col>
+                  <Col lg={2} sm={4} xs={6}>
+                    <SeasonSelector
+                      {...seasonSelectorProps}
+                    />
+                  </Col>
+                  <Col xs={'auto'} className='pr-0'>
+                    <T path='selectors.season.postfix'/>
+                  </Col>
+                </Row>
+                <DevColourbar
+                  season={get('value', this.state.season)}
+                  variable={get('value', this.state.variable)}
+                />
+              </Tab>
+
               <Tab
                 eventKey={'summary'}
                 title={<T as='string' path='summary.tab'/>}

@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: summary
+    default: dev
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -211,7 +211,7 @@ maps:
     fallback:
       palette: seq-Oranges
       logscale: false
-      aboveMaxColor: black
+      aboveMaxColor: gray
       belowMinColor: black
       range:
         min: -50
@@ -242,6 +242,8 @@ maps:
     pr:
       palette: seq-Greens
       logscale: true
+      belowMinColor: white
+      aboveMaxColor: black
       range:
         min: 0.1
         max: 20
@@ -505,7 +507,7 @@ components:
     concentrations.
 
 colourScale:
-  length: 1200
+  length: 80
   breadth: 20
   label: ${variable} (${units})
   rangeLabel: Minimum and maximum data values for colour scale

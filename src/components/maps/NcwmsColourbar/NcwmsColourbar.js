@@ -19,7 +19,7 @@
 //    colour variation runs horizontally, and the whole thing is wider than
 //    high.
 //
-//  - Props `width` and `height` are for the unrotated (vertical) graphic;
+//  - Props `breadth` and `length` are for the unrotated (vertical) graphic;
 //    so their meaning is reversed in the rendered graphic. Confusing, sorry.
 
 // TODO: Configuration should be obtained outside this component and passed in;
@@ -27,16 +27,15 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import getOr from 'lodash/fp/getOr';
 import map from 'lodash/fp/map';
 import union from 'lodash/fp/union';
 import T from '../../../temporary/external-text';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
-  wmsLogscale,
   wmsNumcolorbands,
   wmsPalette,
-  wmsTicks
 } from '../map-utils';
 
 
@@ -60,67 +59,100 @@ export default class NcwmsColourbar extends React.Component {
 
   static propTypes = {
     variableSpec: PropTypes.object,
-    width: PropTypes.number,
-    height: PropTypes.number,
+    breadth: PropTypes.number,  // px
+    length: PropTypes.number,  // %
     range: PropTypes.object,
+    logscale: PropTypes.bool,
+    belowAboveLength: PropTypes.number,
+    belowMinColor: PropTypes.string,
+    aboveMaxColor: PropTypes.string,
+    ticks: PropTypes.array,
   };
 
   static defaultProps = {
-    width: 20,
-    height: 300,
+    breadth: 20,
+    length: 300,
+    belowAboveLength: 50,
   };
 
+  constructor(props) {
+    super(props);
+    this.thing = React.createRef();
+  }
+
   render() {
-    const { variableSpec, width, height, range } = this.props;
+    const {
+      variableSpec,
+      breadth,
+      length,
+      range,
+      logscale,
+      belowMinColor,
+      aboveMaxColor,
+      ticks,
+    } = this.props;
+    console.log('### NcwmsColourbar.render', this.thing)
     const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
-    const logscale = wmsLogscale(displaySpec, variableSpec);
     const span = range.max - range.min;
-    const ticks = union(
-      wmsTicks(displaySpec, variableSpec),
-      [range.min, range.max]
-    );
+    const allTicks = union(ticks, [range.min, range.max]);
+    const belowAboveLength = (100 - length) /2;  //%
+    const width = getOr(0, 'current.offsetWidth', this.thing);
+    const imageWidth = width * length / 100;
     return (
-      <div
-          className={styles.wrapper}
-          style={{ width: this.props.height + 20 }}
-        >
+      <div className={styles.all} ref={this.thing}>
+        <div className={styles.allColours}>
+          <span
+            className={styles.belowabove}
+            style={{
+              'background-color': belowMinColor,
+              height: breadth,
+              width: `${belowAboveLength}%`,
+            }}
+          />
           <img
             className={styles.image}
             style={{
-              'margin-top': -height,
-              'margin-left': -width,
+              height: imageWidth,
+              'margin-top': -imageWidth + breadth/2,
+              'margin-left': -breadth,
+              'margin-right': `${length}%`,
             }}
             src={getColorbarURI(
-              displaySpec,
-              variableSpec,
-              width,
-              height,
+              displaySpec, variableSpec, breadth, Math.round(imageWidth),
             )}
           />
-          <div className={styles.ticks}>
-            {
-              // <span>s containing tick labels are positioned relative to
-              // their enclosing div; a value of `left` in % makes it very
-              // easy to place them correctly.
-              map(
-                tick => {
-                  const position = logscale ?
-                    Math.log(tick/range.min) / Math.log(range.max/range.min) :
-                    (tick - range.min) / span;
-                  return (
-                    <span
-                      style={{
-                        left: `${position * 100}%`
-                      }}
-                    >
-                      {tick}
-                    </span>
-                  )
-                }
-              )(ticks)
-            }
-          </div>
+          <span
+            className={styles.belowabove}
+            style={{
+              'background-color': aboveMaxColor,
+              height: breadth,
+              width: `${belowAboveLength}%`,
+            }}
+          />
         </div>
+        <div
+          className={styles.ticks}
+          style={{ width: `${length}%` }}
+        >
+          {
+            // <span>s containing tick labels are positioned relative to
+            // their enclosing div; a value of `left` in % makes it very
+            // easy to place them correctly.
+            map(
+              tick => {
+                const position = logscale ?
+                  Math.log(tick/range.min) / Math.log(range.max/range.min) :
+                  (tick - range.min) / span;
+                return (
+                  <span style={{ left: `${position * 100}%` }}>
+                    {tick}
+                  </span>
+                )
+              }
+            )(allTicks)
+          }
+        </div>
+      </div>
     );
   }
 }
