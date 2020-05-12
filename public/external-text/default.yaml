@@ -405,21 +405,27 @@ about:
       cards:
         - header: Development
           body: |
-            Development of this tool has been made possible through funding and
-            support provided by the [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change)
-            and the [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
-            Forest Science Program, and
+            Development of the original version of Plan2Adapt was been made possible through funding and
+            support provided by the
+            [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change),
+            [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+            Forest Science Program,
+            [BC Ministry of Municipal Affairs and Housing](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/municipal-affairs-housing),
+            and
             Natural Resources Canada's
             [British Columbia Regional Adaptation Collaborative](https://www.fraserbasin.bc.ca/ccaq_bcrac.html).
 
         - header: Data
           body: |
-            #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
+
+            #### [Natural Resources Canada](https://www.nrcan.gc.ca)
 
             We thank the Landscape Analysis and Applications section of the
             Canadian Forest Service, Natural Resources Canada, for developing
             and making available the Canada-wide historical daily gridded
             climate dataset used as the downscaling target.
+
+            #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
 
             PCIC gratefully acknowledges support from
             Environment and Climate Change Canada
