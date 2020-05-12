@@ -1,3 +1,9 @@
+// This module is a short-term replacement for receiving this data from the
+// backend. The basis is the contents of a CSV file that holds the rulebase.
+// Here, we process that CSV file into something usable for this application.
+// Some or all of this may be able to be eliminated depending on what the
+// backend returns for the rulebase.
+
 import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import zipObject from 'lodash/fp/zipObject';
@@ -97,23 +103,75 @@ const rawCsv =
 
 export const byLines = rawCsv.split('\n');
 
+// Transform a function `f` into a function that recursively reapplies `f` to
+// its argument until a fixed point of `f` is reached, i.e., until applying `f`
+// results in no further changes. Useful for repeating a transformation upon
+// a string until nothing is left to be transformed.
 export const recurse = f =>
   s => {
-    const helper = (prev, curr) =>
-      {
-        // console.log(`recurse: \\${prev}\\, \\${curr}\\`)
-        return prev === curr ? curr : helper(curr, f(curr));
-      };
+    const helper = (prev, curr) => prev === curr ? curr : helper(curr, f(curr));
     return helper('', s);
   };
-export const fixUnquotedCols = recurse(replace(/;([^";]*);/g, ';"$1";'));
+
+// Internal quotes (which are escaped by doubling in CSV) pose a problem
+// for processing the outer quotes that surround the content. Therefore
+// we recode the doubled quotes in an unconfusing way.
+export const internalQuoteRecoding = '!Q!'
+// This recoding algorithm assumes that there will never be a degenerate
+// case of an empty column signified by "". If not, this gets harder.
+export const recodeInternalQuotes = replace(/""/g, internalQuoteRecoding);
+export const restoreInternalQuotes = replace(
+  RegExp(`${internalQuoteRecoding}`, 'g'),
+  '"'
+);
+
+// Similarly, semicolons inside the quoted content of columsn pose a problem.
+export const internalSemiRecoding = '!S!'
+export const recodeInternalSemis = recurse(
+  replace(
+    /(;"[^"]*);([^"]*";)/g,
+    `$1${internalSemiRecoding}$2`
+    )
+);
+export const restoreInternalSemis = replace(
+  RegExp(`${internalSemiRecoding}`, 'g'),
+  ';'
+);
+
+// Except for a few cases, column contents are double-quoted, and we use that
+// pattern to separate columns. `quoteUnquotedCols` quotes those that aren't.
+export const quoteUnquotedCols = recurse(
+  flow(
+    replace(/^;/, '"";'),               // First column
+    replace(/;([^";]*?);/g, ';"$1";'),  // Middle columns
+  replace(/;$/, ';""'),                 // Last column
+  )
+);
 
 export const byLinesThenColumns =
-  map(flow(
-    fixUnquotedCols,
-    replace(/^\s*"|"\s*$/g, ''),
-    split('";"')
-  ))(byLines);
+  flow(
+    // take(3),
+    map(
+      flow(
+        recodeInternalQuotes,
+        recodeInternalSemis,
+        quoteUnquotedCols,
+        // To avoid some post-splitting complication, remove the first and last
+        // quotes in a line.
+        replace(/^\s*"|"\s*$/g, ''),
+        // Split into columns on now reliable and uniform separator.
+        split('";"'),
+        // Now that columns have been split, the recoding must be undone on
+        // each column.
+        map(
+          flow(
+            restoreInternalSemis,
+            restoreInternalQuotes,
+          )
+        ),
+      )
+    ),
+  )(byLines);
 
 export const propNames = ["id", "condition", "category", "sector", "effects", "notes", "comment"];
 export const linesAsObjects = map(line => zipObject(propNames, line))(byLinesThenColumns);
@@ -206,14 +264,3 @@ export default linesAsObjects;
 //     'Transportation and other temperature-sensitive infrastructure components could be adversely affected',
 //     'Warmer and shorter cold season',
 //     'Water contamination' ]
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
