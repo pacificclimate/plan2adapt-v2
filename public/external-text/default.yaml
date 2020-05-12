@@ -462,8 +462,10 @@ about:
 
     - tab: Team
       cards:
+        - header: '[Trevor Murdock](https://pacificclimate.org/about-pcic/people/trevor-murdock)'
+          body: Climate science lead.
         - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
-          body: Team lead.
+          body: Development team lead.
         - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
           body: Backend engineer. Data wrangling.
         - header: '[Nikola Radoš](https://pacificclimate.org/about-pcic/people/nikola-rados)'
