@@ -45,8 +45,6 @@ summary:
         precision: 2
         seasons:
           - annual
-          - summer
-          - winter
       - variable: pr
         display: relative
         precision: 2
