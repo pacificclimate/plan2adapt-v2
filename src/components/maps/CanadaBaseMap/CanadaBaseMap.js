@@ -25,6 +25,7 @@ class CanadaBaseMap extends React.Component {
     srs: PropTypes.string,
     origin: PropTypes.object,
     mapRef: PropTypes.func,
+    // Any other props are passed through to Map
   };
 
   static defaultProps = {
@@ -51,19 +52,18 @@ class CanadaBaseMap extends React.Component {
   };
 
   render() {
-    const center = _.pick(this.props.origin, 'lat', 'lng');
-    // TODO: Do this with ...rest:
-    const { bounds, viewport, onViewportChange, onViewportChanged, onClick } = this.props;
+    const center = _.pick(origin, 'lat', 'lng');
+    const { crs, version, srs, origin, mapRef, children, ...rest } = this.props;
     return (
         <Map
-          crs={this.props.crs}
+          crs={crs}
           center={center}
-          zoom={this.props.origin.zoom}
+          zoom={origin.zoom}
           minZoom={0}
           maxZoom={10}
           maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
-          ref={this.props.mapRef}
-          {...{ bounds, viewport, onViewportChange, onViewportChanged, onClick }}
+          ref={mapRef}
+          {...rest}
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -72,7 +72,7 @@ class CanadaBaseMap extends React.Component {
             noWrap
             maxZoom={12}
           />
-          { this.props.children }
+          { children }
         </Map>
     );
   }

@@ -57,6 +57,7 @@ class DataMapDisplay extends React.Component {
     popup: PropTypes.object,
     onPopupChange: PropTypes.func,
     fileMetadata: PropTypes.object,
+    // Any other props are passed through to CanadaBaseMap.
   };
 
   // TODO: This code is currently disabled because the CE ncWMS does not allow
@@ -108,34 +109,26 @@ class DataMapDisplay extends React.Component {
   });
 
   render() {
-    // console.log(`### DataMap [${this.props.id}]: wmsClimateLayerProps`,
-    //   wmsClimateLayerProps(this.props))
-    // TODO: Do this with ...rest:
-    const { bounds, viewport, onViewportChange, onViewportChanged } = this.props;
+    const { region, timePeriod, season, variable, popup, fileMetadata, ...rest }
+      = this.props;
 
     return (
       <CanadaBaseMap
-        {...{ bounds, viewport, onViewportChange, onViewportChanged }}
+        {...rest}
         // FIXME: Popups are disabled because the CE ncWMS does not allow
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
       >
         <ClimateLayer
-          fileMetadata={this.props.fileMetadata}
-          variableSpec={this.props.variable.representative}
-          season={this.props.season}
+          fileMetadata={fileMetadata}
+          variableSpec={variable.representative}
+          season={season}
         />
         {
-          this.props.popup.isOpen &&
-          <LayerValuePopup
-            {...this.props.popup}
-            onClose={this.handleClosePopup}
-          />
+          popup.isOpen &&
+          <LayerValuePopup{...popup} onClose={this.handleClosePopup}/>
         }
-        <SimpleGeoJSON
-          data={this.props.region}
-          fill={false}
-        />
+        <SimpleGeoJSON data={region} fill={false}/>
       </CanadaBaseMap>
     );
   }
