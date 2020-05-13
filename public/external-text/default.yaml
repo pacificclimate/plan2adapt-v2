@@ -321,24 +321,17 @@ references:
   disabled: false
   tab: References
   content: |
-    **NOTE:** Some of references are out of date for the present version of the
-    application and will be updated shortly.
+    Cannon, A.J., Sobie, S.R., Murdock, T.Q., 2015: _Bias correction of simulated precipitation by quantile mapping: how well do methods preserve relative changes in quantiles and extremes?_ Journal of Climate, 28(17): 6938-6959. https://doi.org/10.1175/jcli-d-14-00754.1
 
-    British Columbia Ministry of Water, Land and Air Protection. 2002. _Indicators of Climate Change for British Columbia 2002_. Victoria, BC. 48 pp.
-
-    Bronaugh, D., T. Murdock. In review. _Developing Improved Degree-Day Regressions_. Pacific Climate Impacts Consortium report; 33 pp.
-
-    Cohen, Stewart. 2009. _Climate Change in the 21st Century - Understanding the World's Biggest Crisis_. McGill-Queen's University Press. 379 pp.
-
-    Daly, C., W.P. Gibson, G.H. Taylor, G.L. Johnson, and P. Pasteris. 2002. "A knowledge-based approach to the statistical mapping of climate", _Climate Research_, 22: 99-113. Details the PRISM 4km climatology.
+    Government of British Columbia. _Climate Change Indicators._ (web page). https://www2.gov.bc.ca/gov/content/environment/research-monitoring-reporting/reporting/environmental-reporting-bc/climate-change-indicators
 
     Hamlet A.F., D.P. Lettenmaier. 2005. _Effects of Temperature and Precipitation Variability on Snowpack Trends in the Western U.S._ Journal of Climate, 18 (21): pp. 4545-4561.
 
-    Hamlet A.F., D.P. Lettenmaier. 2007. _Effects of 20th Century Warming and Climate Variability on Flood Risk in the Western U.S._ Water Resources Research, 43: W06427.doi:10.1029/2006WR005099.
-
-    Intergovernmental Panel on Climate Change. 2000. _Special Report on Emissions Scenarios_. Cambridge University Press. 570 pp. http://www.ipcc.ch/ipccreports/sres/emission/index.htm
+    Hamlet A.F., D.P. Lettenmaier. 2007. _Effects of 20th Century Warming and Climate Variability on Flood Risk in the Western U.S._ Water Resources Research, 43: https://doi.org/10.1029/2006wr005099.
 
     Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
+
+    Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
 
     Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
     https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
@@ -346,11 +339,13 @@ references:
     Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
     https://cran.r-project.org/web/packages/climdex.pcic/index.html
 
-    Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
-
     Rodenhuis, D.R., Bennett, K.E., Werner, A.T., Murdock, T.Q., Bronaugh, D. Revised 2009. _Hydro-climatology and future climate impacts in British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria BC, 132 pp. Provides additional information on future climate projects in British Columbia.
 
-    Wang, T.L., Hamann, A., Spittlehouse, D.L. and Aitken, S.N., 2006. "Development of scale-free climate data for Western Canada for use in resource management", _International Journal of Climatology_, 26: 383-397. Details the ClimateBC empirical downscaling tool.
+    Sobie, S.R. and T.Q. Murdock, 2017: High-Resolution Statistical Downscaling in Southwestern British Columbia. Journal of Applied Meteorology and Climatology, 56, 6, 1625–1641, https://doi.org/10.1175/jamc-d-16-0287.1
+
+    Taylor, K. E., R. J. Stouffer, and G. A. Meehl, 2012: _An overview of CMIP5 and the experiment design._ Bull. Amer. Meteor. Soc., 93, 485–498, https://doi.org/10.1175/bams-d-11-00094.1
+
+    Werner, A. T. and A. J. Cannon, A. J., 2016: _Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods._ Hydrololgy and Earth System Sciences, 20, 1483-1508, https://doi.org/10.5194/hess-20-1483-2016.
 
 about:
   disabled: false
