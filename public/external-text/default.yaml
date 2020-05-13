@@ -104,10 +104,11 @@ impacts:
     These are based on limited climate change information, as shown in the
     detailed rules logic.
     These rules were developed based on a workshop attended by climate
-    impacts experts and subsequent review.
+    impacts experts and subsequent review in 2012.
     Although quite comprehensive, the rules are a work in progress, and some
     key impacts or management implications may be missing.
-    We welcome contributions and suggestions from users of Plan2Adapt.
+    We are planning a literature review and update to these rules in light of
+    newer impacts research and the availability of additional indices.
   rulesLogic:
     prologue: |
       The table below shows all of the rules used to determine whether to
@@ -183,13 +184,14 @@ impacts:
       The effects signalled by active rules are summarized for easy
       interpretation in the By Category and By Sector tabs.
 
-      In the table below, active rules have a white background;
-      inactive rules have a grey background.
+      In the table below, rules that are true for the
+      region and time period selected have a white background;
+      rules that are false have a grey background.
 
     table:
       showInactiveRulesButton:
-        true: Hide Inactive Rules
-        false: Show Inactive Rules
+        true: Hide False-Valued Rules
+        false: Show False-Valued Rules
       heading:
         ruleId: Rule ID
         condition: Condition
