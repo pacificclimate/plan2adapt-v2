@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Accordion, Card, CardGroup } from 'react-bootstrap';
+import { Accordion, Card, CardGroup, Button } from 'react-bootstrap';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import groupBy from 'lodash/fp/groupBy';
@@ -52,11 +52,9 @@ export default class Impacts extends React.Component {
       <CardGroup className='Impacts-table'>
         <Accordion>
           <Card>
-            <Accordion.Toggle as={Card.Body} eventKey={'none'}>
-              <div className='clearfix'>
-                <Card.Title className='float-left mr-5'>{this.props.groupHeading}</Card.Title>
-                <Card.Title className='float-right'>{this.props.itemsHeading}</Card.Title>
-              </div>
+            <Accordion.Toggle as={Card.Body} eventKey={'none'} className='clearfix'>
+              <div className='float-left mr-5'>{this.props.groupHeading}</div>
+              <div className='float-right'>{this.props.itemsHeading}</div>
             </Accordion.Toggle>
           </Card>
 
@@ -64,20 +62,17 @@ export default class Impacts extends React.Component {
             map(([key, items]) => (
               key.length > 0 && items.length > 0 &&
                   <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey={key}>
-                      <div className='clearfix'>
-                        <div className='float-left mr-5'>
-                          <ImpactIcon kind={this.props.groupKey} icon={key}/>
-                          {key}
-                        </div>
-                        <div className='float-right'>
-                          {
-                            map(item => (
-                              <ImpactIcon kind={this.props.itemKey} icon={item}/>
-                            ))(items)
-                          }
-                        </div>
-                        <div/>
+                    <Accordion.Toggle as={Button} variant={'outline-primary'} eventKey={key} className='clearfix'>
+                      <div className='float-left mr-5'>
+                        <ImpactIcon kind={this.props.groupKey} icon={key}/>
+                        {key}
+                      </div>
+                      <div className='float-right'>
+                        {
+                          map(item => (
+                            <ImpactIcon kind={this.props.itemKey} icon={item}/>
+                          ))(items)
+                        }
                       </div>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey={key}>
