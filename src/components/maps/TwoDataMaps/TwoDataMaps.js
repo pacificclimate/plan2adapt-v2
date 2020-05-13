@@ -32,6 +32,7 @@ import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
+import { regionBounds } from '../map-utils';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -47,11 +48,27 @@ export default class TwoDataMaps extends React.Component {
   };
 
   state = {
+    prevPropsRegion: undefined,
+    bounds: undefined,
     viewport: BCBaseMap.initialViewport,
     popup: {
       isOpen: false,
     },
   };
+
+  static getDerivedStateFromProps(props, state) {
+    // Any time the current region changes, reset the bounds to the
+    // bounding box of the region. We are fortunate that when bounds change,
+    // they override the current viewport, and vice-versa, eliminating any
+    // need for logic around this on our part.
+    if (props.region !== state.prevPropsRegion) {
+      return {
+        prevPropsRegion: props.region,
+        bounds: regionBounds(props.region),
+      }
+    }
+    return null;
+  }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
@@ -77,6 +94,7 @@ export default class TwoDataMaps extends React.Component {
             }}/>
             <DataMap
               id={'historical'}
+              bounds={this.state.bounds}
               viewport={this.state.viewport}
               onViewportChanged={this.handleChangeViewport}
               popup={this.state.popup}
@@ -95,6 +113,7 @@ export default class TwoDataMaps extends React.Component {
             }}/>
             <DataMap
               id={'projected'}
+              bounds={this.state.bounds}
               viewport={this.state.viewport}
               onViewportChanged={this.handleChangeViewport}
               popup={this.state.popup}

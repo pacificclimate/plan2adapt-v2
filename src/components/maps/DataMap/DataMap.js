@@ -110,11 +110,12 @@ class DataMapDisplay extends React.Component {
   render() {
     // console.log(`### DataMap [${this.props.id}]: wmsClimateLayerProps`,
     //   wmsClimateLayerProps(this.props))
-    const { viewport, onViewportChange, onViewportChanged } = this.props;
+    // TODO: Do this with ...rest:
+    const { bounds, viewport, onViewportChange, onViewportChanged } = this.props;
 
     return (
       <CanadaBaseMap
-        {...{ viewport, onViewportChange, onViewportChanged }}
+        {...{ bounds, viewport, onViewportChange, onViewportChanged }}
         // FIXME: Popups are disabled because the CE ncWMS does not allow
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}

@@ -52,7 +52,8 @@ class CanadaBaseMap extends React.Component {
 
   render() {
     const center = _.pick(this.props.origin, 'lat', 'lng');
-    const { viewport, onViewportChange, onViewportChanged, onClick } = this.props;
+    // TODO: Do this with ...rest:
+    const { bounds, viewport, onViewportChange, onViewportChanged, onClick } = this.props;
     return (
         <Map
           crs={this.props.crs}
@@ -62,7 +63,7 @@ class CanadaBaseMap extends React.Component {
           maxZoom={10}
           maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
           ref={this.props.mapRef}
-          {...{ viewport, onViewportChange, onViewportChanged, onClick }}
+          {...{ bounds, viewport, onViewportChange, onViewportChanged, onClick }}
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
