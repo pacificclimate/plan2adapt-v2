@@ -1,7 +1,45 @@
+import L from 'leaflet';
 import curry from 'lodash/fp/curry';
+import flattenDepth from 'lodash/fp/flattenDepth';
 import getOr from 'lodash/fp/getOr';
 import map from 'lodash/fp/map';
 import range from 'lodash/fp/range';
+
+// Geometry
+
+
+// Return depth in array at which position (coordinate tuples) are found
+// for a given GeoJSON geometry (type).
+export const geometryPositionDepth = geometryType => {
+  switch (geometryType) {
+    case 'Point': return 0;
+    case 'MultiPoint': return geometryPositionDepth('Point') + 1;
+    case 'LineString': return geometryPositionDepth('Point') + 1;
+    case 'MultiLineString': return geometryPositionDepth('LineString') + 1;
+    case 'LinearRing': return geometryPositionDepth('LineString');
+    case 'Polygon': return geometryPositionDepth('LinearRing') + 1;
+    case 'MultiPolygon': return geometryPositionDepth('Polygon') + 1;
+  }
+}
+
+
+// Reverse order of lats and longs.
+export const reverse = a => [a[1], a[0]];
+
+
+// Return a Leaflet LatLngBounds object bounding the GeoJSON geometry object.
+export const geometryBounds = geometry => {
+  const depth = geometryPositionDepth(geometry.type);
+  const lonLats = flattenDepth(depth-1)(geometry.coordinates);
+  const latLngs = map(reverse)(lonLats);
+  const bounds = L.latLngBounds(latLngs);
+  return bounds;
+}
+
+// Return a Leaflet LatLngBounds object bounding the GeoJSON region object.
+export const regionBounds = region => geometryBounds(region.geometry);
+
+// Generic map helpers
 
 export const generateResolutions = (maxRes, count) =>
   map(i => maxRes / Math.pow(2, i)) (range(0, count));
