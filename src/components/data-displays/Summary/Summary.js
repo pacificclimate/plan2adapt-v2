@@ -339,9 +339,9 @@ const getDisplayData = (response, period, display) => {
     return anomalyValues;
   }
 
-  // display === 'relative'
+  // display === 'relative': units: %
   const baselineValue = getPeriodData(response.baseline, period);
-  return map(x => x/baselineValue)(anomalyValues);
+  return map(x => 100 * x/baselineValue)(anomalyValues);
 };
 
 
