@@ -74,7 +74,6 @@ const SeasonTds = ({ data }) => {
 // These are the percentiles used to establish the range (min, max) and median
 // shown in the Summary table. Note that order is important; it is assumed in
 // the data-handling code that the order is [min, median, max].
-// TODO: Use these values in the table headings/labels.
 // TODO: Make these prop(s) of Summary?
 const percentiles = [10, 50, 90];
 
@@ -160,7 +159,6 @@ class Summary extends React.Component {
     //    },
     //    ...
     //  }
-
   };
 
   static defaultProps = {
@@ -192,7 +190,7 @@ class Summary extends React.Component {
             <T path='summary.table.heading.ensembleMedian' as='string'/>
           </th>
           <th>
-            <T path='summary.table.heading.range' as='string'/>
+            <T path='summary.table.heading.range' data={{percentiles}} as='string'/>
           </th>
         </tr>
         </thead>

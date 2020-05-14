@@ -30,7 +30,7 @@ summary:
       season: Season
       projectedChange: Projected Change from ${$$.components.period} Baseline
       ensembleMedian: Ensemble Median
-      range: Range (10th to 90th percentile)
+      range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
     rows:
       variable: |
         ${variable.label}${variable.derived ? '*': ''} (${variable.units})
