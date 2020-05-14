@@ -277,45 +277,32 @@ notes:
   disabled: false
   tab: Notes
   content: |
-    ## Notes
 
-    1. Information for the Summary and Impacts tabs is drawn from a set of ?? GCM
-    projections based on results from 12 different Global Climate Models (GCMs),
-    each using one run of the RCP 8.5 (business as usual) greenhouse gas
-    emissions scenario. These projections are referred to as the "ensemble."
-    By the end of the 21st century, the RCP 8.5 scenario anticipates an atmospheric
-    concentration of greenhouse gases, expressed as
-    carbon dioxide (CO2) equivalent, of approximately 950 ppm CO2. The scenario does not incorporate the
-    effects of international agreements on the reduction of greenhouse gas
-    emissions, though other socio-economic factors like population growth are
-    modelled. Each GCM comes from a different modelling centre (e.g. the
-    Hadley Centre (UK), National Centre for Atmospheric Research (USA),
-    Geophysical Fluid Dynamics Laboratory (USA), and
-    Commonwealth Scientific and Industrial Research Organisation (Australia),
-    etc.).
+    1. Information for the Summary and Impacts tabs is drawn from a set of
+    projections from 12 different Global Climate Models (GCMs), each using one
+    run of the RCP 8.5 (high emissions) greenhouse gas emissions scenario.
+    This set of projections is referred to as the "ensemble." By the end of
+    the 21st century, the RCP 8.5 scenario includes an atmospheric
+    concentration of greenhouse gases, expressed as carbon dioxide (CO2)
+    equivalent, of approximately 950 ppm Each GCM comes from a different
+    modelling centre (e.g. the Hadley Centre (UK), National Centre for
+    Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA),
+    and Commonwealth Scientific and Industrial Research Organisation
+    (Australia), etc.).
 
-    1. The Maps tab shows high-resolution overlays of an ensemble average (mean)
-    value of the selected variable.
-    (example layer: pr_aClimMean_BCCAQv2_PCIC12_historical-rcp85_rXi1p1_20400101-20691230_Canada)
-
-    1. High-resolution climate data is obtained by using the ClimateBC
-    empirical downscaling tool. ClimateBC uses interpolation, an elevation
-    correction on temperature, and the PRISM (Parameter-elevation Regressions
-    on Independent Slopes Model) 4 km high-resolution climatology derived
-    from a multiple regression of weather station data against topographical
-    features. This projected change from Global Climate Models (GCMs) is
-    applied to the high resolution past in order to obtain an estimate of
-    future climate at the same high resolution.
+    1. The Maps tab shows results for the ensemble average value of the
+    selected variable.
 
     1. The 2020s, 2050s, and 2080s time periods are meant to be used as three
     representative planning horizons over the 21st century. Results for these
     three planning horizons are computed by averaging GCM projections over
     the 2010-2039, 2040-2069, and 2070-2099 periods, respectively.
 
-    1. With the exception of temperature and precipitation, most variable
-    values shown here are not directly observed or obtained from the GCMs.
-    Instead, they are derived from temperature and/or precipitation using
-    methods described in Wang et al., 2006 (see 'References' tab).
+    1. All variables shown here are computed from daily time series of
+    downscaled climate simulations. Precipitation as snow is an approximation
+    of snowfall based on total precipitation and temperature, and may provide
+    different result than if snowfall was downscaled directly.
+
 
 references:
   disabled: false
