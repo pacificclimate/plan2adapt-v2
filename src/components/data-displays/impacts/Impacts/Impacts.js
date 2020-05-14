@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Accordion, Card, CardGroup } from 'react-bootstrap';
+import { Accordion, Card, CardGroup, Button } from 'react-bootstrap';
 import filter from 'lodash/fp/filter';
 import flow from 'lodash/fp/flow';
 import groupBy from 'lodash/fp/groupBy';
@@ -12,9 +12,6 @@ import toPairs from 'lodash/fp/toPairs';
 import ReactMarkdown from 'react-markdown';
 import ImpactIcon from '../ImpactIcon';
 import './Impacts.css';
-
-
-const sort = sortBy(x => x);
 
 
 export default class Impacts extends React.Component {
@@ -30,33 +27,36 @@ export default class Impacts extends React.Component {
   };
 
   render() {
-    const rulesByGroupKey =
-      groupBy(rule => rule[this.props.groupKey])(this.props.rulebase);
+    const rulesByGroupKey = flow(
+      groupBy(rule => rule[this.props.groupKey]),
+      mapValues(sortBy(this.props.itemKey))
+    )(this.props.rulebase);
 
     const activeItemsByGroupKey =
       mapValues(
+        // Values are rules with given groupKey (e.g., 'category')
         flow(
+          // Pass only active rules
           filter(rule => this.props.ruleValues[rule.id]),
+          // Map to items selected by itemKey (e.g., 'sector')
           map(rule => rule[this.props.itemKey]),
+          // There may be repetitions in items
           uniq,
-          sort,
         )
       )(rulesByGroupKey);
 
     const sortedActiveItemsByGroupKey = flow(
       toPairs,
-      sortBy(([category, sectors]) => category)
+      sortBy(([key, items]) => key)
     )(activeItemsByGroupKey);
 
     return (
       <CardGroup className='Impacts-table'>
         <Accordion>
           <Card>
-            <Accordion.Toggle as={Card.Body} eventKey={'none'}>
-              <div className='clearfix'>
-                <Card.Title className='float-left mr-5'>{this.props.groupHeading}</Card.Title>
-                <Card.Title className='float-right'>{this.props.itemsHeading}</Card.Title>
-              </div>
+            <Accordion.Toggle as={Card.Body} eventKey={'none'} className='clearfix'>
+              <div className='float-left mr-5'>{this.props.groupHeading}</div>
+              <div className='float-right'>{this.props.itemsHeading}</div>
             </Accordion.Toggle>
           </Card>
 
@@ -64,20 +64,17 @@ export default class Impacts extends React.Component {
             map(([key, items]) => (
               key.length > 0 && items.length > 0 &&
                   <Card>
-                    <Accordion.Toggle as={Card.Header} eventKey={key}>
-                      <div className='clearfix'>
-                        <div className='float-left mr-5'>
-                          <ImpactIcon kind={this.props.groupKey} icon={key}/>
-                          {key}
-                        </div>
-                        <div className='float-right'>
-                          {
-                            map(item => (
-                              <ImpactIcon kind={this.props.itemKey} icon={item}/>
-                            ))(items)
-                          }
-                        </div>
-                        <div/>
+                    <Accordion.Toggle as={Button} variant={'outline-primary'} eventKey={key} className='clearfix'>
+                      <div className='float-left mr-5'>
+                        <ImpactIcon kind={this.props.groupKey} icon={key}/>
+                        {key}
+                      </div>
+                      <div className='float-right'>
+                        {
+                          map(item => (
+                            <ImpactIcon kind={this.props.itemKey} icon={item}/>
+                          ))(items)
+                        }
                       </div>
                     </Accordion.Toggle>
                     <Accordion.Collapse eventKey={key}>
