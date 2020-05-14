@@ -16,12 +16,46 @@ import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
 
 
+// Utility functions for formatting items for display by Summary.
+
+const getVariableLabel = (variableConfig, variable) =>
+  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
+
+
+const getUnits = (variableConfig, variable, display) => {
+  if (display === 'relative') {
+    return '%';
+  }
+  return variableConfig[variable].units;
+};
+
 
 const unitsSuffix = units =>
   `${units.match(/^[%]/) ? '' : ' '}${units}`;
 
+
 const isLong = s => s.length > 2;
 
+
+const expToFixed = s => {
+  // Convert a string representing a number in exponential notation to a string
+  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
+  // returns exponential notation frequently when we do not want it to. So
+  // we apply this.
+  const match = s.match(/-?\d\.\d+e[+-]\d+/);
+  if (!match) {
+    return s;
+  }
+  return Number.parseFloat(match[0]).toString();
+};
+
+
+const displayFormat = (sigfigs = 3) => (value) =>
+  // Convert a number value to a string in the display format we prefer.
+  `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
+
+
+// Component for displaying the per-season data in a Summary table row.
 const SeasonTds = ({ data }) => {
   return [
     <td className="text-center">
@@ -64,33 +98,33 @@ class Summary extends React.Component {
     // to construct the concrete table specification. Rows are specified
     // in order of display, "depth first" by variable then seasons.
     //
+    // TODO: Convert this to a more explicit PropType when the layout settles.
     // Example value of this prop:
     //
-    // [
-    //   { variable: 'tasmean', seasons: ['annual'] },
-    //   { variable: 'pr', seasons: ['annual', 'summer', 'winter'] },
-    // ]
+    //  [
+    //    {
+    //      variable: 'tasmean',
+    //      display: 'absolute',
+    //      precision: 2
+    //      seasons: ['annual']
+    //    },
+    //    {
+    //      variable: 'pr',
+    //      display: 'relative',
+    //      precision: 2
+    //      seasons: ['annual', 'summer', 'winter']
+    //    },
+    //  ]
 
-    summary: PropTypes.array,
-    // Concrete specification of the summary table, explicitly including data
-    // fetched from the backend and some labelling. This is a holdover from
-    // an earlier, highly convenient format used when there was no backend
-    // API at all. It has however proved a good design to separate the abstract
-    // spec (`tableContents`) from the concrete one. It is not a perfect way
-    // to handle this (see TO-DO below), but it is quite usable.
-    //
-    // Table rows are specified in order of display, "depth first" by
-    // variable then seasons.
+    tableContentsWithData: PropTypes.array,
+    // Abstract specification of the summary table, with data fetched from the
+    // backend.
     //
     // Note: This prop is injected via `withAsyncData`. Users should not be
     // specifying this prop directly, only `tableContents`.
     //
-    // The data loader is (at present) responsible for making the transformation
-    // from backend data to these row specifiers, using the value of
-    // `tableContents` to direct it.
-    //
     // TODO: Convert this to a more explicit PropType when the layout settles.
-    //
+    // Example value:
     //  [
     //    {
     //      variable: 'pr',
@@ -110,12 +144,6 @@ class Summary extends React.Component {
     //    },
     //    ...
     //  ]
-    //
-    // This looks *remarkably* like the `tableContents` prop, supplemented with
-    // the data retrieved from the backend. Goodness ensues.
-    //
-    // TODO: `summary` is now no longer a "concrete" specification; it is
-    //  an "abstract" specification extended with data. It should be so renamed.
 
     variableConfig: PropTypes.object,
     // Object mapping (scientific) variable names (e.g., 'tasmean') to
@@ -179,6 +207,12 @@ class Summary extends React.Component {
               units: getUnits(variableConfig, variable, display),
             };
             return map(season => {
+              // Const `data` is provided as context data to the external text.
+              // The external text implements the structure and formatting of
+              // this data for display. Slightly tricky, very flexible.
+              // In addition to the data items it might want (e.g.,
+              // `variable.label`, we also include utility functions (e.g.,
+              // `format`).
               const data = {
                 variable: variableData,
                 season: {
@@ -207,7 +241,7 @@ class Summary extends React.Component {
                   </tr>
                 )
               })(row.seasons);
-          })(this.props.summary)
+          })(this.props.tableContentsWithData)
         }
         </tbody>
       </Table>
@@ -217,23 +251,9 @@ class Summary extends React.Component {
 
 
 // These functions convert the data we retrieve from the backend to the
-// format that Summary consumes. It's a bit tedious, but Summary already
-// works with hardcoded data in this format, and something very like this
-// would have to be done in any case. Let's reduce to an already solved problem!
-
-// TODO: This idea turned out to have strengths. It would be even better to
-//  eliminate `getVariableLabel` by placing this information in the
-//  `summary.table.contents` data structure. This will likely include a somewhat
-//  more general refactoring of what external text content drives Summary.
-
-
-const getVariableLabel = (variableConfig, variable) =>
-  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
-
-
-const getVariableSigfigs = (variableConfig, variable) =>
-  variableConfig[variable].precision;
-
+// format that Summary consumes. Essentially, it merges the data with the
+// table specification. Component Summary is responsible for displaying this
+// in the appropriate layout and formatting.
 
 const periodToTimescale = period => {
   // Return the timescale (subannual period category) corresponding to the named
@@ -282,24 +302,6 @@ const periodToMonth = period => {
 };
 
 
-const expToFixed = s => {
-  // Convert a string representing a number in exponential notation to a string
-  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
-  // returns exponential notation frequently when we do not want it to. So
-  // we apply this.
-  const match = s.match(/-?\d\.\d+e[+-]\d+/);
-  if (!match) {
-    return s;
-  }
-  return Number.parseFloat(match[0]).toString();
-};
-
-
-const displayFormat = (sigfigs = 3) => (value) =>
-  // Convert a number value to a string in the display format we prefer.
-  `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
-
-
 const getPeriodData = (source, period) => {
   // Extract the specific data item selected by `period` from `source`.
   //
@@ -345,26 +347,6 @@ const getDisplayData = (response, period, display) => {
 };
 
 
-// TODO: Translate using configuration value
-const getUnits = (variableConfig, variable, display) => {
-  if (display === 'relative') {
-    return '%';
-  }
-  return variableConfig[variable].units;
-};
-// const getUnits = (response, display) => {
-//   if (isUndefined(response)) {
-//     return '--';
-//   }
-//   if (display === 'relative') {
-//     return '%';
-//   }
-//   return {
-//       'degC': '°C',
-//   }[response.units] || response.units;
-// };
-
-
 const tableContentsAndDataToSummarySpec =
   // Convert the raw summary statistics data for each `tableContent` item to
   // the objects consumed by Summary via its `summary` prop. See Summary
@@ -373,14 +355,6 @@ const tableContentsAndDataToSummarySpec =
   // corresponding data fetched from the backend.
   map(([content, data]) => {
     const { variable, precision, display, seasons } = content;
-    const sigfigs = precision || 3;
-    const rep = value => {
-      if (isUndefined(value)) {
-        return '(n/a)';
-      }
-      const displayValue = display === 'absolute' ? value : value * 100;
-      return displayFormat(displayValue, sigfigs);
-    };
     return {
       variable,
       display,
@@ -393,24 +367,6 @@ const tableContentsAndDataToSummarySpec =
         }
       })(seasons),
     };
-
-    // return {
-    //   variable: {
-    //     label: getVariableLabel(variable),
-    //     units: getUnits(data, display),
-    //   },
-    //   seasons: map(season => {
-    //     const displayData = getDisplayData(data, season, display);
-    //     return {
-    //       label: capitalize(season),
-    //       ensembleMedian: rep(displayData[1]),
-    //       range: {
-    //         min: rep(displayData[0]),
-    //         max: rep(displayData[2]),
-    //       }
-    //     };
-    //   })(seasons)
-    // };
   });
 
 
@@ -450,5 +406,5 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
 
 // Wrap the display component with data injection.
 export default withAsyncData(
-  loadSummaryStatistics, shouldLoadSummaryStatistics, 'summary'
+  loadSummaryStatistics, shouldLoadSummaryStatistics, 'tableContentsWithData'
 )(Summary);
