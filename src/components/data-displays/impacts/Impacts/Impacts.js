@@ -14,9 +14,6 @@ import ImpactIcon from '../ImpactIcon';
 import './Impacts.css';
 
 
-const sort = sortBy(x => x);
-
-
 export default class Impacts extends React.Component {
   static propTypes = {
     rulebase: PropTypes.array.isRequired,
@@ -30,22 +27,27 @@ export default class Impacts extends React.Component {
   };
 
   render() {
-    const rulesByGroupKey =
-      groupBy(rule => rule[this.props.groupKey])(this.props.rulebase);
+    const rulesByGroupKey = flow(
+      groupBy(rule => rule[this.props.groupKey]),
+      mapValues(sortBy(this.props.itemKey))
+    )(this.props.rulebase);
 
     const activeItemsByGroupKey =
       mapValues(
+        // Values are rules with given groupKey (e.g., 'category')
         flow(
+          // Pass only active rules
           filter(rule => this.props.ruleValues[rule.id]),
+          // Map to items selected by itemKey (e.g., 'sector')
           map(rule => rule[this.props.itemKey]),
+          // There may be repetitions in items
           uniq,
-          sort,
         )
       )(rulesByGroupKey);
 
     const sortedActiveItemsByGroupKey = flow(
       toPairs,
-      sortBy(([category, sectors]) => category)
+      sortBy(([key, items]) => key)
     )(activeItemsByGroupKey);
 
     return (
