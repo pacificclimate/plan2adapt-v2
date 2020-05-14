@@ -149,7 +149,8 @@ export default class App extends Component {
                 <Summary
                   region={get('value', this.state.region)}
                   futureTimePeriod={futureTimePeriod}
-                  tableContents={T.get(texts, 'summary.table.contents')}
+                  tableContents={getConfig('summary.table.contents')}
+                  variableConfig={getConfig('variables')}
                 />
                 <T path='summary.notes.derivedVars'/>
               </Tab>

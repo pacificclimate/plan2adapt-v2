@@ -16,16 +16,13 @@ import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
 
 
-const format = number => `${number > 0 ? '+' : ''}${number}`;
 
 const unitsSuffix = units =>
   `${units.match(/^[%]/) ? '' : ' '}${units}`;
 
 const isLong = s => s.length > 2;
 
-const SeasonTds = ({ variable, season }) => {
-  const units = unitsSuffix(variable.units);
-  const data = {variable, season, units, format, isLong};
+const SeasonTds = ({ data }) => {
   return [
     <td className="text-center">
       <T path='summary.table.rows.season' data={data} as='string'/>
@@ -92,35 +89,49 @@ class Summary extends React.Component {
     // from backend data to these row specifiers, using the value of
     // `tableContents` to direct it.
     //
-    // Example value of this prop:
+    // TODO: Convert this to a more explicit PropType when the layout settles.
     //
-    // [
-    //   {
-    //     variable: {
-    //       label: 'Precipitation',
-    //       units: '%',
-    //     },
-    //     seasons: [
-    //       {
-    //         label: 'Annual',
-    //         ensembleMedian: 6,
-    //         range: { min: 2, max: 12, },
-    //       },
-    //       {
-    //         label: 'Summer',
-    //         ensembleMedian: -1,
-    //         range: { min: -8, max: 6, },
-    //       },
-    //       {
-    //         label: 'Winter',
-    //         ensembleMedian: 8,
-    //         range: { min: -2, max: 15, },
-    //       },
-    //       ...
-    //     ]
-    //   },
-    //   ...
-    // ]
+    //  [
+    //    {
+    //      variable: 'pr',
+    //      display: 'absolute',
+    //      precision: 2,
+    //      seasons: [
+    //        {
+    //          name: 'annual',
+    //          percentiles: [2, 6, 12]
+    //        },
+    //        {
+    //          name: 'summer',
+    //          percentiles: [-1, 8, 6]
+    //        },
+    //        ...
+    //      ]
+    //    },
+    //    ...
+    //  ]
+    //
+    // This looks *remarkably* like the `tableContents` prop, supplemented with
+    // the data retrieved from the backend. Goodness ensues.
+    //
+    // TODO: `summary` is now no longer a "concrete" specification; it is
+    //  an "abstract" specification extended with data. It should be so renamed.
+
+    variableConfig: PropTypes.object,
+    // Object mapping (scientific) variable names (e.g., 'tasmean') to
+    // information used to process and display the variables. Typically this
+    // object will be provided from a configuration file, but that is not the
+    // job of this component:
+    //
+    // TODO: Convert this to a more explicit PropType when the layout settles.
+    // Example value:
+    //  {
+    //    tasmean: {
+    //      label: 'Temperature',
+    //      units: '°C',
+    //    },
+    //    ...
+    //  }
 
   };
 
@@ -132,6 +143,7 @@ class Summary extends React.Component {
   };
 
   render() {
+    const { variableConfig } = this.props;
     return (
       <Table striped bordered>
         <thead>
@@ -158,25 +170,44 @@ class Summary extends React.Component {
         </thead>
         <tbody>
         {
-          map(item =>
-            map(season => (
-                <tr>
-                  {
-                    season === item.seasons[0] &&
-                    <td
-                      rowSpan={item.seasons.length}
-                      className='align-middle'
-                    >
-                      <T path='summary.table.rows.variable'
-                        data={item} as='string'
-                      />
-                    </td>
-                  }
-                  <SeasonTds variable={item.variable} season={season}/>
-                </tr>
-              )
-            )(item.seasons)
-          )(this.props.summary)
+          map(row => {
+            // TODO: Extract as component
+            const { variable, display, precision } = row;
+            const variableData = {
+              id: variable,
+              label: getVariableLabel(variableConfig, variable),
+              units: getUnits(variableConfig, variable, display),
+            };
+            return map(season => {
+              const data = {
+                variable: variableData,
+                season: {
+                  ...season,
+                  label: capitalize(season.id)
+                },
+                format: displayFormat(precision),
+                isLong,
+                unitsSuffix,
+              };
+                return (
+                  <tr>
+                    {
+                      season === row.seasons[0] &&
+                      <td
+                        rowSpan={row.seasons.length}
+                        className='align-middle'
+                      >
+                        <T path='summary.table.rows.variable'
+                          data={data}
+                          as='string'
+                        />
+                      </td>
+                    }
+                    <SeasonTds data={data}/>
+                  </tr>
+                )
+              })(row.seasons);
+          })(this.props.summary)
         }
         </tbody>
       </Table>
@@ -191,23 +222,17 @@ class Summary extends React.Component {
 // would have to be done in any case. Let's reduce to an already solved problem!
 
 // TODO: This idea turned out to have strengths. It would be even better to
-//  eliminate `toVariableLabel` by placing this information in the
+//  eliminate `getVariableLabel` by placing this information in the
 //  `summary.table.contents` data structure. This will likely include a somewhat
 //  more general refactoring of what external text content drives Summary.
 
 
-// There's a better way to do this with the Variable selector options, but
-// this is easy to implement and works.
-// TODO: Apply the asterisk, which indicates a derived variable,
-//   under control of a configuration value.
-const toVariableLabel = variable => ({
-  'tasmean': 'Mean Temperature*',
-  'pr': 'Precipitation',
-  'prsn': 'Snowfall*',
-  'gdd': 'Growing Degree Days*',
-  'hdd': 'Heating Degree Days*',
-  'ffd': 'Frost-Free Days*',
-}[variable]);
+const getVariableLabel = (variableConfig, variable) =>
+  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
+
+
+const getVariableSigfigs = (variableConfig, variable) =>
+  variableConfig[variable].precision;
 
 
 const periodToTimescale = period => {
@@ -270,9 +295,9 @@ const expToFixed = s => {
 };
 
 
-const displayFormat = (value, sigfigs = 3) =>
+const displayFormat = (sigfigs = 3) => (value) =>
   // Convert a number value to a string in the display format we prefer.
-  expToFixed(value.toPrecision(sigfigs));
+  `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 
 
 const getPeriodData = (source, period) => {
@@ -321,17 +346,23 @@ const getDisplayData = (response, period, display) => {
 
 
 // TODO: Translate using configuration value
-const getUnits = (response, display) => {
-  if (isUndefined(response)) {
-    return '--';
-  }
+const getUnits = (variableConfig, variable, display) => {
   if (display === 'relative') {
     return '%';
   }
-  return {
-      'degC': '°C',
-  }[response.units] || response.units;
+  return variableConfig[variable].units;
 };
+// const getUnits = (response, display) => {
+//   if (isUndefined(response)) {
+//     return '--';
+//   }
+//   if (display === 'relative') {
+//     return '%';
+//   }
+//   return {
+//       'degC': '°C',
+//   }[response.units] || response.units;
+// };
 
 
 const tableContentsAndDataToSummarySpec =
@@ -351,22 +382,35 @@ const tableContentsAndDataToSummarySpec =
       return displayFormat(displayValue, sigfigs);
     };
     return {
-      variable: {
-        label: toVariableLabel(variable),
-        units: getUnits(data, display),
-      },
+      variable,
+      display,
+      precision,
+      hasData: !isUndefined(data),
       seasons: map(season => {
-        const displayData = getDisplayData(data, season, display);
         return {
-          label: capitalize(season),
-          ensembleMedian: rep(displayData[1]),
-          range: {
-            min: rep(displayData[0]),
-            max: rep(displayData[2]),
-          }
-        };
-      })(seasons)
+          id: season,
+          percentiles: getDisplayData(data, season, display),
+        }
+      })(seasons),
     };
+
+    // return {
+    //   variable: {
+    //     label: getVariableLabel(variable),
+    //     units: getUnits(data, display),
+    //   },
+    //   seasons: map(season => {
+    //     const displayData = getDisplayData(data, season, display);
+    //     return {
+    //       label: capitalize(season),
+    //       ensembleMedian: rep(displayData[1]),
+    //       range: {
+    //         min: rep(displayData[0]),
+    //         max: rep(displayData[2]),
+    //       }
+    //     };
+    //   })(seasons)
+    // };
   });
 
 
