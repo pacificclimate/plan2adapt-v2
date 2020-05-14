@@ -70,6 +70,7 @@ export default class App extends Component {
     }
     console.log('### Loaded')
     const getConfig = path => T.get(texts, path, {}, 'raw');
+    const variableConfig = getConfig('variables');
 
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
@@ -81,6 +82,8 @@ export default class App extends Component {
       value: this.state.variable,
       default: getConfig('selectors.variable.default'),
       onChange: this.handleChangeVariable,
+      getOptionLabel: ({ value: { representative: { variable_id }}}) =>
+        `${variableConfig[variable_id].label}`,
     };
     const seasonSelectorProps = {
       // Common to both SeasonSelector instances
@@ -149,7 +152,8 @@ export default class App extends Component {
                 <Summary
                   region={get('value', this.state.region)}
                   futureTimePeriod={futureTimePeriod}
-                  tableContents={T.get(texts, 'summary.table.contents')}
+                  tableContents={getConfig('summary.table.contents')}
+                  variableConfig={getConfig('variables')}
                 />
                 <T path='summary.notes.derivedVars'/>
               </Tab>

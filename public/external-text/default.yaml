@@ -30,15 +30,15 @@ summary:
       season: Season
       projectedChange: Projected Change from ${$$.components.period} Baseline
       ensembleMedian: Ensemble Median
-      range: Range (10th to 90th percentile)
+      range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
     rows:
       variable: |
         ${variable.label}${variable.derived ? '*': ''} (${variable.units})
       season: ${season.label}
-      ensembleMedian: ${format(season.ensembleMedian)}${units}
+      ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
       range: |
-        ${format(season.range.min)}${isLong(units) ? '': units} to
-        ${format(season.range.max)}${units}
+        ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
+        ${format(season.percentiles[2])}${unitsSuffix(variable.units)}
     contents:
       - variable: tasmean
         display: absolute
@@ -72,7 +72,7 @@ summary:
           - annual
       - variable: ffd
         display: absolute
-        precision: 4
+        precision: 2
         seasons:
           - annual
   notes:
@@ -492,18 +492,31 @@ colourScale:
 
 variables:
   tasmax:
+    label: Maximum Temperature
     units: °C
   tasmin:
+    label: Minimum Temperature
     units: °C
   tasmean:
+    label: Temperature
+    derived: true
     units: °C
   pr:
+    label: Precipitation
     units: mm/d
   prsn:
+    label: Snowfall
+    derived: true
     units: ??
   gdd:
+    label: Growing Degree-Days
+    derived: true
     units: degree days
   hdd:
+    label: Heating Degree-Days
+    derived: true
     units: degree days
   ffd:
+    label: Frost-Free Days
+    derived: true
     units: days
