@@ -27,27 +27,33 @@ export default class Impacts extends React.Component {
   };
 
   render() {
-    const rulesByGroupKey = flow(
+    const activeRulesByGroupKey = flow(
       groupBy(rule => rule[this.props.groupKey]),
-      mapValues(sortBy(this.props.itemKey))
+      mapValues(
+        // Values are rules with given groupKey (e.g., 'category')
+        flow(
+          // Pass only active rules
+          filter(rule => this.props.ruleValues[rule.id]),
+          // Sort the surviving rules by itemKey (e.g., 'sector)
+          sortBy(this.props.itemKey),
+        )
+      )
     )(this.props.rulebase);
 
     const activeItemsByGroupKey =
       mapValues(
         // Values are rules with given groupKey (e.g., 'category')
         flow(
-          // Pass only active rules
-          filter(rule => this.props.ruleValues[rule.id]),
-          // Map to items selected by itemKey (e.g., 'sector')
-          map(rule => rule[this.props.itemKey]),
-          // There may be repetitions in items
-          uniq,
+          // Map each rule to the item selected by itemKey (e.g., 'sector')
+          map(this.props.itemKey),
+          // There may be repetitions in items: same key but distinct rule
+          // uniq,
         )
-      )(rulesByGroupKey);
+      )(activeRulesByGroupKey);
 
     const sortedActiveItemsByGroupKey = flow(
       toPairs,
-      sortBy(([key, items]) => key)
+      sortBy(0),  // Pairs are [key, value]
     )(activeItemsByGroupKey);
 
     return (
@@ -93,7 +99,7 @@ export default class Impacts extends React.Component {
                                 <ReactMarkdown source={rule.notes} escapeHtml={false}/>
                               </Card.Body>
                             </Card>
-                          ))(rulesByGroupKey[key])
+                          ))(activeRulesByGroupKey[key])
                         }
                       </Card.Body>
                     </Accordion.Collapse>
