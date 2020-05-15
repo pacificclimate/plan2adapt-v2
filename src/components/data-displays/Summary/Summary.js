@@ -44,12 +44,12 @@ const getDisplayUnits = (variableConfig, variable, display) => {
 
 
 const convertToDisplayUnits = curry(
-  (displayUnits, value, units) => {
-    if (displayUnits.target === units) {
+  (displayUnits, baseUnits, value) => {
+    if (displayUnits.target === baseUnits) {
       return value;
     }
     try {
-      const conversion = displayUnits.conversions[units];
+      const conversion = displayUnits.conversions[baseUnits];
       const { scale, offset } = isNumber(conversion) ?
         { scale: conversion, offset: 0 } :
         conversion;
@@ -231,7 +231,7 @@ class Summary extends React.Component {
             const { variable, display, precision } = row;
             const displayUnits =
               getDisplayUnits(variableConfig, variable, display);
-            const convertData = convertToDisplayUnits(displayUnits);
+            const convertDataFrom = convertToDisplayUnits(displayUnits);
             const units = displayUnits.target;
             // const units = getUnits(variableConfig, variable, display);
             const variableData = {
@@ -246,16 +246,14 @@ class Summary extends React.Component {
               // In addition to the data items it might want (e.g.,
               // `variable.label`, we also include utility functions (e.g.,
               // `format`).
-              // TODO: Curry this better!
-              const displayPercentiles = map(
-                percentile => convertData(percentile, season.units)
-              )(season.percentiles);
+              const convertData = convertDataFrom(season.units);
+              const percentiles = map(convertData)(season.percentiles);
               const data = {
                 variable: variableData,
                 season: {
                   ...season,
                   label: capitalize(season.id),
-                  percentiles: displayPercentiles,
+                  percentiles,
                 },
                 format: displayFormat(precision),
                 isLong,
