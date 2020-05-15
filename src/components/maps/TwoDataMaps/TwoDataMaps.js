@@ -27,13 +27,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import get from 'lodash/fp/get';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
 import { regionBounds } from '../map-utils';
 import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
+import {
+  getDisplayUnits, getVariableInfo,
+} from '../../../utils/variables-and-units';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -78,12 +80,10 @@ export default class TwoDataMaps extends React.Component {
 
   render() {
     const variableSpec = this.props.variable.representative;
+    const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');
-    const getUnits = variableSpec =>
-      get(
-        [get('variable_id', variableSpec), 'units'],
-        variableConfig,
-      );
+    const displayUnits =
+      getDisplayUnits(variableConfig, variable);
     return (
       <React.Fragment>
         <Row>
@@ -93,10 +93,11 @@ export default class TwoDataMaps extends React.Component {
               height={600}
               heading={<T
                 path='colourScale.label'
-                data={{
-                  variable: get('variable_name', variableSpec),
-                  units: getUnits(variableSpec)
-                }}
+                data={getVariableInfo(variableConfig, variable, displayUnits)}
+                // data={{
+                //   variable: get('variable_name', variableSpec),
+                //   units: getUnits(variableSpec)
+                // }}
                 placeholder={null}
                 className={styles.label}
               />}
