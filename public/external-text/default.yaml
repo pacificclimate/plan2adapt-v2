@@ -46,12 +46,22 @@ summary:
         seasons:
           - annual
       - variable: pr
+        display: absolute
+        precision: 2
+        seasons:
+          - annual
+      - variable: pr
         display: relative
         precision: 2
         seasons:
           - annual
           - summer
           - winter
+      - variable: prsn
+        display: absolute
+        precision: 2
+        seasons:
+          - annual
       - variable: prsn
         display: relative
         precision: 2
@@ -487,7 +497,7 @@ components:
     concentrations.
 
 colourScale:
-  label: ${variable} (${units})
+  label: ${label} (${units})
   note: '*Note: This colour scale applies to both maps.*'
 
 # TODO: remove 'units' key-val pairs; defunct
@@ -511,15 +521,19 @@ variables:
     label: Precipitation
     units: mm/d
     displayUnits:
-      target: mm/d
+      target: mm/yr
       conversions:
+        'kg m-2 d-1': 365
+        'mm/d': 365
   prsn:
     label: Snowfall
     derived: true
     units: ??
     displayUnits:
-      target: mm/d
+      target: mm/yr
       conversions:
+        'kg m-2 d-1': 365
+        'mm/d': 365
   gdd:
     label: Growing Degree-Days
     derived: true
