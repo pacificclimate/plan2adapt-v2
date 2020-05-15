@@ -4,77 +4,28 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import capitalize from 'lodash/fp/capitalize';
-import curry from 'lodash/fp/curry';
 import flow from 'lodash/fp/flow';
 import find from 'lodash/fp/find';
 import keys from 'lodash/fp/keys';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
+import isEqual from 'lodash/fp/isEqual';
 import isUndefined from 'lodash/fp/isUndefined';
-import isNumber from 'lodash/fp/isNumber';
 import T from '../../../temporary/external-text';
+import {
+  convertToDisplayUnits,
+  displayFormat,
+  getVariableInfo,
+  getDisplayUnits,
+  getVariableLabel,
+  unitsSuffix,
+} from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
-import isEqual from 'lodash/fp/isEqual';
 
 
-// Utility functions for formatting items for display by Summary.
-
-const getVariableLabel = (variableConfig, variable) =>
-  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
-
-
-const getDisplayUnits = (variableConfig, variable, display) => {
-  if (display === 'relative') {
-    return {
-      target: '%',
-      // no conversions
-    };
-  }
-  return variableConfig[variable].displayUnits;
-};
-
-
-const convertToDisplayUnits = curry(
-  (displayUnits, baseUnits, value) => {
-    if (displayUnits.target === baseUnits) {
-      return value;
-    }
-    try {
-      const conversion = displayUnits.conversions[baseUnits];
-      const { scale, offset } = isNumber(conversion) ?
-        { scale: conversion, offset: 0 } :
-        conversion;
-      return value * scale + offset;
-    } catch (e) {
-      return undefined;
-    }
-  }
-);
-
-const unitsSuffix = units =>
-  `${units.match(/^[%]/) ? '' : ' '}${units}`;
-
-
+// Utility function for formatting items for display by Summary.
 const isLong = s => s.length > 2;
-
-
-const expToFixed = s => {
-  // Convert a string representing a number in exponential notation to a string
-  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
-  // returns exponential notation frequently when we do not want it to. So
-  // we apply this.
-  const match = s.match(/-?\d\.\d+e[+-]\d+/);
-  if (!match) {
-    return s;
-  }
-  return Number.parseFloat(match[0]).toString();
-};
-
-
-const displayFormat = (sigfigs = 3) => (value) =>
-  // Convert a number value to a string in the display format we prefer.
-  `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 
 
 // Component for displaying the per-season data in a Summary table row.
@@ -224,13 +175,8 @@ class Summary extends React.Component {
             const displayUnits =
               getDisplayUnits(variableConfig, variable, display);
             const convertDataFrom = convertToDisplayUnits(displayUnits);
-            const units = displayUnits.target;
-            // const units = getUnits(variableConfig, variable, display);
-            const variableData = {
-              id: variable,
-              label: getVariableLabel(variableConfig, variable),
-              units: units,
-            };
+            const variableInfo =
+              getVariableInfo(variableConfig, variable, displayUnits);
             return map(season => {
               // Const `data` is provided as context data to the external text.
               // The external text implements the structure and formatting of
@@ -241,7 +187,7 @@ class Summary extends React.Component {
               const convertData = convertDataFrom(season.units);
               const percentiles = map(convertData)(season.percentiles);
               const data = {
-                variable: variableData,
+                variable: variableInfo,
                 season: {
                   ...season,
                   label: capitalize(season.id),
