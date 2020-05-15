@@ -326,22 +326,37 @@ const getPeriodData = (source, period) => {
 
 
 const getDisplayData = (response, period, display) => {
-  // Return the data to be displayed from the response, according to the
-  // selected period (e.g., 'spring') and display type ('absolute' or
-  // 'relative').
+  // Return the data, with units, to be displayed from the response,
+  // according to the selected period (e.g., 'spring') and display type
+  // ('absolute' or 'relative'). Object returned is of the form:
+  //  {
+  //    percentiles: [ ... ],
+  //    units: '...',
+  //  }
 
   if (isUndefined(response)) {
-    return [];  // Empty array -> undefined when subscripted; possibly better to return undefined
+    // TODO: Probably better to return just undefined here.
+    return {
+      // Empty array -> undefined when subscripted; possibly better to return undefined
+      percentiles: [],
+      units: '??',
+    };
   }
 
   const anomalyValues = getPeriodData(response.anomaly, period);
   if (display === 'absolute') {
-    return anomalyValues;
+    return {
+      percentiles: anomalyValues,
+      units: response.units,
+    };
   }
 
-  // display === 'relative': units: %
+  // display === 'relative':
   const baselineValue = getPeriodData(response.baseline, period);
-  return map(x => 100 * x/baselineValue)(anomalyValues);
+  return {
+    percentiles: map(x => 100 * x/baselineValue)(anomalyValues),
+    units: '%',
+  };
 };
 
 
@@ -361,7 +376,7 @@ const tableContentsAndDataToSummarySpec =
       seasons: map(season => {
         return {
           id: season,
-          percentiles: getDisplayData(data, season, display),
+          ...getDisplayData(data, season, display),
         }
       })(seasons),
     };
