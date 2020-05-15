@@ -57,12 +57,41 @@ const getColorbarURI = (displaySpec, variableSpec, width, height) =>
 
 
 export default class NcwmsColourbar extends React.Component {
+  // TODO: This component should probably not be getting configuration
+  //  values directly from the config file, but be passed them. Why? Because
+  //  it is more of a utility than most components, and we should keep it
+  //  agnostic about where its config comes from if possible.
+  //  OTOH, we do get external texts directly. Sigh.
   static contextType = T.contextType;
 
   static propTypes = {
-    variableSpec: PropTypes.object,
+    // TODO: Change names
     width: PropTypes.number,
     height: PropTypes.number,
+
+    title: PropTypes.element,
+    note: PropTypes.element,
+
+    variableSpec: PropTypes.object,
+
+    displaySpec: PropTypes.object,
+    // Display spec
+    
+    variableConfig: PropTypes.object,
+    // Object mapping (scientific) variable names (e.g., 'tasmean') to
+    // information used to process and display the variables. Typically this
+    // object will be provided from a configuration file, but that is not the
+    // job of this component:
+    //
+    // TODO: Convert this to a more explicit PropType when the layout settles.
+    // Example value:
+    //  {
+    //    tasmean: {
+    //      label: 'Temperature',
+    //      units: '°C',
+    //    },
+    //    ...
+    //  }
   };
 
   static defaultProps = {
@@ -70,44 +99,30 @@ export default class NcwmsColourbar extends React.Component {
     height: 300,
   };
 
-  getConfig = path => T.get(this.context, path, {}, 'raw');
-  getUnits = variableSpec =>
-    get(
-      [get('variable_id', variableSpec), 'units'],
-      this.getConfig('variables')
-    );
-
   render() {
-    const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
-    const logscale = wmsLogscale(displaySpec, this.props.variableSpec);
-    const range = wmsDataRange(displaySpec, this.props.variableSpec);
+    const { width, height, heading, note, displaySpec, variableSpec,  } =
+      this.props;
+    const logscale = wmsLogscale(displaySpec, variableSpec);
+    const range = wmsDataRange(displaySpec, variableSpec);
     const span = range.max - range.min;
-    const ticks = wmsTicks(displaySpec, this.props.variableSpec);
+    const ticks = wmsTicks(displaySpec, variableSpec);
     return (
       <div
           className={styles.wrapper}
-          style={{ width: this.props.height + 20 }}
+          style={{ width: height + 20 }}
         >
-          <T
-            path='colourScale.label'
-            data={{
-              variable: get('variable_name', this.props.variableSpec),
-              units: this.getUnits(this.props.variableSpec)
-            }}
-             placeholder={null}
-             className={styles.label}
-          />
+          { heading }
           <img
             className={styles.image}
             style={{
-              'margin-top': -this.props.height,
-              'margin-left': -this.props.width,
+              'margin-top': -height,
+              'margin-left': -width,
             }}
             src={getColorbarURI(
               displaySpec,
-              this.props.variableSpec,
-              this.props.width,
-              this.props.height
+              variableSpec,
+              width,
+              height
             )}
           />
           <div className={styles.ticks}>
@@ -133,11 +148,7 @@ export default class NcwmsColourbar extends React.Component {
               )(ticks)
             }
           </div>
-          <T
-            path={'colourScale.note'}
-            placeholder={null}
-            className={styles.note}
-          />
+          { note }
         </div>
     );
   }

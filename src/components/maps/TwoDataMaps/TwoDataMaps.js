@@ -33,10 +33,12 @@ import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
 import { regionBounds } from '../map-utils';
+import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
 
 
 export default class TwoDataMaps extends React.Component {
   static contextType = T.contextType;
+  getConfig = path => T.get(this.context, path, {}, 'raw');
 
   static propTypes = {
     region: PropTypes.string,
@@ -75,14 +77,37 @@ export default class TwoDataMaps extends React.Component {
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
   render() {
+    const variableSpec = this.props.variable.representative;
+    const variableConfig = this.getConfig('variables');
+    const getUnits = variableSpec =>
+      get(
+        [get('variable_id', variableSpec), 'units'],
+        variableConfig,
+      );
     return (
       <React.Fragment>
         <Row>
           <Col lg={12}>
             <NcwmsColourbar
-              variableSpec={this.props.variable.representative}
               width={20}
               height={600}
+              heading={<T
+                path='colourScale.label'
+                data={{
+                  variable: get('variable_name', variableSpec),
+                  units: getUnits(variableSpec)
+                }}
+                placeholder={null}
+                className={styles.label}
+              />}
+              note={<T
+                path={'colourScale.note'}
+                placeholder={null}
+                className={styles.note}
+              />}
+              variableSpec={variableSpec}
+              displaySpec={this.getConfig('maps.displaySpec')}
+              variableConfig={variableConfig}
             />
           </Col>
         </Row>
