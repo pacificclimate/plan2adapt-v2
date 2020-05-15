@@ -4,12 +4,14 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import capitalize from 'lodash/fp/capitalize';
+import curry from 'lodash/fp/curry';
 import flow from 'lodash/fp/flow';
 import find from 'lodash/fp/find';
 import keys from 'lodash/fp/keys';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
 import isUndefined from 'lodash/fp/isUndefined';
+import isNumber from 'lodash/fp/isNumber';
 import T from '../../../temporary/external-text';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
@@ -29,6 +31,34 @@ const getUnits = (variableConfig, variable, display) => {
   return variableConfig[variable].units;
 };
 
+
+const getDisplayUnits = (variableConfig, variable, display) => {
+  if (display === 'relative') {
+    return {
+      target: '%',
+      // no conversions
+    };
+  }
+  return variableConfig[variable].displayUnits;
+};
+
+
+const convertToDisplayUnits = curry(
+  (displayUnits, value, units) => {
+    if (displayUnits.target === units) {
+      return value;
+    }
+    try {
+      const conversion = displayUnits.conversions[units];
+      const { scale, offset } = isNumber(conversion) ?
+        { scale: conversion, offset: 0 } :
+        conversion;
+      return value * scale + offset;
+    } catch (e) {
+      return undefined;
+    }
+  }
+);
 
 const unitsSuffix = units =>
   `${units.match(/^[%]/) ? '' : ' '}${units}`;
@@ -199,10 +229,15 @@ class Summary extends React.Component {
           map(row => {
             // TODO: Extract as component
             const { variable, display, precision } = row;
+            const displayUnits =
+              getDisplayUnits(variableConfig, variable, display);
+            const convertData = convertToDisplayUnits(displayUnits);
+            const units = displayUnits.target;
+            // const units = getUnits(variableConfig, variable, display);
             const variableData = {
               id: variable,
               label: getVariableLabel(variableConfig, variable),
-              units: getUnits(variableConfig, variable, display),
+              units: units,
             };
             return map(season => {
               // Const `data` is provided as context data to the external text.
@@ -211,11 +246,16 @@ class Summary extends React.Component {
               // In addition to the data items it might want (e.g.,
               // `variable.label`, we also include utility functions (e.g.,
               // `format`).
+              // TODO: Curry this better!
+              const displayPercentiles = map(
+                percentile => convertData(percentile, season.units)
+              )(season.percentiles);
               const data = {
                 variable: variableData,
                 season: {
                   ...season,
-                  label: capitalize(season.id)
+                  label: capitalize(season.id),
+                  percentiles: displayPercentiles,
                 },
                 format: displayFormat(precision),
                 isLong,
