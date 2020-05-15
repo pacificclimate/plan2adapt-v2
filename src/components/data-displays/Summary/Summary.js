@@ -24,14 +24,6 @@ const getVariableLabel = (variableConfig, variable) =>
   `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
 
 
-const getUnits = (variableConfig, variable, display) => {
-  if (display === 'relative') {
-    return '%';
-  }
-  return variableConfig[variable].units;
-};
-
-
 const getDisplayUnits = (variableConfig, variable, display) => {
   if (display === 'relative') {
     return {
