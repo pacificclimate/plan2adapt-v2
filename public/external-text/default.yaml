@@ -34,7 +34,7 @@ summary:
     rows:
       variable: |
         ${variable.label}${variable.derived ? '*': ''} (${variable.units})
-      season: ${season.label}
+      season: ${season.label} ((${season.units}))
       ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
       range: |
         ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
@@ -490,33 +490,54 @@ colourScale:
   label: ${variable} (${units})
   note: '*Note: This colour scale applies to both maps.*'
 
+# TODO: remove 'units' key-val pairs; defunct
 variables:
-  tasmax:
-    label: Maximum Temperature
-    units: °C
-  tasmin:
-    label: Minimum Temperature
-    units: °C
   tasmean:
     label: Temperature
     derived: true
     units: °C
+    displayUnits:
+      target: °C
+      conversions:
+        'degC': 1  # shorthand for the following
+        # 'degC':
+        #   scale: 1
+        #   offset: 0
+        'degF':
+          scale: .555
+          offset: -32
+
   pr:
     label: Precipitation
     units: mm/d
+    displayUnits:
+      target: mm/d
+      conversions:
   prsn:
     label: Snowfall
     derived: true
     units: ??
+    displayUnits:
+      target: mm/d
+      conversions:
   gdd:
     label: Growing Degree-Days
     derived: true
     units: degree days
+    displayUnits:
+      target: degree days
+      conversions:
   hdd:
     label: Heating Degree-Days
     derived: true
     units: degree days
+    displayUnits:
+      target: degree days
+      conversions:
   ffd:
     label: Frost-Free Days
     derived: true
     units: days
+    displayUnits:
+      target: days
+      conversions:
