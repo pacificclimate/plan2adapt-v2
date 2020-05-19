@@ -13,11 +13,10 @@ import isEqual from 'lodash/fp/isEqual';
 import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
 import {
-  convertToDisplayUnits,
   displayFormat,
+  getConvertUnits,
   getVariableInfo,
-  getDisplayUnits,
-  getVariableLabel,
+  getVariableDisplayUnits,
   unitsSuffix,
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
@@ -120,18 +119,19 @@ class Summary extends React.Component {
     variableConfig: PropTypes.object,
     // Object mapping (scientific) variable names (e.g., 'tasmean') to
     // information used to process and display the variables. Typically this
-    // object will be provided from a configuration file, but that is not the
-    // job of this component:
+    // object will be retrieved from a configuration file, but that is not the
+    // job of this component.
     //
+    // Example value: See configuration file, key 'variables'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
-    // Example value:
-    //  {
-    //    tasmean: {
-    //      label: 'Temperature',
-    //      units: '°C',
-    //    },
-    //    ...
-    //  }
+
+    unitsConversions: PropTypes.object,
+    // Object containing units conversions information.Typically this
+    // object will be retrieved from a configuration file, but that is not the
+    // job of this component.
+    //
+    // Example value: See configuration file, key 'units'.
+    // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
   static defaultProps = {
@@ -142,7 +142,8 @@ class Summary extends React.Component {
   };
 
   render() {
-    const { variableConfig } = this.props;
+    console.log('### Summary: props', this.props)
+    const { variableConfig, unitsConversions } = this.props;
     return (
       <Table striped bordered>
         <thead>
@@ -171,20 +172,23 @@ class Summary extends React.Component {
         {
           map(row => {
             // TODO: Extract as component
+            console.log('### Summary: row', row)
             const { variable, display, precision } = row;
             const displayUnits =
-              getDisplayUnits(variableConfig, variable, display);
-            const convertDataFrom = convertToDisplayUnits(displayUnits);
+              getVariableDisplayUnits(variableConfig, variable, display);
+            const convertUnits =
+              getConvertUnits(unitsConversions, variableConfig, variable);
             const variableInfo =
-              getVariableInfo(variableConfig, variable, displayUnits);
+              getVariableInfo(variableConfig, variable, display);
             return map(season => {
+              console.log('### Summary: season', season)
               // Const `data` is provided as context data to the external text.
               // The external text implements the structure and formatting of
               // this data for display. Slightly tricky, very flexible.
               // In addition to the data items it might want (e.g.,
               // `variable.label`, we also include utility functions (e.g.,
               // `format`).
-              const convertData = convertDataFrom(season.units);
+              const convertData = convertUnits(season.units, displayUnits);
               const percentiles = map(convertData)(season.percentiles);
               const data = {
                 variable: variableInfo,
@@ -197,24 +201,25 @@ class Summary extends React.Component {
                 isLong,
                 unitsSuffix,
               };
-                return (
-                  <tr>
-                    {
-                      season === row.seasons[0] &&
-                      <td
-                        rowSpan={row.seasons.length}
-                        className='align-middle'
-                      >
-                        <T path='summary.table.rows.variable'
-                          data={data}
-                          as='string'
-                        />
-                      </td>
-                    }
-                    <SeasonTds data={data}/>
-                  </tr>
-                )
-              })(row.seasons);
+              console.log('### Summary: season 2: data', data)
+              return (
+                <tr>
+                  {
+                    season === row.seasons[0] &&
+                    <td
+                      rowSpan={row.seasons.length}
+                      className='align-middle'
+                    >
+                      <T path='summary.table.rows.variable'
+                        data={data}
+                        as='string'
+                      />
+                    </td>
+                  }
+                  <SeasonTds data={data}/>
+                </tr>
+              )
+            })(row.seasons);
           })(this.props.tableContentsWithData)
         }
         </tbody>
