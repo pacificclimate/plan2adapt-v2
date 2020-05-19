@@ -142,7 +142,6 @@ class Summary extends React.Component {
   };
 
   render() {
-    console.log('### Summary: props', this.props)
     const { variableConfig, unitsConversions } = this.props;
     return (
       <Table striped bordered>
@@ -172,7 +171,6 @@ class Summary extends React.Component {
         {
           map(row => {
             // TODO: Extract as component
-            console.log('### Summary: row', row)
             const { variable, display, precision } = row;
             const displayUnits =
               getVariableDisplayUnits(variableConfig, variable, display);
@@ -181,7 +179,6 @@ class Summary extends React.Component {
             const variableInfo =
               getVariableInfo(variableConfig, variable, display);
             return map(season => {
-              console.log('### Summary: season', season)
               // Const `data` is provided as context data to the external text.
               // The external text implements the structure and formatting of
               // this data for display. Slightly tricky, very flexible.
@@ -201,7 +198,6 @@ class Summary extends React.Component {
                 isLong,
                 unitsSuffix,
               };
-              console.log('### Summary: season 2: data', data)
               return (
                 <tr>
                   {
