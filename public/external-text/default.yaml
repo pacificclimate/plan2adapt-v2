@@ -12,7 +12,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: pr
+    default: prsn
   season:
     prefix: for a typical
     postfix: period
@@ -218,6 +218,8 @@ maps:
   projected:
     title: "#### Projected: ${$$.components.period}"
   displaySpec:
+    # Organized by variable.
+    # NB: range and tick values are in *display* units.
     fallback:
       palette: seq-Oranges
       logscale: false
@@ -249,16 +251,16 @@ maps:
       palette: seq-Greens
       logscale: true
       range:
-        min: 0.1
-        max: 20
-      ticks: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+        min: 10
+        max: 10000
+      ticks: [10, 100, 1000, 10000]
     prsn:
       palette: x-Occam
       logscale: true
       range:
-        min: 0.1
-        max: 20
-      ticks: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+        min: 10
+        max: 20000
+      ticks: [10, 100, 1000, 10000, 20000]
     tasmax:
       palette: x-Occam
       range:
@@ -504,36 +506,43 @@ colourScale:
 # Variables are identified by their short, science-y id.
 # The `type` key is used to locate the appropriate units conversion data
 # in the `units` config, below.
+# TODO: Remove `dataUnits` and supply from metadata.
 variables:
   tasmean:
     label: Temperature
     derived: true
     type: temperature
     displayUnits: °C
+    dataUnits: degC
   pr:
     label: Precipitation
     type: precipitation flux
     displayUnits: mm/yr
+    dataUnits: kg m-2 d-1
   prsn:
     label: Snowfall
     derived: true
     type: snowfall flux
     displayUnits: mm/yr
+    dataUnits: kg m-2 d-1
   gdd:
     label: Growing Degree-Days
     derived: true
     type: temperature-time
     displayUnits: degree days
+    dataUnits: degree days
   hdd:
     label: Heating Degree-Days
     derived: true
     type: temperature-time
     displayUnits: degree days
+    dataUnits: degree days
   ffd:
     label: Frost-Free Days
     derived: true
     type: time
     displayUnits: days
+    dataUnits: days
 
 # Application-wide information about units of measure, mainly consisting of
 # data for computing conversions between units within a specific variable type.

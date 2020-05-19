@@ -33,9 +33,7 @@ import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
 import { regionBounds } from '../map-utils';
 import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
-import {
-  getDisplayUnits, getVariableInfo,
-} from '../../../utils/variables-and-units';
+import { getVariableInfo, } from '../../../utils/variables-and-units';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -82,8 +80,6 @@ export default class TwoDataMaps extends React.Component {
     const variableSpec = this.props.variable.representative;
     const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');
-    const displayUnits =
-      getDisplayUnits(variableConfig, variable);
     return (
       <React.Fragment>
         <Row>
@@ -93,11 +89,7 @@ export default class TwoDataMaps extends React.Component {
               height={600}
               heading={<T
                 path='colourScale.label'
-                data={getVariableInfo(variableConfig, variable, displayUnits)}
-                // data={{
-                //   variable: get('variable_name', variableSpec),
-                //   units: getUnits(variableSpec)
-                // }}
+                data={getVariableInfo(variableConfig, variable, 'absolute')}
                 placeholder={null}
                 className={styles.label}
               />}
@@ -108,7 +100,6 @@ export default class TwoDataMaps extends React.Component {
               />}
               variableSpec={variableSpec}
               displaySpec={this.getConfig('maps.displaySpec')}
-              variableConfig={variableConfig}
             />
           </Col>
         </Row>
