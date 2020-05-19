@@ -500,58 +500,70 @@ colourScale:
   label: ${label} (${units})
   note: '*Note: This colour scale applies to both maps.*'
 
-# TODO: remove 'units' key-val pairs; defunct
+# Application-wide information about variables and how they are to be treated.
+# Variables are identified by their short, science-y id.
+# The `type` key is used to locate the appropriate units conversion data
+# in the `units` config, below.
 variables:
   tasmean:
     label: Temperature
     derived: true
-    units: °C
-    displayUnits:
-      target: °C
-      conversions:
-        'degC': 1  # shorthand for the following
-        # 'degC':
-        #   scale: 1
-        #   offset: 0
-        'degF':
-          scale: .555
-          offset: -32
-
+    type: temperature
+    displayUnits: °C
   pr:
     label: Precipitation
-    units: mm/d
-    displayUnits:
-      target: mm/yr
-      conversions:
-        'kg m-2 d-1': 365
-        'mm/d': 365
+    type: precipitation flux
+    displayUnits: mm/yr
   prsn:
     label: Snowfall
     derived: true
-    units: ??
-    displayUnits:
-      target: mm/yr
-      conversions:
-        'kg m-2 d-1': 365
-        'mm/d': 365
+    type: snowfall flux
+    displayUnits: mm/yr
   gdd:
     label: Growing Degree-Days
     derived: true
-    units: degree days
-    displayUnits:
-      target: degree days
-      conversions:
+    type: temperature-time
+    displayUnits: degree days
   hdd:
     label: Heating Degree-Days
     derived: true
-    units: degree days
-    displayUnits:
-      target: degree days
-      conversions:
+    type: temperature-time
+    displayUnits: degree days
   ffd:
     label: Frost-Free Days
     derived: true
-    units: days
-    displayUnits:
-      target: days
-      conversions:
+    type: time
+    displayUnits: days
+
+# Application-wide information about units of measure, mainly consisting of
+# data for computing conversions between units within a specific variable type.
+# Conversions are grouped by variable type, named by top-level key.
+# In each group, key-value pairs specify scale and offset (value) for
+# converting units (key) to nominal base units:
+#   baseValue = value * scale + offset
+# Scale and offset can be specified key-value pairs of those names or by a
+# single numerical value. If only a single numerical value is provided, it is
+# interpreted as scale, with implicit offset 0.
+# If a string is provided, it is interpreted as a synonym for the named unit.
+# Note the distinction between precipitation flux and snowfall flux: The
+# conversion from mass flux units to depth flux units differs.
+units:
+  'precipitation flux':   # variable type
+    'mm/yr': 1            # nominal base unit
+    'mm/d': 365           # another unit: scale: 365, offset: 0
+    'kg m-2 d-1': mm/d    # synonym
+  'snowfall flux':
+    'mm/yr': 1
+    'mm/d': 365
+    'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
+  temperature:
+    degC: 1
+    '°C': degC
+    'degF':
+      scale: .55555555555555
+      offset: -17.7777777777778
+    '°F': degF
+  temperature-time:
+    'degree days': 1
+  time:
+    days: 1

@@ -6,51 +6,53 @@ import find from 'lodash/fp/find';
 import flow from 'lodash/fp/flow';
 import isNumber from 'lodash/fp/isNumber';
 import isString from 'lodash/fp/isString';
+import isUndefined from 'lodash/fp/isUndefined';
 
+
+// Functions that encapsulate knowledge about the structure of variable
+// configuration information.
 
 export const getVariableLabel = (variableConfig, variable) =>
   `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
 
 
-export const getDisplayUnits =
+export const getVariableType = (variableConfig, variable) =>
+  variableConfig[variable].type;
+
+
+export const getVariableDisplayUnits =
   (variableConfig, variable, display = 'absolute') => {
     if (display === 'relative') {
-      return {
-        target: '%',
-        // no conversions
-      };
+      return '%';
     }
     return variableConfig[variable].displayUnits;
   };
 
 
-export const getVariableInfo = (variableConfig, variable, displayUnits) => {
+export const getVariableInfo = (variableConfig, variable, display) => {
   return {
     id: variable,
     label: getVariableLabel(variableConfig, variable),
-    units: displayUnits.target,
+    units: getVariableDisplayUnits(variableConfig, variable, display),
   };
 };
 
 
-export const convertToDisplayUnits = curry((displayUnits, baseUnits, value) => {
-  if (displayUnits.target === baseUnits) {
-    return value;
-  }
-  try {
-    const conversion = displayUnits.conversions[baseUnits];
-    const { scale, offset } = isNumber(conversion) ?
-      { scale: conversion, offset: 0 } :
-      conversion;
-    return value * scale + offset;
-  } catch (e) {
-    return undefined;
-  }
-});
+export const getConvertUnits= (conversions, variableConfig, variable) => {
+  const variableType = getVariableType(variableConfig, variable);
+  const conversionGroup = conversions[variableType];
+  return convertUnitsInGroup(conversionGroup);
+};
 
 
-export const unitsSuffix = units =>
-  `${units.match(/^[%]/) ? '' : ' '}${units}`;
+// Functions for formatting displayed values.
+
+export const unitsSuffix = units => {
+  if (isUndefined(units)) {
+    return ' ???';
+  }
+  return `${units.match(/^[%]/) ? '' : ' '}${units}`;
+};
 
 
 export const expToFixed = s => {
@@ -74,6 +76,11 @@ export const displayFormat = curry((sigfigs = 3) => (value) => {
   return `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 });
 
+
+// Functions for units conversions. These functions are all curried so that
+// partial application is greatly simplified. Note that assumptions about the
+// layout of units conversion information is embedded in these functions.
+// TODO: Place in separate module.
 
 const findWithKey = find.convert({ 'cap': false });
 
@@ -100,6 +107,9 @@ export const fromBaseUnits = curry((conversion, value) =>
 
 
 export const convertUnitsInGroup = curry((conversionGroup, fromUnits, toUnits, value) => {
+  if (!conversionGroup) {
+    return undefined; // Or `value`?
+  }
   if (fromUnits === toUnits) {  // Identity
     return value;
   }
@@ -115,6 +125,8 @@ export const convertUnitsInGroup = curry((conversionGroup, fromUnits, toUnits, v
 });
 
 
+// TODO: Remove? This is not a very good idea given overlapping types like
+//  precipitation flux an snowfall.
 export const convertUnits = curry((conversions, fromUnits, toUnits, value) => {
   if (fromUnits === toUnits) {
     return value;
