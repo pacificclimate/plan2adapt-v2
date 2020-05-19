@@ -34,7 +34,7 @@ summary:
     rows:
       variable: |
         ${variable.label}${variable.derived ? '*': ''} (${variable.units})
-      season: ${season.label} ((${season.units}))
+      season: ${season.label}
       ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
       range: |
         ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
