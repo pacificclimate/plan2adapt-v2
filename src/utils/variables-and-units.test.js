@@ -1,8 +1,7 @@
 import each from 'jest-each';
 import keys from 'lodash/fp/keys';
 import {
-  canonicalConversion, convertUnits, convertUnitsInGroup,
-  findConversionGroup, fromBaseUnits, toBaseUnits
+  canonicalConversion, convertUnitsInGroup, fromBaseUnits, toBaseUnits
 } from './variables-and-units';
 
 
@@ -25,28 +24,6 @@ const conversions = {
 
 const tGroup = conversions['temperature'];
 const degFconversion = tGroup['degF'];
-
-
-describe('findConversionGroup', () => {
-  describe('existing units', () => {
-    each([
-      ['kg m-1 d-1'],
-      ['mm/d'],
-      ['mm/yr'],
-      ['°C'],
-    ]).test('for %s', (units) => {
-      expect(keys(findConversionGroup(conversions, units))).toContain(units);
-    });
-  });
-  describe('non-existent units', () => {
-    each([
-      ['bargle'],
-      [undefined],
-    ]).test('for %s', (units) => {
-      expect(findConversionGroup(conversions, units)).toBeUndefined();
-    });
-  });
-});
 
 
 describe('canonicalConversion', () => {
@@ -112,24 +89,5 @@ describe('convertUnitsInGroup', () => {
   ]).it('%d %s = %d %s', (value, fromUnits, expected, toUnits, group) => {
     expect(convertUnitsInGroup(group, fromUnits, toUnits, value))
       .toBeCloseTo(expected);
-  });
-});
-
-
-describe('convertUnits', () => {
-  each([
-    [3, 'degC', 3, 'degC', conversions],
-    [4, 'degC', 4, '°C', conversions],
-    [5, '°C', 5, 'degC', conversions],
-    [10, 'degC', 50, 'degF', conversions],
-    [10, '°C', 50, 'degF', conversions],
-    [50, 'degF', 10, 'degC', conversions],
-    [50, '°F', 10, 'degC', conversions],
-    [50, '°F', 10, '°C', conversions],
-    [5, 'kg m-1 d-1', 5, 'mm/d', conversions],
-    [5, 'mm/d', 5 * 365, 'mm/yr', conversions],
-  ]).test('%d %s = %d %s', (value, fromUnits, expected, toUnits, conversions) => {
-    expect(convertUnits(conversions, fromUnits, toUnits, value))
-    .toBeCloseTo(expected);     
   });
 });

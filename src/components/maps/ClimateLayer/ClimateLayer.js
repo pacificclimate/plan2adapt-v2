@@ -4,10 +4,15 @@ import { WMSTileLayer } from 'react-leaflet';
 import mapValues from 'lodash/fp/mapValues';
 import T from '../../../temporary/external-text';
 import {
-  wmsAboveMaxColor, wmsBelowMinColor,
-  wmsColorScaleRange, wmsDataRange, wmsLayerName,
+  wmsAboveMaxColor,
+  wmsBelowMinColor,
+  wmsColorScaleRange,
+  wmsDataRange,
+  wmsLayerName,
   wmsLogscale,
-  wmsNumcolorbands, wmsStyle, wmsTime
+  wmsNumcolorbands,
+  wmsStyle,
+  wmsTime
 } from '../map-utils';
 import {
   getConvertUnits,
@@ -27,7 +32,7 @@ export default class ClimateLayer extends React.Component {
 
   render() {
     const { fileMetadata, variableSpec, season } = this.props;
-    const variable = variableSpec.variable_id;
+    const variableId = variableSpec.variable_id;
     const displaySpec = this.getConfig('maps.displaySpec');
     const variableConfig = this.getConfig('variables');
     const unitsConversions = this.getConfig('units');
@@ -37,36 +42,32 @@ export default class ClimateLayer extends React.Component {
     // units, which is what the data actually comes in.
     const rangeInDisplayUnits = wmsDataRange(displaySpec, variableSpec);
     const displayUnits =
-      getVariableDisplayUnits(variableConfig, variable, 'absolute');
+      getVariableDisplayUnits(variableConfig, variableId, 'absolute');
     // TODO: dataUnits should come from metadata, not config.
-    const dataUnits = variableConfig[variable].dataUnits;
+    const dataUnits = variableConfig[variableId].dataUnits;
     const convertUnits =
-      getConvertUnits(unitsConversions, variableConfig, variable);
+      getConvertUnits(unitsConversions, variableConfig, variableId);
     const rangeInDataUnits = mapValues(
       convertUnits(displayUnits, dataUnits)
     )(rangeInDisplayUnits);
 
-    const layerProps = {
-      format: 'image/png',
-      logscale: wmsLogscale(displaySpec, variableSpec),
-      noWrap: true,
-      numcolorbands: wmsNumcolorbands,
-      opacity: 0.7,
-      // srs: "EPSG:3005",
-      transparent: true,
-      version: '1.1.1',
-      abovemaxcolor: wmsAboveMaxColor(displaySpec, variableSpec),
-      belowmincolor: wmsBelowMinColor(displaySpec, variableSpec),
-      layers: wmsLayerName(fileMetadata, variableSpec),
-      time: wmsTime(fileMetadata, season),
-      styles: wmsStyle(displaySpec, variableSpec),
-      colorscalerange: wmsColorScaleRange(rangeInDataUnits),
-    };
-
     return (
       <WMSTileLayer
         url={process.env.REACT_APP_NCWMS_URL}
-        {...layerProps}
+        format={'image/png'}
+        logscale={wmsLogscale(displaySpec, variableSpec)}
+        noWrap={true}
+        numcolorbands={wmsNumcolorbands}
+        opacity={0.7}
+        // srs={"EPSG:3005"}
+        transparent={true}
+        version={'1.1.1'}
+        abovemaxcolor={wmsAboveMaxColor(displaySpec, variableSpec)}
+        belowmincolor={wmsBelowMinColor(displaySpec, variableSpec)}
+        layers={wmsLayerName(fileMetadata, variableSpec)}
+        time={wmsTime(fileMetadata, season)}
+        styles={wmsStyle(displaySpec, variableSpec)}
+        colorscalerange={wmsColorScaleRange(rangeInDataUnits)}
       />
     );
   }

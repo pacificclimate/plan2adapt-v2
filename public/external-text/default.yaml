@@ -12,7 +12,7 @@ selectors:
     default: 2050
   variable:
     prefix: ... with details about
-    default: prsn
+    default: pr
   season:
     prefix: for a typical
     postfix: period
@@ -23,7 +23,7 @@ summary:
   tab: Summary
   title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
   # It's tempting to do this content as a Markdown table, but unfortunately
-  # MD doesn't# let you span table rows or columns.
+  # MD doesn't let you span table rows or columns.
   table:
     heading:
       variable: Climate Variable
@@ -46,22 +46,12 @@ summary:
         seasons:
           - annual
       - variable: pr
-        display: absolute
-        precision: 2
-        seasons:
-          - annual
-      - variable: pr
         display: relative
         precision: 2
         seasons:
           - annual
           - summer
           - winter
-      - variable: prsn
-        display: absolute
-        precision: 2
-        seasons:
-          - annual
       - variable: prsn
         display: relative
         precision: 2

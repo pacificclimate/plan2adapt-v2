@@ -15,8 +15,8 @@ import T from '../../../temporary/external-text';
 import {
   displayFormat,
   getConvertUnits,
-  getVariableInfo,
   getVariableDisplayUnits,
+  getVariableInfo,
   unitsSuffix,
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
@@ -176,8 +176,6 @@ class Summary extends React.Component {
               getVariableDisplayUnits(variableConfig, variable, display);
             const convertUnits =
               getConvertUnits(unitsConversions, variableConfig, variable);
-            const variableInfo =
-              getVariableInfo(variableConfig, variable, display);
             return map(season => {
               // Const `data` is provided as context data to the external text.
               // The external text implements the structure and formatting of
@@ -188,7 +186,7 @@ class Summary extends React.Component {
               const convertData = convertUnits(season.units, displayUnits);
               const percentiles = map(convertData)(season.percentiles);
               const data = {
-                variable: variableInfo,
+                variable: getVariableInfo(variableConfig, variable, display),
                 season: {
                   ...season,
                   label: capitalize(season.id),

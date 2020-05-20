@@ -82,15 +82,6 @@ export const displayFormat = curry((sigfigs = 3) => (value) => {
 // layout of units conversion information is embedded in these functions.
 // TODO: Place in separate module.
 
-const findWithKey = find.convert({ 'cap': false });
-
-export const findConversionGroup = curry((conversions, units) => {
-  return find(
-    findWithKey((value, key) => key === units)
-  )(conversions);
-});
-
-
 export const canonicalConversion = (conversion) => {
   return isNumber(conversion) ? { scale: conversion, offset: 0 } : conversion;
 };
@@ -124,25 +115,3 @@ export const convertUnitsInGroup = curry((conversionGroup, fromUnits, toUnits, v
   return fromBaseUnits(canonicalConversion(toConversion), toBaseUnits(canonicalConversion(fromConversion), value));
 });
 
-
-// TODO: Remove? This is not a very good idea given overlapping types like
-//  precipitation flux an snowfall.
-export const convertUnits = curry((conversions, fromUnits, toUnits, value) => {
-  if (fromUnits === toUnits) {
-    return value;
-  }
-  const cGroup = findConversionGroup(conversions, fromUnits);
-  if (!cGroup) {
-    console.error('undefined units', fromUnits);
-    return undefined;
-  }
-  const cGroup2 = findConversionGroup(conversions, toUnits);
-  if (!cGroup2) {
-    console.error('undefined units', toUnits);
-    return undefined;
-  }
-  if (cGroup !== cGroup2) {
-    console.error('incompatible units', fromUnits, toUnits);
-  }
-  return convertUnitsInGroup(cGroup, fromUnits, toUnits, value);
-});
