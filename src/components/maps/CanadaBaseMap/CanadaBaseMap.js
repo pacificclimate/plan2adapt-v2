@@ -2,7 +2,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'lodash';
 import every from 'lodash/fp/every';
 import isUndefined from 'lodash/fp/isUndefined';
 import pick from 'lodash/fp/pick';
@@ -65,12 +64,10 @@ class CanadaBaseMap extends React.Component {
     // These cause all kinds of trouble up the line, so we filter them out
     // here. Could be we would be better advised to filter them out further
     // up the line.
-    console.log('### CanadaBaseMap.onViewportChanged', viewport)
     if (
       viewport && viewport.center &&
       every(isDefined, [viewport.center[0], viewport.center[1], viewport.zoom])
     ) {
-      console.log('### CanadaBaseMap.onViewportChanged: passing')
       this.props.onViewportChanged(viewport);
     }
   }

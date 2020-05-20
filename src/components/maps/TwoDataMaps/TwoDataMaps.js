@@ -64,27 +64,19 @@ export default class TwoDataMaps extends React.Component {
     // they override the current viewport, and vice-versa, eliminating any
     // need for logic around this on our part.
     if (props.region !== state.prevPropsRegion) {
-      console.log('### TwoDataMaps.getDerivedStateFromProps: update')
       return {
         prevPropsRegion: props.region,
         bounds: regionBounds(props.region),
       }
     }
-    console.log('### TwoDataMaps.getDerivedStateFromProps: no change')
     return null;
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
-  // handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
-  handleChangeViewport = viewport => {
-    console.log('### TwoDataMaps.handleChangeViewport', viewport)
-    this.setState({ viewport });
-  }
+  handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
   render() {
-    console.log("### TwoDataMaps.render: props", this.props)
-    console.log("### TwoDataMaps.render: state", this.state)
     const variableSpec = this.props.variable.representative;
     const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');

@@ -108,20 +108,13 @@ class DataMapDisplay extends React.Component {
     ...this.props.popup, isOpen: false, value: null,
   });
 
-  onViewportChanged = viewport => {
-    console.log(`### DataMapDisplay(${this.props.id}).onViewportChanged: viewport`, viewport)
-    this.props.onViewportChanged(viewport);
-  }
-
   render() {
-    console.log('### DataMapDisplay.render: props', this.props)
     const { region, timePeriod, season, variable, popup, fileMetadata, ...rest }
       = this.props;
 
     return (
       <CanadaBaseMap
         {...rest}
-        onViewportChanged={this.onViewportChanged}
         // FIXME: Popups are disabled because the CE ncWMS does not allow
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
