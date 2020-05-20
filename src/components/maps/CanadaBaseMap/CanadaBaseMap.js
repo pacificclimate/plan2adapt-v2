@@ -2,7 +2,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import _ from 'lodash';
+import every from 'lodash/fp/every';
+import isUndefined from 'lodash/fp/isUndefined';
+import pick from 'lodash/fp/pick';
 import L from 'leaflet';
 
 import { Map, TileLayer } from 'react-leaflet';
@@ -11,6 +13,9 @@ import 'proj4leaflet';
 
 import './CanadaBaseMap.css';
 import { generateResolutions } from '../map-utils';
+
+
+const isDefined = x => !isUndefined(x);
 
 
 class CanadaBaseMap extends React.Component {
@@ -24,6 +29,7 @@ class CanadaBaseMap extends React.Component {
     version: PropTypes.string,
     srs: PropTypes.string,
     origin: PropTypes.object,
+    maxBounds: PropTypes.object,
     mapRef: PropTypes.func,
     // Any other props are passed through to Map
   };
@@ -49,11 +55,28 @@ class CanadaBaseMap extends React.Component {
     version: '1.1.1',
     srs: 'EPSG:4326',
     origin: { lat: 60, lng: -100, zoom: 0 },
+    maxBounds: L.latLngBounds([[40, -150], [90, -50]]),
   };
 
+  onViewportChanged = viewport => {
+    // From time to time, for reasons not understood, <Map> calls
+    // `onViewportChanged` with undefined values for center and zoom.
+    // These cause all kinds of trouble up the line, so we filter them out
+    // here. Could be we would be better advised to filter them out further
+    // up the line.
+    if (
+      viewport && viewport.center &&
+      every(isDefined, [viewport.center[0], viewport.center[1], viewport.zoom])
+    ) {
+      this.props.onViewportChanged(viewport);
+    }
+  }
+
   render() {
-    const center = _.pick(origin, 'lat', 'lng');
-    const { crs, version, srs, origin, mapRef, children, ...rest } = this.props;
+    const {
+      crs, version, srs, origin, mapRef, children, maxBounds, ...rest
+    } = this.props;
+    const center = pick(['lat', 'lng'], origin);
     return (
         <Map
           crs={crs}
@@ -61,9 +84,10 @@ class CanadaBaseMap extends React.Component {
           zoom={origin.zoom}
           minZoom={0}
           maxZoom={10}
-          maxBounds={L.latLngBounds([[40, -150], [90, -50]])}
+          maxBounds={maxBounds}
           ref={mapRef}
           {...rest}
+          onViewportChanged={this.onViewportChanged}
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
