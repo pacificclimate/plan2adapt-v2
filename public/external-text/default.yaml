@@ -23,7 +23,7 @@ summary:
   tab: Summary
   title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
   # It's tempting to do this content as a Markdown table, but unfortunately
-  # MD doesn't# let you span table rows or columns.
+  # MD doesn't let you span table rows or columns.
   table:
     heading:
       variable: Climate Variable
@@ -208,6 +208,8 @@ maps:
   projected:
     title: "#### Projected: ${$$.components.period}"
   displaySpec:
+    # Organized by variable.
+    # NB: range and tick values are in *display* units.
     fallback:
       palette: seq-Oranges
       logscale: false
@@ -239,16 +241,16 @@ maps:
       palette: seq-Greens
       logscale: true
       range:
-        min: 0.1
-        max: 20
-      ticks: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+        min: 10
+        max: 10000
+      ticks: [10, 100, 1000, 10000]
     prsn:
       palette: x-Occam
       logscale: true
       range:
-        min: 0.1
-        max: 20
-      ticks: [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+        min: 10
+        max: 20000
+      ticks: [10, 100, 1000, 10000, 20000]
     tasmax:
       palette: x-Occam
       range:
@@ -487,36 +489,80 @@ components:
     concentrations.
 
 colourScale:
-  label: ${variable} (${units})
+  label: ${label} (${units})
   note: '*Note: This colour scale applies to both maps.*'
 
+# Application-wide information about variables and how they are to be treated.
+# Variables are identified by their short, science-y id.
+# The `type` key is used to locate the appropriate units conversion data
+# in the `units` config, below.
+# TODO: Remove `dataUnits` and supply from metadata.
 variables:
-  tasmax:
-    label: Maximum Temperature
-    units: °C
-  tasmin:
-    label: Minimum Temperature
-    units: °C
   tasmean:
     label: Temperature
     derived: true
-    units: °C
+    type: temperature
+    displayUnits: °C
+    dataUnits: degC
   pr:
     label: Precipitation
-    units: mm/d
+    type: precipitation flux
+    displayUnits: mm/yr
+    dataUnits: kg m-2 d-1
   prsn:
     label: Snowfall
     derived: true
-    units: ??
+    type: snowfall flux
+    displayUnits: mm/yr
+    dataUnits: kg m-2 d-1
   gdd:
     label: Growing Degree-Days
     derived: true
-    units: degree days
+    type: temperature-time
+    displayUnits: degree days
+    dataUnits: degree days
   hdd:
     label: Heating Degree-Days
     derived: true
-    units: degree days
+    type: temperature-time
+    displayUnits: degree days
+    dataUnits: degree days
   ffd:
     label: Frost-Free Days
     derived: true
-    units: days
+    type: time
+    displayUnits: days
+    dataUnits: days
+
+# Application-wide information about units of measure, mainly consisting of
+# data for computing conversions between units within a specific variable type.
+# Conversions are grouped by variable type, named by top-level key.
+# In each group, key-value pairs specify scale and offset (value) for
+# converting units (key) to nominal base units:
+#   baseValue = value * scale + offset
+# Scale and offset can be specified key-value pairs of those names or by a
+# single numerical value. If only a single numerical value is provided, it is
+# interpreted as scale, with implicit offset 0.
+# If a string is provided, it is interpreted as a synonym for the named unit.
+# Note the distinction between precipitation flux and snowfall flux: The
+# conversion from mass flux units to depth flux units differs.
+units:
+  'precipitation flux':   # variable type
+    'mm/yr': 1            # nominal base unit
+    'mm/d': 365           # another unit: scale: 365, offset: 0
+    'kg m-2 d-1': mm/d    # synonym
+  'snowfall flux':
+    'mm/yr': 1
+    'mm/d': 365
+    'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
+  temperature:
+    degC: 1
+    '°C': degC
+    'degF':
+      scale: .55555555555555
+      offset: -17.7777777777778
+    '°F': degF
+  temperature-time:
+    'degree days': 1
+  time:
+    days: 1

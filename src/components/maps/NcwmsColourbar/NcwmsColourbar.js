@@ -22,14 +22,11 @@
 //  - Props `width` and `height` are for the unrotated (vertical) graphic;
 //    so their meaning is reversed in the rendered graphic. Confusing, sorry.
 
-// TODO: Configuration should be obtained outside this component and passed in;
-//  no use of ExternalText here.
-
 import PropTypes from 'prop-types';
 import React from 'react';
-import get from 'lodash/fp/get';
+import identity from 'lodash/fp/identity';
 import map from 'lodash/fp/map';
-import T from '../../../temporary/external-text';
+import mapValues from 'lodash/fp/mapValues';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
@@ -57,12 +54,18 @@ const getColorbarURI = (displaySpec, variableSpec, width, height) =>
 
 
 export default class NcwmsColourbar extends React.Component {
-  static contextType = T.contextType;
-
   static propTypes = {
-    variableSpec: PropTypes.object,
+    // TODO: Change names
     width: PropTypes.number,
     height: PropTypes.number,
+
+    title: PropTypes.element,
+    note: PropTypes.element,
+
+    variableSpec: PropTypes.object,
+
+    displaySpec: PropTypes.object,
+    // Display spec
   };
 
   static defaultProps = {
@@ -70,44 +73,34 @@ export default class NcwmsColourbar extends React.Component {
     height: 300,
   };
 
-  getConfig = path => T.get(this.context, path, {}, 'raw');
-  getUnits = variableSpec =>
-    get(
-      [get('variable_id', variableSpec), 'units'],
-      this.getConfig('variables')
-    );
-
   render() {
-    const displaySpec = T.get(this.context, 'maps.displaySpec', {}, 'raw');
-    const logscale = wmsLogscale(displaySpec, this.props.variableSpec);
-    const range = wmsDataRange(displaySpec, this.props.variableSpec);
-    const span = range.max - range.min;
-    const ticks = wmsTicks(displaySpec, this.props.variableSpec);
+    const { width, height, heading, note, displaySpec, variableSpec  } =
+      this.props;
+    const logscale = wmsLogscale(displaySpec, variableSpec);
+    const scaleOperator = logscale ? Math.log : identity;
+    const range = mapValues(
+      scaleOperator,
+      wmsDataRange(displaySpec, variableSpec)
+    );
+    const rangeSpan = range.max - range.min;
+    const ticks = wmsTicks(displaySpec, variableSpec);
     return (
       <div
           className={styles.wrapper}
-          style={{ width: this.props.height + 20 }}
+          style={{ width: height + 20 }}
         >
-          <T
-            path='colourScale.label'
-            data={{
-              variable: get('variable_name', this.props.variableSpec),
-              units: this.getUnits(this.props.variableSpec)
-            }}
-             placeholder={null}
-             className={styles.label}
-          />
+          { heading }
           <img
             className={styles.image}
             style={{
-              'margin-top': -this.props.height,
-              'margin-left': -this.props.width,
+              'margin-top': -height,
+              'margin-left': -width,
             }}
             src={getColorbarURI(
               displaySpec,
-              this.props.variableSpec,
-              this.props.width,
-              this.props.height
+              variableSpec,
+              width,
+              height
             )}
           />
           <div className={styles.ticks}>
@@ -117,9 +110,8 @@ export default class NcwmsColourbar extends React.Component {
               // easy to place them correctly.
               map(
                 tick => {
-                  const position = logscale ?
-                    Math.log(tick/range.min) / Math.log(range.max/range.min) :
-                    (tick - range.min) / span;
+                  const position =
+                    (scaleOperator(tick) - range.min) / rangeSpan;
                   return (
                     <span
                       style={{
@@ -133,11 +125,7 @@ export default class NcwmsColourbar extends React.Component {
               )(ticks)
             }
           </div>
-          <T
-            path={'colourScale.note'}
-            placeholder={null}
-            className={styles.note}
-          />
+          { note }
         </div>
     );
   }

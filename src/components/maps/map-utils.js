@@ -39,10 +39,12 @@ export const geometryBounds = geometry => {
 // Return a Leaflet LatLngBounds object bounding the GeoJSON region object.
 export const regionBounds = region => geometryBounds(region.geometry);
 
+
 // Generic map helpers
 
 export const generateResolutions = (maxRes, count) =>
   map(i => maxRes / Math.pow(2, i)) (range(0, count));
+
 
 // WMS tile layer props helpers
 
@@ -79,31 +81,11 @@ export const wmsTicks = getDisplaySpecItem('ticks');
 export const wmsAboveMaxColor = getDisplaySpecItem('aboveMaxColor');
 export const wmsBelowMinColor = getDisplaySpecItem('belowMinColor');
 
+
 export const wmsStyle = (displaySpec, variableSpec) =>
   `default-scalar/${wmsPalette(displaySpec, variableSpec)}`;
 
 
-export const wmsColorScaleRange = (displaySpec, variableSpec) => {
-  const range = wmsDataRange(displaySpec, variableSpec);
+export const wmsColorScaleRange = range => {
   return `${range.min},${range.max}`
-};
-
-
-export const wmsClimateLayerProps = (fileMetadata, displaySpec, variableSpec, season) => {
-  return {
-    format: 'image/png',
-    logscale: wmsLogscale(displaySpec, variableSpec),
-    noWrap: true,
-    numcolorbands: wmsNumcolorbands,
-    opacity: 0.7,
-    // srs: "EPSG:3005",
-    transparent: true,
-    version: '1.1.1',
-    abovemaxcolor: wmsAboveMaxColor(displaySpec, variableSpec),
-    belowmincolor: wmsBelowMinColor(displaySpec, variableSpec),
-    layers: wmsLayerName(fileMetadata, variableSpec),
-    time: wmsTime(fileMetadata, season),
-    styles: wmsStyle(displaySpec, variableSpec),
-    colorscalerange: wmsColorScaleRange(displaySpec, variableSpec),
-  }
 };

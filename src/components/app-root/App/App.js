@@ -154,6 +154,7 @@ export default class App extends Component {
                   futureTimePeriod={futureTimePeriod}
                   tableContents={getConfig('summary.table.contents')}
                   variableConfig={getConfig('variables')}
+                  unitsConversions={getConfig('units')}
                 />
                 <T path='summary.notes.derivedVars'/>
               </Tab>

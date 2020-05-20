@@ -9,50 +9,22 @@ import find from 'lodash/fp/find';
 import keys from 'lodash/fp/keys';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
+import isEqual from 'lodash/fp/isEqual';
 import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
+import {
+  displayFormat,
+  getConvertUnits,
+  getVariableDisplayUnits,
+  getVariableInfo,
+  unitsSuffix,
+} from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
-import isEqual from 'lodash/fp/isEqual';
 
 
-// Utility functions for formatting items for display by Summary.
-
-const getVariableLabel = (variableConfig, variable) =>
-  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
-
-
-const getUnits = (variableConfig, variable, display) => {
-  if (display === 'relative') {
-    return '%';
-  }
-  return variableConfig[variable].units;
-};
-
-
-const unitsSuffix = units =>
-  `${units.match(/^[%]/) ? '' : ' '}${units}`;
-
-
+// Utility function for formatting items for display by Summary.
 const isLong = s => s.length > 2;
-
-
-const expToFixed = s => {
-  // Convert a string representing a number in exponential notation to a string
-  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
-  // returns exponential notation frequently when we do not want it to. So
-  // we apply this.
-  const match = s.match(/-?\d\.\d+e[+-]\d+/);
-  if (!match) {
-    return s;
-  }
-  return Number.parseFloat(match[0]).toString();
-};
-
-
-const displayFormat = (sigfigs = 3) => (value) =>
-  // Convert a number value to a string in the display format we prefer.
-  `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 
 
 // Component for displaying the per-season data in a Summary table row.
@@ -147,18 +119,19 @@ class Summary extends React.Component {
     variableConfig: PropTypes.object,
     // Object mapping (scientific) variable names (e.g., 'tasmean') to
     // information used to process and display the variables. Typically this
-    // object will be provided from a configuration file, but that is not the
-    // job of this component:
+    // object will be retrieved from a configuration file, but that is not the
+    // job of this component.
     //
+    // Example value: See configuration file, key 'variables'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
-    // Example value:
-    //  {
-    //    tasmean: {
-    //      label: 'Temperature',
-    //      units: '°C',
-    //    },
-    //    ...
-    //  }
+
+    unitsConversions: PropTypes.object,
+    // Object containing units conversions information.Typically this
+    // object will be retrieved from a configuration file, but that is not the
+    // job of this component.
+    //
+    // Example value: See configuration file, key 'units'.
+    // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
   static defaultProps = {
@@ -169,7 +142,7 @@ class Summary extends React.Component {
   };
 
   render() {
-    const { variableConfig } = this.props;
+    const { variableConfig, unitsConversions } = this.props;
     return (
       <Table striped bordered>
         <thead>
@@ -199,11 +172,10 @@ class Summary extends React.Component {
           map(row => {
             // TODO: Extract as component
             const { variable, display, precision } = row;
-            const variableData = {
-              id: variable,
-              label: getVariableLabel(variableConfig, variable),
-              units: getUnits(variableConfig, variable, display),
-            };
+            const displayUnits =
+              getVariableDisplayUnits(variableConfig, variable, display);
+            const convertUnits =
+              getConvertUnits(unitsConversions, variableConfig, variable);
             return map(season => {
               // Const `data` is provided as context data to the external text.
               // The external text implements the structure and formatting of
@@ -211,34 +183,37 @@ class Summary extends React.Component {
               // In addition to the data items it might want (e.g.,
               // `variable.label`, we also include utility functions (e.g.,
               // `format`).
+              const convertData = convertUnits(season.units, displayUnits);
+              const percentiles = map(convertData)(season.percentiles);
               const data = {
-                variable: variableData,
+                variable: getVariableInfo(variableConfig, variable, display),
                 season: {
                   ...season,
-                  label: capitalize(season.id)
+                  label: capitalize(season.id),
+                  percentiles,
                 },
                 format: displayFormat(precision),
                 isLong,
                 unitsSuffix,
               };
-                return (
-                  <tr>
-                    {
-                      season === row.seasons[0] &&
-                      <td
-                        rowSpan={row.seasons.length}
-                        className='align-middle'
-                      >
-                        <T path='summary.table.rows.variable'
-                          data={data}
-                          as='string'
-                        />
-                      </td>
-                    }
-                    <SeasonTds data={data}/>
-                  </tr>
-                )
-              })(row.seasons);
+              return (
+                <tr>
+                  {
+                    season === row.seasons[0] &&
+                    <td
+                      rowSpan={row.seasons.length}
+                      className='align-middle'
+                    >
+                      <T path='summary.table.rows.variable'
+                        data={data}
+                        as='string'
+                      />
+                    </td>
+                  }
+                  <SeasonTds data={data}/>
+                </tr>
+              )
+            })(row.seasons);
           })(this.props.tableContentsWithData)
         }
         </tbody>
@@ -326,22 +301,37 @@ const getPeriodData = (source, period) => {
 
 
 const getDisplayData = (response, period, display) => {
-  // Return the data to be displayed from the response, according to the
-  // selected period (e.g., 'spring') and display type ('absolute' or
-  // 'relative').
+  // Return the data, with units, to be displayed from the response,
+  // according to the selected period (e.g., 'spring') and display type
+  // ('absolute' or 'relative'). Object returned is of the form:
+  //  {
+  //    percentiles: [ ... ],
+  //    units: '...',
+  //  }
 
   if (isUndefined(response)) {
-    return [];  // Empty array -> undefined when subscripted; possibly better to return undefined
+    // TODO: Probably better to return just undefined here.
+    return {
+      // Empty array -> undefined when subscripted; possibly better to return undefined
+      percentiles: [],
+      units: '??',
+    };
   }
 
   const anomalyValues = getPeriodData(response.anomaly, period);
   if (display === 'absolute') {
-    return anomalyValues;
+    return {
+      percentiles: anomalyValues,
+      units: response.units,
+    };
   }
 
-  // display === 'relative': units: %
+  // display === 'relative':
   const baselineValue = getPeriodData(response.baseline, period);
-  return map(x => 100 * x/baselineValue)(anomalyValues);
+  return {
+    percentiles: map(x => 100 * x/baselineValue)(anomalyValues),
+    units: '%',
+  };
 };
 
 
@@ -361,7 +351,7 @@ const tableContentsAndDataToSummarySpec =
       seasons: map(season => {
         return {
           id: season,
-          percentiles: getDisplayData(data, season, display),
+          ...getDisplayData(data, season, display),
         }
       })(seasons),
     };
