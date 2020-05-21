@@ -495,7 +495,12 @@ components:
 
 colourScale:
   label: ${label} (${units})
-  note: '*Note: This colour scale applies to both maps.*'
+  note: |
+    ${logscale ? $$.colourScale.logscaleNote : ''} This colour scale applies to both maps.
+  logscaleNote: |
+    *This colour scale is logarithmic.
+    A logarithmic scale cannot include zero values;
+    these are mapped to the below-minimum colour.* <br/>
 
 # Application-wide information about variables and how they are to be treated.
 # Variables are identified by their short, science-y id.

@@ -31,7 +31,7 @@ import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
 import NcwmsColourbar from '../NcwmsColourbar';
-import { regionBounds } from '../map-utils';
+import { regionBounds, wmsLogscale } from '../map-utils';
 import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 
@@ -80,6 +80,8 @@ export default class TwoDataMaps extends React.Component {
     const variableSpec = this.props.variable.representative;
     const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');
+    const displaySpec = this.getConfig('maps.displaySpec');
+    const logscale = wmsLogscale(displaySpec, variableSpec);
     return (
       <React.Fragment>
         <Row>
@@ -97,9 +99,10 @@ export default class TwoDataMaps extends React.Component {
                 path={'colourScale.note'}
                 placeholder={null}
                 className={styles.note}
+                data={{logscale}}
               />}
               variableSpec={variableSpec}
-              displaySpec={this.getConfig('maps.displaySpec')}
+              displaySpec={displaySpec}
             />
           </Col>
         </Row>
