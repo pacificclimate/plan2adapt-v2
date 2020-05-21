@@ -18,6 +18,9 @@ selectors:
     postfix: period
     default: 16
 
+dev:
+  visible: false
+
 summary:
   disabled: false
   tab: Summary
@@ -213,8 +216,8 @@ maps:
     fallback:
       palette: seq-Oranges
       logscale: false
+      belowMinColor: white
       aboveMaxColor: black
-      belowMinColor: black
       range:
         min: -50
         max: 50
@@ -240,6 +243,8 @@ maps:
     pr:
       palette: seq-Greens
       logscale: true
+      belowMinColor: white
+      aboveMaxColor: black
       range:
         min: 10
         max: 10000

@@ -1,39 +1,62 @@
-.wrapper {
+.all {
+    overflow: hidden;
+    text-align: center;
+}
+
+.allColours {
     margin-left: auto;
     margin-right: auto;
-    padding: 10px;
-    width: 320px;  /* for nominal 300px height */
+    border: 1px solid lightgrey;
 }
 
-.wrapper .label {
-    text-align: center;
-    margin-bottom: -0.4rem;
-}
-
-.wrapper .image {
+.image {
+    display: inline-block;
+    position: relative;
     transform: rotate(90deg);
     transform-origin: bottom right;
-    margin-top: -300px;  /* for nominal 300px height */
     margin-bottom: 0px;
 }
 
+.belowabove {
+    position: relative;
+    display: inline-block;
+}
+
 .ticks {
+    display: inline-block;
     position: relative;
     height: 20px;
+    width: 800px;
 }
 
 .ticks span {
     font-size: 90%;
     position: absolute;
-    top: -10px;
-    border-left: 1px solid darkgrey;
+    top: 0px;
+    border-left: 1px solid black;
     padding-left: 3px;
     line-height: 0px;
     padding-top: 10px;
+    padding-bottom: 0px;
 }
 
-.wrapper .note {
+.belowaboveLabels {
+    position: relative;
+    display: inline-block;
+    top: -1.7em;
+    font-size: 90%;
+    color: white;
+    mix-blend-mode: exclusion;
+}
+
+.label {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: -0.4rem;
+}
+
+.note {
     font-size: 80%;
     text-align: center;
-    margin-top: -0.75rem;
+    /*margin-top: -0.75rem;*/
 }
