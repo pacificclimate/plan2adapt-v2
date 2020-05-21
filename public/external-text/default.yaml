@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: summary
+    default: dev
 
 selectors:
   prologue: I am interested in information about projected climate change ...
