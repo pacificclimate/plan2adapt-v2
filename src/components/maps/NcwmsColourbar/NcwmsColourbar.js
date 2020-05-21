@@ -28,6 +28,7 @@ import getOr from 'lodash/fp/getOr';
 import identity from 'lodash/fp/identity';
 import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
+import union from 'lodash/fp/union';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
@@ -35,7 +36,9 @@ import {
   wmsLogscale,
   wmsNumcolorbands,
   wmsPalette,
-  wmsTicks
+  wmsTicks,
+  wmsAboveMaxColor,
+  wmsBelowMinColor,
 } from '../map-utils';
 
 
@@ -56,14 +59,17 @@ const getColorbarURI = (displaySpec, variableSpec, width, height) =>
 
 export default class NcwmsColourbar extends React.Component {
   static propTypes = {
-    // TODO: Change names
     breadth: PropTypes.number,
+    // Size of smaller (vertical) dimension, px.
+
     length: PropTypes.number,
-    belowMinColor: PropTypes.string,
-    aboveMaxColor: PropTypes.string,
+    // Fraction (%) of width of container that colourbar proper occupies.
 
     title: PropTypes.element,
+    // Title element, placed above colourbar
+
     note: PropTypes.element,
+    // Note element, placed below colourbar
 
     variableSpec: PropTypes.object,
 
@@ -73,9 +79,7 @@ export default class NcwmsColourbar extends React.Component {
 
   static defaultProps = {
     breadth: 20,
-    length: 600,
-    belowMinColor: 'black',
-    aboveMaxColor: 'gray',
+    length: 80,
   };
 
   constructor(props) {
@@ -85,7 +89,7 @@ export default class NcwmsColourbar extends React.Component {
 
   render() {
     const {
-      breadth, length, belowMinColor, aboveMaxColor,
+      breadth, length,
       heading, note, displaySpec, variableSpec,
     } = this.props;
 
@@ -100,7 +104,10 @@ export default class NcwmsColourbar extends React.Component {
 
     const belowAboveLength = (100 - length) /2;  //%
     const width = getOr(0, 'current.offsetWidth', this.thing);
-    const imageWidth = width * length / 100;
+    const imageWidth = Math.round(width * length / 100);
+
+    const belowMinColor = wmsBelowMinColor(displaySpec, variableSpec);
+    const aboveMaxColor = wmsAboveMaxColor(displaySpec, variableSpec);
 
     return (
       <div className={styles.all} ref={this.thing}>
@@ -118,7 +125,7 @@ export default class NcwmsColourbar extends React.Component {
             className={styles.image}
             style={{
               height: imageWidth,
-              'margin-top': -imageWidth + breadth/2,
+              'margin-top': -imageWidth,
               'margin-left': -breadth,
               'margin-right': `${length}%`,
             }}
@@ -126,7 +133,7 @@ export default class NcwmsColourbar extends React.Component {
               displaySpec,
               variableSpec,
               breadth,
-              Math.round(imageWidth)
+              imageWidth
             )}
           />
           <span
