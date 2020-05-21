@@ -55,28 +55,6 @@ export default class DevColourbar extends React.Component {
             <div>Other stuff</div>
           </Col>
         </Row>
-
-        {/*<Row>*/}
-        {/*  <Col lg={12}>*/}
-        {/*    <NcwmsColourbar*/}
-        {/*      breadth={20}*/}
-        {/*      length={80}*/}
-        {/*      heading={<T*/}
-        {/*        path='colourScale.label'*/}
-        {/*        data={getVariableInfo(variableConfig, variable, 'absolute')}*/}
-        {/*        placeholder={null}*/}
-        {/*        className={styles.label}*/}
-        {/*      />}*/}
-        {/*      note={<T*/}
-        {/*        path={'colourScale.note'}*/}
-        {/*        placeholder={null}*/}
-        {/*        className={styles.note}*/}
-        {/*      />}*/}
-        {/*      variableSpec={variableSpec}*/}
-        {/*      displaySpec={this.getConfig('maps.displaySpec')}*/}
-        {/*    />*/}
-        {/*  </Col>*/}
-        {/*</Row>*/}
       </React.Fragment>
     );
   }

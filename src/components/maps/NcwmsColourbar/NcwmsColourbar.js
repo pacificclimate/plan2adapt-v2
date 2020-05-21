@@ -18,9 +18,6 @@
 //  - At present the colour bar is rendered only horizontally (i.e., the
 //    colour variation runs horizontally, and the whole thing is wider than
 //    high.
-//
-//  - Props `breadth` and `length` are for the unrotated (vertical) graphic;
-//    so their meaning is reversed in the rendered graphic. Confusing, sorry.
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -63,7 +60,7 @@ export default class NcwmsColourbar extends React.Component {
     // Size of smaller (vertical) dimension, px.
 
     length: PropTypes.number,
-    // Fraction (%) of width of container that colourbar proper occupies.
+    // Fraction (%) of width of container that colourbar graphic occupies.
 
     title: PropTypes.element,
     // Title element, placed above colourbar
@@ -131,12 +128,7 @@ export default class NcwmsColourbar extends React.Component {
               'margin-left': -breadth,
               'margin-right': `${length}%`,
             }}
-            src={getColorbarURI(
-              displaySpec,
-              variableSpec,
-              breadth,
-              imageWidth
-            )}
+            src={getColorbarURI(displaySpec, variableSpec, breadth, imageWidth)}
           />
           <span
             className={styles.belowabove}
@@ -166,11 +158,7 @@ export default class NcwmsColourbar extends React.Component {
                 const position =
                   (scaleOperator(tick) - rangeScale.min) / rangeSpan;
                 return (
-                  <span
-                    style={{
-                      left: `${position * 100}%`
-                    }}
-                  >
+                  <span style={{ left: `${position * 100}%` }}>
                     {tick}
                   </span>
                 )
