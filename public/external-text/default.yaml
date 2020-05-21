@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: dev
+    default: summary
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -17,6 +17,9 @@ selectors:
     prefix: for a typical
     postfix: period
     default: 16
+
+dev:
+  visible: false
 
 summary:
   disabled: false

@@ -137,6 +137,7 @@ export default class App extends Component {
               id={'main'}
               defaultActiveKey={getConfig('app.tabs.default')}
             >
+              {getConfig('dev.visible') &&
               <Tab
                 eventKey={'dev'}
                 title={'Dev'}
@@ -169,6 +170,7 @@ export default class App extends Component {
                   variable={get('value', this.state.variable)}
                 />
               </Tab>
+              }
 
               <Tab
                 eventKey={'summary'}
