@@ -24,6 +24,7 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
+import getOr from 'lodash/fp/getOr';
 import identity from 'lodash/fp/identity';
 import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
@@ -58,6 +59,8 @@ export default class NcwmsColourbar extends React.Component {
     // TODO: Change names
     breadth: PropTypes.number,
     length: PropTypes.number,
+    belowMinColor: PropTypes.string,
+    aboveMaxColor: PropTypes.string,
 
     title: PropTypes.element,
     note: PropTypes.element,
@@ -71,11 +74,21 @@ export default class NcwmsColourbar extends React.Component {
   static defaultProps = {
     breadth: 20,
     length: 600,
+    belowMinColor: 'black',
+    aboveMaxColor: 'gray',
   };
 
+  constructor(props) {
+    super(props);
+    this.thing = React.createRef();
+  }
+
   render() {
-    const { breadth, length, heading, note, displaySpec, variableSpec  } =
-      this.props;
+    const {
+      breadth, length, belowMinColor, aboveMaxColor,
+      heading, note, displaySpec, variableSpec,
+    } = this.props;
+
     const logscale = wmsLogscale(displaySpec, variableSpec);
     const scaleOperator = logscale ? Math.log : identity;
     const range = mapValues(
@@ -84,49 +97,74 @@ export default class NcwmsColourbar extends React.Component {
     );
     const rangeSpan = range.max - range.min;
     const ticks = wmsTicks(displaySpec, variableSpec);
+
+    const belowAboveLength = (100 - length) /2;  //%
+    const width = getOr(0, 'current.offsetWidth', this.thing);
+    const imageWidth = width * length / 100;
+
     return (
-      <div
-          className={styles.wrapper}
-          style={{ width: length + 20 }}
-        >
-          { heading }
+      <div className={styles.all} ref={this.thing}>
+        { heading }
+        <div className={styles.allColours}>
+          <span
+            className={styles.belowabove}
+            style={{
+              'background-color': belowMinColor,
+              height: breadth,
+              width: `${belowAboveLength}%`,
+            }}
+          />
           <img
             className={styles.image}
             style={{
-              'margin-top': -length,
+              height: imageWidth,
+              'margin-top': -imageWidth + breadth/2,
               'margin-left': -breadth,
+              'margin-right': `${length}%`,
             }}
             src={getColorbarURI(
               displaySpec,
               variableSpec,
               breadth,
-              length
+              Math.round(imageWidth)
             )}
           />
-          <div className={styles.ticks}>
-            {
-              // <span>s containing tick labels are positioned relative to
-              // their enclosing div; a value of `left` in % makes it very
-              // easy to place them correctly.
-              map(
-                tick => {
-                  const position =
-                    (scaleOperator(tick) - range.min) / rangeSpan;
-                  return (
-                    <span
-                      style={{
-                        left: `${position * 100}%`
-                      }}
-                    >
-                      {tick}
-                    </span>
-                  )
-                }
-              )(ticks)
-            }
-          </div>
-          { note }
+          <span
+            className={styles.belowabove}
+            style={{
+              'background-color': aboveMaxColor,
+              height: breadth,
+              width: `${belowAboveLength}%`,
+            }}
+          />
         </div>
+        <div
+          className={styles.ticks}
+          style={{ width: `${length}%` }}
+        >
+          {
+            // <span>s containing tick labels are positioned relative to
+            // their enclosing div; a value of `left` in % makes it very
+            // easy to place them correctly.
+            map(
+              tick => {
+                const position =
+                  (scaleOperator(tick) - range.min) / rangeSpan;
+                return (
+                  <span
+                    style={{
+                      left: `${position * 100}%`
+                    }}
+                  >
+                    {tick}
+                  </span>
+                )
+              }
+            )(ticks)
+          }
+        </div>
+        { note }
+      </div>
     );
   }
 }

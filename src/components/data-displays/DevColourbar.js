@@ -31,7 +31,7 @@ export default class DevColourbar extends React.Component {
         <Col lg={12}>
           <NcwmsColourbar
             breadth={20}
-            length={600}
+            length={80}
             heading={<T
               path='colourScale.label'
               data={getVariableInfo(variableConfig, variable, 'absolute')}
