@@ -95,11 +95,9 @@ export default class NcwmsColourbar extends React.Component {
 
     const logscale = wmsLogscale(displaySpec, variableSpec);
     const scaleOperator = logscale ? Math.log : identity;
-    const range = mapValues(
-      scaleOperator,
-      wmsDataRange(displaySpec, variableSpec)
-    );
-    const rangeSpan = range.max - range.min;
+    const range = wmsDataRange(displaySpec, variableSpec);
+    const rangeScale = mapValues(scaleOperator, range);
+    const rangeSpan = rangeScale.max - rangeScale.min;
     const ticks = wmsTicks(displaySpec, variableSpec);
 
     const belowAboveLength = (100 - length) /2;  //%
@@ -111,8 +109,12 @@ export default class NcwmsColourbar extends React.Component {
 
     return (
       <div className={styles.all} ref={this.thing}>
+        <div></div>
         { heading }
-        <div className={styles.allColours}>
+        <div
+          className={styles.allColours}
+          style={{ height: breadth + 2 }}
+        >
           <span
             className={styles.belowabove}
             style={{
@@ -125,6 +127,7 @@ export default class NcwmsColourbar extends React.Component {
             className={styles.image}
             style={{
               height: imageWidth,
+              top: 5,
               'margin-top': -imageWidth,
               'margin-left': -breadth,
               'margin-right': `${length}%`,
@@ -146,6 +149,12 @@ export default class NcwmsColourbar extends React.Component {
           />
         </div>
         <div
+          className={styles.xxx}
+          style={{ width: `${belowAboveLength}%`}}
+        >
+          {'<'} {range.min}
+        </div>
+        <div
           className={styles.ticks}
           style={{ width: `${length}%` }}
         >
@@ -156,7 +165,7 @@ export default class NcwmsColourbar extends React.Component {
             map(
               tick => {
                 const position =
-                  (scaleOperator(tick) - range.min) / rangeSpan;
+                  (scaleOperator(tick) - rangeScale.min) / rangeSpan;
                 return (
                   <span
                     style={{
@@ -169,6 +178,12 @@ export default class NcwmsColourbar extends React.Component {
               }
             )(ticks)
           }
+        </div>
+        <div
+          className={styles.xxx}
+          style={{ width: `${belowAboveLength}%`}}
+        >
+          {'>'} {range.max}
         </div>
         { note }
       </div>
