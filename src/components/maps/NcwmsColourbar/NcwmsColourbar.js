@@ -109,7 +109,6 @@ export default class NcwmsColourbar extends React.Component {
 
     return (
       <div className={styles.all} ref={this.thing}>
-        <div></div>
         { heading }
         <div
           className={styles.allColours}
@@ -149,7 +148,7 @@ export default class NcwmsColourbar extends React.Component {
           />
         </div>
         <div
-          className={styles.xxx}
+          className={styles.belowaboveLabels}
           style={{ width: `${belowAboveLength}%`}}
         >
           {'<'} {range.min}
@@ -180,7 +179,7 @@ export default class NcwmsColourbar extends React.Component {
           }
         </div>
         <div
-          className={styles.xxx}
+          className={styles.belowaboveLabels}
           style={{ width: `${belowAboveLength}%`}}
         >
           {'>'} {range.max}

@@ -22,19 +22,11 @@
     display: inline-block;
 }
 
-.belowabove span {
-    font-size: 90%;
-    color: white;
-    mix-blend-mode: difference;
-}
-
 .ticks {
     display: inline-block;
     position: relative;
     height: 20px;
     width: 800px;
-    /*margin-left: auto;*/
-    /*margin-right: auto;*/
 }
 
 .ticks span {
@@ -48,7 +40,7 @@
     padding-bottom: 0px;
 }
 
-.xxx {
+.belowaboveLabels {
     position: relative;
     display: inline-block;
     top: -1.7em;
