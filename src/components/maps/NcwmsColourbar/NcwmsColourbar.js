@@ -19,7 +19,7 @@
 //    colour variation runs horizontally, and the whole thing is wider than
 //    high.
 //
-//  - Props `width` and `height` are for the unrotated (vertical) graphic;
+//  - Props `breadth` and `length` are for the unrotated (vertical) graphic;
 //    so their meaning is reversed in the rendered graphic. Confusing, sorry.
 
 import PropTypes from 'prop-types';
@@ -56,8 +56,8 @@ const getColorbarURI = (displaySpec, variableSpec, width, height) =>
 export default class NcwmsColourbar extends React.Component {
   static propTypes = {
     // TODO: Change names
-    width: PropTypes.number,
-    height: PropTypes.number,
+    breadth: PropTypes.number,
+    length: PropTypes.number,
 
     title: PropTypes.element,
     note: PropTypes.element,
@@ -69,12 +69,12 @@ export default class NcwmsColourbar extends React.Component {
   };
 
   static defaultProps = {
-    width: 20,
-    height: 300,
+    breadth: 20,
+    length: 600,
   };
 
   render() {
-    const { width, height, heading, note, displaySpec, variableSpec  } =
+    const { breadth, length, heading, note, displaySpec, variableSpec  } =
       this.props;
     const logscale = wmsLogscale(displaySpec, variableSpec);
     const scaleOperator = logscale ? Math.log : identity;
@@ -87,20 +87,20 @@ export default class NcwmsColourbar extends React.Component {
     return (
       <div
           className={styles.wrapper}
-          style={{ width: height + 20 }}
+          style={{ width: length + 20 }}
         >
           { heading }
           <img
             className={styles.image}
             style={{
-              'margin-top': -height,
-              'margin-left': -width,
+              'margin-top': -length,
+              'margin-left': -breadth,
             }}
             src={getColorbarURI(
               displaySpec,
               variableSpec,
-              width,
-              height
+              breadth,
+              length
             )}
           />
           <div className={styles.ticks}>

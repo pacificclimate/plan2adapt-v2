@@ -2,7 +2,7 @@
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
-    width: 320px;  /* for nominal 300px height */
+    width: 320px;  /* for nominal 300px length */
 }
 
 .wrapper .label {
@@ -13,7 +13,7 @@
 .wrapper .image {
     transform: rotate(90deg);
     transform-origin: bottom right;
-    margin-top: -300px;  /* for nominal 300px height */
+    margin-top: -300px;  /* for nominal 300px length */
     margin-bottom: 0px;
 }
 

@@ -85,8 +85,8 @@ export default class TwoDataMaps extends React.Component {
         <Row>
           <Col lg={12}>
             <NcwmsColourbar
-              width={20}
-              height={600}
+              breadth={20}
+              length={600}
               heading={<T
                 path='colourScale.label'
                 data={getVariableInfo(variableConfig, variable, 'absolute')}
