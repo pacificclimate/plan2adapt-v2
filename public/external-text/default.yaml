@@ -347,14 +347,6 @@ about:
   tabs:
     - tab: Plan2Adapt
       cards:
-        - header: Beta Release
-          bg: info
-          text: light
-          body: |
-            This is a beta (pre-production) release. It demonstrates the capabilities of Plan2Adapt,
-            but not all features are present or in their final form. We welcome feedback from users (see Contact tab)
-            on any facet of this tool.
-
         - header: Description
           body: |
             Plan2Adapt generates maps, plots, and data describing projected future climate conditions
