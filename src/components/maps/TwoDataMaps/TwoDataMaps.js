@@ -27,6 +27,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import Loader from 'react-loader';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
@@ -77,6 +78,15 @@ export default class TwoDataMaps extends React.Component {
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
   render() {
+    if (!(
+      this.props.region &&
+      this.props.futureTimePeriod &&
+      this.props.variable &&
+      this.props.season
+    )) {
+      console.log('### TwoDataMaps: unsettled props', this.props)
+      return <Loader/>
+    }
     const variableSpec = this.props.variable.representative;
     const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');
@@ -99,7 +109,7 @@ export default class TwoDataMaps extends React.Component {
                 path={'colourScale.note'}
                 placeholder={null}
                 className={styles.note}
-                data={{logscale}}
+                data={{ logscale }}
               />}
               variableSpec={variableSpec}
               displaySpec={displaySpec}
