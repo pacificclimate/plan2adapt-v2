@@ -119,17 +119,24 @@ export default class NcwmsColourbar extends React.Component {
               width: `${belowAboveLength}%`,
             }}
           />
-          <img
-            className={styles.image}
-            style={{
-              height: imageWidth,
-              top: 5,
-              'margin-top': -imageWidth,
-              'margin-left': -breadth,
-              'margin-right': `${length}%`,
-            }}
-            src={getColorbarURI(displaySpec, variableSpec, breadth, imageWidth)}
-          />
+          {
+            // Zero values for imageWidth provoke a 500 error from ncWMS.
+            // Avoid this. It does not suffice to render null from this
+            // component if this condition is violated; it has to have a chance
+            // to render an actual DOM element: hence this.
+            imageWidth &&
+            <img
+              className={styles.image}
+              style={{
+                height: imageWidth,
+                top: 5,
+                'margin-top': -imageWidth,
+                'margin-left': -breadth,
+                'margin-right': `${length}%`,
+              }}
+              src={getColorbarURI(displaySpec, variableSpec, breadth, imageWidth)}
+            />
+          }
           <span
             className={styles.belowabove}
             style={{
