@@ -109,8 +109,9 @@ class DataMapDisplay extends React.Component {
   });
 
   render() {
-    const { region, timePeriod, season, variable, popup, fileMetadata, ...rest }
-      = this.props;
+    const {
+      children, region, timePeriod, season, variable, popup, fileMetadata, ...rest
+    } = this.props;
 
     return (
       <CanadaBaseMap
@@ -129,6 +130,7 @@ class DataMapDisplay extends React.Component {
           <LayerValuePopup{...popup} onClose={this.handleClosePopup}/>
         }
         <SimpleGeoJSON data={region} fill={false}/>
+        { children }
       </CanadaBaseMap>
     );
   }
