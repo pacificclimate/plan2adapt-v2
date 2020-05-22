@@ -11,7 +11,7 @@ node {
 
     stage('Build Image') {
         def commitish = sh(returnStdout: true, script: './generate-commitish.sh').trim()
-        def options = [buildArgs: "--pull --build-arg REACT_APP_CE_CURRENT_VERSION='${commitish}' ."]
+        def options = [buildArgs: "--pull --build-arg REACT_APP_VERSION='${commitish}' ."]
         image = buildDockerImage(imageName, options)
     }
 
