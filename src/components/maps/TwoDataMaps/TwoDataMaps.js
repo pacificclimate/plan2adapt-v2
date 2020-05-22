@@ -74,7 +74,11 @@ export default class TwoDataMaps extends React.Component {
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
-  handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
+  handleChangeViewport = viewport => {
+    // When viewport is changed, remove bounds so that viewport takes
+    // precedence.
+    this.setState({ bounds: undefined, viewport })
+  }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
   render() {
