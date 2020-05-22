@@ -35,6 +35,8 @@ import NcwmsColourbar from '../NcwmsColourbar';
 import { regionBounds, wmsLogscale } from '../map-utils';
 import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
+import Button from 'react-bootstrap/Button';
+import StaticControl from '../StaticControl';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -81,6 +83,9 @@ export default class TwoDataMaps extends React.Component {
   }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
+  zoomToRegion = () =>
+    this.setState({ bounds: regionBounds(this.props.region)});
+
   render() {
     if (!(
       this.props.region &&
@@ -96,6 +101,19 @@ export default class TwoDataMaps extends React.Component {
     const variableConfig = this.getConfig('variables');
     const displaySpec = this.getConfig('maps.displaySpec');
     const logscale = wmsLogscale(displaySpec, variableSpec);
+    const zoomButton = (
+      <StaticControl position='topright'>
+        <Button
+          variant="outline-primary"
+          size={'sm'}
+          onClick={this.zoomToRegion}
+          style={{ zIndex: 99999 }}
+        >
+          Zoom to region
+        </Button>
+      </StaticControl>
+    );
+
     return (
       <React.Fragment>
         <Row>
@@ -138,7 +156,9 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
-            />
+            >
+              {zoomButton}
+            </DataMap>
           </Col>
           <Col lg={6}>
             <T path='maps.projected.title' data={{
@@ -157,7 +177,9 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
-            />
+            >
+              {zoomButton}
+            </DataMap>
           </Col>
         </Row>
       </React.Fragment>
