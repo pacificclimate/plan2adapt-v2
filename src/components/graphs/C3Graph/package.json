@@ -1,0 +1,6 @@
+{
+  "name": "C3Graph",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./C3Graph.js"
+}
