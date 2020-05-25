@@ -30,15 +30,9 @@ export default class C3Graph extends React.Component {
 
   renderGraph = () => {
     console.log('### C3Graph.renderGraph')
-    console.log('### C3Graph.renderGraph: node', this.node)
     this.graph = c3.generate({
       bindto: this.node.current,
-      data: {
-        columns: [
-          ['data1', 30, 200, 100, 400, 150, 250],
-          ['data2', 50, 20, 10, 40, 15, 25]
-        ]
-      },
+      ...this.props,
     })
   }
 
