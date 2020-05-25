@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import get from 'lodash/fp/get';
+import C3Graph from '../C3Graph';
 
 
 export default class ChangeOverTimeGraph extends React.Component {
@@ -15,16 +16,9 @@ export default class ChangeOverTimeGraph extends React.Component {
   };
 
   render() {
+    // Let's try this from the ground up
     return (
-      <div className={'data'}>
-        {`
-          Graph:
-          ${get('label', this.state.region)},
-          ${get('label', this.props.season)},
-          ${get('label', this.props.variable)}
-          vs. Time period
-        `}
-      </div>
+      <C3Graph/>
     );
   }
 }
