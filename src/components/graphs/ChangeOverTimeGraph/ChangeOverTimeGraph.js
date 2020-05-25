@@ -1,7 +1,22 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import get from 'lodash/fp/get';
+import Button from 'react-bootstrap/Button';
 import C3Graph from '../C3Graph';
+
+const datas = [
+  {
+    columns: [
+      ['data1', 30, 200, 100, 400, 150, 250],
+      ['data2', 50, 20, 10, 40, 15, 25]
+    ]
+  },
+  {
+    columns: [
+      ['data1', 400, 150, 250, 30, 200, 100, ],
+      ['data2', 40, 15, 25, 50, 20, 10]
+    ]
+  }
+]
 
 
 export default class ChangeOverTimeGraph extends React.Component {
@@ -13,19 +28,24 @@ export default class ChangeOverTimeGraph extends React.Component {
   };
 
   state = {
+    dataIndex: 0,
   };
+
+  toggle = () => this.setState({ dataIndex: 1-this.state.dataIndex })
 
   render() {
     // Let's try this from the ground up
     return (
-      <C3Graph
-        data={{
-          columns: [
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 50, 20, 10, 40, 15, 25]
-          ]
-        }}
-      />
+      <React.Fragment>
+        <Button
+          onClick={this.toggle}
+        >
+          Toggle Data
+        </Button>
+        <C3Graph
+          data={datas[this.state.dataIndex]}
+        />
+      </React.Fragment>
     );
   }
 }

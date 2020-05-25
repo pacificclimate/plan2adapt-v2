@@ -1,5 +1,8 @@
 // This component wraps the package c3 so that it can be used conveniently
-// in React.
+// in React. This component offers a very static version of C3: It just
+// generates a graph based on the props, nothing more. Props change, graph
+// changes, but only in the sense that a new one is generated. There is no
+// equivalent of dynamic features like c3.load, for example.
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -8,6 +11,9 @@ import 'c3/c3.css';
 
 export default class C3Graph extends React.Component {
   static propTypes = {
+    // Props for this component are top-level options for C3.
+    // I'm too lazy at the moment to define them all here. Key ones are
+    // size, color, data, axis, legend, ...
   };
 
   state = {
@@ -19,17 +25,14 @@ export default class C3Graph extends React.Component {
   }
 
   componentDidMount() {
-    console.log('### C3Graph.componentDidMount')
     this.renderGraph();
   }
 
   componentDidUpdate() {
-    console.log('### C3Graph.componentDidUpdate')
     this.renderGraph();
   }
 
   renderGraph = () => {
-    console.log('### C3Graph.renderGraph')
     this.graph = c3.generate({
       bindto: this.node.current,
       ...this.props,
