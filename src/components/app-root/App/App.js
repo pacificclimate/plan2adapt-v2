@@ -24,7 +24,7 @@ import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
 import Summary from '../../data-displays/Summary';
-import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
+import ChangeOverTimeGraph from '../../graphs/ChangeOverTimeGraph';
 import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
