@@ -27,6 +27,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import Loader from 'react-loader';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../BCBaseMap';
@@ -34,6 +35,8 @@ import NcwmsColourbar from '../NcwmsColourbar';
 import { regionBounds, wmsLogscale } from '../map-utils';
 import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
+import Button from 'react-bootstrap/Button';
+import StaticControl from '../StaticControl';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -73,15 +76,44 @@ export default class TwoDataMaps extends React.Component {
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
-  handleChangeViewport = this.handleChangeSelection.bind(this, 'viewport');
+  handleChangeViewport = viewport => {
+    // When viewport is changed, remove bounds so that viewport takes
+    // precedence.
+    this.setState({ bounds: undefined, viewport })
+  }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
+  zoomToRegion = () =>
+    this.setState({ bounds: regionBounds(this.props.region)});
+
   render() {
+    if (!(
+      this.props.region &&
+      this.props.futureTimePeriod &&
+      this.props.variable &&
+      this.props.season
+    )) {
+      console.log('### TwoDataMaps: unsettled props', this.props)
+      return <Loader/>
+    }
     const variableSpec = this.props.variable.representative;
     const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');
     const displaySpec = this.getConfig('maps.displaySpec');
     const logscale = wmsLogscale(displaySpec, variableSpec);
+    const zoomButton = (
+      <StaticControl position='topright'>
+        <Button
+          variant="outline-primary"
+          size={'sm'}
+          onClick={this.zoomToRegion}
+          style={{ zIndex: 99999 }}
+        >
+          Zoom to region
+        </Button>
+      </StaticControl>
+    );
+
     return (
       <React.Fragment>
         <Row>
@@ -99,7 +131,7 @@ export default class TwoDataMaps extends React.Component {
                 path={'colourScale.note'}
                 placeholder={null}
                 className={styles.note}
-                data={{logscale}}
+                data={{ logscale }}
               />}
               variableSpec={variableSpec}
               displaySpec={displaySpec}
@@ -124,7 +156,9 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
-            />
+            >
+              {zoomButton}
+            </DataMap>
           </Col>
           <Col lg={6}>
             <T path='maps.projected.title' data={{
@@ -143,7 +177,9 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
-            />
+            >
+              {zoomButton}
+            </DataMap>
           </Col>
         </Row>
       </React.Fragment>
