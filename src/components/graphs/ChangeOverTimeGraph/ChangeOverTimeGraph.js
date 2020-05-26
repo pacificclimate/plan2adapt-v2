@@ -9,12 +9,14 @@ import curry from 'lodash/fp/curry';
 import tap from 'lodash/fp/tap';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
+import zipWith from 'lodash/fp/zipWith';
 import concat from 'lodash/fp/concat';
 import {
   getDisplayData,
   getPeriodData,
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
+import { middleDecade } from '../../../utils/time-periods';
 
 const datas = [
   {
@@ -82,8 +84,16 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const { futureTimePeriods, statistics } = this.props;
 
     const rows = concat(
-      [map(p => `${p}th`)(percentiles)],
-      map('percentiles')(statistics),
+      // Curve names: The first, 'time' is the x (horizontal) axis.
+      // The rest are the names of the various percentile-vs-time curves.
+      [concat(['time'], map(p => `${p}th`)(percentiles))],
+
+      // Zip the time axis value onto the front of the percentile data values.
+      zipWith(
+        (ftp, pileValues) => concat([middleDecade(ftp)], pileValues),
+        futureTimePeriods,
+        map('percentiles')(statistics)
+      ),
     );
     console.log('### ChangeOverTimeGraph.render: rows', rows)
 
@@ -91,6 +101,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       <React.Fragment>
         <C3Graph
           data={{
+            x: 'time',
             rows
           }}
         />
