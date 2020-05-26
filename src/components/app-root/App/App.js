@@ -296,7 +296,19 @@ export default class App extends Component {
                   </Col>
                   <Col lg={6}>
                     <ChangeOverTimeGraph
-                      {...this.state}
+                      region={get('value', this.state.region)}
+                      historicalTimePeriod={{
+                        start_date: 1961,
+                        end_date: 1990,
+                      }}
+                      season={get('value', this.state.season)}
+                      variable={get('value', this.state.variable)}
+                      // TODO: Get this from config
+                      futureTimePeriods={[
+                        { start_date: "2010", end_date: "2039"  },
+                        { start_date: "2040", end_date: "2069"  },
+                        { start_date: "2070", end_date: "2099"  },
+                      ]}
                     />
                   </Col>
                 </Row>
