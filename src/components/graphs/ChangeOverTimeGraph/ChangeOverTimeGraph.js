@@ -9,7 +9,6 @@ import curry from 'lodash/fp/curry';
 import tap from 'lodash/fp/tap';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
-import transpose from 'lodash/fp/zipAll';  // Yes, it functions as transpose
 import concat from 'lodash/fp/concat';
 import {
   getDisplayData,
@@ -82,18 +81,17 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   render() {
     const { futureTimePeriods, statistics } = this.props;
 
-    // Transform the statistics data into the form consumed by C3.
-    const statsTranspose = transpose(map('percentiles')(statistics));
-    const columns = map(
-      ([p, values]) => concat([`${p}th`], values)
-    )(zip(percentiles, statsTranspose));
-    console.log('### ChangeOverTimeGraph.render: columns', columns)
+    const rows = concat(
+      [map(p => `${p}th`)(percentiles)],
+      map('percentiles')(statistics),
+    );
+    console.log('### ChangeOverTimeGraph.render: rows', rows)
 
     return (
       <React.Fragment>
         <C3Graph
           data={{
-            columns
+            rows
           }}
         />
       </React.Fragment>
