@@ -17,6 +17,7 @@ import {
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
 import { middleDecade } from '../../../utils/time-periods';
+import { concatAll } from '../../../utils/lodash-fp-extras';
 
 const datas = [
   {
@@ -48,6 +49,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     region: PropTypes.any,
     season: PropTypes.any,
     variable: PropTypes.any,
+
+    historicalTimePeriod: PropTypes.object,
+    // The time period of the historical baseline dataset.
+
     futureTimePeriods: PropTypes.array.isRequired,
     // The future time periods to graph, in temporal order.
     // Layout:
@@ -81,12 +86,16 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   toggle = () => this.setState({ dataIndex: 1-this.state.dataIndex })
 
   render() {
-    const { futureTimePeriods, statistics } = this.props;
+    const { historicalTimePeriod, futureTimePeriods, statistics } = this.props;
 
-    const rows = concat(
+    const rows = concatAll([
       // Curve names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
       [concat(['time'], map(p => `${p}th`)(percentiles))],
+
+      // Place a zero for the historical time period "anomaly", which is the
+      // first point in each series.
+      [concat(middleDecade(historicalTimePeriod), map(p => 0)(percentiles))],
 
       // Zip the time axis value onto the front of the percentile data values.
       zipWith(
@@ -94,7 +103,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         futureTimePeriods,
         map('percentiles')(statistics)
       ),
-    );
+    ]);
     console.log('### ChangeOverTimeGraph.render: rows', rows)
 
     return (
@@ -126,8 +135,9 @@ const convertToDisplayData = curry((variableId, season, data) => {
 
 
 const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
-  // Return (a promise for) the summary statistics to be displayed in the
-  // Graphs tab.
+  // Return (a promise for) the statistics to be displayed in the Graphs tab.
+  // These are "summary" statistics, which are stats across the ensemble of
+  // models driving this app.
   {
     const variableId = variable.representative.variable_id;
     return Promise.all(
@@ -142,9 +152,7 @@ const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
           console.error('Failed to fetch summary statistics:\n', err);
           return undefined;
         })
-        .then(tap(x => console.log('### stats:', x)))
         .then(convertToDisplayData(variableId, season))
-        .then(tap(x => console.log('### stats filtered:', x)))
       )(futureTimePeriods)
     );
   }
