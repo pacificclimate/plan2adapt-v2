@@ -302,7 +302,7 @@ export default class App extends Component {
                       // TODO: This may be better obtained from metadata
                       futureTimePeriods={
                         getConfig('graph.config.futureTimePeriods')}
-                      graphVarConfig={getConfig('graph.config.variables')}
+                      graphConfig={getConfig('graph.config')}
                       variableConfig={getConfig('variables')}
                       unitsConversions={getConfig('units')}
                     />

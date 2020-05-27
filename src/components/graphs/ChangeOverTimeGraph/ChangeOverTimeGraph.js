@@ -66,7 +66,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // There is one item per element of futureTimePeriods, in corresponding
     // order.
 
-    graphVarConfig: PropTypes.object.isRequired,
+    graphConfig: PropTypes.object.isRequired,
     // Object mapping variable id to information used to control the appearance
     // of the graph for that variable.
 
@@ -92,7 +92,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const {
       variable,
       historicalTimePeriod, futureTimePeriods, statistics,
-      graphVarConfig, variableConfig, unitsConversions,
+      graphConfig, variableConfig, unitsConversions,
     } = this.props;
 
     // Because we receive the main data to be displayed, `props.statistics`
@@ -119,7 +119,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // units.
     // TODO: Robusticate
     const variableId = variable.representative.variable_id;
-    const display = graphVarConfig[variableId].display;
+    const display = graphConfig.variables[variableId].display;
     const displayUnits =
       getVariableDisplayUnits(variableConfig, variableId, display);
     const convertUnits =
