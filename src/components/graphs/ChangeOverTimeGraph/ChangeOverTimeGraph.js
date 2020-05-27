@@ -67,8 +67,28 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       historicalTimePeriod, futureTimePeriods, statistics
     } = this.props;
 
+    // Because we receive the main data to be displayed, `props.statistics`
+    // in what C3 calls rows, we use the `data.rows` option in C3 to pass the
+    // data. Rows data is submitted in the following layout:
+    //
+    // rows: [
+    //   ['name1', 'name2', 'name3'], // names of datasets
+    //   [90, 120, 300], // first datum for name1, name2, name3
+    //   [40, 160, 240], // second datum for name1, name2, name3
+    //   [50, 200, 290], // etc.
+    //   ...
+    // ]
+    //
+    // The statistics data is not the whole of what needs to be on the graph.
+    // We must add:
+    //  - A data column for the time axis
+    //  - A data row of zero value anomalies for the historical time period
+    //
+    // Note: The first element of each data row is the time point
+    // of that row. The rest are the data for each curve, at that time point.
+
     const rows = concatAll([
-      // Curve names: The first, 'time' is the x (horizontal) axis.
+      // Dataset names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
       [concat(['time'], map(p => `${p}th`)(percentiles))],
 
@@ -76,7 +96,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       // first point in each series.
       [concat(middleDecade(historicalTimePeriod), map(p => 0)(percentiles))],
 
-      // Zip the time axis value onto the front of the percentile data values.
+      // Now the data from the backend (props.statistics).
       zipWith(
         (ftp, pileValues) => concat([middleDecade(ftp)], pileValues),
         futureTimePeriods,
