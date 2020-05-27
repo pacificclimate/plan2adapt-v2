@@ -251,10 +251,7 @@ export default class App extends Component {
                 </Row>
                 <TwoDataMaps
                   region={get('value', this.state.region)}
-                  historicalTimePeriod={{
-                    start_date: 1961,
-                    end_date: 1990,
-                  }}
+                  historicalTimePeriod={baselineTimePeriod}
                   futureTimePeriod={futureTimePeriod}
                   season={get('value', this.state.season)}
                   variable={get('value', this.state.variable)}
@@ -299,10 +296,7 @@ export default class App extends Component {
                   <Col lg={12}>
                     <ChangeOverTimeGraph
                       region={get('value', this.state.region)}
-                      historicalTimePeriod={{
-                        start_date: 1961,
-                        end_date: 1990,
-                      }}
+                      historicalTimePeriod={baselineTimePeriod}
                       season={get('value', this.state.season)}
                       variable={get('value', this.state.variable)}
                       // TODO: This may be better obtained from metadata
