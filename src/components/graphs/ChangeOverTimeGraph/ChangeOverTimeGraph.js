@@ -12,7 +12,7 @@ import {
   getDisplayData,
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
-import { middleDecade } from '../../../utils/time-periods';
+import { middleYear } from '../../../utils/time-periods';
 import { concatAll } from '../../../utils/lodash-fp-extras';
 import {
   getConvertUnits,
@@ -136,11 +136,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
       // Place a zero for the historical time period "anomaly", which is the
       // first point in each series.
-      [concat(middleDecade(historicalTimePeriod), map(p => 0)(percentiles))],
+      [concat(middleYear(historicalTimePeriod), map(p => 0)(percentiles))],
 
       // Now the data from the backend (props.statistics).
       zipWith(
-        (ftp, pileValues) => concat([middleDecade(ftp)], pileValues),
+        (ftp, pileValues) => concat([middleYear(ftp)], pileValues),
         futureTimePeriods,
         percentileValuesByTimePeriod,
       ),
@@ -158,10 +158,18 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           }}
           axis={{
             x: {
-              type: 'category',
+              type: 'indexed',
               label: {
                 text: 'Time Period (middle year)',
                 position: 'outer-center',
+              },
+              min: 1960,
+              max: 2100,
+              tick: {
+                values: [
+                  1960, 1970, 1980, 1990, 2000, 2010, 2020,
+                  2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100
+                ],
               }
             },
             y: {
