@@ -154,7 +154,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     return (
       <React.Fragment>
         <C3Graph
-          size={{ height: 600 }}
+          {...graphConfig.c3}
           data={{
             x: 'time',
             rows,

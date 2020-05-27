@@ -280,8 +280,10 @@ graph:
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
   config:
-    size:
-      height: 600
+    c3:
+      # C3 option values to be passed directly in
+      size:
+        height: 600
     futureTimePeriods:
       # This may be better obtained from metadata
       - { start_date: "2010", end_date: "2039" }
