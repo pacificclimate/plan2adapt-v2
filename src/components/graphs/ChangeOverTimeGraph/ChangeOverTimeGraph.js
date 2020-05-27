@@ -1,38 +1,20 @@
-import PropTypes, { checkPropTypes } from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
-import Button from 'react-bootstrap/Button';
 import C3Graph from '../C3Graph';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import curry from 'lodash/fp/curry';
-import tap from 'lodash/fp/tap';
 import map from 'lodash/fp/map';
-import zip from 'lodash/fp/zip';
 import zipWith from 'lodash/fp/zipWith';
 import concat from 'lodash/fp/concat';
 import {
   getDisplayData,
-  getPeriodData,
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
 import { middleDecade } from '../../../utils/time-periods';
 import { concatAll } from '../../../utils/lodash-fp-extras';
 
-const datas = [
-  {
-    columns: [
-      ['data1', 30, 200, 100, 400, 150, 250],
-      ['data2', 50, 20, 10, 40, 15, 25]
-    ]
-  },
-  {
-    columns: [
-      ['data1', 400, 150, 250, 30, 200, 100, ],
-      ['data2', 40, 15, 25, 50, 20, 10]
-    ]
-  }
-];
 
 const percentiles = [10, 25, 50, 75, 90];
 
@@ -78,12 +60,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // There is one item per element of futureTimePeriods, in corresponding
     // order.
   };
-
-  state = {
-    dataIndex: 0,
-  };
-
-  toggle = () => this.setState({ dataIndex: 1-this.state.dataIndex })
 
   render() {
     const { historicalTimePeriod, futureTimePeriods, statistics } = this.props;
