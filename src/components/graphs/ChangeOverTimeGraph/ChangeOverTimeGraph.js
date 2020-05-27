@@ -62,7 +62,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   };
 
   render() {
-    const { historicalTimePeriod, futureTimePeriods, statistics } = this.props;
+    const {
+      variable,
+      historicalTimePeriod, futureTimePeriods, statistics
+    } = this.props;
 
     const rows = concatAll([
       // Curve names: The first, 'time' is the x (horizontal) axis.
@@ -82,12 +85,30 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     ]);
     console.log('### ChangeOverTimeGraph.render: rows', rows)
 
+    const units = statistics[0].units;
+
     return (
       <React.Fragment>
         <C3Graph
           data={{
             x: 'time',
-            rows
+            rows,
+          }}
+          axis={{
+            x: {
+              type: 'category',
+              label: {
+                text: 'Time Period (middle year)',
+                position: 'outer-center',
+              }
+            },
+            y: {
+              type: 'linear', // 'log' for precip vars?
+              label: {
+                text: `Change in ${variable.representative.variable_name} (${units})`,
+                position: 'outer-middle',
+              },
+            }
           }}
         />
       </React.Fragment>
