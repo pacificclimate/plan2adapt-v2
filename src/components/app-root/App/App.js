@@ -294,7 +294,9 @@ export default class App extends Component {
                       region: get('label', this.state.region),
                     }}/>
                   </Col>
-                  <Col lg={6}>
+                </Row>
+                <Row>
+                  <Col lg={12}>
                     <ChangeOverTimeGraph
                       region={get('value', this.state.region)}
                       historicalTimePeriod={{
