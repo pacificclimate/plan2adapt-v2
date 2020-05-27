@@ -14,6 +14,10 @@ import {
 } from '../../../utils/percentile-anomaly';
 import { middleDecade } from '../../../utils/time-periods';
 import { concatAll } from '../../../utils/lodash-fp-extras';
+import {
+  getConvertUnits,
+  getVariableDisplayUnits, getVariableInfo
+} from '../../../utils/variables-and-units';
 
 
 const percentiles = [10, 25, 50, 75, 90];
@@ -32,7 +36,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     season: PropTypes.any,
     variable: PropTypes.any,
 
-    historicalTimePeriod: PropTypes.object,
+    historicalTimePeriod: PropTypes.object.isRequired,
     // The time period of the historical baseline dataset.
 
     futureTimePeriods: PropTypes.array.isRequired,
@@ -43,7 +47,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //    ...
     //  ]
 
-    statistics: PropTypes.array,
+    statistics: PropTypes.array.isRequired,
     // This prop receives the data fetched from the backend according
     // props region, season, variable, and futureTimePeriods. (`withAsyncData`
     // injects this data.)
@@ -59,12 +63,34 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //
     // There is one item per element of futureTimePeriods, in corresponding
     // order.
+
+    graphVarConfig: PropTypes.object.isRequired,
+    // Object mapping variable id to information used to control the appearance
+    // of the graph for that variable.
+
+    variableConfig: PropTypes.object.isRequired,
+    // Object mapping (scientific) variable names (e.g., 'tasmean') to
+    // information used to process and display the variables. Typically this
+    // object will be retrieved from a configuration file, but that is not the
+    // job of this component.
+    //
+    // Example value: See configuration file, key 'variables'.
+    // TODO: Convert this to a more explicit PropType when the layout settles.
+
+    unitsConversions: PropTypes.object.isRequired,
+    // Object containing units conversions information.Typically this
+    // object will be retrieved from a configuration file, but that is not the
+    // job of this component.
+    //
+    // Example value: See configuration file, key 'units'.
+    // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
   render() {
     const {
       variable,
-      historicalTimePeriod, futureTimePeriods, statistics
+      historicalTimePeriod, futureTimePeriods, statistics,
+      graphVarConfig, variableConfig, unitsConversions,
     } = this.props;
 
     // Because we receive the main data to be displayed, `props.statistics`
@@ -87,6 +113,22 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // Note: The first element of each data row is the time point
     // of that row. The rest are the data for each curve, at that time point.
 
+    // Establish display units for variables, and convert data values to those
+    // units.
+    // TODO: Robusticate
+    const variableId = variable.representative.variable_id;
+    const display = graphVarConfig[variableId].display;
+    const displayUnits =
+      getVariableDisplayUnits(variableConfig, variableId, display);
+    const convertUnits =
+      getConvertUnits(unitsConversions, variableConfig, variableId);
+    const dataUnits = statistics[0].units;
+    const convertData = convertUnits(dataUnits, displayUnits);
+    const percentileValuesByTimePeriod = map(
+      stat => convertData(stat.percentiles)
+    )(statistics);
+
+    // Create the data rows for C3.
     const rows = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
@@ -100,12 +142,12 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       zipWith(
         (ftp, pileValues) => concat([middleDecade(ftp)], pileValues),
         futureTimePeriods,
-        map('percentiles')(statistics)
+        percentileValuesByTimePeriod,
       ),
     ]);
     console.log('### ChangeOverTimeGraph.render: rows', rows)
 
-    const units = statistics[0].units;
+    const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
       <React.Fragment>
@@ -125,7 +167,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
             y: {
               type: 'linear', // 'log' for precip vars?
               label: {
-                text: `Change in ${variable.representative.variable_name} (${units})`,
+                text: `Change in ${variableInfo.label} (${displayUnits})`,
                 position: 'outer-middle',
               },
             }

@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: summary
+    default: graph
 
 selectors:
   prologue: I am interested in information about projected climate change ...
@@ -276,9 +276,31 @@ maps:
       ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
 
 graph:
-  disabled: true
+  disabled: false
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
+  config:
+    futureTimePeriods:
+      # This may be better obtained from metadata
+      - { start_date: "2010", end_date: "2039" }
+      - { start_date: "2040", end_date: "2069" }
+      - { start_date: "2070", end_date: "2099" }
+    variables:
+      fallback:
+        display: absolute
+      ffd:
+        display: absolute
+      gdd:
+        display: absolute
+      hdd:
+        display: absolute
+      pr:
+        display: relative
+      prsn:
+        display: relative
+      tasmean:
+        display: absolute
+
 
 notes:
   disabled: false

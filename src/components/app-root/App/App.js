@@ -305,12 +305,12 @@ export default class App extends Component {
                       }}
                       season={get('value', this.state.season)}
                       variable={get('value', this.state.variable)}
-                      // TODO: Get this from config
-                      futureTimePeriods={[
-                        { start_date: "2010", end_date: "2039"  },
-                        { start_date: "2040", end_date: "2069"  },
-                        { start_date: "2070", end_date: "2099"  },
-                      ]}
+                      // TODO: This may be better obtained from metadata
+                      futureTimePeriods={
+                        getConfig('graph.config.futureTimePeriods')}
+                      graphVarConfig={getConfig('graph.config.variables')}
+                      variableConfig={getConfig('variables')}
+                      unitsConversions={getConfig('units')}
                     />
                   </Col>
                 </Row>
