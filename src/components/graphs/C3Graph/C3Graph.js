@@ -11,17 +11,29 @@ import 'c3/c3.css';
 
 export default class C3Graph extends React.Component {
   static propTypes = {
-    // Props for this component are top-level options for C3.
+    id: PropTypes.string,
+    // id for chart dom element
+
+    onRenderChart: PropTypes.func,
+    // Called with arguments (node, chart) whenever the component (re)renders
+    // a chart.
+
+    // Remaining props for this component are top-level options for C3.
     // I'm too lazy at the moment to define them all here. Key ones are
     // size, color, data, axis, legend, ...
   };
 
-  state = {
+  static defaultProps = {
+    onRenderChart: (node, chart) => {
+      console.log('### C3Graph: node', node);
+      console.log('### C3Graph: chart', chart);
+    },
   };
 
   constructor(props) {
     super(props);
     this.node = React.createRef();
+    console.log('### C3Graph: c3', c3)
   }
 
   componentDidMount() {
@@ -33,15 +45,17 @@ export default class C3Graph extends React.Component {
   }
 
   renderGraph = () => {
-    this.graph = c3.generate({
+    const { id, onRenderChart, ...rest } = this.props;
+    this.chart = c3.generate({
       bindto: this.node.current,
-      ...this.props,
-    })
+      ...rest,
+    });
+    onRenderChart(this.node, this.chart);
   }
 
   render() {
     return (
-      <div ref={this.node}/>
+      <div id={this.props.id} ref={this.node}/>
     );
   }
 }
