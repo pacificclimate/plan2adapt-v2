@@ -30,6 +30,7 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
+import DevGraph from '../../data-displays/DevGraph';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -137,10 +138,20 @@ export default class App extends Component {
               id={'main'}
               defaultActiveKey={getConfig('app.tabs.default')}
             >
-              {getConfig('dev.visible') &&
+              {getConfig('dev-graph.visible') &&
               <Tab
-                eventKey={'dev'}
-                title={'Dev'}
+                eventKey={'dev-graph'}
+                title={'Dev Graph'}
+                className='pt-2'
+              >
+                <DevGraph/>
+              </Tab>
+              }
+
+              {getConfig('dev-colourbar.visible') &&
+              <Tab
+                eventKey={'dev-colourbar'}
+                title={'Dev Colourbar'}
                 className='pt-2'
                 mountOnEnter
               >
@@ -177,6 +188,7 @@ export default class App extends Component {
                 title={<T as='string' path='summary.tab'/>}
                 disabled={getConfig('summary.disabled')}
                 className='pt-2'
+                mountOnEnter
               >
                 <T path='summary.notes.general' data={{
                   region: region,
@@ -200,6 +212,7 @@ export default class App extends Component {
                 title={<T as='string' path='impacts.tab'/>}
                 disabled={getConfig('impacts.disabled')}
                 className='pt-2'
+                mountOnEnter
               >
                 <Row>
                   <Col lg={12}>
@@ -264,6 +277,7 @@ export default class App extends Component {
                 title={<T as='string' path='graph.tab'/>}
                 disabled={getConfig('graph.disabled')}
                 className='pt-2'
+                mountOnEnter
               >
                 <Row>
                   <Col xs={'auto'} className='pr-0'>
