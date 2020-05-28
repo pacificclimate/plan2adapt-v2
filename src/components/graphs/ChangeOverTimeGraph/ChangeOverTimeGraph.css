@@ -1,0 +1,11 @@
+.c3-line-50th {
+    stroke-width: 3 !important;
+}
+
+.c3-line-25th, .c3-line-75th {
+    stroke-width: 2 !important;
+}
+
+.c3-line-10th, .c3-line-90th {
+    stroke-width: 1 !important;
+}

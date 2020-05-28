@@ -18,7 +18,10 @@ selectors:
     postfix: period
     default: 16
 
-dev:
+dev-colourbar:
+  visible: false
+
+dev-graph:
   visible: false
 
 summary:
@@ -300,7 +303,14 @@ graph:
         y:
           type: linear
           label:
-            position: outer-middle,
+            position: outer-middle
+      data:
+        colors:
+          10th: '#cccccc'
+          90th: '#cccccc'
+          25th: '#aaaaaa'
+          75th: '#aaaaaa'
+          50th: black
     futureTimePeriods:
       # This may be better obtained from metadata
       - { start_date: "2010", end_date: "2039" }

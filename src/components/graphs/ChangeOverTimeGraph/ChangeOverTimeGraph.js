@@ -20,6 +20,7 @@ import {
   getVariableDisplayUnits, getVariableInfo
 } from '../../../utils/variables-and-units';
 import styles from './ChangeOverTimeGraph.module.css';
+import './ChangeOverTimeGraph.css';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 
 
@@ -178,7 +179,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
     return (
       <React.Fragment>
-        <C3Graph {...c3options}/>
+        <C3Graph
+          id={'graphs'}
+          onRenderChart={this.handleRenderChart}
+          {...c3options}
+        />
       </React.Fragment>
     );
   }
