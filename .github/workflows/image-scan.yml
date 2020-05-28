@@ -25,6 +25,6 @@ jobs:
       - name: Scan Image
         uses: anchore/scan-action@master
         with:
-          image-reference: "pcic/climate-explorer-frontend:${{ env.TAG }}"
+          image-reference: "pcic/plan2adapt-v2-frontend:${{ env.TAG }}"
           fail-build: true
         if: steps.wait-for-build.outputs.conclusion == 'success'
