@@ -675,6 +675,7 @@ graph:
           '75-90th': '#cccccc'
           '25-50th': '#aaaaaa'
           '50-75th': '#aaaaaa'
+        hide: ['10th', '25th', '75th', '90th', ]
       legend:
         hide: '0-10th'
       bar:
