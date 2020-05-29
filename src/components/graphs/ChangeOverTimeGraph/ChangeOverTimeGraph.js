@@ -205,7 +205,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     )([
       map(middleYear)(futureTimePeriods),
       percentileValueDifferencesByTimePeriod,
-      map(percentileValues => percentileValues[percentile50Index])(percentileValuesByTimePeriod),
+      map(percentile50Index)(percentileValuesByTimePeriod),
     ]);
     const rows2 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
