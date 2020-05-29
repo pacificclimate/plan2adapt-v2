@@ -296,8 +296,74 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       }
     );
 
+    // Create the data rows for C3.
+    const rows3 = concatAll([
+      // Dataset names: The first, 'time' is the x (horizontal) axis.
+      // The rest are the names of the various percentile-vs-time curves.
+      [concatAll([
+        'time',
+        map(p => `${p}th`)(percentiles)
+      ])],
+
+      // Place a zero for the historical time period "anomaly", which is the
+      // first point in each series.
+      [concatAll([
+        middleYear(historicalTimePeriod), map(p => 0)(percentiles)
+      ])],
+
+      // Now the data from the backend (props.statistics).
+      flow(
+        zipAll,
+        map(concatAll),
+      )([
+        map(middleYear)(futureTimePeriods),
+        percentileValuesByTimePeriod,
+      ]),
+    ]);
+    console.log('### ChangeOverTimeGraph.render: rows', rows)
+
+    const c3options3 = merge(
+      graphConfig.c3options,
+      {
+        data: {
+          x: 'time',
+          rows: rows3,
+        },
+        axis: {
+          y: {
+            label: {
+              text: `Change in ${variableInfo.label} (${displayUnits})`,
+            },
+          },
+        },
+        tooltip: {
+          format: {
+            title: year => `${floorMultiple(10, year)}s`,
+            name: name => `${name} %ile`,
+            value: (value, ratio, id) => {
+              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
+                return `${displayFormat(2, value)} ${displayUnits}`;
+              }
+            },
+          },
+        },
+        regions:
+          mapWithKey((tp, index) => ({
+            axis: 'x',
+            start: Number(tp.start_date),
+            end: Number(tp.end_date),
+            class: index ? styles.projected : styles.baseline,
+          }))(concatAll([historicalTimePeriod, futureTimePeriods]))
+      }
+    );
+
+
     return (
       <React.Fragment>
+        <C3Graph
+          id={'projected-change-graph3'}
+          {...c3options3}
+        />
         <C3Graph
           id={'projected-change-graph2'}
           {...c3options2}
