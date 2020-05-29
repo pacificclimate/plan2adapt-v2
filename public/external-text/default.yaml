@@ -657,10 +657,18 @@ graph:
         x: time
         type: bar
         types:
+          '10th': line
+          '25th': line
           '50th': line
+          '75th': line
+          '90th': line
         groups:
           - ['0-10th',  '10-25th', '25-50th', '50-75th', '75-90th']
         colors:
+          '10th': '#cccccc'
+          '90th': '#cccccc'
+          '25th': '#aaaaaa'
+          '75th': '#aaaaaa'
           '50th': black
           '0-10th': transparent
           '10-25th': '#cccccc'

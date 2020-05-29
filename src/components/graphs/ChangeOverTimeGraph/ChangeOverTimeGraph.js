@@ -23,7 +23,8 @@ import { middleYear } from '../../../utils/time-periods';
 import { concatAll } from '../../../utils/lodash-fp-extras';
 import {
   getConvertUnits,
-  getVariableDisplayUnits, getVariableInfo
+  getVariableDisplayUnits,
+  getVariableInfo
 } from '../../../utils/variables-and-units';
 import styles from './ChangeOverTimeGraph.module.css';
 import './ChangeOverTimeGraph.css';
@@ -199,14 +200,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const minPercentileValue = min(flatten(percentileValuesByTimePeriod));
     const maxPercentileValue = max(flatten(percentileValuesByTimePeriod));
 
-    const dataRows = flow(
-      zipAll,
-      map(concatAll),
-    )([
-      map(middleYear)(futureTimePeriods),
-      percentileValueDifferencesByTimePeriod,
-      map(percentile50Index)(percentileValuesByTimePeriod),
-    ]);
     const rows2 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
@@ -215,14 +208,14 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         map(
           i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
         )(percentileIndices),
-        '50th',
+        map(p => `${p}th`)(percentiles),
       ])],
 
       // Fake data row to impose desired ordering of datasets in stacks
       [concatAll([
         0,
         map(i => i * 1000)(percentileIndices),
-        0,
+        map(() => 0)(percentileIndices),
       ])],
 
       // Zero row for the historical time period "anomaly", which is the
@@ -230,10 +223,17 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       [concatAll([
         middleYear(historicalTimePeriod),
         map(() => 0)(percentileIndices),
-        0,
+        map(() => 0)(percentileIndices),
       ])],
 
-      dataRows,
+      flow(
+        zipAll,
+        map(concatAll),
+      )([
+        map(middleYear)(futureTimePeriods),
+        percentileValueDifferencesByTimePeriod,
+        percentileValuesByTimePeriod,
+      ]),
     ]);
     console.log('### ChangeOverTimeGraph.render: rows2', rows2)
 
