@@ -13,7 +13,7 @@ import merge from 'lodash/fp/merge';
 import range from 'lodash/fp/range';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
-import flatten from 'lodash/fp/flatten';
+import flattenDeep from 'lodash/fp/flattenDeep';
 import flow from 'lodash/fp/flow';
 import {
   getDisplayData,
@@ -189,16 +189,29 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const percentileIndices = range(0, percentiles.length);
     const percentile50Index = 2; // TODO: Determine from percentiles
 
-    const percentileValueDifferencesByTimePeriod = map(
+    // You know I could do this in a one-liner, right?
+    const allPercentileValues = flattenDeep([0, percentileValuesByTimePeriod]);
+    const minPercentileValue = min(allPercentileValues);
+    const maxPercentileValue = max(allPercentileValues);
+
+    // const offset = 6;
+    const ceilMultiple = (mult = 1, value) =>
+      Math.ceil(value/mult) * mult;
+    const roundMultiple = (mult = 1, value) =>
+      Math.round(value/mult) * mult;
+    const offset = ceilMultiple(2, -min([0, minPercentileValue]));
+    const addOffset = v => v + offset;
+    console.log('### ChangeOverTimeGraph.render: minPercentileValue, offset', minPercentileValue, offset)
+    const yMin = minPercentileValue + offset;
+    const yMax = maxPercentileValue + offset;
+    console.log('### ChangeOverTimeGraph.render: yMin, yMax', yMin, yMax)
+
+    const percentileValueDifferencesByTimePeriodWithOffset = map(
       pileValues => map(
-        i => pileValues[i] - (i ? pileValues[i-1] : 0)
+        i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
       )(percentileIndices)
     )(percentileValuesByTimePeriod);
-    console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriod', percentileValueDifferencesByTimePeriod)
-
-    // You know I could do this in a one-liner, right?
-    const minPercentileValue = min(flatten(percentileValuesByTimePeriod));
-    const maxPercentileValue = max(flatten(percentileValuesByTimePeriod));
+    console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriodWithOffset', percentileValueDifferencesByTimePeriodWithOffset)
 
     const rows2 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
@@ -214,8 +227,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       // Fake data row to impose desired ordering of datasets in stacks
       [concatAll([
         0,
-        map(i => i * 1000)(percentileIndices),
-        map(() => 0)(percentileIndices),
+        map(i => i * 1000)(percentileIndices),  // offset?
+        map(() => offset)(percentileIndices),
       ])],
 
       // Zero row for the historical time period "anomaly", which is the
@@ -223,7 +236,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       [concatAll([
         middleYear(historicalTimePeriod),
         map(() => 0)(percentileIndices),
-        map(() => 0)(percentileIndices),
+        map(() => offset)(percentileIndices),
       ])],
 
       flow(
@@ -231,8 +244,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         map(concatAll),
       )([
         map(middleYear)(futureTimePeriods),
-        percentileValueDifferencesByTimePeriod,
-        percentileValuesByTimePeriod,
+        percentileValueDifferencesByTimePeriodWithOffset,
+        map(map(addOffset))(percentileValuesByTimePeriod),
       ]),
     ]);
     console.log('### ChangeOverTimeGraph.render: rows2', rows2)
@@ -246,8 +259,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         },
         axis: {
           y: {
-            min: minPercentileValue,
-            max: maxPercentileValue,
+            min: yMin,
+            max: yMax,
+            tick: {
+              format: d => `${d-offset}!`
+            },
             label: {
               text: `Change in ${variableInfo.label} (${displayUnits})`,
             },
