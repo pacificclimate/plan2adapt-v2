@@ -9,6 +9,10 @@ import map from 'lodash/fp/map';
 import zipWith from 'lodash/fp/zipWith';
 import concat from 'lodash/fp/concat';
 import merge from 'lodash/fp/merge';
+import range from 'lodash/fp/range';
+import min from 'lodash/fp/min';
+import max from 'lodash/fp/max';
+import flatten from 'lodash/fp/flatten';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -177,10 +181,74 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       }
     );
 
+    // Alternative: Bar chart.
+
+    const percentileIndices = range(0, percentiles.length);
+
+    const percentileValueDifferencesByTimePeriod = map(
+      pileValues => map(
+        i => pileValues[i] - (i ? pileValues[i-1] : 0)
+      )(percentileIndices)
+    )(percentileValuesByTimePeriod);
+
+    // You know I could do this in a one-liner, right?
+    const minPercentileValue = min(flatten(percentileValuesByTimePeriod));
+    const maxPercentileValue = max(flatten(percentileValuesByTimePeriod));
+
+    console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriod', percentileValueDifferencesByTimePeriod)
+    const rows2 = concatAll([
+      // Dataset names: The first, 'time' is the x (horizontal) axis.
+      // The rest are the names of the various percentile-vs-time curves.
+      [concat(
+        ['time'],
+        map(
+          i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
+        )(percentileIndices)
+      )],
+
+      // Fake data row to impose desired ordering of datasets in stacks
+      [concat(0, map(i => i * 1000)(percentileIndices))],
+
+      // Zero row for the historical time period "anomaly", which is the
+      // first actual point in each series.
+      [concat(middleYear(historicalTimePeriod), map(p => 0)(percentileIndices))],
+
+      // Now the data from the backend (props.statistics).
+      zipWith(
+        (ftp, pileValues) => concat([middleYear(ftp)], pileValues),
+        futureTimePeriods,
+        percentileValueDifferencesByTimePeriod,
+      ),
+    ]);
+    console.log('### ChangeOverTimeGraph.render: rows2', rows2)
+
+    const c3options2 = merge(
+      graphConfig.c3options2,
+      {
+        data: {
+          x: 'time',
+          rows: rows2,
+        },
+        axis: {
+          y: {
+            min: minPercentileValue,
+            max: maxPercentileValue,
+            label: {
+              text: `Change in ${variableInfo.label} (${displayUnits})`,
+            },
+          },
+        },
+      }
+    );
+
     return (
       <React.Fragment>
         <C3Graph
-          id={'graphs'}
+          id={'projected-change-graph2'}
+          {...c3options2}
+        />
+        <C3Graph
+          id={'projected-change-graph'}
           onRenderChart={this.handleRenderChart}
           {...c3options}
         />
