@@ -665,19 +665,19 @@ graph:
         groups:
           - ['0-10th',  '10-25th', '25-50th', '50-75th', '75-90th']
         colors:
-          '10th': '#cccccc'
-          '90th': '#cccccc'
-          '25th': '#aaaaaa'
-          '75th': '#aaaaaa'
+          '10th': transparent
+          '90th': transparent
+          '25th': transparent
+          '75th': transparent
           '50th': black
           '0-10th': transparent
           '10-25th': '#cccccc'
           '75-90th': '#cccccc'
           '25-50th': '#aaaaaa'
           '50-75th': '#aaaaaa'
-        hide: ['10th', '25th', '75th', '90th', ]
+#        hide: ['10th', '25th', '75th', '90th', ]
       legend:
-        hide: '0-10th'
+        hide: ['0-10th', '10th', '25th', '75th', '90th']
       bar:
         width:
           ratio: 2.5
