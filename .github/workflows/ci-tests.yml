@@ -1,0 +1,19 @@
+name: CI Tests
+
+on: push
+
+jobs:
+  node-test:
+
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@master
+    - name: Set up Node.js 9.2
+      uses: actions/setup-node@v1
+      with:
+        node-version: 9.2
+    - name: Node.js Test Suite
+      run: |
+        npm install
+        npm test
