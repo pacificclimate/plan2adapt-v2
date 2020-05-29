@@ -7,12 +7,14 @@ import withAsyncData from '../../../HOCs/withAsyncData';
 import curry from 'lodash/fp/curry';
 import map from 'lodash/fp/map';
 import zipWith from 'lodash/fp/zipWith';
+import zipAll from 'lodash/fp/zipAll';
 import concat from 'lodash/fp/concat';
 import merge from 'lodash/fp/merge';
 import range from 'lodash/fp/range';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
 import flatten from 'lodash/fp/flatten';
+import flow from 'lodash/fp/flow';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -148,7 +150,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
       // Now the data from the backend (props.statistics).
       zipWith(
-        (ftp, pileValues) => concat([middleYear(ftp)], pileValues),
+        (ftp, pileValues) => concat(middleYear(ftp), pileValues),
         futureTimePeriods,
         percentileValuesByTimePeriod,
       ),
@@ -181,44 +183,57 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       }
     );
 
-    // Alternative: Bar chart.
+    // Alternative: Bar chart, with 50th %ile line.
 
     const percentileIndices = range(0, percentiles.length);
+    const percentile50Index = 2; // TODO: Determine from percentiles
 
     const percentileValueDifferencesByTimePeriod = map(
       pileValues => map(
         i => pileValues[i] - (i ? pileValues[i-1] : 0)
       )(percentileIndices)
     )(percentileValuesByTimePeriod);
+    console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriod', percentileValueDifferencesByTimePeriod)
 
     // You know I could do this in a one-liner, right?
     const minPercentileValue = min(flatten(percentileValuesByTimePeriod));
     const maxPercentileValue = max(flatten(percentileValuesByTimePeriod));
 
-    console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriod', percentileValueDifferencesByTimePeriod)
+    const dataRows = flow(
+      zipAll,
+      map(concatAll),
+    )([
+      map(middleYear)(futureTimePeriods),
+      percentileValueDifferencesByTimePeriod,
+      map(percentileValues => percentileValues[percentile50Index])(percentileValuesByTimePeriod),
+    ]);
     const rows2 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
-      [concat(
-        ['time'],
+      [concatAll([
+        'time',
         map(
           i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
-        )(percentileIndices)
-      )],
+        )(percentileIndices),
+        '50th',
+      ])],
 
       // Fake data row to impose desired ordering of datasets in stacks
-      [concat(0, map(i => i * 1000)(percentileIndices))],
+      [concatAll([
+        0,
+        map(i => i * 1000)(percentileIndices),
+        0,
+      ])],
 
       // Zero row for the historical time period "anomaly", which is the
       // first actual point in each series.
-      [concat(middleYear(historicalTimePeriod), map(p => 0)(percentileIndices))],
+      [concatAll([
+        middleYear(historicalTimePeriod),
+        map(() => 0)(percentileIndices),
+        0,
+      ])],
 
-      // Now the data from the backend (props.statistics).
-      zipWith(
-        (ftp, pileValues) => concat([middleYear(ftp)], pileValues),
-        futureTimePeriods,
-        percentileValueDifferencesByTimePeriod,
-      ),
+      dataRows,
     ]);
     console.log('### ChangeOverTimeGraph.render: rows2', rows2)
 
