@@ -240,8 +240,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       // Fake data row to impose desired ordering of datasets in stacks
       [concatAll([
         0,
-        map(i => i * 1000)(percentileIndices),  // offset?
-        map(() => offset)(percentileIndices),
+        map(i => i * 1000)(percentileIndices),
+        map(() => null)(percentileIndices),
       ])],
 
       // Zero row for the historical time period "anomaly", which is the
