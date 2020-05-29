@@ -143,6 +143,7 @@ export default class App extends Component {
                 eventKey={'dev-graph'}
                 title={'Dev Graph'}
                 className='pt-2'
+                mountOnEnter
               >
                 <DevGraph/>
               </Tab>
