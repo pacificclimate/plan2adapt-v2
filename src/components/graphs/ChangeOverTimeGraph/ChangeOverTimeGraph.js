@@ -15,6 +15,7 @@ import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
 import flattenDeep from 'lodash/fp/flattenDeep';
 import flow from 'lodash/fp/flow';
+import includes from 'lodash/fp/includes';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -22,6 +23,7 @@ import {
 import { middleYear } from '../../../utils/time-periods';
 import { concatAll } from '../../../utils/lodash-fp-extras';
 import {
+  displayFormat,
   getConvertUnits,
   getVariableDisplayUnits,
   getVariableInfo
@@ -174,6 +176,17 @@ class ChangeOverTimeGraphDisplay extends React.Component {
             },
           },
         },
+        tooltip: {
+          format: {
+            title: year => `${floorMultiple(10, year)}s`,
+            name: name => `${name} %ile`,
+            value: (value, ratio, id) => {
+              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
+                return `${displayFormat(2, value)} ${displayUnits}`;
+              }
+            },
+          },
+        },
         regions:
           mapWithKey((tp, index) => ({
             axis: 'x',
@@ -195,10 +208,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const maxPercentileValue = max(allPercentileValues);
 
     // const offset = 6;
-    const ceilMultiple = (mult = 1, value) =>
-      Math.ceil(value/mult) * mult;
-    const roundMultiple = (mult = 1, value) =>
-      Math.round(value/mult) * mult;
+    const fMultiple = curry((f, mult, value) => f(value/mult) * mult);
+    const ceilMultiple = fMultiple(Math.ceil);
+    const floorMultiple = fMultiple(Math.floor);
+    const roundMultiple = fMultiple(Math.round);
     const offset = ceilMultiple(2, -min([0, minPercentileValue]));
     const addOffset = v => v + offset;
     console.log('### ChangeOverTimeGraph.render: minPercentileValue, offset', minPercentileValue, offset)
@@ -262,10 +275,21 @@ class ChangeOverTimeGraphDisplay extends React.Component {
             min: yMin,
             max: yMax,
             tick: {
-              format: d => `${d-offset}!`
+              format: d => `${d-offset}`
             },
             label: {
               text: `Change in ${variableInfo.label} (${displayUnits})`,
+            },
+          },
+        },
+        tooltip: {
+          format: {
+            title: year => `${floorMultiple(10, year)}s`,
+            name: name => `${name} %ile`,
+            value: (value, ratio, id) => {
+              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
+                return `${displayFormat(2, value - offset)} ${displayUnits}`;
+              }
             },
           },
         },
