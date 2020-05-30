@@ -1,5 +1,9 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Tabs from 'react-bootstrap/Tabs';
+import Tab from 'react-bootstrap/Tab';
 import C3Graph from '../C3Graph';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
@@ -419,21 +423,69 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
 
     return (
-      <React.Fragment>
-        <C3Graph
-          id={'projected-change-graph3'}
-          {...c3options3}
-        />
-        <C3Graph
-          id={'projected-change-graph2'}
-          {...c3options2}
-        />
-        <C3Graph
-          id={'projected-change-graph'}
-          onRenderChart={this.handleRenderChart}
-          {...c3options}
-        />
-      </React.Fragment>
+      <Tabs id={'graph-alternatives'}>
+        <Tab
+          eventKey={'simple-lines'}
+          title={'Simple Lines'}
+          className='pt-2'
+          mountOnEnter
+        >
+          <p>
+            Shows 10th, 25th, 50th, 75th, and 90th percentile values as
+            line graphs. No fill between these lines.
+          </p>
+          <C3Graph
+            id={'projected-change-graph'}
+            {...c3options}
+          />
+        </Tab>
+
+        <Tab
+          eventKey={'psuedofilled-lines'}
+          title={'Pseudo-filled Lines'}
+          className='pt-2'
+          mountOnEnter
+        >
+          <p>
+            Shows 10th, 25th, 50th, 75th, and 90th percentile values as line
+            graphs.
+          </p>
+          <p>
+            As an approximation to filling these primary data lines,
+            we (linearly) interpolate a variable number of intermediate graph
+            lines.
+          </p>
+          <C3Graph
+            id={'projected-change-graph3'}
+            {...c3options3}
+          />
+        </Tab>
+
+        <Tab
+          eventKey={'bar-chart'}
+          title={'Bar Chart'}
+          className='pt-2'
+          mountOnEnter
+        >
+          <p>
+            Shows 50th percentile values as a line graph.
+          </p>
+          <p>
+            Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
+            intervals as a stacked bar chart.
+          </p>
+          <p>
+            This presentation is the most technically accurate, but it does not
+            provide visual interpolation (which may or may not be justified)
+            except for 50th percentile values. Adding the other primary
+            percentile values as similar graphs is ugly and unhelpfule.
+          </p>
+          <C3Graph
+            id={'projected-change-graph2'}
+            {...c3options2}
+          />
+        </Tab>
+      </Tabs>
     );
   }
 }
