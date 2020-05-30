@@ -13,9 +13,11 @@ import merge from 'lodash/fp/merge';
 import range from 'lodash/fp/range';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
+import flatten from 'lodash/fp/flatten';
 import flattenDeep from 'lodash/fp/flattenDeep';
 import flow from 'lodash/fp/flow';
 import includes from 'lodash/fp/includes';
+import fromPairs from 'lodash/fp/fromPairs';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -141,6 +143,9 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       stat => convertData(stat.percentiles)
     )(statistics);
 
+    /////////////////////////////////////////////////////////////////////
+    // Alternative: Unfilled percentile line graph
+
     // Create the data rows for C3.
     const rows = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
@@ -197,6 +202,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       }
     );
 
+    /////////////////////////////////////////////////////////////////////
     // Alternative: Bar chart, with 50th %ile line.
 
     const percentileIndices = range(0, percentiles.length);
@@ -296,19 +302,54 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       }
     );
 
+    /////////////////////////////////////////////////////////////////////
+    // Alternative: Pseudo-filled line graph
+
+    const interpolateBy = curry((n, v1, v2) => {
+      // Compute `n` interpolated values between `v1` and `v2`.
+      // Return an array `r` of `n` interpolated values, such that
+      // `r[0] === v1`, `r[n] === v2`, and `r[i] < r[j]` for `0 <= i < j < n`.
+      // Interpolation is linear.
+      const delta = (v2 - v1) / n;
+      return map(i => v1 + i * delta)(range(0, n));
+    });
+
+    const interpolateArrayBy = curry((n, a) => {
+      // Compute `n` interpolated values between each successive pair of
+      // values in array `a`.
+      // Return an array `r` of `m = (a.length-1) * n + 1` interpolated values
+      // with r[0] = a[0], r[m-1] = a[a.length-1].
+      const length = a.length;
+      return flow(
+        range(0),
+        map(i => i < length-1 ? interpolateBy(n, a[i], a[i+1]) : a[i]),
+        flatten,
+      )(length);
+    });
+
+    const nInterp = 20;
+    const interpolateArray = interpolateArrayBy(nInterp);
+    const interpPercentiles = interpolateArray(percentiles);
+    const interpPercentileValuesByTimePeriod =
+      map(interpolateArray)(percentileValuesByTimePeriod);
+
+    const datasetName = p => `${p}th`;
+    const datasetNames = map(datasetName)(interpPercentiles);
+
     // Create the data rows for C3.
     const rows3 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
       [concatAll([
         'time',
-        map(p => `${p}th`)(percentiles)
+        datasetNames
       ])],
 
       // Place a zero for the historical time period "anomaly", which is the
       // first point in each series.
       [concatAll([
-        middleYear(historicalTimePeriod), map(p => 0)(percentiles)
+        middleYear(historicalTimePeriod),
+        map(p => 0)(interpPercentiles)
       ])],
 
       // Now the data from the backend (props.statistics).
@@ -317,17 +358,30 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         map(concatAll),
       )([
         map(middleYear)(futureTimePeriods),
-        percentileValuesByTimePeriod,
+        interpPercentileValuesByTimePeriod,
       ]),
     ]);
-    console.log('### ChangeOverTimeGraph.render: rows', rows)
+    console.log('### ChangeOverTimeGraph.render: rows3', rows3)
 
     const c3options3 = merge(
-      graphConfig.c3options,
+      graphConfig.c3options3,
       {
         data: {
           x: 'time',
           rows: rows3,
+          colors: flow(
+            map(p => {
+              const key = datasetName(p);
+              if (p === 50) {
+                return [key, 'black']
+              }
+              if (p < 25 || p > 75) {
+                return [key, '#cccccc']
+              }
+              return [key, '#aaaaaa']
+            }),
+            fromPairs,
+          )(interpPercentiles),
         },
         axis: {
           y: {
@@ -356,6 +410,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           }))(concatAll([historicalTimePeriod, futureTimePeriods]))
       }
     );
+    console.log('### ChangeOverTimeGraph.render: c3options3', c3options3)
 
 
     return (
