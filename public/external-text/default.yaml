@@ -652,6 +652,8 @@ graph:
           type: linear
           label:
             position: outer-middle
+      point:
+        show: false
 
     c3options2:
       size:
