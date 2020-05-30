@@ -38,6 +38,7 @@ import {
 import styles from './ChangeOverTimeGraph.module.css';
 import './ChangeOverTimeGraph.css';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
+import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 
 
 const percentiles = [10, 25, 50, 75, 90];
@@ -105,6 +106,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // Example value: See configuration file, key 'units'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
   };
+
+  state = {
+    numInterpolations: { label: 10, value: 10 },
+  };
+
+  handleChangeNInterpolations =
+      numInterpolations => this.setState({ numInterpolations });
 
   render() {
     const {
@@ -332,8 +340,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       )(length);
     });
 
-    const nInterp = 20;
-    const interpolateArray = interpolateArrayBy(nInterp);
+    const interpolateArray = interpolateArrayBy(this.state.numInterpolations.value);
     const interpPercentiles = interpolateArray(percentiles);
     const interpPercentileValuesByTimePeriod =
       map(interpolateArray)(percentileValuesByTimePeriod);
@@ -423,7 +430,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
 
     return (
-      <Tabs id={'graph-alternatives'}>
+      <Tabs
+        id={'graph-alternatives'}
+        defaultActiveKey={'psuedofilled-lines'}
+      >
         <Tab
           eventKey={'simple-lines'}
           title={'Simple Lines'}
@@ -446,15 +456,34 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           className='pt-2'
           mountOnEnter
         >
-          <p>
-            Shows 10th, 25th, 50th, 75th, and 90th percentile values as line
-            graphs.
-          </p>
-          <p>
-            As an approximation to filling these primary data lines,
-            we (linearly) interpolate a variable number of intermediate graph
-            lines.
-          </p>
+          <Row>
+            <Col lg={6}>
+              <p>
+                Shows 10th, 25th, 50th, 75th, and 90th percentile values as line
+                graphs.
+              </p>
+              <p>
+                As an approximation to filling these primary data lines,
+                we (linearly) interpolate a variable number of intermediate graph
+                lines.
+              </p>
+            </Col>
+            <Col lg={5}>
+              <p>You can experiment with various densities of interpolation
+              with the dropdown at left. Bear in mind that the number of lines
+              created is equal to 4 * N + 1; so for an interpolation factor
+              of 100, 401 lines are being drawn.</p>
+            </Col>
+            <Col lg={1}>
+              <Select
+                options={
+                  map(n => ({ label: n, value: n }))([3, 4, 5, 10, 20, 40, 60, 80, 100])
+                }
+                value={this.state.numInterpolations}
+                onChange={this.handleChangeNInterpolations}
+              />
+            </Col>
+          </Row>
           <C3Graph
             id={'projected-change-graph3'}
             {...c3options3}
