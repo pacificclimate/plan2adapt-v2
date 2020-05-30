@@ -18,6 +18,7 @@ import flattenDeep from 'lodash/fp/flattenDeep';
 import flow from 'lodash/fp/flow';
 import includes from 'lodash/fp/includes';
 import fromPairs from 'lodash/fp/fromPairs';
+import difference from 'lodash/fp/difference';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -334,7 +335,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       map(interpolateArray)(percentileValuesByTimePeriod);
 
     const datasetName = p => `${p}th`;
-    const datasetNames = map(datasetName)(interpPercentiles);
+    const primaryDatasetNames = map(datasetName)(percentiles);
+    const allDatasetNames = map(datasetName)(interpPercentiles);
 
     // Create the data rows for C3.
     const rows3 = concatAll([
@@ -342,7 +344,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       // The rest are the names of the various percentile-vs-time curves.
       [concatAll([
         'time',
-        datasetNames
+        allDatasetNames
       ])],
 
       // Place a zero for the historical time period "anomaly", which is the
@@ -389,6 +391,9 @@ class ChangeOverTimeGraphDisplay extends React.Component {
               text: `Change in ${variableInfo.label} (${displayUnits})`,
             },
           },
+        },
+        legend: {
+          hide: difference(allDatasetNames, primaryDatasetNames),
         },
         tooltip: {
           format: {
