@@ -432,7 +432,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     return (
       <Tabs
         id={'graph-alternatives'}
-        defaultActiveKey={'psuedofilled-lines'}
+        defaultActiveKey={'simple-lines'}
       >
         <Tab
           eventKey={'simple-lines'}

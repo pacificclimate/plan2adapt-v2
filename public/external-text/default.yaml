@@ -1,28 +1,34 @@
 app:
   tabs:
-    default: graph
+    default: graph  # Not working again, sigh
 
 selectors:
-  prologue: I am interested in information about projected climate change ...
+  prologue: |
+    I am interested in information about projected climate change in
+    British Columbia ...
   region:
-    prefix: in
+    prefix: within the region of
     default: bc
+    forTabs: ['summary', 'impacts', 'maps', 'graphs']
   timePeriod:
     prefix: during the
     default: 2050
+    forTabs: ['summary', 'impacts', 'maps']
   variable:
-    prefix: ... with details about
+    prefix: with details about
     default: pr
+    forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
     postfix: period
     default: 16
+    forTabs: ['maps', 'graphs']
 
 dev-colourbar:
   visible: false
 
 dev-graph:
-  visible: true
+  visible: false
   charts:
     - title: Stacked with unified 25-75, NO 50, large ordering values
       comment: |
