@@ -47,6 +47,7 @@ import {
 } from '../utils';
 import SimpleLineGraph from '../SimpleLineGraph';
 import PseudoFilledLineGraph from '../PseudoFilledLineGraph';
+import BarChart from '../BarChart';
 
 
 const barChartWidthOptions =
@@ -126,11 +127,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     barChartWidth: { label: 0.1, value: 0.1 },
   };
 
-  handleChangeNInterpolations =
-      numInterpolations => this.setState({ numInterpolations });
-  handleChangeBarChartWidth =
-      barChartWidth => this.setState({ barChartWidth });
-
   render() {
     const {
       variable,
@@ -176,113 +172,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
 
     /////////////////////////////////////////////////////////////////////
-    // Alternative: Bar chart, with 50th %ile line.
-
-    const percentileIndices = range(0, percentiles.length);
-    const percentile50Index = 2; // TODO: Determine from percentiles
-
-    // You know I could do this in a one-liner, right?
-    const allPercentileValues = flattenDeep([0, percentileValuesByTimePeriod]);
-    const minPercentileValue = min(allPercentileValues);
-    const maxPercentileValue = max(allPercentileValues);
-
-    // const offset = 6;
-    const offset = ceilMultiple(2, -min([0, minPercentileValue]));
-    const addOffset = v => v + offset;
-    console.log('### ChangeOverTimeGraph.render: minPercentileValue, offset', minPercentileValue, offset)
-    const yMin = minPercentileValue + offset;
-    const yMax = maxPercentileValue + offset;
-    console.log('### ChangeOverTimeGraph.render: yMin, yMax', yMin, yMax)
-    const fakeMedianBarValue = (yMax - yMin) / 500;
-
-    const percentileValueDifferencesByTimePeriodWithOffset = map(
-      pileValues => map(
-        i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
-      )(percentileIndices)
-    )(percentileValuesByTimePeriod);
-    console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriodWithOffset', percentileValueDifferencesByTimePeriodWithOffset)
-
-    const injectMedianValue = curry((value, items) =>
-      concatAll([slice(0, 3, items), value, slice(3, 5, items)])
-    );
-    const percentileDifferenceNames = flow(
-      map(
-        i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
-      ),
-      injectMedianValue('median'),
-    )(percentileIndices);
-
-    const rows2 = concatAll([
-      // Dataset names: The first, 'time' is the x (horizontal) axis.
-      // The rest are the names of the various percentile-vs-time curves.
-      [concatAll([
-        'time',
-        percentileDifferenceNames,
-        map(p => `${p}th`)(percentiles),
-      ])],
-
-      // Zero row for the historical time period "anomaly", which is the
-      // first actual point in each series.
-      [concatAll([
-        middleYear(historicalTimePeriod),
-        injectMedianValue(0, map(() => 0)(percentileIndices)),
-        map(() => offset)(percentileIndices),
-      ])],
-
-      flow(
-        zipAll,
-        map(concatAll),
-      )([
-        map(middleYear)(futureTimePeriods),
-        map(
-          injectMedianValue(fakeMedianBarValue),
-          percentileValueDifferencesByTimePeriodWithOffset
-        ),
-        map(map(addOffset))(percentileValuesByTimePeriod),
-      ]),
-    ]);
-    console.log('### ChangeOverTimeGraph.render: rows2', rows2)
-
-    const c3optionsBarChart = merge(
-      graphConfig.c3optionsBarChart,
-      {
-        data: {
-          x: 'time',
-          rows: rows2,
-        },
-        bar: {
-          width: {
-            ratio: this.state.barChartWidth.value
-          },
-        },
-        axis: {
-          y: {
-            min: yMin,
-            max: yMax,
-            tick: {
-              format: d => `${d-offset}`
-            },
-            label: {
-              text: `Change in ${variableInfo.label} (${displayUnits})`,
-            },
-          },
-        },
-        tooltip: {
-          format: {
-            title: year => `${floorMultiple(10, year)}s`,
-            name: name => `${name} %ile`,
-            value: (value, ratio, id) => {
-              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
-                return `${displayFormat(2, value - offset)} ${displayUnits}`;
-              }
-            },
-          },
-        },
-      }
-    );
-    console.log('### ChangeOverTimeGraph.render: c3optionsBarChart', c3optionsBarChart)
-
-    /////////////////////////////////////////////////////////////////////
     // Alternative: Bar chart, with time interpolation.
 
     // Note: zipAll computes the transpose of a 2D matrix.
@@ -293,7 +182,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     return (
       <Tabs
         id={'graph-alternatives'}
-        defaultActiveKey={'psuedofilled-lines'}
+        defaultActiveKey={'bar-chart'}
       >
         <Tab
           eventKey={'simple-lines'}
@@ -333,30 +222,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           className='pt-2'
           mountOnEnter
         >
-          <Row>
-            <Col lg={6}>
-              <p>
-                Shows 50th percentile values as a line graph.
-              </p>
-              <p>
-                Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
-                intervals as a stacked bar chart.
-              </p>
-            </Col>
-            <Col lg={5}>
-              You can select bar widths at right.
-            </Col>
-            <Col lg={1}>
-              <Select
-                options={barChartWidthOptions}
-                value={this.state.barChartWidth}
-                onChange={this.handleChangeBarChartWidth}
-              />
-            </Col>
-          </Row>
-          <C3Graph
-            id={'projected-change-graph2'}
-            {...c3optionsBarChart}
+          <BarChart
+            historicalTimePeriod={historicalTimePeriod}
+            futureTimePeriods={futureTimePeriods}
+            graphConfig={graphConfig}
+            variableInfo={variableInfo}
+            percentiles={percentiles}
+            percentileValuesByTimePeriod={percentileValuesByTimePeriod}
           />
         </Tab>
       </Tabs>
