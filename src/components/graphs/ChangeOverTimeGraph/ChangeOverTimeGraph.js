@@ -46,12 +46,9 @@ import {
   ceilMultiple,
 } from '../utils';
 import SimpleLineGraph from '../SimpleLineGraph';
+import PseudoFilledLineGraph from '../PseudoFilledLineGraph';
 
 
-const numInterpolationSelectorOptions =
-  map(n => ({ label: n, value: n }))(
-    [3, 4, 5, 10, 20, 40, 60, 80, 100]
-  );
 const barChartWidthOptions =
   map(n => ({ label: n, value: n }))(
     [0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
@@ -293,104 +290,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const timeInterpolator = interpolateArrayBy(5);
     const timeInterpPercentiles = timeInterpolator(percentileValuesT);
 
-    /////////////////////////////////////////////////////////////////////
-    // Alternative: Pseudo-filled line graph
-
-    const valueInterpolator = interpolateArrayBy(this.state.numInterpolations.value);
-    const valueInterpPercentiles = valueInterpolator(percentiles);
-    const valueInterpPercentileValuesByTimePeriod =
-      map(valueInterpolator)(percentileValuesByTimePeriod);
-
-    const datasetName = p => `${p}th`;
-    const primaryDatasetNames = map(datasetName)(percentiles);
-    const allDatasetNames = map(datasetName)(valueInterpPercentiles);
-
-    // Create the data rows for C3.
-    const rows3 = concatAll([
-      // Dataset names: The first, 'time' is the x (horizontal) axis.
-      // The rest are the names of the various percentile-vs-time curves.
-      [concatAll([
-        'time',
-        allDatasetNames
-      ])],
-
-      // Place a zero for the historical time period "anomaly", which is the
-      // first point in each series.
-      [concatAll([
-        middleYear(historicalTimePeriod),
-        map(p => 0)(valueInterpPercentiles)
-      ])],
-
-      // Now the data from the backend (props.statistics).
-      flow(
-        zipAll,
-        map(concatAll),
-      )([
-        map(middleYear)(futureTimePeriods),
-        valueInterpPercentileValuesByTimePeriod,
-      ]),
-    ]);
-    console.log('### ChangeOverTimeGraph.render: rows3', rows3)
-
-    const c3optionsPseudoFilled = merge(
-      graphConfig.c3optionsPseudoFilled,
-      {
-        data: {
-          x: 'time',
-          rows: rows3,
-          colors: flow(
-            map(p => {
-              const key = datasetName(p);
-              if (p === 50) {
-                return [key, 'black']
-              }
-              if (p < 25 || p > 75) {
-                // return [key, '#cccccc'];
-                return [key, '#89dd44'];
-              }
-              // return [key, '#aaaaaa'];
-              return [key, '#4493dd'];
-            }),
-            fromPairs,
-          )(valueInterpPercentiles),
-        },
-        axis: {
-          y: {
-            label: {
-              text: `Change in ${variableInfo.label} (${displayUnits})`,
-            },
-          },
-        },
-        legend: {
-          hide: difference(allDatasetNames, primaryDatasetNames),
-        },
-        tooltip: {
-          format: {
-            title: year => `${floorMultiple(10, year)}s`,
-            name: name => `${name} %ile`,
-            value: (value, ratio, id) => {
-              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
-                return `${displayFormat(2, value)} ${displayUnits}`;
-              }
-            },
-          },
-        },
-        regions:
-          mapWithKey((tp, index) => ({
-            axis: 'x',
-            start: Number(tp.start_date),
-            end: Number(tp.end_date),
-            class: index ? styles.projected : styles.baseline,
-          }))(concatAll([historicalTimePeriod, futureTimePeriods]))
-      }
-    );
-    console.log('### ChangeOverTimeGraph.render: c3optionsPseudoFilled', c3optionsPseudoFilled)
-
-
     return (
       <Tabs
         id={'graph-alternatives'}
-        defaultActiveKey={'simple-lines'}
+        defaultActiveKey={'psuedofilled-lines'}
       >
         <Tab
           eventKey={'simple-lines'}
@@ -414,35 +317,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           className='pt-2'
           mountOnEnter
         >
-          <Row>
-            <Col lg={6}>
-              <p>
-                Shows 10th, 25th, 50th, 75th, and 90th percentile values as line
-                graphs.
-              </p>
-              <p>
-                As an approximation to filling these primary data lines,
-                we (linearly) interpolate a variable number of intermediate graph
-                lines.
-              </p>
-            </Col>
-            <Col lg={5}>
-              <p>You can experiment with various densities of interpolation
-              with the dropdown at left. Bear in mind that the number of lines
-              created is equal to 4 * N + 1; so for an interpolation factor
-              of 100, 401 lines are being drawn.</p>
-            </Col>
-            <Col lg={1}>
-              <Select
-                options={numInterpolationSelectorOptions}
-                value={this.state.numInterpolations}
-                onChange={this.handleChangeNInterpolations}
-              />
-            </Col>
-          </Row>
-          <C3Graph
-            id={'projected-change-graph3'}
-            {...c3optionsPseudoFilled}
+          <PseudoFilledLineGraph
+            historicalTimePeriod={historicalTimePeriod}
+            futureTimePeriods={futureTimePeriods}
+            graphConfig={graphConfig}
+            variableInfo={variableInfo}
+            percentiles={percentiles}
+            percentileValuesByTimePeriod={percentileValuesByTimePeriod}
           />
         </Tab>
 
