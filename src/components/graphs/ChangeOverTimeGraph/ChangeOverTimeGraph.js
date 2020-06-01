@@ -396,9 +396,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
                 return [key, 'black']
               }
               if (p < 25 || p > 75) {
-                return [key, '#0066CC']
+                // return [key, '#cccccc'];
+                return [key, '#89dd44'];
               }
-              return [key, '#004080']
+              // return [key, '#aaaaaa'];
+              return [key, '#4493dd'];
             }),
             fromPairs,
           )(interpPercentiles),
