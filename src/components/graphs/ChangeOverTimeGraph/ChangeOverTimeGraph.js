@@ -23,6 +23,7 @@ import flow from 'lodash/fp/flow';
 import includes from 'lodash/fp/includes';
 import fromPairs from 'lodash/fp/fromPairs';
 import difference from 'lodash/fp/difference';
+import slice from 'lodash/fp/slice';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -180,8 +181,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
-    const c3options = merge(
-      graphConfig.c3options,
+    const c3optionsSimpleLine = merge(
+      graphConfig.c3optionsSimpleLine,
       {
         data: {
           x: 'time',
@@ -237,6 +238,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const yMin = minPercentileValue + offset;
     const yMax = maxPercentileValue + offset;
     console.log('### ChangeOverTimeGraph.render: yMin, yMax', yMin, yMax)
+    const fakeMedianBarValue = (yMax - yMin) / 500;
 
     const percentileValueDifferencesByTimePeriodWithOffset = map(
       pileValues => map(
@@ -245,29 +247,30 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     )(percentileValuesByTimePeriod);
     console.log('### ChangeOverTimeGraph.render: percentileValueDifferencesByTimePeriodWithOffset', percentileValueDifferencesByTimePeriodWithOffset)
 
+    const injectMedianValue = curry((value, items) =>
+      concatAll([slice(0, 3, items), value, slice(3, 5, items)])
+    );
+    const percentileDifferenceNames = flow(
+      map(
+        i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
+      ),
+      injectMedianValue('median'),
+    )(percentileIndices);
+
     const rows2 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
       // The rest are the names of the various percentile-vs-time curves.
       [concatAll([
         'time',
-        map(
-          i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
-        )(percentileIndices),
+        percentileDifferenceNames,
         map(p => `${p}th`)(percentiles),
-      ])],
-
-      // Fake data row to impose desired ordering of datasets in stacks
-      [concatAll([
-        0,
-        map(i => i * 1000)(percentileIndices),
-        map(() => null)(percentileIndices),
       ])],
 
       // Zero row for the historical time period "anomaly", which is the
       // first actual point in each series.
       [concatAll([
         middleYear(historicalTimePeriod),
-        map(() => 0)(percentileIndices),
+        injectMedianValue(0, map(() => 0)(percentileIndices)),
         map(() => offset)(percentileIndices),
       ])],
 
@@ -276,14 +279,17 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         map(concatAll),
       )([
         map(middleYear)(futureTimePeriods),
-        percentileValueDifferencesByTimePeriodWithOffset,
+        map(
+          injectMedianValue(fakeMedianBarValue),
+          percentileValueDifferencesByTimePeriodWithOffset
+        ),
         map(map(addOffset))(percentileValuesByTimePeriod),
       ]),
     ]);
     console.log('### ChangeOverTimeGraph.render: rows2', rows2)
 
-    const c3options2 = merge(
-      graphConfig.c3options2,
+    const c3optionsBarChart = merge(
+      graphConfig.c3optionsBarChart,
       {
         data: {
           x: 'time',
@@ -314,6 +320,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         },
       }
     );
+    console.log('### ChangeOverTimeGraph.render: c3optionsBarChart', c3optionsBarChart)
 
     /////////////////////////////////////////////////////////////////////
     // Alternative: Pseudo-filled line graph
@@ -376,8 +383,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     ]);
     console.log('### ChangeOverTimeGraph.render: rows3', rows3)
 
-    const c3options3 = merge(
-      graphConfig.c3options3,
+    const c3optionsPseudoFilled = merge(
+      graphConfig.c3optionsPseudoFilled,
       {
         data: {
           x: 'time',
@@ -389,9 +396,9 @@ class ChangeOverTimeGraphDisplay extends React.Component {
                 return [key, 'black']
               }
               if (p < 25 || p > 75) {
-                return [key, '#cccccc']
+                return [key, '#0066CC']
               }
-              return [key, '#aaaaaa']
+              return [key, '#004080']
             }),
             fromPairs,
           )(interpPercentiles),
@@ -426,13 +433,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           }))(concatAll([historicalTimePeriod, futureTimePeriods]))
       }
     );
-    console.log('### ChangeOverTimeGraph.render: c3options3', c3options3)
+    console.log('### ChangeOverTimeGraph.render: c3optionsPseudoFilled', c3optionsPseudoFilled)
 
 
     return (
       <Tabs
         id={'graph-alternatives'}
-        defaultActiveKey={'simple-lines'}
+        defaultActiveKey={'bar-chart'}
       >
         <Tab
           eventKey={'simple-lines'}
@@ -446,7 +453,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           </p>
           <C3Graph
             id={'projected-change-graph'}
-            {...c3options}
+            {...c3optionsSimpleLine}
           />
         </Tab>
 
@@ -486,7 +493,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           </Row>
           <C3Graph
             id={'projected-change-graph3'}
-            {...c3options3}
+            {...c3optionsPseudoFilled}
           />
         </Tab>
 
@@ -509,9 +516,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
             except for 50th percentile values. Adding the other primary
             percentile values as similar graphs is ugly and unhelpfule.
           </p>
+          <p>offset = {offset}</p>
           <C3Graph
             id={'projected-change-graph2'}
-            {...c3options2}
+            {...c3optionsBarChart}
           />
         </Tab>
       </Tabs>

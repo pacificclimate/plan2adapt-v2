@@ -8,7 +8,7 @@ selectors:
     British Columbia ...
   region:
     prefix: within the region of
-    default: bc
+    default: alberni_clayoquot
     forTabs: ['summary', 'impacts', 'maps', 'graphs']
   timePeriod:
     prefix: during the
@@ -16,7 +16,7 @@ selectors:
     forTabs: ['summary', 'impacts', 'maps']
   variable:
     prefix: with details about
-    default: pr
+    default: gdd
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
@@ -637,7 +637,7 @@ graph:
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
   config:
-    c3options3:
+    c3optionsPseudoFilled:
       # C3 option values to be merged with computed options values.
       size:
         height: 600
@@ -661,7 +661,7 @@ graph:
       point:
         show: false
 
-    c3options2:
+    c3optionsBarChart:
       size:
         height: 600
       axis:
@@ -686,6 +686,7 @@ graph:
       data:
         x: time
         type: bar
+        order: null
         types:
           '10th': line
           '25th': line
@@ -693,18 +694,28 @@ graph:
           '75th': line
           '90th': line
         groups:
-          - ['0-10th',  '10-25th', '25-50th', '50-75th', '75-90th']
+          - ['0-10th', '10-25th', '25-50th', 'median', '50-75th', '75-90th']
         colors:
           '10th': transparent
           '90th': transparent
           '25th': transparent
           '75th': transparent
+#          '10th': '#cccccc'
+#          '90th': '#cccccc'
+#          '25th': '#aaaaaa'
+#          '75th': '#aaaaaa'
           '50th': black
           '0-10th': transparent
           '10-25th': '#cccccc'
           '75-90th': '#cccccc'
           '25-50th': '#aaaaaa'
           '50-75th': '#aaaaaa'
+          median: black
+#          '0-10th': red
+#          '10-25th': orange
+#          '25-50th': yellow
+#          '50-75th': green
+#          '75-90th': blue
 #        hide: ['10th', '25th', '75th', '90th', ]
       legend:
         hide: ['0-10th', '10th', '25th', '75th', '90th']
@@ -712,7 +723,7 @@ graph:
         width:
           ratio: 2.5
 
-    c3options:
+    c3optionsSimpleLine:
       # C3 option values to be merged with computed options values.
       size:
         height: 600
