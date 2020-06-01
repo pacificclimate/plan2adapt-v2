@@ -8,7 +8,7 @@ import range from 'lodash/fp/range';
 import flattenDeep from 'lodash/fp/flattenDeep';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
-import { ceilMultiple, floorMultiple } from './utils';
+import { ceilMultiple, floorMultiple, interpolateArrayBy } from './utils';
 import map from 'lodash/fp/map';
 import curry from 'lodash/fp/curry';
 import { concatAll } from '../../utils/lodash-fp-extras';
@@ -19,6 +19,15 @@ import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import { displayFormat } from '../../utils/variables-and-units';
+
+
+// zipAll computes the transpose of a 2D matrix.
+const transpose = zipAll;
+
+const numInterpolationSelectorOptions =
+  map(n => ({ label: n, value: n }))(
+    [1, 2, 3, 4, 5, 8, 10, 12, 16, 20]
+  );
 
 
 const barChartWidthOptions =
@@ -51,8 +60,12 @@ export default class BarChart extends React.Component {
   };
 
   state = {
+    numInterpolations: numInterpolationSelectorOptions[9],
     barChartWidth: barChartWidthOptions[0],
   };
+
+  handleChangeNInterpolations =
+    numInterpolations => this.setState({ numInterpolations });
 
   handleChangeBarChartWidth =
     barChartWidth => this.setState({ barChartWidth });
@@ -65,27 +78,35 @@ export default class BarChart extends React.Component {
     } = this.props;
 
     const percentileIndices = range(0, percentiles.length);
-    const percentile50Index = 2; // TODO: Determine from percentiles
 
     // You know I could do this in a one-liner, right?
     const allPercentileValues = flattenDeep([0, percentileValuesByTimePeriod]);
     const minPercentileValue = min(allPercentileValues);
     const maxPercentileValue = max(allPercentileValues);
 
-    // const offset = 6;
     const offset = ceilMultiple(2, -min([0, minPercentileValue]));
     const addOffset = v => v + offset;
     console.log('### BarChart.render: minPercentileValue, offset', minPercentileValue, offset)
     const yMin = minPercentileValue + offset;
     const yMax = maxPercentileValue + offset;
     console.log('### BarChart.render: yMin, yMax', yMin, yMax)
-    const fakeMedianBarValue = (yMax - yMin) / 500;
+    const fakeMedianBarValue = (yMax - yMin) / 400;
+
+    // Interpolate temporally
+    const timeInterpolator = interpolateArrayBy(this.state.numInterpolations.value);
+
+    const futureTPMiddleYears = map(middleYear)(futureTimePeriods);
+    const timeInterpFutureTPMMiddleYears = timeInterpolator(futureTPMiddleYears);
+
+    const percentileValuesT = transpose(percentileValuesByTimePeriod);
+    const timeInterpPercentilesT = map(timeInterpolator)(percentileValuesT);
+    const timeInterpPercentilesByTimePeriod = transpose(timeInterpPercentilesT);
 
     const percentileValueDifferencesByTimePeriodWithOffset = map(
       pileValues => map(
         i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
       )(percentileIndices)
-    )(percentileValuesByTimePeriod);
+    )(timeInterpPercentilesByTimePeriod);
     console.log('### BarChart.render: percentileValueDifferencesByTimePeriodWithOffset', percentileValueDifferencesByTimePeriodWithOffset)
 
     const injectMedianValue = curry((value, items) =>
@@ -119,12 +140,12 @@ export default class BarChart extends React.Component {
         zipAll,
         map(concatAll),
       )([
-        map(middleYear)(futureTimePeriods),
+        timeInterpFutureTPMMiddleYears,
         map(
           injectMedianValue(fakeMedianBarValue),
           percentileValueDifferencesByTimePeriodWithOffset
         ),
-        map(map(addOffset))(percentileValuesByTimePeriod),
+        map(map(addOffset))(timeInterpPercentilesByTimePeriod),
       ]),
     ]);
     console.log('### BarChart.render: rows2', rows2)
@@ -179,9 +200,24 @@ export default class BarChart extends React.Component {
               Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
               intervals as a stacked bar chart.
             </p>
+            <p>
+              Data is interpolated temporally.
+              N-1 interpolated time points (with interpolated values) are
+              placed between each successive pair of primary data points.
+              (Therefore there are a total of 2N + 1 bar stacks.)
+              Interpolation factor 1 yields the original bar chart.
+            </p>
           </Col>
-          <Col lg={6}>
-            Bar widths
+          <Col lg={3}>
+            Temporal interpolation factor
+            <Select
+              options={numInterpolationSelectorOptions}
+              value={this.state.numInterpolations}
+              onChange={this.handleChangeNInterpolations}
+            />
+          </Col>
+          <Col lg={3}>
+            Bar width
             <Select
               options={barChartWidthOptions}
               value={this.state.barChartWidth}
