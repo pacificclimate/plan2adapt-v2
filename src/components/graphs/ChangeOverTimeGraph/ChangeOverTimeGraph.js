@@ -42,6 +42,17 @@ import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 
 
+const numInterpolationSelectorOptions =
+  map(n => ({ label: n, value: n }))(
+    [3, 4, 5, 10, 20, 40, 60, 80, 100]
+  );
+const barChartWidthOptions =
+  map(n => ({ label: n, value: n }))(
+    [0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
+  );
+
+
+
 const percentiles = [10, 25, 50, 75, 90];
 
 
@@ -110,10 +121,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
   state = {
     numInterpolations: { label: 10, value: 10 },
+    barChartWidth: { label: 0.1, value: 0.1 },
   };
 
   handleChangeNInterpolations =
       numInterpolations => this.setState({ numInterpolations });
+  handleChangeBarChartWidth =
+      barChartWidth => this.setState({ barChartWidth });
 
   render() {
     const {
@@ -294,6 +308,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         data: {
           x: 'time',
           rows: rows2,
+        },
+        bar: {
+          width: {
+            ratio: this.state.barChartWidth.value
+          },
         },
         axis: {
           y: {
@@ -485,9 +504,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
             </Col>
             <Col lg={1}>
               <Select
-                options={
-                  map(n => ({ label: n, value: n }))([3, 4, 5, 10, 20, 40, 60, 80, 100])
-                }
+                options={numInterpolationSelectorOptions}
                 value={this.state.numInterpolations}
                 onChange={this.handleChangeNInterpolations}
               />
@@ -505,20 +522,27 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           className='pt-2'
           mountOnEnter
         >
-          <p>
-            Shows 50th percentile values as a line graph.
-          </p>
-          <p>
-            Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
-            intervals as a stacked bar chart.
-          </p>
-          <p>
-            This presentation is the most technically accurate, but it does not
-            provide visual interpolation (which may or may not be justified)
-            except for 50th percentile values. Adding the other primary
-            percentile values as similar graphs is ugly and unhelpfule.
-          </p>
-          <p>offset = {offset}</p>
+          <Row>
+            <Col lg={6}>
+              <p>
+                Shows 50th percentile values as a line graph.
+              </p>
+              <p>
+                Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
+                intervals as a stacked bar chart.
+              </p>
+            </Col>
+            <Col lg={5}>
+              You can select bar widths at right.
+            </Col>
+            <Col lg={1}>
+              <Select
+                options={barChartWidthOptions}
+                value={this.state.barChartWidth}
+                onChange={this.handleChangeBarChartWidth}
+              />
+            </Col>
+          </Row>
           <C3Graph
             id={'projected-change-graph2'}
             {...c3optionsBarChart}
