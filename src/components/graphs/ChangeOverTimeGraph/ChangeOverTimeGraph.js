@@ -40,6 +40,12 @@ import styles from './ChangeOverTimeGraph.module.css';
 import './ChangeOverTimeGraph.css';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
+import {
+  interpolateArrayBy,
+  floorMultiple,
+  ceilMultiple,
+} from '../utils';
+import SimpleLineGraph from '../SimpleLineGraph';
 
 
 const numInterpolationSelectorOptions =
@@ -50,7 +56,6 @@ const barChartWidthOptions =
   map(n => ({ label: n, value: n }))(
     [0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
   );
-
 
 
 const percentiles = [10, 25, 50, 75, 90];
@@ -170,65 +175,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const percentileValuesByTimePeriod = map(
       stat => convertData(stat.percentiles)
     )(statistics);
-
-    /////////////////////////////////////////////////////////////////////
-    // Alternative: Unfilled percentile line graph
-
-    // Create the data rows for C3.
-    const rows = concatAll([
-      // Dataset names: The first, 'time' is the x (horizontal) axis.
-      // The rest are the names of the various percentile-vs-time curves.
-      [concat(['time'], map(p => `${p}th`)(percentiles))],
-
-      // Place a zero for the historical time period "anomaly", which is the
-      // first point in each series.
-      [concat(middleYear(historicalTimePeriod), map(p => 0)(percentiles))],
-
-      // Now the data from the backend (props.statistics).
-      zipWith(
-        (ftp, pileValues) => concat(middleYear(ftp), pileValues),
-        futureTimePeriods,
-        percentileValuesByTimePeriod,
-      ),
-    ]);
-    console.log('### ChangeOverTimeGraph.render: rows', rows)
-
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
-    const c3optionsSimpleLine = merge(
-      graphConfig.c3optionsSimpleLine,
-      {
-        data: {
-          x: 'time',
-          rows,
-        },
-        axis: {
-          y: {
-            label: {
-              text: `Change in ${variableInfo.label} (${displayUnits})`,
-            },
-          },
-        },
-        tooltip: {
-          format: {
-            title: year => `${floorMultiple(10, year)}s`,
-            name: name => `${name} %ile`,
-            value: (value, ratio, id) => {
-              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
-                return `${displayFormat(2, value)} ${displayUnits}`;
-              }
-            },
-          },
-        },
-        regions:
-          mapWithKey((tp, index) => ({
-            axis: 'x',
-            start: Number(tp.start_date),
-            end: Number(tp.end_date),
-            class: index ? styles.projected : styles.baseline,
-          }))(concatAll([historicalTimePeriod, futureTimePeriods]))
-      }
-    );
 
     /////////////////////////////////////////////////////////////////////
     // Alternative: Bar chart, with 50th %ile line.
@@ -242,10 +190,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const maxPercentileValue = max(allPercentileValues);
 
     // const offset = 6;
-    const fMultiple = curry((f, mult, value) => f(value/mult) * mult);
-    const ceilMultiple = fMultiple(Math.ceil);
-    const floorMultiple = fMultiple(Math.floor);
-    const roundMultiple = fMultiple(Math.round);
     const offset = ceilMultiple(2, -min([0, minPercentileValue]));
     const addOffset = v => v + offset;
     console.log('### ChangeOverTimeGraph.render: minPercentileValue, offset', minPercentileValue, offset)
@@ -342,38 +286,24 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     console.log('### ChangeOverTimeGraph.render: c3optionsBarChart', c3optionsBarChart)
 
     /////////////////////////////////////////////////////////////////////
+    // Alternative: Bar chart, with time interpolation.
+
+    // Note: zipAll computes the transpose of a 2D matrix.
+    const percentileValuesT = zipAll(percentileValuesByTimePeriod);
+    const timeInterpolator = interpolateArrayBy(5);
+    const timeInterpPercentiles = timeInterpolator(percentileValuesT);
+
+    /////////////////////////////////////////////////////////////////////
     // Alternative: Pseudo-filled line graph
 
-    const interpolateBy = curry((n, v1, v2) => {
-      // Compute `n` interpolated values between `v1` and `v2`.
-      // Return an array `r` of `n` interpolated values, such that
-      // `r[0] === v1`, `r[n] === v2`, and `r[i] < r[j]` for `0 <= i < j < n`.
-      // Interpolation is linear.
-      const delta = (v2 - v1) / n;
-      return map(i => v1 + i * delta)(range(0, n));
-    });
-
-    const interpolateArrayBy = curry((n, a) => {
-      // Compute `n` interpolated values between each successive pair of
-      // values in array `a`.
-      // Return an array `r` of `m = (a.length-1) * n + 1` interpolated values
-      // with r[0] = a[0], r[m-1] = a[a.length-1].
-      const length = a.length;
-      return flow(
-        range(0),
-        map(i => i < length-1 ? interpolateBy(n, a[i], a[i+1]) : a[i]),
-        flatten,
-      )(length);
-    });
-
-    const interpolateArray = interpolateArrayBy(this.state.numInterpolations.value);
-    const interpPercentiles = interpolateArray(percentiles);
-    const interpPercentileValuesByTimePeriod =
-      map(interpolateArray)(percentileValuesByTimePeriod);
+    const valueInterpolator = interpolateArrayBy(this.state.numInterpolations.value);
+    const valueInterpPercentiles = valueInterpolator(percentiles);
+    const valueInterpPercentileValuesByTimePeriod =
+      map(valueInterpolator)(percentileValuesByTimePeriod);
 
     const datasetName = p => `${p}th`;
     const primaryDatasetNames = map(datasetName)(percentiles);
-    const allDatasetNames = map(datasetName)(interpPercentiles);
+    const allDatasetNames = map(datasetName)(valueInterpPercentiles);
 
     // Create the data rows for C3.
     const rows3 = concatAll([
@@ -388,7 +318,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       // first point in each series.
       [concatAll([
         middleYear(historicalTimePeriod),
-        map(p => 0)(interpPercentiles)
+        map(p => 0)(valueInterpPercentiles)
       ])],
 
       // Now the data from the backend (props.statistics).
@@ -397,7 +327,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         map(concatAll),
       )([
         map(middleYear)(futureTimePeriods),
-        interpPercentileValuesByTimePeriod,
+        valueInterpPercentileValuesByTimePeriod,
       ]),
     ]);
     console.log('### ChangeOverTimeGraph.render: rows3', rows3)
@@ -422,7 +352,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
               return [key, '#4493dd'];
             }),
             fromPairs,
-          )(interpPercentiles),
+          )(valueInterpPercentiles),
         },
         axis: {
           y: {
@@ -460,7 +390,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     return (
       <Tabs
         id={'graph-alternatives'}
-        defaultActiveKey={'bar-chart'}
+        defaultActiveKey={'simple-lines'}
       >
         <Tab
           eventKey={'simple-lines'}
@@ -468,13 +398,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           className='pt-2'
           mountOnEnter
         >
-          <p>
-            Shows 10th, 25th, 50th, 75th, and 90th percentile values as
-            line graphs. No fill between these lines.
-          </p>
-          <C3Graph
-            id={'projected-change-graph'}
-            {...c3optionsSimpleLine}
+          <SimpleLineGraph
+            historicalTimePeriod={historicalTimePeriod}
+            futureTimePeriods={futureTimePeriods}
+            graphConfig={graphConfig}
+            variableInfo={variableInfo}
+            percentiles={percentiles}
+            percentileValuesByTimePeriod={percentileValuesByTimePeriod}
           />
         </Tab>
 
