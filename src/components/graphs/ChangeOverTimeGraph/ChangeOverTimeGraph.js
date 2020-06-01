@@ -1,59 +1,25 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Tabs from 'react-bootstrap/Tabs';
 import Tab from 'react-bootstrap/Tab';
-import C3Graph from '../C3Graph';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import curry from 'lodash/fp/curry';
 import map from 'lodash/fp/map';
-import zipWith from 'lodash/fp/zipWith';
-import zipAll from 'lodash/fp/zipAll';
-import concat from 'lodash/fp/concat';
-import merge from 'lodash/fp/merge';
-import range from 'lodash/fp/range';
-import min from 'lodash/fp/min';
-import max from 'lodash/fp/max';
-import flatten from 'lodash/fp/flatten';
-import flattenDeep from 'lodash/fp/flattenDeep';
-import flow from 'lodash/fp/flow';
-import includes from 'lodash/fp/includes';
-import fromPairs from 'lodash/fp/fromPairs';
-import difference from 'lodash/fp/difference';
-import slice from 'lodash/fp/slice';
 import {
   getDisplayData,
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
-import { middleYear } from '../../../utils/time-periods';
-import { concatAll } from '../../../utils/lodash-fp-extras';
 import {
-  displayFormat,
   getConvertUnits,
   getVariableDisplayUnits,
   getVariableInfo
 } from '../../../utils/variables-and-units';
-import styles from './ChangeOverTimeGraph.module.css';
 import './ChangeOverTimeGraph.css';
-import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
-import { SelectWithValueReplacement as Select } from 'pcic-react-components';
-import {
-  interpolateArrayBy,
-  floorMultiple,
-  ceilMultiple,
-} from '../utils';
 import SimpleLineGraph from '../SimpleLineGraph';
 import PseudoFilledLineGraph from '../PseudoFilledLineGraph';
 import BarChart from '../BarChart';
-
-
-const barChartWidthOptions =
-  map(n => ({ label: n, value: n }))(
-    [0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
-  );
 
 
 const percentiles = [10, 25, 50, 75, 90];
@@ -122,11 +88,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
-  state = {
-    numInterpolations: { label: 10, value: 10 },
-    barChartWidth: { label: 0.1, value: 0.1 },
-  };
-
   render() {
     const {
       variable,
@@ -169,15 +130,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       stat => convertData(stat.percentiles)
     )(statistics);
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
-
-
-    /////////////////////////////////////////////////////////////////////
-    // Alternative: Bar chart, with time interpolation.
-
-    // Note: zipAll computes the transpose of a 2D matrix.
-    const percentileValuesT = zipAll(percentileValuesByTimePeriod);
-    const timeInterpolator = interpolateArrayBy(5);
-    const timeInterpPercentiles = timeInterpolator(percentileValuesT);
 
     return (
       <Tabs
