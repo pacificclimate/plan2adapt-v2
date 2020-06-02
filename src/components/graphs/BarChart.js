@@ -203,7 +203,6 @@ export default class BarChart extends React.Component {
                 includes(timeInterpFutureTPMMiddleYears[index-1], futureTPMiddleYears)
               ) {
                 const displayValue = displayFormat(2, value - offset);
-                return `${displayValue} ${variableInfo.units} (${index})`;
                 return `${displayValue} ${variableInfo.units}`;
               }
             },
