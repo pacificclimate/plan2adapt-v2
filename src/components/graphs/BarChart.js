@@ -128,7 +128,7 @@ export default class BarChart extends React.Component {
       map(
         i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
       ),
-      injectMedianValue('median'),
+      // injectMedianValue('median'),
     )(percentileIndices);
     const primaryDatasetNames = map(percentileDatasetName)(percentiles);
 
@@ -145,7 +145,8 @@ export default class BarChart extends React.Component {
       // first actual point in each series.
       [concatAll([
         historicalTimePeriodMiddleYear,
-        injectMedianValue(0, map(() => 0)(percentileIndices)),
+        // injectMedianValue(0)(map(() => 0)(percentileIndices)),
+        map(() => 0)(percentileIndices),
         map(() => offset)(percentileIndices),
       ])],
 
@@ -154,10 +155,11 @@ export default class BarChart extends React.Component {
         map(concatAll),
       )([
         timeInterpFutureTPMMiddleYears,
-        map(
-          injectMedianValue(fakeMedianBarValue),
-          percentileValueDifferencesByTimePeriodWithOffset
-        ),
+        percentileValueDifferencesByTimePeriodWithOffset,
+        // map(
+        //   injectMedianValue(fakeMedianBarValue),
+        //   percentileValueDifferencesByTimePeriodWithOffset
+        // ),
         flow(
           map(map(addOffset)),
           map(reverse),
