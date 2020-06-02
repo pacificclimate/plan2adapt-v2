@@ -101,6 +101,8 @@ export default class BarChart extends React.Component {
     console.log('### BarChart.render: yMin, yMax', yMin, yMax)
     const fakeMedianBarValue = (yMax - yMin) / 400;
 
+    const historicalTimePeriodMiddleYear = middleYear(historicalTimePeriod);
+
     // Interpolate temporally
     const timeInterpolator = interpolateArrayBy(this.state.numInterpolations.value);
 
@@ -142,7 +144,7 @@ export default class BarChart extends React.Component {
       // Zero row for the historical time period "anomaly", which is the
       // first actual point in each series.
       [concatAll([
-        middleYear(historicalTimePeriod),
+        historicalTimePeriodMiddleYear,
         injectMedianValue(0, map(() => 0)(percentileIndices)),
         map(() => offset)(percentileIndices),
       ])],
@@ -192,54 +194,34 @@ export default class BarChart extends React.Component {
         tooltip: {
           format: {
             title: year => {
-              if (includes(year, futureTPMiddleYears)) {
-                return `${floorMultiple(10, year)}s`;
+              if (year === historicalTimePeriodMiddleYear) {
+                return `${floorMultiple(10, year)}s (baseline)`;
               }
+              if (includes(year, futureTPMiddleYears)) {
+                return `${floorMultiple(10, year)}s (average projected)`;
+              }
+              return `${year} (interpolated)`;
             },
-            name: name => `${name} %ile`,
+            name: (name, ratio, id, index) => {
+              if (index === 0) {
+                return 'all';
+              }
+              return `${name} %ile`;
+            },
             value: (value, ratio, id, index) => {
+              if (index === 0 && id === '10th') {
+                return 'no change';
+              }
+              const year = timeInterpFutureTPMMiddleYears[index-1];
               if (
                 includes(id, ['10th', '25th', '50th', '75th', '90th']) &&
-                includes(timeInterpFutureTPMMiddleYears[index-1], futureTPMiddleYears)
+                includes(year, futureTPMiddleYears)
               ) {
                 const displayValue = displayFormat(2, value - offset);
                 return `${displayValue} ${variableInfo.units}`;
               }
             },
           },
-          // contents: (data, defaultTitleFormat, defaultValueFormat, color) => {
-          //   // `data` is an array of objects like
-          //   // {
-          //   //   id: "0-10th"
-          //   //   index: 41
-          //   //   name: "0-10th"
-          //   //   value: 846.3571039244187
-          //   //   x: 2085
-          //   // }
-          //   // console.log('#### data', data)
-          //   if (!includes(data[0].x, futureTPMiddleYears)) {
-          //     return undefined;
-          //   }
-          //   return `
-          //     <table class="c3-tooltip">
-          //       <tbody>
-          //           <tr>
-          //               <th colspan="2">2080s</th>
-          //           </tr>
-          //           <tr class="c3-tooltip-name--\\39 0th">
-          //               <td class="name">
-          //                   <span style="background-color:#cccccc"></span>90th %ile
-          //                 </td>
-          //                 <td class="value">+1600 degree days</td>
-          //             </tr>
-          //             <tr class="c3-tooltip-name--\\37 5th"><td class="name"><span style="background-color:#aaaaaa"></span>75th %ile</td><td class="value">+1500 degree days</td></tr><tr class="c3-tooltip-name--\\35 0th"><td class="name"><span style="background-color:black"></span>50th %ile</td><td class="value">+1100 degree days</td></tr><tr class="c3-tooltip-name--\\32 5th"><td class="name"><span style="background-color:#aaaaaa"></span>25th %ile</td><td class="value">+1000 degree days</td></tr><tr class="c3-tooltip-name--\\31 0th"><td class="name"><span style="background-color:#cccccc"></span>10th %ile</td><td class="value">+850 degree days</td></tr></tbody></table>
-          //   `;
-          //   return flow(
-          //     map('value'),
-          //     map(displayFormat(2)),
-          //     join(', '),
-          //   )(data);
-          // },
         },
         regions:
           mapWithKey((tp, index) => ({
