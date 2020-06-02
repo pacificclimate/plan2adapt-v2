@@ -668,7 +668,7 @@ graph:
         x:
           type: indexed
           label:
-            text: Time Period (middle year)
+            text: Year
             position: outer-center
           min: 1960
           max: 2100
