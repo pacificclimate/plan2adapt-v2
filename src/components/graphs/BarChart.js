@@ -26,6 +26,8 @@ import includes from 'lodash/fp/includes';
 import join from 'lodash/fp/join';
 import reverse from 'lodash/fp/reverse';
 import { displayFormat } from '../../utils/variables-and-units';
+import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
+import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
 
 
 // zipAll computes the transpose of a 2D matrix.
@@ -240,6 +242,13 @@ export default class BarChart extends React.Component {
           //   )(data);
           // },
         },
+        regions:
+          mapWithKey((tp, index) => ({
+            axis: 'x',
+            start: Number(tp.start_date),
+            end: Number(tp.end_date),
+            class: index ? styles.projected : styles.baseline,
+          }))(concatAll([historicalTimePeriod, futureTimePeriods])),
       }
     );
     console.log('### BarChart.render: c3options', c3options)
