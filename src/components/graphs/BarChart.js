@@ -8,7 +8,12 @@ import range from 'lodash/fp/range';
 import flattenDeep from 'lodash/fp/flattenDeep';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
-import { ceilMultiple, floorMultiple, interpolateArrayBy } from './utils';
+import {
+  ceilMultiple,
+  floorMultiple,
+  interpolateArrayBy,
+  percentileDatasetName
+} from './utils';
 import map from 'lodash/fp/map';
 import curry from 'lodash/fp/curry';
 import { concatAll } from '../../utils/lodash-fp-extras';
@@ -19,6 +24,7 @@ import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import join from 'lodash/fp/join';
+import reverse from 'lodash/fp/reverse';
 import { displayFormat } from '../../utils/variables-and-units';
 
 
@@ -113,12 +119,14 @@ export default class BarChart extends React.Component {
     const injectMedianValue = curry((value, items) =>
       concatAll([slice(0, 3, items), value, slice(3, 5, items)])
     );
+
     const percentileDifferenceNames = flow(
       map(
         i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
       ),
       injectMedianValue('median'),
     )(percentileIndices);
+    const primaryDatasetNames = map(percentileDatasetName)(percentiles);
 
     const rows2 = concatAll([
       // Dataset names: The first, 'time' is the x (horizontal) axis.
@@ -126,7 +134,7 @@ export default class BarChart extends React.Component {
       [concatAll([
         'time',
         percentileDifferenceNames,
-        map(p => `${p}th`)(percentiles),
+        reverse(primaryDatasetNames),
       ])],
 
       // Zero row for the historical time period "anomaly", which is the
@@ -146,7 +154,11 @@ export default class BarChart extends React.Component {
           injectMedianValue(fakeMedianBarValue),
           percentileValueDifferencesByTimePeriodWithOffset
         ),
-        map(map(addOffset))(timeInterpPercentilesByTimePeriod),
+        flow(
+          map(map(addOffset)),
+          map(reverse),
+        )(timeInterpPercentilesByTimePeriod),
+
       ]),
     ]);
     console.log('### BarChart.render: rows2', rows2)
