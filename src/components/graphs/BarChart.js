@@ -18,6 +18,7 @@ import { middleYear } from '../../utils/time-periods';
 import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
+import join from 'lodash/fp/join';
 import { displayFormat } from '../../utils/variables-and-units';
 
 
@@ -176,14 +177,56 @@ export default class BarChart extends React.Component {
         },
         tooltip: {
           format: {
-            title: year => `${floorMultiple(10, year)}s`,
+            title: year => {
+              if (includes(year, futureTPMiddleYears)) {
+                return `${floorMultiple(10, year)}s`;
+              }
+            },
             name: name => `${name} %ile`,
-            value: (value, ratio, id) => {
-              if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
-                return `${displayFormat(2, value - offset)} ${variableInfo.units}`;
+            value: (value, ratio, id, index) => {
+              if (
+                includes(id, ['10th', '25th', '50th', '75th', '90th']) &&
+                includes(timeInterpFutureTPMMiddleYears[index-1], futureTPMiddleYears)
+              ) {
+                const displayValue = displayFormat(2, value - offset);
+                return `${displayValue} ${variableInfo.units} (${index})`;
+                return `${displayValue} ${variableInfo.units}`;
               }
             },
           },
+          // contents: (data, defaultTitleFormat, defaultValueFormat, color) => {
+          //   // `data` is an array of objects like
+          //   // {
+          //   //   id: "0-10th"
+          //   //   index: 41
+          //   //   name: "0-10th"
+          //   //   value: 846.3571039244187
+          //   //   x: 2085
+          //   // }
+          //   // console.log('#### data', data)
+          //   if (!includes(data[0].x, futureTPMiddleYears)) {
+          //     return undefined;
+          //   }
+          //   return `
+          //     <table class="c3-tooltip">
+          //       <tbody>
+          //           <tr>
+          //               <th colspan="2">2080s</th>
+          //           </tr>
+          //           <tr class="c3-tooltip-name--\\39 0th">
+          //               <td class="name">
+          //                   <span style="background-color:#cccccc"></span>90th %ile
+          //                 </td>
+          //                 <td class="value">+1600 degree days</td>
+          //             </tr>
+          //             <tr class="c3-tooltip-name--\\37 5th"><td class="name"><span style="background-color:#aaaaaa"></span>75th %ile</td><td class="value">+1500 degree days</td></tr><tr class="c3-tooltip-name--\\35 0th"><td class="name"><span style="background-color:black"></span>50th %ile</td><td class="value">+1100 degree days</td></tr><tr class="c3-tooltip-name--\\32 5th"><td class="name"><span style="background-color:#aaaaaa"></span>25th %ile</td><td class="value">+1000 degree days</td></tr><tr class="c3-tooltip-name--\\31 0th"><td class="name"><span style="background-color:#cccccc"></span>10th %ile</td><td class="value">+850 degree days</td></tr></tbody></table>
+          //   `;
+          //   return flow(
+          //     map('value'),
+          //     map(displayFormat(2)),
+          //     join(', '),
+          //   )(data);
+          // },
         },
       }
     );
