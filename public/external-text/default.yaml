@@ -683,6 +683,17 @@ graph:
           label:
             text: Change in variable
             position: outer-middle
+      grid:
+        x:
+          lines:
+            - value: 1976
+              text: 1970s (baseline)
+            - value: 2025
+              text: 2020s
+            - value: 2055
+              text: 2050s
+            - value: 2085
+              text: 2020s
       data:
         x: time
         type: bar
