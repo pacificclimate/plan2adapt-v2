@@ -35,13 +35,13 @@ const transpose = zipAll;
 
 const numInterpolationSelectorOptions =
   map(n => ({ label: n, value: n }))(
-    [1, 2, 3, 4, 5, 8, 10, 12, 16, 20]
+    [1, 2, 3, 4, 5, 8, 10, 12, 15, 20]
   );
 
 
 const barChartWidthOptions =
   map(n => ({ label: n, value: n }))(
-    [0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
+    [0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
   );
 
 
