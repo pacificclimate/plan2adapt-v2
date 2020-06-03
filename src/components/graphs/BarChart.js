@@ -10,8 +10,8 @@ import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
 import {
   ceilMultiple,
-  floorMultiple,
-  interpolateArrayBy,
+  floorMultiple, interpolateArrayAt,
+  interpolateArrayBy, linearFnArray, linearInterpolator,
   percentileDatasetName
 } from './utils';
 import map from 'lodash/fp/map';
@@ -25,6 +25,7 @@ import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import join from 'lodash/fp/join';
 import reverse from 'lodash/fp/reverse';
+import flatten from 'lodash/fp/flatten';
 import { displayFormat } from '../../utils/variables-and-units';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
@@ -88,93 +89,167 @@ export default class BarChart extends React.Component {
 
     const percentileIndices = range(0, percentiles.length);
 
+    const percentileDifferenceNames = flow(
+      map(
+        i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
+      ),
+    )(percentileIndices);
+    const primaryDatasetNames = map(percentileDatasetName)(percentiles);
+
+
     // You know I could do this in a one-liner, right?
     const allPercentileValues = flattenDeep([0, percentileValuesByTimePeriod]);
     const minPercentileValue = min(allPercentileValues);
     const maxPercentileValue = max(allPercentileValues);
 
     const offset = ceilMultiple(2, -min([0, minPercentileValue]));
+    // const offset = 0;
     const addOffset = v => v + offset;
     console.log('### BarChart.render: minPercentileValue, offset', minPercentileValue, offset)
     const yMin = minPercentileValue + offset;
     const yMax = maxPercentileValue + offset;
     console.log('### BarChart.render: yMin, yMax', yMin, yMax)
-    const fakeMedianBarValue = (yMax - yMin) / 400;
 
-    const historicalTimePeriodMiddleYear = middleYear(historicalTimePeriod);
+    const historicalMiddleYear = middleYear(historicalTimePeriod);
+    const futureMiddleYears = map(middleYear)(futureTimePeriods);
+    console.log('### BarChart: futureMiddleYears:', futureMiddleYears)
 
-    // Interpolate temporally
-    const timeInterpolator = interpolateArrayBy(this.state.numInterpolations.value);
+    // Interpolate temporally: new
+    //
 
-    const futureTPMiddleYears = map(middleYear)(futureTimePeriods);
-    const timeInterpFutureTPMMiddleYears = timeInterpolator(futureTPMiddleYears);
+    //  baseTimes: [t0, t1, ... ]
+    //    from input data
+    const baseTimes = concatAll([
+      historicalMiddleYear,
+      futureMiddleYears
+    ]);
+    console.log('### BarChart: baseTimes:', baseTimes)
 
-    const percentileValuesT = transpose(percentileValuesByTimePeriod);
-    const timeInterpPercentilesT = map(timeInterpolator)(percentileValuesT);
-    const timeInterpPercentilesByTimePeriod = transpose(timeInterpPercentilesT);
+    //  basePercentileValuesByTime: [
+    //    [ P0,10; P0,25; P0,50; ... ],  // for t0
+    //    [ P1,10; P1,25; P1,50; ... ],  // for t1
+    //    ...
+    //  ]
+    //    from input data
+    const basePercentileValuesByTime = concatAll([
+      [map(() => 0)(percentileIndices)],  // zero values for historical time
+      percentileValuesByTimePeriod,       // data points
+    ]);
+    console.log('### BarChart: basePercentileValuesByTime:', basePercentileValuesByTime)
 
-    const percentileValueDifferencesByTimePeriodWithOffset = map(
+    //  basePercentileValuesByPercentile: [  // = transpose(basePercentileValuesByTime)
+    //    [ P0,10; P1,10; P2,10; ... ],  // for p=10
+    //    [ P0,25; P1,25; P2,25; ... ],  // for p=25
+    //    ...
+    //  ]
+    const basePercentileValuesByPercentile =
+      transpose(basePercentileValuesByTime);
+    console.log('### BarChart: basePercentileValuesByPercentile:', basePercentileValuesByPercentile)
+
+    //  interpTimes: [
+    //    [ t0,0; t0,1; t0,2; ... ], // t0,0 = t0
+    //    [ t1,0; t1,1; t1,2; ... ], // t1,0 = t1
+    //    ...
+    //  ]
+
+    //  interpPercentileValuesByPercentile: [
+    //    [                                 // for p=10
+    //      [ P0,0,10; P0,1,10; P0,2,10; ... ],  // for t0,0; t0,1; , ...
+    //      [ P1,0,10; P1,1,10; P1,2,10; ... ],  // for t1,0; t1,1; , ...
+    //      ...
+    //    ],
+    //    [                                 // for p=25
+    //      [ P0,0,25; P0,1,25; P0,2,25; ... ],  // for t0,0; t0,1; , ...
+    //      [ P1,0,25; P1,1,25; P1,2,25; ... ],  // for t1,0; t1,1; , ...
+    //      ...
+    //    ],
+    //  ]
+    //
+    //    Pi,j,p = percentile value at ti,j, percentile p
+    //    Pi,j,p = Ii,p(ti,j)
+    //      where Ii,p interpolates between Pi,p Pi+1,p
+    //    In our particular case, Ii,p is a linear interpolator
+
+    //    flatten second-level (per p value) arrays to get pure time series
+
+    // For each percentile, we want to interpolate the basePercentileValues
+    // at all the times.
+    const deltaT = 10;
+    const li = linearInterpolator(deltaT, baseTimes);
+    const interpTimesAndValues = map(li)(basePercentileValuesByPercentile);
+    // Each element in this array is a pair
+    //    [interpTimes, interpPercentilesValues]
+    // one pair for each percentile. The interpTimes are the same for each
+    // pair, because it is indpendent of the argument.
+    // interpPercentileValues differs in each because it depends on the
+    // argument.
+    const interpTimesDeep = interpTimesAndValues[0][0];
+    const interpPercentilesByPercentileDeep = map(1)(interpTimesAndValues);
+    console.log('### BarChart: interpTimesDeep:', interpTimesDeep)
+    console.log('### BarChart: interpPercentilesByPercentileDeep:', interpPercentilesByPercentileDeep)
+    const interpTimes = flatten(interpTimesDeep);
+    const interpPercentilesByPercentile =
+      map(flatten)(interpPercentilesByPercentileDeep);
+    console.log('### BarChart: interpTimes:', interpTimes)
+    console.log('### BarChart: interpPercentilesByPercentile:', interpPercentilesByPercentile)
+
+
+    //
+    //  GOAL:
+    // 
+    //  interpPercentileValuesByTime: [
+    //    [                                     // for t0
+    //      [P0,0,10; P0,0,25; P0,0,50; ...],   // for t0,0; P0,0,p = P0,p
+    //      [P0,1,10; P0,1,25; P0,1,50; ...],   // for t0,1
+    //      [P0,2,10; P0,2,25; P0,2,50; ...],   // for t0,2
+    //      ...
+    //    ],
+    //    [                                     // for t1
+    //      [P1,0,10; P1,0,25; P1,0,50; ...],   // for t1,0; P1,0,p = P1,p
+    //      [P1,1,10; P1,1,25; P1,1,50; ...],   // for t1,1
+    //      [P1,2,10; P1,2,25; P1,2,50; ...],   // for t1,2
+    //      ...
+    //    ],
+    //    ...
+    //  ]
+    const interpPercentileValuesByTime =
+      transpose(interpPercentilesByPercentile);
+    const interpPercentileValueDiffsByTimeWithOffset = map(
       pileValues => map(
         i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
       )(percentileIndices)
-    )(timeInterpPercentilesByTimePeriod);
-    console.log('### BarChart.render: percentileValueDifferencesByTimePeriodWithOffset', percentileValueDifferencesByTimePeriodWithOffset)
+    )(interpPercentileValuesByTime);
 
-    const injectMedianValue = curry((value, items) =>
-      concatAll([slice(0, 3, items), value, slice(3, 5, items)])
-    );
-
-    const percentileDifferenceNames = flow(
-      map(
-        i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
-      ),
-      // injectMedianValue('median'),
-    )(percentileIndices);
-    const primaryDatasetNames = map(percentileDatasetName)(percentiles);
-
-    const rows2 = concatAll([
-      // Dataset names: The first, 'time' is the x (horizontal) axis.
-      // The rest are the names of the various percentile-vs-time curves.
+    const rows = concatAll([
+      // Dataset names: concatenate the various names
       [concatAll([
         'time',
         percentileDifferenceNames,
         reverse(primaryDatasetNames),
       ])],
 
-      // Zero row for the historical time period "anomaly", which is the
-      // first actual point in each series.
-      [concatAll([
-        historicalTimePeriodMiddleYear,
-        // injectMedianValue(0)(map(() => 0)(percentileIndices)),
-        map(() => 0)(percentileIndices),
-        map(() => offset)(percentileIndices),
-      ])],
-
+      // Values: zip together times and values, then concatenate these triples
+      // to form a row for each triple
       flow(
         zipAll,
         map(concatAll),
       )([
-        timeInterpFutureTPMMiddleYears,
-        percentileValueDifferencesByTimePeriodWithOffset,
-        // map(
-        //   injectMedianValue(fakeMedianBarValue),
-        //   percentileValueDifferencesByTimePeriodWithOffset
-        // ),
+        interpTimes,
+        interpPercentileValueDiffsByTimeWithOffset,
         flow(
           map(map(addOffset)),
           map(reverse),
-        )(timeInterpPercentilesByTimePeriod),
-
-      ]),
+        )(interpPercentileValuesByTime),
+      ])
     ]);
-    console.log('### BarChart.render: rows2', rows2)
+    console.log('### BarChart: rows:', rows)
 
     const c3options = merge(
       graphConfig.c3optionsBarChart,
       {
         data: {
           x: 'time',
-          rows: rows2,
+          rows: rows,
         },
         bar: {
           width: {
@@ -196,10 +271,10 @@ export default class BarChart extends React.Component {
         tooltip: {
           format: {
             title: year => {
-              if (year === historicalTimePeriodMiddleYear) {
+              if (year === historicalMiddleYear) {
                 return `${floorMultiple(10, year)}s (baseline)`;
               }
-              if (includes(year, futureTPMiddleYears)) {
+              if (includes(year, futureMiddleYears)) {
                 return `${floorMultiple(10, year)}s (average projected)`;
               }
               return `${year} (interpolated)`;
@@ -214,10 +289,10 @@ export default class BarChart extends React.Component {
               if (index === 0 && id === '10th') {
                 return 'no change';
               }
-              const year = timeInterpFutureTPMMiddleYears[index-1];
+              const year = interpTimes[index];
               if (
                 includes(id, ['10th', '25th', '50th', '75th', '90th']) &&
-                includes(year, futureTPMiddleYears)
+                includes(year, futureMiddleYears)
               ) {
                 const displayValue = displayFormat(2, value - offset);
                 return `${displayValue} ${variableInfo.units}`;
