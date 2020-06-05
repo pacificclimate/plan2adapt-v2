@@ -16,11 +16,16 @@
 
 import React from 'react';
 import Loader from 'react-loader';
+import merge from 'lodash/fp/merge';
 
 
 const getDisplayName = WrappedComponent =>
   WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
+const defaultHandlers = {
+  loading: Loader,
+  error: ({ error }) => error.toString(),
+};
 
 export default function withAsyncData(
   loadAsyncData,
@@ -41,10 +46,7 @@ export default function withAsyncData(
   dataPropName,
   // Name of prop to pass data to base component through.
 
-  handlers = {
-    loading: Loader,
-    error: ({ error }) => error.toString(),
-  },
+  handlerOptions = {},
   // Components rendered in loading and error states. States are:
   //  loading: props[dataPropName] === null && !props[errorPropName]
   //  error: props[errorPropName] !== null
@@ -109,6 +111,7 @@ export default function withAsyncData(
 
       render() {
         const { error, externalData } = this.state;
+        const handlers = merge(defaultHandlers, handlerOptions);
         if (error) {
           return <handlers.error {...this.props} error={error}/>;
         }
@@ -117,7 +120,7 @@ export default function withAsyncData(
         }
         return (
           <BaseComponent
-            {...{ [dataPropName]: this.state.externalData }}
+            {...{ [dataPropName]: externalData }}
             {...this.props}
           />
         );
