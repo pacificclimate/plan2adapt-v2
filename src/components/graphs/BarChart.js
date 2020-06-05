@@ -66,6 +66,7 @@ export default class BarChart extends React.Component {
     percentileValuesByTimePeriod: PropTypes.array,
   };
 
+  // TODO: Move these state values into props, and control from outside.
   state = {
     interpolationInterval: interpolationIntervalSelectorOptions[0],
     barChartWidth: barChartWidthOptions[1],
@@ -101,17 +102,28 @@ export default class BarChart extends React.Component {
 
     const offset = ceilMultiple(2, -min([0, minPercentileValue]));
     const addOffset = v => v + offset;
-    console.log('### BarChart.render: minPercentileValue, offset', minPercentileValue, offset)
     const yMin = minPercentileValue + offset;
     const yMax = maxPercentileValue + offset;
-    console.log('### BarChart.render: yMin, yMax', yMin, yMax)
 
     const historicalMiddleYear = middleYear(historicalTimePeriod);
     const futureMiddleYears = map(middleYear)(futureTimePeriods);
-    console.log('### BarChart: futureMiddleYears:', futureMiddleYears)
 
-    // Interpolate temporally: new
+    // Interpolate temporally
     //
+    // The goal is easily stated: Linearly interpolate each percentile
+    // vs time graph at time points a fixed interval apart (e.g., 1 yr), from
+    // the first year (baseline midpoint) to the last (last projected midpoint).
+    // Present those interpolated values as both lines and bar charts.
+    // The bar charts serve in the place of filled regions between the data
+    // lines, and also look quite cool on their own account; there is an
+    // intended resemblance here to error bars, which they can legitimately
+    // be regarded as.
+    //
+    // The actual doing of this is a little complicated, basically because
+    // each line segment between base data points needs a different
+    // interpolation function. This is not at all hard mathematically, but
+    // organizing the computations is a bit complicated. Hence all the
+    // comments below describing the intermediate computations.
 
     //  baseTimes: [t0, t1, ... ]
     //    from input data
@@ -119,7 +131,6 @@ export default class BarChart extends React.Component {
       historicalMiddleYear,
       futureMiddleYears
     ]);
-    console.log('### BarChart: baseTimes:', baseTimes)
 
     //  basePercentileValuesByTime: [
     //    [ P0,10; P0,25; P0,50; ... ],  // for t0
@@ -131,7 +142,6 @@ export default class BarChart extends React.Component {
       [map(() => 0)(percentileIndices)],  // zero values for historical time
       percentileValuesByTimePeriod,       // data points
     ]);
-    console.log('### BarChart: basePercentileValuesByTime:', basePercentileValuesByTime)
 
     //  basePercentileValuesByPercentile: [  // = transpose(basePercentileValuesByTime)
     //    [ P0,10; P1,10; P2,10; ... ],  // for p=10
@@ -140,7 +150,6 @@ export default class BarChart extends React.Component {
     //  ]
     const basePercentileValuesByPercentile =
       transpose(basePercentileValuesByTime);
-    console.log('### BarChart: basePercentileValuesByPercentile:', basePercentileValuesByPercentile)
 
     //  interpTimes: [
     //    [ t0,0; t0,1; t0,2; ... ], // t0,0 = t0
@@ -173,38 +182,34 @@ export default class BarChart extends React.Component {
     const li =
       linearInterpolator(this.state.interpolationInterval.value, baseTimes);
     const interpTimesAndValues = map(li)(basePercentileValuesByPercentile);
-    // Each element in this array is a pair
-    //    [interpTimes, interpPercentilesValues]
-    // one pair for each percentile. The interpTimes are the same for each
-    // pair, because it is independent of the last argument.
-    // interpPercentileValues differs in each because it depends on the last
+    // Each element in `interpTimesAndValues` is a pair
+    //    [interpTimes, interpPercentileValues]
+    // one pair for each percentile.
+    // `interpTimes` are the same for each pair, because it is independent of
+    // the last argument.
+    // `interpPercentileValues` differs in each because it depends on the last
     // argument.
     // This is slightly inefficient but we will bite that for now.
+
     const interpTimesDeep = interpTimesAndValues[0][0];
     const interpPercentilesByPercentileDeep = map(1)(interpTimesAndValues);
-    console.log('### BarChart: interpTimesDeep:', interpTimesDeep)
-    console.log('### BarChart: interpPercentilesByPercentileDeep:', interpPercentilesByPercentileDeep)
     const interpTimes = flatten(interpTimesDeep);
     const interpPercentilesByPercentile =
       map(flatten)(interpPercentilesByPercentileDeep);
-    console.log('### BarChart: interpTimes:', interpTimes)
-    console.log('### BarChart: interpPercentilesByPercentile:', interpPercentilesByPercentile)
 
-
-    //
     //  GOAL:
     // 
     //  interpPercentileValuesByTime: [
-    //    [                                     // for t0
-    //      [P0,0,10; P0,0,25; P0,0,50; ...],   // for t0,0; P0,0,p = P0,p
-    //      [P0,1,10; P0,1,25; P0,1,50; ...],   // for t0,1
-    //      [P0,2,10; P0,2,25; P0,2,50; ...],   // for t0,2
+    //    [                                   // for t0
+    //      P0,0,10; P0,0,25; P0,0,50; ...,   // for t0,0
+    //      P0,1,10; P0,1,25; P0,1,50; ...,   // for t0,1
+    //      P0,2,10; P0,2,25; P0,2,50; ...,   // for t0,2
     //      ...
     //    ],
-    //    [                                     // for t1
-    //      [P1,0,10; P1,0,25; P1,0,50; ...],   // for t1,0; P1,0,p = P1,p
-    //      [P1,1,10; P1,1,25; P1,1,50; ...],   // for t1,1
-    //      [P1,2,10; P1,2,25; P1,2,50; ...],   // for t1,2
+    //    [                                   // for t1
+    //      P1,0,10; P1,0,25; P1,0,50; ...,   // for t1,0
+    //      P1,1,10; P1,1,25; P1,1,50; ...,   // for t1,1
+    //      P1,2,10; P1,2,25; P1,2,50; ...,   // for t1,2
     //      ...
     //    ],
     //    ...
@@ -217,6 +222,7 @@ export default class BarChart extends React.Component {
       )(percentileIndices)
     )(interpPercentileValuesByTime);
 
+    // Form the `rows` component of the C3 options.
     const rows = concatAll([
       // Dataset names: concatenate the various names
       [concatAll([
@@ -239,8 +245,10 @@ export default class BarChart extends React.Component {
         )(interpPercentileValuesByTime),
       ])
     ]);
-    console.log('### BarChart: rows:', rows)
 
+    // Build the full C3 options.
+    // TODO: Don't get so much of this from config; instead pass in a few
+    //  parameters and compute the rest of them. This is still in dev mode.
     const c3options = merge(
       graphConfig.c3optionsBarChart,
       {

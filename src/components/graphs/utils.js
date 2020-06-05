@@ -94,13 +94,10 @@ export const linearInterpolator = curry((deltaX, xs, ys) => {
   // successive pairs of `ys`, evaluated at the values of `interpolatedXs`,
   // having the layout
   //    [ [y00, y01, y02, ...], [y10, y11, y12, ...], ... ]
-  // where yij = fi(xij), and fi is the appropriate linear interpolation
+  // where yij = Li(xij), and Li is the appropriate linear interpolation
   // function passing through points (xs[i], ys[i]) and (xs[i+1], ys[i+1]).
   const interpolatedXs = interpolateArrayAt(deltaX, xs);
   const yInterpolators = linearFnArray(xs, ys);
-  console.log('## linearInterpolator: interpolatedXs', interpolatedXs)
-  console.log('## linearInterpolator: yInterpolators', yInterpolators)
-  console.assert(every(isFunction)(yInterpolators), 'shit');
   // for each m, apply yInterpolators[m] to each value of interpolatedXs[m]
   const interpolatedYs = flow(
     zipAll,
@@ -120,7 +117,3 @@ export const floorMultiple = fMultiple(Math.floor);
 export const roundMultiple = fMultiple(Math.round);
 
 export const percentileDatasetName = p => `${p}th`;
-
-
-
-
