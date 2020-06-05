@@ -5,6 +5,9 @@ import isEqual from 'lodash/fp/isEqual';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import curry from 'lodash/fp/curry';
 import map from 'lodash/fp/map';
+import every from 'lodash/fp/every';
+import flow from 'lodash/fp/flow';
+import filter from 'lodash/fp/filter';
 import merge from 'lodash/fp/merge';
 import {
   getDisplayData,
@@ -65,15 +68,24 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //  ]
 
     statistics: PropTypes.array.isRequired,
-    // This prop receives the data fetched from the backend according
+    // This prop receives the data-fetch responses the backend according
     // props region, season, variable, and futureTimePeriods. (`withAsyncData`
     // injects this data.)
     // The layout of this data is:
     //
     //  [
     //    {
-    //      percentiles: [ ... ],
-    //      units: '...',
+    //      status: 'fulfilled',
+    //      value: {
+    //        percentiles: [ ... ],
+    //        units: '...',
+    //    },
+    //    // OR
+    //    {
+    //      status: 'rejected',
+    //      reason: {
+    //        error: ...
+    //        parameters: ...
     //    },
     //    ...
     //  ]
@@ -126,6 +138,36 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       historicalTimePeriod, futureTimePeriods, statistics,
       variableConfig, unitsConversions,
     } = this.props;
+    console.log('### COTG.render: statistics', statistics)
+
+    // The data-fetcher always returns a fulfilled promise, but with an array of
+    // results that indicate whether each sub-request promise was fulfilled or
+    // rejected. We must therefore handle the case that one or more was
+    // rejected.
+    // In this case we return a detailed error indicator within the app. This is
+    // probably not useful to the user. Instead perhaps we should be cagier and
+    // print such detailed error info to the console instead.
+    if (!every({ status: 'fulfilled'})(statistics)) {
+      return (
+        <React.Fragment>
+          <p>Could not retrieve data for the following time periods:</p>
+          <ul>
+            {
+              flow(
+                filter(s => s.status !== 'fulfilled'),
+                map(s => (
+                  <li>
+                    {s.reason.parameters.futureTimePeriod.start_date}{' - '}
+                    {s.reason.parameters.futureTimePeriod.end_date}{': '}
+                    {s.reason.error.toString()}
+                  </li>)
+                )
+              )(statistics)
+            }
+          </ul>
+        </React.Fragment>
+      );
+    }
 
     // const graphConfig = this.props.graphConfig;
     const graphConfig = merge(
@@ -154,10 +196,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       getVariableDisplayUnits(variableConfig, variableId, display);
     const convertUnits =
       getConvertUnits(unitsConversions, variableConfig, variableId);
-    const dataUnits = statistics[0].units;
+    const dataUnits = statistics[0].value.units;
     const convertData = convertUnits(dataUnits, displayUnits);
     const percentileValuesByTimePeriod = map(
-      stat => convertData(stat.percentiles)
+      stat => convertData(stat.value.percentiles)
     )(statistics);
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
@@ -232,6 +274,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
 const convertToDisplayData = curry((variableId, season, data) => {
   // TODO: Replace with config
+  console.log('COT: convertToDisplayData', variableId, season, data)
   const display = {
     tasmean: 'absolute',
     pr: 'relative',
@@ -250,19 +293,24 @@ const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
   // models driving this app.
   {
     const variableId = variable.representative.variable_id;
-    return Promise.all(
+    // Note use of Promise.allSettled, which always returns a fulfilled promise,
+    // containing an array of values indicating fulfillment or rejection of
+    // each subpromise. We convert raw fetch rejections to a more informative
+    // rejected promise.
+    return Promise.allSettled(
       map(
-        futureTimePeriod => fetchSummaryStatistics(
-          region, futureTimePeriod, variableId, percentiles
-        )
-        // Unavailable or otherwise problematic fetches are returned as
-        // undefined. Data display elements are responsible for showing a
-        // suitable message.
-        .catch(err => {
-          console.error('Failed to fetch summary statistics:\n', err);
-          return undefined;
-        })
-        .then(convertToDisplayData(variableId, season))
+        futureTimePeriod => {
+          return fetchSummaryStatistics(
+            region, futureTimePeriod, variableId, percentiles
+          )
+          .then(convertToDisplayData(variableId, season))
+          .catch(error =>
+            Promise.reject({
+              error,
+              parameters: { region, futureTimePeriod, variable, percentiles }
+            })
+          )
+        }
       )(futureTimePeriods)
     );
   }
