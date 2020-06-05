@@ -38,14 +38,23 @@ export default function withAsyncData(
   // This prevents not loading initially due to the timing of
   // `getDerivedStateFromProps`, which is invoked before `componentDidMount`.
 
-  dataPropName
+  dataPropName,
   // Name of prop to pass data to base component through.
+
+  handlers = {
+    loading: Loader,
+    error: ({ error }) => error.toString(),
+  },
+  // Components rendered in loading and error states. States are:
+  //  loading: props[dataPropName] === null && !props[errorPropName]
+  //  error: props[errorPropName] !== null
 ) {
   return function(BaseComponent) {
     class WithAsyncData extends React.Component {
       state = {
         prevProps: undefined,
         externalData: null,
+        error: null,
       };
 
       static getDerivedStateFromProps(props, state) {
@@ -85,17 +94,26 @@ export default function withAsyncData(
 
       _loadAsyncData(...args) {
         console.log(`### ${WithAsyncData.displayName}._loadAsyncData`, ...args)
-        this._asyncRequest = loadAsyncData(...args).then(
-          externalData => {
+        this._asyncRequest =
+          loadAsyncData(...args).then(
+            externalData => {
+              this.setState({ externalData, error: null });
+            }
+          ).catch(error => {
+            this.setState({ externalData: null, error })
+          })
+          .finally(() => {
             this._asyncRequest = null;
-            this.setState({ externalData });
-          }
-        );
+          });
       }
 
       render() {
-        if (this.state.externalData === null) {
-          return <Loader/>;
+        const { error, externalData } = this.state;
+        if (error) {
+          return <handlers.error {...this.props} error={error}/>;
+        }
+        if (externalData === null) {
+          return <handlers.loading {...this.props}/>;
         }
         return (
           <BaseComponent
