@@ -394,6 +394,12 @@ export default class BarChart extends React.Component {
             }))(baseTimes),
           },
         },
+        legend: {
+          hide: concatAll([
+            interpPercentileValueNames,
+            interpPercentileValueDiffNames,
+          ]),
+        },
         tooltip: {
           format: {
             title: year => {
