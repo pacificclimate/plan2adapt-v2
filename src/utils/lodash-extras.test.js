@@ -1,5 +1,7 @@
 import each from 'jest-each';
-import { concatAll } from './lodash-extras';
+import { concatAll } from './lodash-fp-extras';
+import { fromPairsMulti } from './lodash-fp-extras';
+
 
 describe('concatAll', () => {
   each([
@@ -13,4 +15,15 @@ describe('concatAll', () => {
   ]).test('%p', (input, expected) => {
     expect(concatAll(input)).toEqual(expected);
   })
+});
+
+
+describe('fromPairsMulti', () => {
+  each([
+    [ [['a', 1], ['b', 2], ], { a: 1, b: 2 } ],
+    [ [[['a1', 'a2', 'a3'], 1], ['b', 2], ], { a1: 1, a2: 1, a3: 1, b: 2 } ],
+    [ [['a', 1], [['b1', 'b2', 'b3'], 2], ], { a: 1, b1: 2, b2: 2, b3: 2 } ],
+  ]).test('%p', (input, expected) => {
+    expect(fromPairsMulti(input)).toEqual(expected);
+  });
 });
