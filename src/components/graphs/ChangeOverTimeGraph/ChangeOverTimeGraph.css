@@ -1,4 +1,4 @@
-.c3-line-50th {
-    stroke-width: 3 !important;
+.c3-grid line {
+    stroke: green !important;
 }
 
