@@ -25,6 +25,7 @@ import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import flatten from 'lodash/fp/flatten';
+import tap from 'lodash/fp/tap';
 import { displayFormat } from '../../utils/variables-and-units';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
@@ -148,8 +149,11 @@ export default class BarChart extends React.Component {
     //    [ P1,10; P1,25; P1,50; ... ],  // for t1
     //    ...
     //  ]
-    //    from input data
-    const basePercentileValuesByTime = concatAll([
+    //    from input data, WITH OFFSET ADDED
+    const basePercentileValuesByTime = flow(
+      concatAll,
+      map(map(addOffset)),
+    )([
       [map(() => 0)(percentileIndices)],  // zero values for historical time
       percentileValuesByTimePeriod,       // data points
     ]);
@@ -245,17 +249,17 @@ export default class BarChart extends React.Component {
     //  ]
     const interpPercentileValuesByTime =
       transpose(interpPercentileValuesByPercentile);
-    const diffsWithOffset = pileValues => map(
-      i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
+    const diffs = pileValues => map(
+      i => i ? (pileValues[i] - pileValues[i-1]) : pileValues[i]
     )(percentileIndices);
-    const interpPercentileValueDiffsByTimeWithOffset =
-      map(diffsWithOffset)(interpPercentileValuesByTime);
-    const basePercentileValueDiffsByTimeWithOffset =
-      map(diffsWithOffset)(basePercentileValuesByTime);
-    const basePercentileValueDiffsByPercentileWithOffset =
-      transpose(basePercentileValueDiffsByTimeWithOffset);
-    const interpPercentileValueDiffsByPercentileWithOffset =
-      transpose(interpPercentileValueDiffsByTimeWithOffset);
+    const interpPercentileValueDiffsByTime =
+      map(diffs)(interpPercentileValuesByTime);
+    const basePercentileValueDiffsByTime =
+      map(diffs)(basePercentileValuesByTime);
+    const basePercentileValueDiffsByPercentile =
+      transpose(basePercentileValueDiffsByTime);
+    const interpPercentileValueDiffsByPercentile =
+      transpose(interpPercentileValueDiffsByTime);
 
     const basePercentileValueNames =
       map(p =>`${p}th (base)`)(percentiles);
@@ -285,13 +289,13 @@ export default class BarChart extends React.Component {
       // flow(
       //   zipAll,
       //   map(concatAll),
-      // )([basePercentileValueDiffNames, basePercentileValueDiffsByPercentileWithOffset]),
+      // )([basePercentileValueDiffNames, basePercentileValueDiffsByPercentile]),
 
       // TODO: Interp percentile value differences
       flow(
         zipAll,
         map(concatAll),
-      )([interpPercentileValueDiffNames, interpPercentileValueDiffsByPercentileWithOffset]),
+      )([interpPercentileValueDiffNames, interpPercentileValueDiffsByPercentile]),
     ]);
 
     // Build the full C3 options.
