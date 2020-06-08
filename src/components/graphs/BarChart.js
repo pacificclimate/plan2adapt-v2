@@ -283,10 +283,10 @@ export default class BarChart extends React.Component {
       [concatAll(['interpTime', interpTimes])],
 
       // Temporary: Interpolated percentile values
-      flow(
-        zipAll,
-        map(concatAll),
-      )([interpPercentileValueNames, interpPercentileValuesByPercentile]),
+      // flow(
+      //   zipAll,
+      //   map(concatAll),
+      // )([interpPercentileValueNames, interpPercentileValuesByPercentile]),
 
       // Base percentile value differences
       // flow(
@@ -314,7 +314,7 @@ export default class BarChart extends React.Component {
             // Base data lines use baseTime
             ...fromPairsMulti([[basePercentileValueNames, 'baseTime']]),
             // Temporary: Interpolated data lines use interpTime
-            ...fromPairsMulti([[interpPercentileValueNames, 'interpTime']]),
+            // ...fromPairsMulti([[interpPercentileValueNames, 'interpTime']]),
             // Base data bars use baseTime
             // ...fromPairsMulti([[basePercentileValueDiffNames, 'baseTime']]),
             // Interp data bars use interpTime
@@ -324,7 +324,7 @@ export default class BarChart extends React.Component {
             // Base data presented as lines
             ...fromPairsMulti([[basePercentileValueNames, 'line']]),
             // Temporary: Interp data presented as lines
-            ...fromPairsMulti([[interpPercentileValueNames, 'line']]),
+            // ...fromPairsMulti([[interpPercentileValueNames, 'line']]),
             // Base data presented as stacked bar charts of differences
             // ...fromPairsMulti([[basePercentileValueDiffNames, 'bar']]),
             // Interp data presented as stacked bar charts of differences
@@ -340,11 +340,11 @@ export default class BarChart extends React.Component {
               basePercentileValueNames,
               ['#cccccc', '#aaaaaa', 'black', '#aaaaaa', '#cccccc']
             ])),
-            ...fromPairsMulti([[interpPercentileValueNames, 'transparent']]),
-            ...fromPairs(zipAll([
-              basePercentileValueDiffNames,
-              ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
-            ])),
+            // ...fromPairsMulti([[interpPercentileValueNames, 'transparent']]),
+            // ...fromPairs(zipAll([
+            //   basePercentileValueDiffNames,
+            //   ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
+            // ])),
             ...fromPairs(zipAll([
               interpPercentileValueDiffNames,
               ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
@@ -395,10 +395,7 @@ export default class BarChart extends React.Component {
           },
         },
         legend: {
-          hide: concatAll([
-            interpPercentileValueNames,
-            interpPercentileValueDiffNames,
-          ]),
+          hide: interpPercentileValueDiffNames,
         },
         tooltip: {
           format: {
