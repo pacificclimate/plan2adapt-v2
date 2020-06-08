@@ -4,10 +4,10 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import C3Graph from './C3Graph';
-import range from 'lodash/fp/range';
-import rangeStep from 'lodash/fp/rangeStep';
-import flattenDeep from 'lodash/fp/flattenDeep';
 import fromPairs from 'lodash/fp/fromPairs';
+import range from 'lodash/fp/range';
+import flattenDeep from 'lodash/fp/flattenDeep';
+import tail from 'lodash/fp/tail';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
 import {
@@ -23,7 +23,6 @@ import { middleYear } from '../../utils/time-periods';
 import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
-import reverse from 'lodash/fp/reverse';
 import flatten from 'lodash/fp/flatten';
 import { displayFormat } from '../../utils/variables-and-units';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
@@ -33,16 +32,20 @@ import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
 // zipAll computes the transpose of a 2D matrix.
 const transpose = zipAll;
 
-const interpolationIntervalSelectorOptions =
-  map(n => ({ label: n, value: n }))(
-    [1, 2, 3, 4, 5, 10]
-  );
 
+const labelValueOptions = map(n => ({ label: n, value: n }));
 
-const barChartWidthOptions =
-  map(n => ({ label: n, value: n }))(
-    [0.05, 0.075, 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5]
-  );
+const interpolationIntervalSelectorOptions = labelValueOptions([
+  1, 2, 3, 4, 5, 10
+]);
+
+const barChartWidthOptions = labelValueOptions([
+  0.05, 0.075, 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5
+]);
+
+const pointRadiusOptions = labelValueOptions([
+  2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 8, 10,
+]);
 
 
 export default class BarChart extends React.Component {
@@ -72,6 +75,7 @@ export default class BarChart extends React.Component {
   state = {
     interpolationInterval: interpolationIntervalSelectorOptions[0],
     barChartWidth: barChartWidthOptions[1],
+    pointRadius: pointRadiusOptions[6],
   };
 
   handleChangeInterpolationInterval =
@@ -79,6 +83,9 @@ export default class BarChart extends React.Component {
 
   handleChangeBarChartWidth =
     barChartWidth => this.setState({ barChartWidth });
+
+  handleChangePointRadius =
+    pointRadius => this.setState({ pointRadius });
 
   render() {
     const {
@@ -89,11 +96,11 @@ export default class BarChart extends React.Component {
 
     const percentileIndices = range(0, percentiles.length);
 
-    const basePercentileDifferenceNames = map(
-      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
+    const basePercentileValueDiffNames = map(
+      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (base)`
     )(percentileIndices);
-    const percentileDifferenceNames = map(
-      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
+    const interpPercentileValueDiffNames = map(
+      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (interp)`
     )(percentileIndices);
     const primaryDatasetNames = map(percentileDatasetName)(percentiles);
 
@@ -184,7 +191,8 @@ export default class BarChart extends React.Component {
     // at all the times.
     const li =
       linearInterpolator(this.state.interpolationInterval.value, baseTimes);
-    const interpTimesAndValues = map(li)(basePercentileValuesByPercentile);
+    const interpTimesAndValuesByPercentile =
+      map(li)(basePercentileValuesByPercentile);
     // Each element in `interpTimesAndValues` is a pair
     //    [interpTimes, interpPercentileValues]
     // one pair for each percentile.
@@ -194,11 +202,27 @@ export default class BarChart extends React.Component {
     // argument.
     // This is slightly inefficient but we will bite that for now.
 
-    const interpTimesDeep = interpTimesAndValues[0][0];
-    const interpPercentilesByPercentileDeep = map(1)(interpTimesAndValues);
-    const interpTimes = flatten(interpTimesDeep);
-    const interpPercentilesByPercentile =
-      map(flatten)(interpPercentilesByPercentileDeep);
+    // TODO: Remove if we don't actually use this
+    // Note: We need to assign colours and other presentation formatting
+    // differently for base and interpolated values (that is in fact why
+    // the distinction exists). Therefore we remove base time points from
+    // interpolated value sets (times and percentile values) so that we do
+    // no present base data twice.
+
+    const removeBasePointAndFlatten = flow(
+      // map(tail),  // Not removing!
+      flatten
+    );
+
+    const interpTimes = removeBasePointAndFlatten(
+      // First of repeated interpolated times
+      interpTimesAndValuesByPercentile[0][0],
+    );
+
+    const interpPercentileValuesByPercentile = flow(
+      map(1), // Get interpolated y (percentile) values
+      map(removeBasePointAndFlatten),
+    )(interpTimesAndValuesByPercentile);
 
     //  GOAL:
     // 
@@ -218,7 +242,7 @@ export default class BarChart extends React.Component {
     //    ...
     //  ]
     const interpPercentileValuesByTime =
-      transpose(interpPercentilesByPercentile);
+      transpose(interpPercentileValuesByPercentile);
     const diffsWithOffset = pileValues => map(
       i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
     )(percentileIndices);
@@ -226,39 +250,46 @@ export default class BarChart extends React.Component {
       map(diffsWithOffset)(interpPercentileValuesByTime);
     const basePercentileValueDiffsByTimeWithOffset =
       map(diffsWithOffset)(basePercentileValuesByTime);
+    const basePercentileValueDiffsByPercentileWithOffset =
+      transpose(basePercentileValueDiffsByTimeWithOffset);
+    const interpPercentileValueDiffsByPercentileWithOffset =
+      transpose(interpPercentileValueDiffsByTimeWithOffset);
 
-    // Form the `rows` component of the C3 options.
-    const rows = concatAll([
-      // Dataset names: concatenate the various names
-      [concatAll([
-        'time',
-        percentileDifferenceNames,
-        reverse(primaryDatasetNames),
-      ])],
-
-      // Values: zip together times and values, then concatenate these triples
-      // to form a row for each triple
-      flow(
-        zipAll,
-        map(concatAll),
-      )([
-        interpTimes,
-        interpPercentileValueDiffsByTimeWithOffset,
-        flow(
-          map(map(addOffset)),
-          map(reverse),
-        )(interpPercentileValuesByTime),
-      ])
-    ]);
-
-    const basePercentileValueNames = map(p =>`${p}th-x`)(percentiles);
+    const basePercentileValueNames =
+      map(p =>`${p}th (base)`)(percentiles);
+    const interpPercentileValueNames =
+      map(p =>`${p}th (interp)`)(percentiles);
 
     const columns = concatAll([
+      // Time values for base data
       [concatAll(['baseTime', baseTimes])],
+
+      // Base percentile values
       flow(
         zipAll,
         map(concatAll),
       )([basePercentileValueNames, basePercentileValuesByPercentile]),
+
+      // Time values for interpolated data
+      [concatAll(['interpTime', interpTimes])],
+
+      // Temporary: Interpolated percentile values
+      flow(
+        zipAll,
+        map(concatAll),
+      )([interpPercentileValueNames, interpPercentileValuesByPercentile]),
+
+      // Base percentile value differences
+      // flow(
+      //   zipAll,
+      //   map(concatAll),
+      // )([basePercentileValueDiffNames, basePercentileValueDiffsByPercentileWithOffset]),
+
+      // TODO: Interp percentile value differences
+      flow(
+        zipAll,
+        map(concatAll),
+      )([interpPercentileValueDiffNames, interpPercentileValueDiffsByPercentileWithOffset]),
     ]);
 
     // Build the full C3 options.
@@ -269,14 +300,45 @@ export default class BarChart extends React.Component {
       {
         data: {
           xs: {
+            // Base data lines use baseTime
             ...fromPairsMulti([[basePercentileValueNames, 'baseTime']]),
+            // Temporary: Interpolated data lines use interpTime
+            ...fromPairsMulti([[interpPercentileValueNames, 'interpTime']]),
+            // Base data bars use baseTime
+            // ...fromPairsMulti([[basePercentileValueDiffNames, 'baseTime']]),
+            // Interp data bars use interpTime
+            ...fromPairsMulti([[interpPercentileValueDiffNames, 'interpTime']]),
           },
           types: {
+            // Base data presented as lines
             ...fromPairsMulti([[basePercentileValueNames, 'line']]),
+            // Temporary: Interp data presented as lines
+            ...fromPairsMulti([[interpPercentileValueNames, 'line']]),
+            // Base data presented as stacked bar charts of differences
+            // ...fromPairsMulti([[basePercentileValueDiffNames, 'bar']]),
+            // Interp data presented as stacked bar charts of differences
+            ...fromPairsMulti([[interpPercentileValueDiffNames, 'bar']]),
           },
-          // groups: [
-          //   basePercentileValueNames,
-          // ],
+          groups: [
+            // basePercentileValueDiffNames,
+            interpPercentileValueDiffNames,
+          ],
+          colors: {
+            ...fromPairs(zipAll([
+              basePercentileValueNames,
+              ['#cccccc', '#aaaaaa', 'black', '#aaaaaa', '#cccccc']
+            ])),
+            ...fromPairsMulti([[interpPercentileValueNames, 'transparent']]),
+            ...fromPairs(zipAll([
+              basePercentileValueDiffNames,
+              // ['transparent', 'blue', 'green', 'green', 'blue']
+              ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
+            ])),
+            ...fromPairs(zipAll([
+              interpPercentileValueDiffNames,
+              ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
+            ])),
+          },
           // rows: rows,
           columns,
         },
@@ -284,6 +346,9 @@ export default class BarChart extends React.Component {
           width: {
             ratio: this.state.barChartWidth.value
           },
+        },
+        point: {
+          r: this.state.pointRadius.value,
         },
         axis: {
           y: {
@@ -365,12 +430,20 @@ export default class BarChart extends React.Component {
             />
           </Col>
           <Col lg={3}>
-            Bar width
+            <p>Bar width</p>
             <Select
               options={barChartWidthOptions}
               value={this.state.barChartWidth}
               onChange={this.handleChangeBarChartWidth}
             />
+
+            <p>Point radius</p>
+            <Select
+              options={pointRadiusOptions}
+              value={this.state.pointRadius}
+              onChange={this.handleChangePointRadius}
+            />
+
           </Col>
         </Row>
         <C3Graph
