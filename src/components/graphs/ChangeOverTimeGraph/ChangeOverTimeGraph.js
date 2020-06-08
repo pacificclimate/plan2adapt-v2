@@ -132,58 +132,14 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
-      <Tabs
-        id={'graph-alternatives'}
-        defaultActiveKey={'bar-chart'}
-      >
-        <Tab
-          eventKey={'simple-lines'}
-          title={'Simple Lines'}
-          className='pt-2'
-          mountOnEnter
-        >
-          <SimpleLineGraph
-            historicalTimePeriod={historicalTimePeriod}
-            futureTimePeriods={futureTimePeriods}
-            graphConfig={graphConfig}
-            variableInfo={variableInfo}
-            percentiles={percentiles}
-            percentileValuesByTimePeriod={percentileValuesByTimePeriod}
-          />
-        </Tab>
-
-        <Tab
-          eventKey={'psuedofilled-lines'}
-          title={'Pseudo-filled Lines'}
-          className='pt-2'
-          mountOnEnter
-        >
-          <PseudoFilledLineGraph
-            historicalTimePeriod={historicalTimePeriod}
-            futureTimePeriods={futureTimePeriods}
-            graphConfig={graphConfig}
-            variableInfo={variableInfo}
-            percentiles={percentiles}
-            percentileValuesByTimePeriod={percentileValuesByTimePeriod}
-          />
-        </Tab>
-
-        <Tab
-          eventKey={'bar-chart'}
-          title={'Bar Chart'}
-          className='pt-2'
-          mountOnEnter
-        >
-          <BarChart
-            historicalTimePeriod={historicalTimePeriod}
-            futureTimePeriods={futureTimePeriods}
-            graphConfig={graphConfig}
-            variableInfo={variableInfo}
-            percentiles={percentiles}
-            percentileValuesByTimePeriod={percentileValuesByTimePeriod}
-          />
-        </Tab>
-      </Tabs>
+      <BarChart
+        historicalTimePeriod={historicalTimePeriod}
+        futureTimePeriods={futureTimePeriods}
+        graphConfig={graphConfig}
+        variableInfo={variableInfo}
+        percentiles={percentiles}
+        percentileValuesByTimePeriod={percentileValuesByTimePeriod}
+      />
     );
   }
 }

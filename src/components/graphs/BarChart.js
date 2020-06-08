@@ -440,7 +440,8 @@ export default class BarChart extends React.Component {
             class: index ? styles.projected : styles.baseline,
           }))(concatAll([historicalTimePeriod, futureTimePeriods])),
       },
-      graphConfig.c3optionsBarChart,
+
+      graphConfig.c3options,
     );
     console.log('### BarChart.render: c3options', c3options)
 
