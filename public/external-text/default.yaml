@@ -638,8 +638,21 @@ graphs:
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
   config:
+    foo: bar
+    interpolationInterval: 1
     c3options:
       # CAUTION: These options *override* the ones supplied in code.
+      # The following are not supplied in code (but at present are overridden
+      # by demo selectors).
+      bar:
+        width:
+          ratio: 0.075
+      point:
+        r: 5
+        focus:
+          expand:
+            enabled: true
+            r: 7
 
     futureTimePeriods:
       # This may be better obtained from metadata

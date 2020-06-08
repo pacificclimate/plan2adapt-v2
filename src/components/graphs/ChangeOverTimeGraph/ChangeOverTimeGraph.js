@@ -7,6 +7,7 @@ import isEqual from 'lodash/fp/isEqual';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import curry from 'lodash/fp/curry';
 import map from 'lodash/fp/map';
+import merge from 'lodash/fp/merge';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -20,9 +21,27 @@ import './ChangeOverTimeGraph.css';
 import SimpleLineGraph from '../SimpleLineGraph';
 import PseudoFilledLineGraph from '../PseudoFilledLineGraph';
 import BarChart from '../BarChart';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 
 
 const percentiles = [10, 25, 50, 75, 90];
+
+
+const labelValueOptions = map(n => ({ label: n, value: n }));
+
+const interpolationIntervalSelectorOptions = labelValueOptions([
+  1, 2, 3, 4, 5, 10
+]);
+
+const barChartWidthOptions = labelValueOptions([
+  0.05, 0.075, 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5
+]);
+
+const pointRadiusOptions = labelValueOptions([
+  2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 8, 10,
+]);
 
 
 class ChangeOverTimeGraphDisplay extends React.Component {
@@ -88,32 +107,45 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
+  state = {
+    interpolationInterval: interpolationIntervalSelectorOptions[0],
+    barChartWidth: barChartWidthOptions[1],
+    pointRadius: pointRadiusOptions[6],
+  };
+
+  handleChangeInterpolationInterval =
+    interpolationInterval => this.setState({ interpolationInterval });
+
+  handleChangeBarChartWidth =
+    barChartWidth => this.setState({ barChartWidth });
+
+  handleChangePointRadius =
+    pointRadius => this.setState({ pointRadius });
+
   render() {
     const {
       variable,
       historicalTimePeriod, futureTimePeriods, statistics,
-      graphConfig, variableConfig, unitsConversions,
+      variableConfig, unitsConversions,
     } = this.props;
 
-    // Because we receive the main data to be displayed, `props.statistics`
-    // in what C3 calls rows, we use the `data.rows` option in C3 to pass the
-    // data. Rows data is submitted in the following layout:
-    //
-    // rows: [
-    //   ['name1', 'name2', 'name3'], // names of datasets
-    //   [90, 120, 300], // first datum for name1, name2, name3
-    //   [40, 160, 240], // second datum for name1, name2, name3
-    //   [50, 200, 290], // etc.
-    //   ...
-    // ]
-    //
-    // The statistics data is not the whole of what needs to be on the graph.
-    // We must add:
-    //  - A data column for the time axis
-    //  - A data row of zero value anomalies for the historical time period
-    //
-    // Note: The first element of each data row is the time point
-    // of that row. The rest are the data for each curve, at that time point.
+    // const graphConfig = this.props.graphConfig;
+    const graphConfig = merge(
+      this.props.graphConfig,
+
+      {
+        interpolationInterval: this.state.interpolationInterval.value,
+        c3options: {
+          bar: {
+            width: { ratio: this.state.barChartWidth.value },
+          },
+          point: {
+            r: this.state.pointRadius.value,
+          },
+        },
+      },
+
+    );
 
     // Establish display units for variables, and convert data values to those
     // units.
@@ -132,14 +164,56 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
-      <BarChart
-        historicalTimePeriod={historicalTimePeriod}
-        futureTimePeriods={futureTimePeriods}
-        graphConfig={graphConfig}
-        variableInfo={variableInfo}
-        percentiles={percentiles}
-        percentileValuesByTimePeriod={percentileValuesByTimePeriod}
-      />
+      <React.Fragment>
+        <Row>
+          <Col lg={6}>
+            <p>
+              Shows 50th percentile values as a line graph.
+            </p>
+            <p>
+              Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
+              intervals as a stacked bar chart.
+            </p>
+            <p>
+              Data is interpolated temporally, at equal intervals starting
+              from each base data point (historical, projected).
+            </p>
+          </Col>
+          <Col lg={2}>
+            Interpolation interval (yr)
+            <Select
+              options={interpolationIntervalSelectorOptions}
+              value={this.state.interpolationInterval}
+              onChange={this.handleChangeInterpolationInterval}
+            />
+          </Col>
+          <Col lg={2}>
+            Bar width
+            <Select
+              options={barChartWidthOptions}
+              value={this.state.barChartWidth}
+              onChange={this.handleChangeBarChartWidth}
+            />
+          </Col>
+          <Col lg={2}>
+            Point radius
+            <Select
+              options={pointRadiusOptions}
+              value={this.state.pointRadius}
+              onChange={this.handleChangePointRadius}
+            />
+
+          </Col>
+        </Row>
+        <BarChart
+          historicalTimePeriod={historicalTimePeriod}
+          futureTimePeriods={futureTimePeriods}
+          graphConfig={graphConfig}
+          variableInfo={variableInfo}
+          percentiles={percentiles}
+          percentileValuesByTimePeriod={percentileValuesByTimePeriod}
+        />
+      </React.Fragment>
     );
   }
 }

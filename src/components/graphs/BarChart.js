@@ -35,21 +35,6 @@ import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
 const transpose = zipAll;
 
 
-const labelValueOptions = map(n => ({ label: n, value: n }));
-
-const interpolationIntervalSelectorOptions = labelValueOptions([
-  1, 2, 3, 4, 5, 10
-]);
-
-const barChartWidthOptions = labelValueOptions([
-  0.05, 0.075, 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5
-]);
-
-const pointRadiusOptions = labelValueOptions([
-  2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 8, 10,
-]);
-
-
 export default class BarChart extends React.Component {
   static propTypes = {
     historicalTimePeriod: PropTypes.object.isRequired,
@@ -72,22 +57,6 @@ export default class BarChart extends React.Component {
     percentiles: PropTypes.array,
     percentileValuesByTimePeriod: PropTypes.array,
   };
-
-  // TODO: Move these state values into props, and control from outside.
-  state = {
-    interpolationInterval: interpolationIntervalSelectorOptions[0],
-    barChartWidth: barChartWidthOptions[1],
-    pointRadius: pointRadiusOptions[6],
-  };
-
-  handleChangeInterpolationInterval =
-    interpolationInterval => this.setState({ interpolationInterval });
-
-  handleChangeBarChartWidth =
-    barChartWidth => this.setState({ barChartWidth });
-
-  handleChangePointRadius =
-    pointRadius => this.setState({ pointRadius });
 
   render() {
     const {
@@ -195,7 +164,7 @@ export default class BarChart extends React.Component {
     // For each percentile, we want to interpolate the basePercentileValues
     // at all the times.
     const li =
-      linearInterpolator(this.state.interpolationInterval.value, baseTimes);
+      linearInterpolator(graphConfig.interpolationInterval, baseTimes);
     const interpTimesAndValuesByPercentile =
       map(li)(basePercentileValuesByPercentile);
     // Each element in `interpTimesAndValues` is a pair
@@ -352,14 +321,6 @@ export default class BarChart extends React.Component {
           },
           columns,
         },
-        bar: {
-          width: {
-            ratio: this.state.barChartWidth.value
-          },
-        },
-        point: {
-          r: this.state.pointRadius.value,
-        },
         axis: {
           x: {
             type: 'indexed',
@@ -446,51 +407,9 @@ export default class BarChart extends React.Component {
     console.log('### BarChart.render: c3options', c3options)
 
     return (
-      <React.Fragment>
-        <Row>
-          <Col lg={6}>
-            <p>
-              Shows 50th percentile values as a line graph.
-            </p>
-            <p>
-              Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
-              intervals as a stacked bar chart.
-            </p>
-            <p>
-              Data is interpolated temporally, at equal intervals starting
-              from each base data point (historical, projected).
-            </p>
-          </Col>
-          <Col lg={2}>
-            Interpolation interval (yr)
-            <Select
-              options={interpolationIntervalSelectorOptions}
-              value={this.state.interpolationInterval}
-              onChange={this.handleChangeInterpolationInterval}
-            />
-          </Col>
-          <Col lg={2}>
-            Bar width
-            <Select
-              options={barChartWidthOptions}
-              value={this.state.barChartWidth}
-              onChange={this.handleChangeBarChartWidth}
-            />
-          </Col>
-          <Col lg={2}>
-            Point radius
-            <Select
-              options={pointRadiusOptions}
-              value={this.state.pointRadius}
-              onChange={this.handleChangePointRadius}
-            />
-
-          </Col>
-        </Row>
         <C3Graph
           {...c3options}
         />
-      </React.Fragment>
     )
   }
 }
