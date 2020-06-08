@@ -416,7 +416,7 @@ export default class BarChart extends React.Component {
                 index === 0
                 && id === basePercentileValueNames[0]
               ) {
-                return id;
+                return 'no change';
               }
               const year = baseTimes[index];
               if (
