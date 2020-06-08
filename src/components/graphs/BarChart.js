@@ -5,7 +5,9 @@ import Col from 'react-bootstrap/Col';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import C3Graph from './C3Graph';
 import range from 'lodash/fp/range';
+import rangeStep from 'lodash/fp/rangeStep';
 import flattenDeep from 'lodash/fp/flattenDeep';
+import fromPairs from 'lodash/fp/fromPairs';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
 import {
@@ -15,7 +17,7 @@ import {
   percentileDatasetName,
 } from './utils';
 import map from 'lodash/fp/map';
-import { concatAll } from '../../utils/lodash-fp-extras';
+import { concatAll, fromPairsMulti } from '../../utils/lodash-fp-extras';
 import flow from 'lodash/fp/flow';
 import { middleYear } from '../../utils/time-periods';
 import zipAll from 'lodash/fp/zipAll';
@@ -87,10 +89,11 @@ export default class BarChart extends React.Component {
 
     const percentileIndices = range(0, percentiles.length);
 
-    const percentileDifferenceNames = flow(
-      map(
-        i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
-      ),
+    const basePercentileDifferenceNames = map(
+      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
+    )(percentileIndices);
+    const percentileDifferenceNames = map(
+      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th`
     )(percentileIndices);
     const primaryDatasetNames = map(percentileDatasetName)(percentiles);
 
@@ -216,11 +219,13 @@ export default class BarChart extends React.Component {
     //  ]
     const interpPercentileValuesByTime =
       transpose(interpPercentilesByPercentile);
-    const interpPercentileValueDiffsByTimeWithOffset = map(
-      pileValues => map(
-        i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
-      )(percentileIndices)
-    )(interpPercentileValuesByTime);
+    const diffsWithOffset = pileValues => map(
+      i => i ? (pileValues[i] - pileValues[i-1]) : (pileValues[i] + offset)
+    )(percentileIndices);
+    const interpPercentileValueDiffsByTimeWithOffset =
+      map(diffsWithOffset)(interpPercentileValuesByTime);
+    const basePercentileValueDiffsByTimeWithOffset =
+      map(diffsWithOffset)(basePercentileValuesByTime);
 
     // Form the `rows` component of the C3 options.
     const rows = concatAll([
@@ -246,6 +251,16 @@ export default class BarChart extends React.Component {
       ])
     ]);
 
+    const basePercentileValueNames = map(p =>`${p}th-x`)(percentiles);
+
+    const columns = concatAll([
+      [concatAll(['baseTime', baseTimes])],
+      flow(
+        zipAll,
+        map(concatAll),
+      )([basePercentileValueNames, basePercentileValuesByPercentile]),
+    ]);
+
     // Build the full C3 options.
     // TODO: Don't get so much of this from config; instead pass in a few
     //  parameters and compute the rest of them. This is still in dev mode.
@@ -253,8 +268,17 @@ export default class BarChart extends React.Component {
       graphConfig.c3optionsBarChart,
       {
         data: {
-          x: 'time',
-          rows: rows,
+          xs: {
+            ...fromPairsMulti([[basePercentileValueNames, 'baseTime']]),
+          },
+          types: {
+            ...fromPairsMulti([[basePercentileValueNames, 'line']]),
+          },
+          // groups: [
+          //   basePercentileValueNames,
+          // ],
+          // rows: rows,
+          columns,
         },
         bar: {
           width: {
