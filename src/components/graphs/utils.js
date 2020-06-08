@@ -69,7 +69,6 @@ export const linearFn = curry((x0, y0, xT, yT) => {
 export const linearFnArray = curry((xs, ys) => {
   // Returns an array of linear functions passing through successive pairs
   // of points (xs[m], ys[m]), (xs[m+1], ys[m+1])
-  console.log('### linearFnArray')
   const length = xs.length;
   return flow(
     range(0),
