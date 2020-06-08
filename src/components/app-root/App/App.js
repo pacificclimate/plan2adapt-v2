@@ -277,14 +277,14 @@ export default class App extends Component {
 
               <Tab
                 eventKey={'graphs'}
-                title={<T as='string' path='graph.tab'/>}
-                disabled={this.getConfig('graph.disabled')}
+                title={<T as='string' path='graphs.tab'/>}
+                disabled={this.getConfig('graphs.disabled')}
                 className='pt-2'
                 mountOnEnter
               >
                 <Row>
                   <Col lg={12}>
-                    <T path='graph.title' data={{
+                    <T path='graphs.title' data={{
                       season: get('label', this.state.season),
                       variable: get('label', this.state.variable),
                       region: get('label', this.state.region),
@@ -300,8 +300,8 @@ export default class App extends Component {
                       variable={get('value', this.state.variable)}
                       // TODO: This may be better obtained from metadata
                       futureTimePeriods={
-                        this.getConfig('graph.config.futureTimePeriods')}
-                      graphConfig={this.getConfig('graph.config')}
+                        this.getConfig('graphs.config.futureTimePeriods')}
+                      graphConfig={this.getConfig('graphs.config')}
                       variableConfig={this.getConfig('variables')}
                       unitsConversions={this.getConfig('units')}
                     />
