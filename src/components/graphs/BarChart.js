@@ -8,7 +8,7 @@ import fromPairs from 'lodash/fp/fromPairs';
 import range from 'lodash/fp/range';
 import rangeStep from 'lodash/fp/rangeStep';
 import flattenDeep from 'lodash/fp/flattenDeep';
-import tail from 'lodash/fp/tail';
+import reverse from 'lodash/fp/reverse';
 import min from 'lodash/fp/min';
 import max from 'lodash/fp/max';
 import {
@@ -262,7 +262,7 @@ export default class BarChart extends React.Component {
       transpose(interpPercentileValueDiffsByTime);
 
     const basePercentileValueNames =
-      map(p =>`${p}th (base)`)(percentiles);
+      map(p =>`${p}th`)(percentiles);
     const interpPercentileValueNames =
       map(p =>`${p}th (interp)`)(percentiles);
 
@@ -274,6 +274,9 @@ export default class BarChart extends React.Component {
       flow(
         zipAll,
         map(concatAll),
+        // Reverse so that they are presented in tooltip in same vertical order
+        // as they appear on the graph. Note this is not done to other datasets.
+        reverse,
       )([basePercentileValueNames, basePercentileValuesByPercentile]),
 
       // Time values for interpolated data
@@ -409,13 +412,16 @@ export default class BarChart extends React.Component {
               return `${name} %ile`;
             },
             value: (value, ratio, id, index) => {
-              if (index === 0 && id === '10th') {
-                return 'no change';
-              }
-              const year = interpTimes[index];
               if (
-                includes(id, ['10th', '25th', '50th', '75th', '90th']) &&
-                includes(year, futureMiddleYears)
+                index === 0
+                && id === basePercentileValueNames[0]
+              ) {
+                return id;
+              }
+              const year = baseTimes[index];
+              if (
+                includes(id, basePercentileValueNames)
+                && includes(year, futureMiddleYears)
               ) {
                 const displayValue = displayFormat(2, value - offset);
                 return `${displayValue} ${variableInfo.units}`;
