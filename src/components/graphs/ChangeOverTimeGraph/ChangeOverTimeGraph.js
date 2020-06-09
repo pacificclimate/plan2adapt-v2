@@ -36,11 +36,11 @@ const interpolationIntervalSelectorOptions = labelValueOptions([
 ]);
 
 const barChartWidthOptions = labelValueOptions([
-  0.05, 0.075, 0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1, 1.2, 1.5, 2.0, 2.5
+  0.05, 0.075, 0.1,
 ]);
 
 const pointRadiusOptions = labelValueOptions([
-  2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 8, 10,
+  4, 4.5, 5, 6, 8, 10,
 ]);
 
 
@@ -110,7 +110,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   state = {
     interpolationInterval: interpolationIntervalSelectorOptions[0],
     barChartWidth: barChartWidthOptions[1],
-    pointRadius: pointRadiusOptions[6],
+    pointRadius: pointRadiusOptions[2],
   };
 
   handleChangeInterpolationInterval =
@@ -168,41 +168,54 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         <Row>
           <Col lg={6}>
             <p>
-              Shows 50th percentile values as a line graph.
+              Shows primary data percentile values as line graphs.
             </p>
             <p>
               Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
               intervals as a stacked bar chart.
+              These intervals are interpolated temporally between each primary
+              data point.
+              Bars are coloured darker grey nearer
+              the median and lighter gray further from it.
+              The stacked bars
+              serve as fill between the primary data lines, and as error bars
+              around the median line. This is a matter of interpretation or
+              explanation, not data.
             </p>
+          </Col>
+          <Col lg={6}>
             <p>
-              Data is interpolated temporally, at equal intervals starting
-              from each base data point (historical, projected).
+              The appearance of the graph is affected by 3 parameters.
+              You can experiment with different combinations.
+              The default is the combination currently thought to be
+              most visually effective and pleasing.
             </p>
-          </Col>
-          <Col lg={2}>
-            Interpolation interval (yr)
-            <Select
-              options={interpolationIntervalSelectorOptions}
-              value={this.state.interpolationInterval}
-              onChange={this.handleChangeInterpolationInterval}
-            />
-          </Col>
-          <Col lg={2}>
-            Bar width
-            <Select
-              options={barChartWidthOptions}
-              value={this.state.barChartWidth}
-              onChange={this.handleChangeBarChartWidth}
-            />
-          </Col>
-          <Col lg={2}>
-            Point radius
-            <Select
-              options={pointRadiusOptions}
-              value={this.state.pointRadius}
-              onChange={this.handleChangePointRadius}
-            />
-
+            <Row>
+            <Col lg={4}>
+              Interpolation interval (yr)
+              <Select
+                options={interpolationIntervalSelectorOptions}
+                value={this.state.interpolationInterval}
+                onChange={this.handleChangeInterpolationInterval}
+              />
+            </Col>
+            <Col lg={4}>
+              Bar width
+              <Select
+                options={barChartWidthOptions}
+                value={this.state.barChartWidth}
+                onChange={this.handleChangeBarChartWidth}
+              />
+            </Col>
+            <Col lg={4}>
+              Data point radius
+              <Select
+                options={pointRadiusOptions}
+                value={this.state.pointRadius}
+                onChange={this.handleChangePointRadius}
+              />
+            </Col>
+            </Row>
           </Col>
         </Row>
         <BarChart
