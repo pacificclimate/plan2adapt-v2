@@ -651,8 +651,7 @@ graphs:
         r: 5
         focus:
           expand:
-            enabled: true
-            r: 7
+            factor: 1.5
 
     futureTimePeriods:
       # This may be better obtained from metadata

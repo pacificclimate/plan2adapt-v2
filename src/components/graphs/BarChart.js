@@ -321,6 +321,14 @@ export default class BarChart extends React.Component {
           },
           columns,
         },
+        point: {
+          focus: {
+            expand: {
+              r: graphConfig.c3options.point.focus.expand.factor *
+                graphConfig.c3options.point.r,
+            },
+          },
+        },
         axis: {
           x: {
             type: 'indexed',
