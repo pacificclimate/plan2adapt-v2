@@ -21,6 +21,7 @@ import { fetchFileMetadata } from '../../../data-services/metadata';
 import { wmsLayerName, wmsTime, wmsClimateLayerProps } from '../map-utils';
 
 import './DataMap.css';
+import { allDefined } from '../../../utils/lodash-fp-extras';
 
 
 // Popup content getter
@@ -150,7 +151,8 @@ class DataMapDisplay extends React.Component {
 
 // This function returns a filter that filters the complete set of metadata
 // down to a single item that is the metadata for the layer to be displayed
-// in DataMap.
+// in DataMap. Note that it depends on the various props being well defined;
+// if not, filtering will be wonky and lead to errors.
 const metadataFilter = props => {
   const criteria = {
     // start_date, end_date
@@ -165,9 +167,11 @@ const metadataFilter = props => {
 };
 
 
-const metadataLengthErrorPromise = metadata => Promise.reject(
-  new Error(`Expected 1 matching metadata item, found ${metadata.length}`)
-);
+const metadataLengthErrorPromise = metadata => {
+  const error = new Error(`Expected 1 matching metadata item, found ${metadata.length}`);
+  console.error('### DataMap', error)
+  return Promise.reject(error);
+};
 
 // This function returns a promise for the file metadata needed by
 // `DataMapDisplay` for the given props, or for an appropriate
@@ -189,7 +193,20 @@ const loadFileMetadata = props => {
 // Load when ...
 const shouldLoadFileMetadata = (prevProps, props) =>
   // ... relevant props have settled to defined values
-  props.timePeriod && props.season && props.variable &&
+  allDefined(
+    [
+      // For an unknown reason, timePeriod can transiently be {}, which
+      // is not valid and causes errors in loading the metadata. So check
+      // its innards.
+      'timePeriod.start_date',
+      'timePeriod.end_date',
+      // season is an integer
+      'season',
+      // Let's check that variable isn't just {} either.
+      'variable.representative',
+    ],
+    props
+  ) &&
   // ... and there are either no previous props, or there is a difference
   // between previous and current relevant props
   !(prevProps &&
