@@ -19,8 +19,7 @@ export default class C3Chart extends React.Component {
     // a chart.
 
     // Remaining props for this component are top-level options for C3.
-    // I'm too lazy at the moment to define them all here. Key ones are
-    // size, color, data, axis, legend, ...
+    // See C3 documentation for details: https://c3js.org/reference.html
   };
 
   static defaultProps = {
