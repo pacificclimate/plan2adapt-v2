@@ -1,7 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Tabs from 'react-bootstrap/Tabs';
-import Tab from 'react-bootstrap/Tab';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
 import withAsyncData from '../../../HOCs/withAsyncData';
@@ -18,8 +16,6 @@ import {
   getVariableInfo
 } from '../../../utils/variables-and-units';
 import './ChangeOverTimeGraph.css';
-import SimpleLineGraph from '../SimpleLineGraph';
-import PseudoFilledLineGraph from '../PseudoFilledLineGraph';
 import BarChart from '../BarChart';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -107,6 +103,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
+  // TODO: Replace state and state management code with settings from config
+  //  when values for these parameters are settled.
   state = {
     interpolationInterval: interpolationIntervalSelectorOptions[0],
     barChartWidth: barChartWidthOptions[1],
