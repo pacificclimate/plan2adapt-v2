@@ -38,6 +38,19 @@ import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
 import StaticControl from '../StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
+import { SelectWithValueReplacement as Select } from 'pcic-react-components';
+import map from 'lodash/fp/map';
+
+
+const labelValueOptions = map(n => ({ label: n, value: n }));
+
+const wheelDebounceTimeSelectorOptions = labelValueOptions([
+  40, 50, 60, 80, 100, 120, 150, 200,
+]);
+
+const wheelPxPerZoomLevelSelectorOptions = labelValueOptions([
+  60, 120, 240, 480,
+]);
 
 
 export default class TwoDataMaps extends React.Component {
@@ -60,6 +73,9 @@ export default class TwoDataMaps extends React.Component {
     popup: {
       isOpen: false,
     },
+    scrollWheelZoom: true,
+    wheelDebounceTimeOption: wheelDebounceTimeSelectorOptions[0],
+    wheelPxPerZoomLevelOption: wheelPxPerZoomLevelSelectorOptions[0],
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -83,6 +99,12 @@ export default class TwoDataMaps extends React.Component {
     this.setState({ bounds: undefined, viewport })
   }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
+  toggleScrollWheelZoom =
+    () => this.setState({ scrollWheelZoom: !this.state.scrollWheelZoom });
+  handleChangeWheelDebounceTimeOption =
+    this.handleChangeSelection.bind(this, 'wheelDebounceTimeOption');
+  handleChangeWheelPxPerZoomLevelOption =
+    this.handleChangeSelection.bind(this, 'wheelPxPerZoomLevelOption');
 
   zoomToRegion = () =>
     this.setState({ bounds: regionBounds(this.props.region)});
@@ -147,6 +169,30 @@ export default class TwoDataMaps extends React.Component {
           </Col>
         </Row>
         <Row>
+          <Col lg={4}>
+            <Button onClick={this.toggleScrollWheelZoom}>
+              {this.state.scrollWheelZoom ? 'Disable' : 'Enable'}
+              {' '} scroll wheel zoom
+            </Button>
+          </Col>
+          <Col lg={4}>
+            Wheel debounce time
+            <Select
+              options={wheelDebounceTimeSelectorOptions}
+              value={this.state.wheelDebounceTimeOption}
+              onChange={this.handleChangeWheelDebounceTimeOption}
+            />
+          </Col>
+          <Col lg={4}>
+            Wheel Px Per Zoom Level
+            <Select
+              options={wheelPxPerZoomLevelSelectorOptions}
+              value={this.state.wheelPxPerZoomLevelOption}
+              onChange={this.handleChangeWheelPxPerZoomLevelOption}
+            />
+          </Col>
+        </Row>
+        <Row>
           <Col lg={6}>
             <T path='maps.historical.title' data={{
               start_date: this.props.historicalTimePeriod.start_date,
@@ -164,6 +210,9 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
+              scrollWheelZoom={this.state.scrollWheelZoom}
+              wheelDebounceTime={this.state.wheelDebounceTimeOption.value}
+              wheelPxPerZoomLevel={this.state.wheelPxPerZoomLevelOption.value}
             >
               {zoomButton}
             </DataMap>
@@ -185,6 +234,9 @@ export default class TwoDataMaps extends React.Component {
               variable={this.props.variable}
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
+              scrollWheelZoom={this.state.scrollWheelZoom}
+              wheelDebounceTime={this.state.wheelDebounceTimeOption.value}
+              wheelPxPerZoomLevel={this.state.wheelPxPerZoomLevelOption.value}
             >
               {zoomButton}
             </DataMap>

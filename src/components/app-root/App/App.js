@@ -63,7 +63,7 @@ export default class App extends Component {
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
   handleChangeTab = this.handleChangeSelection.bind(this, 'tabKey');
 
-    selectorEnabled = name =>
+  selectorEnabled = name =>
     includes(this.state.tabKey)(this.getConfig(`selectors.${name}.forTabs`));
 
   render() {
