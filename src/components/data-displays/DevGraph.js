@@ -1,6 +1,6 @@
 import React from 'react';
 import T from '../../temporary/external-text';
-import C3Graph from '../graphs/C3Graph';
+import C3Chart from '../graphs/C3Chart';
 import map from 'lodash/fp/map';
 
 
@@ -14,7 +14,7 @@ export default class DevColourbar extends React.Component {
         <React.Fragment>
           <h3>{chart.title}</h3>
           <p>{chart.comment}</p>
-          <C3Graph
+          <C3Chart
             // id={'chart.title'}
             {...chart.options}
           />

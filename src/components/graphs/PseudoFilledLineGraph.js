@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import C3Graph from './C3Graph';
+import C3Chart from './C3Chart';
 import {
   floorMultiple,
   interpolateArrayBy,
@@ -184,7 +184,7 @@ export default class PseudoFilledLineGraph extends React.Component {
             />
           </Col>
         </Row>
-        <C3Graph
+        <C3Chart
           {...c3options}
         />
       </React.Fragment>

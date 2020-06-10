@@ -15,7 +15,7 @@ import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
-import C3Graph from './C3Graph';
+import C3Chart from './C3Chart';
 import Tab from 'react-bootstrap/Tab';
 import { floorMultiple, percentileDatasetName } from './utils';
 
@@ -110,7 +110,7 @@ export default class SimpleLineGraph extends React.Component {
           Shows 10th, 25th, 50th, 75th, and 90th percentile values as
           line graphs. No fill between these lines.
         </p>
-        <C3Graph
+        <C3Chart
           {...c3options}
         />
       </React.Fragment>

@@ -9,7 +9,7 @@ import React from 'react';
 import c3 from 'c3';
 import 'c3/c3.css';
 
-export default class C3Graph extends React.Component {
+export default class C3Chart extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     // id for chart dom element
@@ -24,27 +24,23 @@ export default class C3Graph extends React.Component {
   };
 
   static defaultProps = {
-    onRenderChart: (node, chart) => {
-      console.log('### C3Graph: node', node);
-      console.log('### C3Graph: chart', chart);
-    },
+    onRenderChart: () => {},
   };
 
   constructor(props) {
     super(props);
     this.node = React.createRef();
-    console.log('### C3Graph: c3', c3)
   }
 
   componentDidMount() {
-    this.renderGraph();
+    this.renderChart();
   }
 
   componentDidUpdate() {
-    this.renderGraph();
+    this.renderChart();
   }
 
-  renderGraph = () => {
+  renderChart = () => {
     const { id, onRenderChart, ...rest } = this.props;
     this.chart = c3.generate({
       bindto: this.node.current,

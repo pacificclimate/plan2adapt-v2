@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
-import C3Graph from './C3Graph';
+import C3Chart from './C3Chart';
 import fromPairs from 'lodash/fp/fromPairs';
 import range from 'lodash/fp/range';
 import rangeStep from 'lodash/fp/rangeStep';
@@ -415,7 +415,7 @@ export default class BarChart extends React.Component {
     console.log('### BarChart.render: c3options', c3options)
 
     return (
-        <C3Graph
+        <C3Chart
           {...c3options}
         />
     )
