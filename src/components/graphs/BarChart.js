@@ -63,13 +63,20 @@ export default class BarChart extends React.Component {
 
     const percentileIndices = range(0, percentiles.length);
 
+    const basePercentileValueNames =
+      map(p =>`${p}th`)(percentiles);
+
     const interpPercentileValueDiffNames = map(
       i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (interp)`
     )(percentileIndices);
-    const primaryDatasetNames = map(percentileDatasetName)(percentiles);
 
+    // In order to display negative values as stacked bars, we have to add
+    // an offset to make them all positive, then subtract it when displaying
+    // these values in axes, tooltips, etc. The offset is zero if there are
+    // no negative values. It is the (negative of) the most negative value
+    // otherwise, rounded to a multiple of 2 so that C3's automatic y-axis
+    // tick values are nice.
 
-    // You know I could do this in a one-liner, right?
     const allPercentileValues = flattenDeep([0, percentileValuesByTimePeriod]);
     const minPercentileValue = min(allPercentileValues);
     const maxPercentileValue = max(allPercentileValues);
@@ -78,9 +85,6 @@ export default class BarChart extends React.Component {
     const addOffset = v => v + offset;
     const yMin = minPercentileValue + offset;
     const yMax = maxPercentileValue + offset;
-
-    const historicalMiddleYear = middleYear(historicalTimePeriod);
-    const futureMiddleYears = map(middleYear)(futureTimePeriods);
 
     // Interpolate temporally
     //
@@ -98,6 +102,9 @@ export default class BarChart extends React.Component {
     // interpolation function. This is not at all hard mathematically, but
     // organizing the computations is a bit complicated. Hence all the
     // comments below describing the intermediate computations.
+
+    const historicalMiddleYear = middleYear(historicalTimePeriod);
+    const futureMiddleYears = map(middleYear)(futureTimePeriods);
 
     //  baseTimes: [t0, t1, ... ]
     //    from input data
@@ -207,9 +214,6 @@ export default class BarChart extends React.Component {
       map(diffs)(interpPercentileValuesByTime);
     const interpPercentileValueDiffsByPercentile =
       transpose(interpPercentileValueDiffsByTime);
-
-    const basePercentileValueNames =
-      map(p =>`${p}th`)(percentiles);
 
     const columns = concatAll([
       // Time values for base data
