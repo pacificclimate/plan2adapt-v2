@@ -5,11 +5,8 @@ import range from 'lodash/fp/range';
 import flow from 'lodash/fp/flow';
 import flatten from 'lodash/fp/flatten';
 import zipAll from 'lodash/fp/zipAll';
-import isFunction from 'lodash/fp/isFunction';
-import every from 'lodash/fp/every';
 
 
-// TODO: Remove
 export const interpolateBy = curry((n, v1, v2) => {
   // Compute `n` interpolated values between `v1` and `v2`.
   // Return an array `r` of `n` interpolated values, such that
@@ -20,7 +17,6 @@ export const interpolateBy = curry((n, v1, v2) => {
 });
 
 
-// TODO: Remove
 export const interpolateArrayBy = curry((n, a) => {
   // Compute `n` interpolated values between each successive pair of
   // values in array `a`.
