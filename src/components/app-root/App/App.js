@@ -10,6 +10,7 @@ import Loader from 'react-loader';
 import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
+import includes from 'lodash/fp/includes';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
 import { middleDecade } from '../../../utils/time-periods';
@@ -24,12 +25,13 @@ import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
 import Summary from '../../data-displays/Summary';
-import ChangeOverTimeGraph from '../../data-displays/ChangeOverTimeGraph';
+import ChangeOverTimeGraph from '../../graphs/ChangeOverTimeGraph';
 import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
+import DevGraph from '../../data-displays/DevGraph';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -38,6 +40,7 @@ const baselineTimePeriod = {
 
 export default class App extends Component {
   static contextType = T.contextType;
+  getConfig = path => T.get(this.context, path, {}, 'raw');
 
   state = {
     metadata: null,
@@ -45,6 +48,7 @@ export default class App extends Component {
     futureTimePeriod: undefined,
     season: undefined,
     variable: undefined,
+    tabKey: 'graphs',
   };
 
   componentDidMount() {
@@ -57,6 +61,10 @@ export default class App extends Component {
   handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriod');
   handleChangeSeason = this.handleChangeSelection.bind(this, 'season');
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
+  handleChangeTab = this.handleChangeSelection.bind(this, 'tabKey');
+
+  selectorEnabled = name =>
+    includes(this.state.tabKey)(this.getConfig(`selectors.${name}.forTabs`));
 
   render() {
     // TODO: Extract various parts of this to components to reduce the nesting
@@ -70,26 +78,24 @@ export default class App extends Component {
       return <Loader/>;
     }
     console.log('### Loaded')
-    const getConfig = path => T.get(texts, path, {}, 'raw');
-    const variableConfig = getConfig('variables');
+    const variableConfig = this.getConfig('variables');
 
     const futureTimePeriod =
       get('futureTimePeriod.value.representative', this.state) || {};
     const region = get('region.label', this.state) || '';
 
+    // TODO: Inline
     const variableSelectorProps = {
-      // Common to both VariableSelector instances
       bases: this.state.metadata,
       value: this.state.variable,
-      default: getConfig('selectors.variable.default'),
+      default: this.getConfig('selectors.variable.default'),
       onChange: this.handleChangeVariable,
       getOptionLabel: ({ value: { representative: { variable_id }}}) =>
         `${variableConfig[variable_id].label}`,
     };
     const seasonSelectorProps = {
-      // Common to both SeasonSelector instances
       value: this.state.season,
-      default: getConfig('selectors.season.default'),
+      default: this.getConfig('selectors.season.default'),
       onChange: this.handleChangeSeason,
     };
 
@@ -106,28 +112,66 @@ export default class App extends Component {
                 </Col>
               </Row>
               <Row>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T path='selectors.region.prefix'/>
-                </Col>
-                <Col xl={12} lg={3} md={6}>
-                  <RegionSelector
-                    default={T.get(texts, 'selectors.region.default', {}, 'raw')}
-                    value={this.state.region}
-                    onChange={this.handleChangeRegion}
-                  />
-                </Col>
-                <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                  <T path='selectors.timePeriod.prefix'/>
-                </Col>
-                <Col xl={12} lg={3} md={4}>
-                  <TimePeriodSelector
-                    bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
-                    value={this.state.futureTimePeriod}
-                    default={T.get(texts, 'selectors.timePeriod.default', {}, 'raw')}
-                    onChange={this.handleChangeTimePeriod}
-                    debug
-                  />
-                </Col>
+                {
+                  this.selectorEnabled('region') && <React.Fragment>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='selectors.region.prefix'/>
+                    </Col>
+                    <Col xl={12} lg={3} md={6}>
+                      <RegionSelector
+                        default={T.get(texts, 'selectors.region.default', {}, 'raw')}
+                        value={this.state.region}
+                        onChange={this.handleChangeRegion}
+                      />
+                    </Col>
+                  </React.Fragment>
+                }
+
+                {
+                  this.selectorEnabled('timePeriod') && <React.Fragment>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='selectors.timePeriod.prefix'/>
+                    </Col>
+                    <Col xl={12} lg={3} md={4}>
+                      <TimePeriodSelector
+                        bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
+                        value={this.state.futureTimePeriod}
+                        default={T.get(texts, 'selectors.timePeriod.default', {}, 'raw')}
+                        onChange={this.handleChangeTimePeriod}
+                        debug
+                      />
+                    </Col>
+                  </React.Fragment>
+                }
+
+                {
+                  this.selectorEnabled('variable') && <React.Fragment>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='selectors.variable.prefix'/>
+                    </Col>
+                    <Col xl={12} lg={3} md={4}>
+                      <VariableSelector
+                        {...variableSelectorProps}
+                      />
+                    </Col>
+                  </React.Fragment>
+                }
+
+                {
+                  this.selectorEnabled('season') && <React.Fragment>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='selectors.season.prefix'/>
+                    </Col>
+                    <Col xl={12} lg={3} md={4}>
+                      <SeasonSelector
+                        {...seasonSelectorProps}
+                      />
+                    </Col>
+                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                      <T path='selectors.season.postfix'/>
+                    </Col>
+                  </React.Fragment>
+                }
               </Row>
             </div>
           </Col>
@@ -135,36 +179,27 @@ export default class App extends Component {
           <Col xl={10} lg={12} md={12}>
             <Tabs
               id={'main'}
-              defaultActiveKey={getConfig('app.tabs.default')}
+              activeKey={this.state.tabKey}
+              onSelect={this.handleChangeTab}
             >
-              {getConfig('dev.visible') &&
+              {this.getConfig('dev-graph.visible') &&
               <Tab
-                eventKey={'dev'}
-                title={'Dev'}
+                eventKey={'dev-graph'}
+                title={'Dev Graph'}
                 className='pt-2'
                 mountOnEnter
               >
-                <Row>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.variable.prefix'/>
-                  </Col>
-                  <Col sm={4} xs={6}>
-                    <VariableSelector
-                      {...variableSelectorProps}
-                    />
-                  </Col>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.season.prefix'/>
-                  </Col>
-                  <Col lg={2} sm={4} xs={6}>
-                    <SeasonSelector
-                      {...seasonSelectorProps}
-                    />
-                  </Col>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.season.postfix'/>
-                  </Col>
-                </Row>
+                <DevGraph/>
+              </Tab>
+              }
+
+              {this.getConfig('dev-colourbar.visible') &&
+              <Tab
+                eventKey={'dev-colourbar'}
+                title={'Dev Colourbar'}
+                className='pt-2'
+                mountOnEnter
+              >
                 <DevColourbar
                   season={get('value', this.state.season)}
                   variable={get('value', this.state.variable)}
@@ -175,8 +210,9 @@ export default class App extends Component {
               <Tab
                 eventKey={'summary'}
                 title={<T as='string' path='summary.tab'/>}
-                disabled={getConfig('summary.disabled')}
+                disabled={this.getConfig('summary.disabled')}
                 className='pt-2'
+                mountOnEnter
               >
                 <T path='summary.notes.general' data={{
                   region: region,
@@ -188,9 +224,9 @@ export default class App extends Component {
                 <Summary
                   region={get('value', this.state.region)}
                   futureTimePeriod={futureTimePeriod}
-                  tableContents={getConfig('summary.table.contents')}
-                  variableConfig={getConfig('variables')}
-                  unitsConversions={getConfig('units')}
+                  tableContents={this.getConfig('summary.table.contents')}
+                  variableConfig={this.getConfig('variables')}
+                  unitsConversions={this.getConfig('units')}
                 />
                 <T path='summary.notes.derivedVars'/>
               </Tab>
@@ -198,8 +234,9 @@ export default class App extends Component {
               <Tab
                 eventKey={'impacts'}
                 title={<T as='string' path='impacts.tab'/>}
-                disabled={getConfig('impacts.disabled')}
+                disabled={this.getConfig('impacts.disabled')}
                 className='pt-2'
+                mountOnEnter
               >
                 <Row>
                   <Col lg={12}>
@@ -224,37 +261,13 @@ export default class App extends Component {
               <Tab
                 eventKey={'maps'}
                 title={<T as='string' path='maps.tab'/>}
-                disabled={getConfig('maps.disabled')}
+                disabled={this.getConfig('maps.disabled')}
                 className='pt-2'
                 mountOnEnter
               >
-                <Row>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.variable.prefix'/>
-                  </Col>
-                  <Col sm={4} xs={6}>
-                    <VariableSelector
-                      {...variableSelectorProps}
-                    />
-                  </Col>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.season.prefix'/>
-                  </Col>
-                  <Col lg={2} sm={4} xs={6}>
-                    <SeasonSelector
-                      {...seasonSelectorProps}
-                    />
-                  </Col>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.season.postfix'/>
-                  </Col>
-                </Row>
                 <TwoDataMaps
                   region={get('value', this.state.region)}
-                  historicalTimePeriod={{
-                    start_date: 1961,
-                    end_date: 1990,
-                  }}
+                  historicalTimePeriod={baselineTimePeriod}
                   futureTimePeriod={futureTimePeriod}
                   season={get('value', this.state.season)}
                   variable={get('value', this.state.variable)}
@@ -263,40 +276,34 @@ export default class App extends Component {
               </Tab>
 
               <Tab
-                eventKey={'graph'}
-                title={<T as='string' path='graph.tab'/>}
-                disabled={getConfig('graph.disabled')}
+                eventKey={'graphs'}
+                title={<T as='string' path='graphs.tab'/>}
+                disabled={this.getConfig('graphs.disabled')}
                 className='pt-2'
+                mountOnEnter
               >
                 <Row>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.variable.prefix'/>
-                  </Col>
-                  <Col sm={4} xs={6}>
-                    <VariableSelector
-                      {...variableSelectorProps}
-                    />
-                  </Col>
-                  <Col xs={'auto'} className='pr-0'>
-                    <T path='selectors.season.prefix'/>
-                  </Col>
-                  <Col lg={2}  sm={4} xs={6}>
-                    <SeasonSelector
-                      {...seasonSelectorProps}
-                    />
-                  </Col>
-                </Row>
-                <Row>
                   <Col lg={12}>
-                    <T path='graph.title' data={{
+                    <T path='graphs.title' data={{
                       season: get('label', this.state.season),
                       variable: get('label', this.state.variable),
                       region: get('label', this.state.region),
                     }}/>
                   </Col>
-                  <Col lg={6}>
+                </Row>
+                <Row>
+                  <Col lg={12}>
                     <ChangeOverTimeGraph
-                      {...this.state}
+                      region={get('value', this.state.region)}
+                      historicalTimePeriod={baselineTimePeriod}
+                      season={get('value', this.state.season)}
+                      variable={get('value', this.state.variable)}
+                      // TODO: This may be better obtained from metadata
+                      futureTimePeriods={
+                        this.getConfig('graphs.config.futureTimePeriods')}
+                      graphConfig={this.getConfig('graphs.config')}
+                      variableConfig={this.getConfig('variables')}
+                      unitsConversions={this.getConfig('units')}
                     />
                   </Col>
                 </Row>
@@ -305,7 +312,7 @@ export default class App extends Component {
               <Tab
                 eventKey={'notes'}
                 title={<T as='string' path='notes.tab'/>}
-                disabled={getConfig('notes.disabled')}
+                disabled={this.getConfig('notes.disabled')}
                 className='pt-2'
               >
                 <T path='notes.content'/>
@@ -314,7 +321,7 @@ export default class App extends Component {
               <Tab
                 eventKey={'references'}
                 title={<T as='string' path='references.tab'/>}
-                disabled={getConfig('references.disabled')}
+                disabled={this.getConfig('references.disabled')}
                 className='pt-2'
               >
                 <T path='references.content'/>
@@ -323,7 +330,7 @@ export default class App extends Component {
               <Tab
                 eventKey={'about'}
                 title={<T as='string' path='about.tab'/>}
-                disabled={getConfig('about.disabled')}
+                disabled={this.getConfig('about.disabled')}
                 className='pt-2'
               >
                 <Tabs id={'about'} defaultActiveKey={'Plan2Adapt'}>

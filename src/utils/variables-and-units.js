@@ -68,7 +68,7 @@ export const expToFixed = s => {
 };
 
 
-export const displayFormat = curry((sigfigs = 3) => (value) => {
+export const displayFormat = curry((sigfigs , value) => {
   // Convert a number value to a string in the display format we prefer.
   if (!isNumber(value)) {
     return '--';

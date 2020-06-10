@@ -1,25 +1,35 @@
 app:
   tabs:
-    default: summary
+    default: graph  # Not working again, sigh
 
 selectors:
-  prologue: I am interested in information about projected climate change ...
+  prologue: |
+    I am interested in information about projected climate change in
+    British Columbia ...
   region:
-    prefix: in
-    default: bc
+    prefix: within the region of
+    default: alberni_clayoquot
+    forTabs: ['summary', 'impacts', 'maps', 'graphs']
   timePeriod:
     prefix: during the
     default: 2050
+    forTabs: ['summary', 'impacts', 'maps']
   variable:
-    prefix: ... with details about
-    default: pr
+    prefix: with details about
+    default: prsn
+    forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
     postfix: period
     default: 16
+    forTabs: ['maps', 'graphs']
 
-dev:
+dev-colourbar:
   visible: false
+
+dev-graph:
+  visible: false
+  charts: []
 
 summary:
   disabled: false
@@ -94,6 +104,7 @@ summary:
 
     derivedVars: |
       &ast; These values are derived from temperature and/or precipitation.
+
 
 impacts:
   disabled: false
@@ -275,10 +286,46 @@ maps:
         max: 40
       ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
 
-graph:
-  disabled: true
+graphs:
+  disabled: false
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
+  config:
+    foo: bar
+    interpolationInterval: 1
+    c3options:
+      # CAUTION: These options *override* the ones supplied in code.
+      # The following are not supplied in code (but at present are overridden
+      # by demo selectors).
+      bar:
+        width:
+          ratio: 0.075
+      point:
+        r: 5
+        focus:
+          expand:
+            factor: 1.5
+
+    futureTimePeriods:
+      # This may be better obtained from metadata
+      - { start_date: "2010", end_date: "2039" }
+      - { start_date: "2040", end_date: "2069" }
+      - { start_date: "2070", end_date: "2099" }
+    variables:
+      fallback:
+        display: absolute
+      ffd:
+        display: absolute
+      gdd:
+        display: absolute
+      hdd:
+        display: absolute
+      pr:
+        display: relative
+      prsn:
+        display: relative
+      tasmean:
+        display: absolute
 
 notes:
   disabled: false
