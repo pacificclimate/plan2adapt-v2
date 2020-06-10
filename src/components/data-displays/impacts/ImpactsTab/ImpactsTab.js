@@ -23,19 +23,9 @@ class ImpactsTab extends React.Component {
     region: PropTypes.object.isRequired,
     futureTimePeriod: PropTypes.object.isRequired,
     ruleValues: PropTypes.object.isRequired,
-
-    active: PropTypes.bool,
-    // This is a mechanism for achieving two things:
-    // 1. Forcing a re-render when the component becomes "active" (which
-    //  is typically when the tab it is inside is selected).
-    // 2. Not rendering anything when it is inactive, which saves a pile
-    //  of unnecessary updates.
   };
 
   render() {
-    if (!this.props.active) {
-      return null;
-    }
     if (!allDefined(
       [
         'rulebase',
@@ -47,6 +37,7 @@ class ImpactsTab extends React.Component {
       this.props
     )) {
       console.log('### ImpactsTab: unsettled props', this.props)
+      return <h1>Loading ImpactsTab</h1>
       return <Loader/>
     }
     return (

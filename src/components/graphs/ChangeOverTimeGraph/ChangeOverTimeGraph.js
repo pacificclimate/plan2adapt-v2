@@ -115,13 +115,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //
     // Example value: See configuration file, key 'units'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
-
-    active: PropTypes.bool,
-    // This is a mechanism for achieving two things:
-    // 1. Forcing a re-render when the component becomes "active" (which
-    //  is typically when the tab it is inside is selected).
-    // 2. Not rendering anything when it is inactive, which saves a pile
-    //  of unnecessary updates.
   };
 
   // TODO: Replace state and state management code with settings from config
@@ -142,9 +135,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     pointRadius => this.setState({ pointRadius });
 
   render() {
-    if (!this.props.active) {
-      return null;
-    }
     if (!allDefined(
       [
         'region.geometry',
@@ -349,8 +339,6 @@ const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
-  // Component is active
-  props.active &&
   // ... relevant props have settled to defined values
   allDefined(
     [
@@ -368,7 +356,6 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
   // between previous and current relevant props
   !(
     prevProps &&
-    isEqual(prevProps.active, props.active) &&
     isEqual(prevProps.region, props.region) &&
     isEqual(prevProps.variable, props.variable) &&
     isEqual(prevProps.season, props.season) &&

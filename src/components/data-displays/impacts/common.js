@@ -8,8 +8,6 @@ export const loadRulesResults = props => {
 
 
 export const shouldLoadRulesResults = (prevProps, props) =>
-  // Component is active
-  props.active &&
   // ... relevant props have settled to defined values
   allDefined(
     [
@@ -23,7 +21,6 @@ export const shouldLoadRulesResults = (prevProps, props) =>
   // between previous and current relevant props
   !(
     prevProps &&
-    isEqual(prevProps.active, props.active) &&
     isEqual(prevProps.region, props.region) &&
     isEqual(prevProps.futureTimePeriod, props.futureTimePeriod)
   );

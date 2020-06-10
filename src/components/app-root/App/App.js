@@ -214,22 +214,26 @@ export default class App extends Component {
                 className='pt-2'
                 mountOnEnter
               >
-                <T path='summary.notes.general' data={{
-                  region: region,
-                  baselineTimePeriod,
-                  futureTimePeriod,
-                  futureDecade: middleDecade(futureTimePeriod),
-                  baselineDecade: middleDecade(baselineTimePeriod),
-                }}/>
-                <Summary
-                  region={get('value', this.state.region)}
-                  futureTimePeriod={futureTimePeriod}
-                  tableContents={this.getConfig('summary.table.contents')}
-                  variableConfig={this.getConfig('variables')}
-                  unitsConversions={this.getConfig('units')}
-                  active={this.state.tabKey === 'summary'}
-                />
-                <T path='summary.notes.derivedVars'/>
+                {
+                  this.state.tabKey === 'summary' &&
+                  <React.Fragment>
+                    <T path='summary.notes.general' data={{
+                      region: region,
+                      baselineTimePeriod,
+                      futureTimePeriod,
+                      futureDecade: middleDecade(futureTimePeriod),
+                      baselineDecade: middleDecade(baselineTimePeriod),
+                    }}/>
+                    <Summary
+                      region={get('value', this.state.region)}
+                      futureTimePeriod={futureTimePeriod}
+                      tableContents={this.getConfig('summary.table.contents')}
+                      variableConfig={this.getConfig('variables')}
+                      unitsConversions={this.getConfig('units')}
+                    />
+                    <T path='summary.notes.derivedVars'/>
+                  </React.Fragment>
+                }
               </Tab>
 
               <Tab
@@ -239,21 +243,25 @@ export default class App extends Component {
                 className='pt-2'
                 mountOnEnter
               >
-                <Row>
-                  <Col lg={12}>
-                    <T path='impacts.prologue' data={{
-                      region: region,
-                      futureDecade: middleDecade(futureTimePeriod),
-                      baselineDecade: middleDecade(baselineTimePeriod),
-                    }}/>
-                    <ImpactsTab
-                      rulebase={rulebase}
-                      region={get('value', this.state.region)}
-                      futureTimePeriod={futureTimePeriod}
-                      active={this.state.tabKey === 'impacts'}
-                    />
-                  </Col>
-                </Row>
+                {
+                  this.state.tabKey === 'impacts' &&
+                  <React.Fragment>
+                    <Row>
+                      <Col lg={12}>
+                        <T path='impacts.prologue' data={{
+                          region: region,
+                          futureDecade: middleDecade(futureTimePeriod),
+                          baselineDecade: middleDecade(baselineTimePeriod),
+                        }}/>
+                        <ImpactsTab
+                          rulebase={rulebase}
+                          region={get('value', this.state.region)}
+                          futureTimePeriod={futureTimePeriod}
+                        />
+                      </Col>
+                    </Row>
+                  </React.Fragment>
+                }
               </Tab>
 
               {/*
@@ -267,15 +275,17 @@ export default class App extends Component {
                 className='pt-2'
                 mountOnEnter
               >
-                <TwoDataMaps
-                  region={get('value', this.state.region)}
-                  historicalTimePeriod={baselineTimePeriod}
-                  futureTimePeriod={futureTimePeriod}
-                  season={get('value', this.state.season)}
-                  variable={get('value', this.state.variable)}
-                  metadata={this.state.metadata}
-                  active={this.state.tabKey === 'maps'}
-                />
+                {
+                  this.state.tabKey === 'maps' &&
+                  <TwoDataMaps
+                    region={get('value', this.state.region)}
+                    historicalTimePeriod={baselineTimePeriod}
+                    futureTimePeriod={futureTimePeriod}
+                    season={get('value', this.state.season)}
+                    variable={get('value', this.state.variable)}
+                    metadata={this.state.metadata}
+                  />
+                }
               </Tab>
 
               <Tab
@@ -285,32 +295,36 @@ export default class App extends Component {
                 className='pt-2'
                 mountOnEnter
               >
-                <Row>
-                  <Col lg={12}>
-                    <T path='graphs.title' data={{
-                      season: get('label', this.state.season),
-                      variable: get('label', this.state.variable),
-                      region: get('label', this.state.region),
-                    }}/>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={12}>
-                    <ChangeOverTimeGraph
-                      region={get('value', this.state.region)}
-                      historicalTimePeriod={baselineTimePeriod}
-                      season={get('value', this.state.season)}
-                      variable={get('value', this.state.variable)}
-                      // TODO: This may be better obtained from metadata
-                      futureTimePeriods={
-                        this.getConfig('graphs.config.futureTimePeriods')}
-                      graphConfig={this.getConfig('graphs.config')}
-                      variableConfig={this.getConfig('variables')}
-                      unitsConversions={this.getConfig('units')}
-                      active={this.state.tabKey === 'graphs'}
-                    />
-                  </Col>
-                </Row>
+                {
+                  this.state.tabKey === 'graphs' &&
+                  <React.Fragment>
+                    <Row>
+                      <Col lg={12}>
+                        <T path='graphs.title' data={{
+                          season: get('label', this.state.season),
+                          variable: get('label', this.state.variable),
+                          region: get('label', this.state.region),
+                        }}/>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col lg={12}>
+                        <ChangeOverTimeGraph
+                          region={get('value', this.state.region)}
+                          historicalTimePeriod={baselineTimePeriod}
+                          season={get('value', this.state.season)}
+                          variable={get('value', this.state.variable)}
+                          // TODO: This may be better obtained from metadata
+                          futureTimePeriods={
+                            this.getConfig('graphs.config.futureTimePeriods')}
+                          graphConfig={this.getConfig('graphs.config')}
+                          variableConfig={this.getConfig('variables')}
+                          unitsConversions={this.getConfig('units')}
+                        />
+                      </Col>
+                    </Row>
+                  </React.Fragment>
+                }
               </Tab>
 
               <Tab
