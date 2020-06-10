@@ -86,10 +86,23 @@ export const getPeriodData = (source, period) => {
   // quirks that can vary the centre date by a day or two. It is independent of
   // year.
   const timescaleItems = source[periodToTimescale(period)];
+  if (!timescaleItems) {
+    throw new Error(
+      `No data for timescale '${periodToTimescale(period)}' 
+      (period '${period}')`
+    );
+  }
   return flow(
     keys,
     find(key => key.substring(5, 7) === periodToMonth(period)),
-    dataKey => timescaleItems[dataKey],
+    dataKey => {
+      if (!dataKey) {
+        throw new Error(
+          `No data for period '${period}' (month ${periodToMonth(period)})`
+        );
+      }
+      return timescaleItems[dataKey]
+    },
   )(timescaleItems);
 };
 
