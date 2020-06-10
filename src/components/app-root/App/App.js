@@ -227,6 +227,7 @@ export default class App extends Component {
                   tableContents={this.getConfig('summary.table.contents')}
                   variableConfig={this.getConfig('variables')}
                   unitsConversions={this.getConfig('units')}
+                  active={this.state.tabKey === 'summary'}
                 />
                 <T path='summary.notes.derivedVars'/>
               </Tab>

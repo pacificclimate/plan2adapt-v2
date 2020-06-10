@@ -19,6 +19,8 @@ import {
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
+import { allDefined } from '../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 // Utility function for formatting items for display by Summary.
@@ -130,6 +132,13 @@ class Summary extends React.Component {
     //
     // Example value: See configuration file, key 'units'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
+
+    active: PropTypes.bool,
+    // This is a mechanism for achieving two things:
+    // 1. Forcing a re-render when the component becomes "active" (which
+    //  is typically when the tab it is inside is selected).
+    // 2. Not rendering anything when it is inactive, which saves a pile
+    //  of unnecessary updates.
   };
 
   static defaultProps = {
@@ -140,6 +149,25 @@ class Summary extends React.Component {
   };
 
   render() {
+    if (!this.props.active) {
+      return null;
+    }
+    if (!allDefined(
+      [
+        'region.geometry',
+        'baseline.start_date',
+        'baseline.end_date',
+        'futureTimePeriod.start_date',
+        'futureTimePeriod.end_date',
+        'tableContents',
+        'variableConfig',
+        'unitsConversions',
+      ],
+      this.props
+    )) {
+      console.log('### Summary: unsettled props', this.props)
+      return <Loader/>
+    }
     const { variableConfig, unitsConversions } = this.props;
     return (
       <Table striped bordered>
@@ -266,12 +294,23 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
+  // Component is active
+  props.active &&
   // ... relevant props have settled to defined values
-  props.region && props.futureTimePeriod && props.tableContents &&
+  allDefined(
+    [
+      'region.geometry',
+      'futureTimePeriod.start_date',
+      'futureTimePeriod.end_date',
+      'tableContents',
+    ],
+    props
+  ) &&
   // ... and there are either no previous props, or there is a difference
   // between previous and current relevant props
   !(
     prevProps &&
+    isEqual(prevProps.active, props.active) &&
     isEqual(prevProps.region, props.region) &&
     isEqual(prevProps.futureTimePeriod, props.futureTimePeriod) &&
     isEqual(prevProps.tableContents, props.tableContents)
