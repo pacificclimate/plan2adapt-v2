@@ -307,6 +307,7 @@ export default class App extends Component {
                       graphConfig={this.getConfig('graphs.config')}
                       variableConfig={this.getConfig('variables')}
                       unitsConversions={this.getConfig('units')}
+                      active={this.state.tabKey === 'graphs'}
                     />
                   </Col>
                 </Row>

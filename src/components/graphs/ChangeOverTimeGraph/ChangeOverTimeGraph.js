@@ -23,6 +23,8 @@ import BarChart from '../BarChart';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
+import { allDefined } from '../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 const percentiles = [10, 25, 50, 75, 90];
@@ -113,6 +115,13 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //
     // Example value: See configuration file, key 'units'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
+
+    active: PropTypes.bool,
+    // This is a mechanism for achieving two things:
+    // 1. Forcing a re-render when the component becomes "active" (which
+    //  is typically when the tab it is inside is selected).
+    // 2. Not rendering anything when it is inactive, which saves a pile
+    //  of unnecessary updates.
   };
 
   // TODO: Replace state and state management code with settings from config
@@ -133,6 +142,28 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     pointRadius => this.setState({ pointRadius });
 
   render() {
+    if (!this.props.active) {
+      return null;
+    }
+    if (!allDefined(
+      [
+        'region.geometry',
+        'season',
+        'variable.representative',
+        'historicalTimePeriod.start_date',
+        'historicalTimePeriod.end_date',
+        'futureTimePeriods[0].start_date',
+        'futureTimePeriods[0].end_date',
+        'statistics',
+        'graphConfig',
+        'variableConfig',
+        'unitsConversions',
+      ],
+      this.props
+    )) {
+      console.log('### COTG: unsettled props', this.props)
+      return <Loader/>
+    }
     const {
       variable,
       historicalTimePeriod, futureTimePeriods, statistics,
@@ -147,7 +178,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // In this case we return a detailed error indicator within the app. This is
     // probably not useful to the user. Instead perhaps we should be cagier and
     // print such detailed error info to the console instead.
-    if (!every({ status: 'fulfilled'})(statistics)) {
+    if (!every({ status: 'fulfilled' })(statistics)) {
       return (
         <React.Fragment>
           <p>Could not retrieve data for the following time periods:</p>
@@ -318,15 +349,30 @@ const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
+  // Component is active
+  props.active &&
   // ... relevant props have settled to defined values
-  props.region && props.variable && props.season && props.futureTimePeriods &&
+  allDefined(
+    [
+      'region.geometry',
+      'season',
+      'variable.representative',
+      'historicalTimePeriod.start_date',
+      'historicalTimePeriod.end_date',
+      'futureTimePeriods[0].start_date',
+      'futureTimePeriods[0].end_date',
+    ],
+    props
+  ) &&
   // ... and there are either no previous props, or there is a difference
   // between previous and current relevant props
   !(
     prevProps &&
+    isEqual(prevProps.active, props.active) &&
     isEqual(prevProps.region, props.region) &&
     isEqual(prevProps.variable, props.variable) &&
     isEqual(prevProps.season, props.season) &&
+    isEqual(prevProps.historicalTimePeriod, props.historicalTimePeriod) &&
     isEqual(prevProps.futureTimePeriods, props.futureTimePeriods)
   );
 
