@@ -63,7 +63,7 @@ export default class App extends Component {
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
   handleChangeTab = this.handleChangeSelection.bind(this, 'tabKey');
 
-  selectorEnabled = name =>
+    selectorEnabled = name =>
     includes(this.state.tabKey)(this.getConfig(`selectors.${name}.forTabs`));
 
   render() {
@@ -272,6 +272,7 @@ export default class App extends Component {
                   season={get('value', this.state.season)}
                   variable={get('value', this.state.variable)}
                   metadata={this.state.metadata}
+                  active={this.state.tabKey === 'maps'}
                 />
               </Tab>
 

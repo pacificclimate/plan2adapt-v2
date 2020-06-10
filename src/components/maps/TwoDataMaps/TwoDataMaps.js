@@ -51,6 +51,13 @@ export default class TwoDataMaps extends React.Component {
     season: PropTypes.number,
     variable: PropTypes.object,
     metadata: PropTypes.array,
+
+    active: PropTypes.bool,
+    // This is a mechanism for achieving two things:
+    // 1. Forcing a re-render when the component becomes "active" (which
+    //  is typically when the tab it is inside is selected).
+    // 2. Not rendering anything when it is inactive, which saves a pile
+    //  of unnecessary updates.
   };
 
   state = {
@@ -88,6 +95,9 @@ export default class TwoDataMaps extends React.Component {
     this.setState({ bounds: regionBounds(this.props.region)});
 
   render() {
+    if (!this.props.active) {
+      return null;
+    }
     if (!allDefined(
       [
         'region.geometry',
