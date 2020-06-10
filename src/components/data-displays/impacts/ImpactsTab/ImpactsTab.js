@@ -6,6 +6,8 @@ import Impacts from '../Impacts';
 import Rules from '../Rules';
 import withAsyncData from '../../../../HOCs/withAsyncData';
 import { loadRulesResults, shouldLoadRulesResults } from '../common';
+import { allDefined } from '../../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 class ImpactsTab extends React.Component {
@@ -21,9 +23,32 @@ class ImpactsTab extends React.Component {
     region: PropTypes.object.isRequired,
     futureTimePeriod: PropTypes.object.isRequired,
     ruleValues: PropTypes.object.isRequired,
+
+    active: PropTypes.bool,
+    // This is a mechanism for achieving two things:
+    // 1. Forcing a re-render when the component becomes "active" (which
+    //  is typically when the tab it is inside is selected).
+    // 2. Not rendering anything when it is inactive, which saves a pile
+    //  of unnecessary updates.
   };
 
   render() {
+    if (!this.props.active) {
+      return null;
+    }
+    if (!allDefined(
+      [
+        'rulebase',
+        'region.geometry',
+        'futureTimePeriod.start_date',
+        'futureTimePeriod.end_date',
+        'ruleValues',
+      ],
+      this.props
+    )) {
+      console.log('### ImpactsTab: unsettled props', this.props)
+      return <Loader/>
+    }
     return (
       <Tabs
         id={'impacts'}

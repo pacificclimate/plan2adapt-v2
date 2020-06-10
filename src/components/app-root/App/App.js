@@ -250,6 +250,7 @@ export default class App extends Component {
                       rulebase={rulebase}
                       region={get('value', this.state.region)}
                       futureTimePeriod={futureTimePeriod}
+                      active={this.state.tabKey === 'impacts'}
                     />
                   </Col>
                 </Row>
