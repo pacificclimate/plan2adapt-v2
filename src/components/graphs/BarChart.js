@@ -1,8 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import C3Chart from './C3Chart';
 import fromPairs from 'lodash/fp/fromPairs';
 import range from 'lodash/fp/range';
@@ -25,7 +22,6 @@ import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import flatten from 'lodash/fp/flatten';
-import tap from 'lodash/fp/tap';
 import { displayFormat } from '../../utils/variables-and-units';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
@@ -67,9 +63,6 @@ export default class BarChart extends React.Component {
 
     const percentileIndices = range(0, percentiles.length);
 
-    const basePercentileValueDiffNames = map(
-      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (base)`
-    )(percentileIndices);
     const interpPercentileValueDiffNames = map(
       i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (interp)`
     )(percentileIndices);
@@ -176,27 +169,14 @@ export default class BarChart extends React.Component {
     // argument.
     // This is slightly inefficient but we will bite that for now.
 
-    // TODO: Remove if we don't actually use this
-    // Note: We need to assign colours and other presentation formatting
-    // differently for base and interpolated values (that is in fact why
-    // the distinction exists). Therefore we remove base time points from
-    // interpolated value sets (times and percentile values) so that we do
-    // no present base data twice.
-
-    // const removeBasePointAndFlatten = flow(
-    //   map(tail),
-    //   flatten
-    // );
-    const removeBasePointAndFlatten = flatten;  // Not removing just now.
-
-    const interpTimes = removeBasePointAndFlatten(
+    const interpTimes = flatten(
       // First of repeated interpolated times
       interpTimesAndValuesByPercentile[0][0],
     );
 
     const interpPercentileValuesByPercentile = flow(
       map(1), // Get interpolated y (percentile) values
-      map(removeBasePointAndFlatten),
+      map(flatten),
     )(interpTimesAndValuesByPercentile);
 
     //  GOAL:
@@ -223,10 +203,6 @@ export default class BarChart extends React.Component {
     )(percentileIndices);
     const interpPercentileValueDiffsByTime =
       map(diffs)(interpPercentileValuesByTime);
-    const basePercentileValueDiffsByTime =
-      map(diffs)(basePercentileValuesByTime);
-    const basePercentileValueDiffsByPercentile =
-      transpose(basePercentileValueDiffsByTime);
     const interpPercentileValueDiffsByPercentile =
       transpose(interpPercentileValueDiffsByTime);
 
@@ -257,13 +233,6 @@ export default class BarChart extends React.Component {
       //   map(concatAll),
       // )([interpPercentileValueNames, interpPercentileValuesByPercentile]),
 
-      // Base percentile value differences
-      // flow(
-      //   zipAll,
-      //   map(concatAll),
-      // )([basePercentileValueDiffNames, basePercentileValueDiffsByPercentile]),
-
-      // TODO: Interp percentile value differences
       flow(
         zipAll,
         map(concatAll),
@@ -284,8 +253,6 @@ export default class BarChart extends React.Component {
             ...fromPairsMulti([[basePercentileValueNames, 'baseTime']]),
             // Temporary: Interpolated data lines use interpTime
             // ...fromPairsMulti([[interpPercentileValueNames, 'interpTime']]),
-            // Base data bars use baseTime
-            // ...fromPairsMulti([[basePercentileValueDiffNames, 'baseTime']]),
             // Interp data bars use interpTime
             ...fromPairsMulti([[interpPercentileValueDiffNames, 'interpTime']]),
           },
@@ -294,13 +261,10 @@ export default class BarChart extends React.Component {
             ...fromPairsMulti([[basePercentileValueNames, 'line']]),
             // Temporary: Interp data presented as lines
             // ...fromPairsMulti([[interpPercentileValueNames, 'line']]),
-            // Base data presented as stacked bar charts of differences
-            // ...fromPairsMulti([[basePercentileValueDiffNames, 'bar']]),
             // Interp data presented as stacked bar charts of differences
             ...fromPairsMulti([[interpPercentileValueDiffNames, 'bar']]),
           },
           groups: [
-            // basePercentileValueDiffNames,
             interpPercentileValueDiffNames,
           ],
           colors: {
@@ -310,10 +274,6 @@ export default class BarChart extends React.Component {
               ['#cccccc', '#aaaaaa', 'black', '#aaaaaa', '#cccccc']
             ])),
             // ...fromPairsMulti([[interpPercentileValueNames, 'transparent']]),
-            // ...fromPairs(zipAll([
-            //   basePercentileValueDiffNames,
-            //   ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
-            // ])),
             ...fromPairs(zipAll([
               interpPercentileValueDiffNames,
               ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
