@@ -104,7 +104,6 @@ export default class NcwmsColourbar extends React.Component {
 
   updateWidth = () => {
     const width = getOr(0, 'current.offsetWidth', this.thing);
-    console.log('### NcwmsColourbar.updateWidth: width', width)
     if (width > 0 && width !== this.state.width) {
       this.setState({ width });
     }
