@@ -16,11 +16,16 @@
 
 import React from 'react';
 import Loader from 'react-loader';
+import merge from 'lodash/fp/merge';
 
 
 const getDisplayName = WrappedComponent =>
   WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
+const defaultHandlers = {
+  loading: Loader,
+  error: ({ error }) => error.toString(),
+};
 
 export default function withAsyncData(
   loadAsyncData,
@@ -38,14 +43,20 @@ export default function withAsyncData(
   // This prevents not loading initially due to the timing of
   // `getDerivedStateFromProps`, which is invoked before `componentDidMount`.
 
-  dataPropName
+  dataPropName,
   // Name of prop to pass data to base component through.
+
+  handlerOptions = {},
+  // Components rendered in loading and error states. States are:
+  //  loading: props[dataPropName] === null && !props[errorPropName]
+  //  error: props[errorPropName] !== null
 ) {
   return function(BaseComponent) {
     class WithAsyncData extends React.Component {
       state = {
         prevProps: undefined,
         externalData: null,
+        error: null,
       };
 
       static getDerivedStateFromProps(props, state) {
@@ -85,21 +96,31 @@ export default function withAsyncData(
 
       _loadAsyncData(...args) {
         console.log(`### ${WithAsyncData.displayName}._loadAsyncData`, ...args)
-        this._asyncRequest = loadAsyncData(...args).then(
-          externalData => {
+        this._asyncRequest =
+          loadAsyncData(...args).then(
+            externalData => {
+              this.setState({ externalData, error: null });
+            }
+          ).catch(error => {
+            this.setState({ externalData: null, error })
+          })
+          .finally(() => {
             this._asyncRequest = null;
-            this.setState({ externalData });
-          }
-        );
+          });
       }
 
       render() {
-        if (this.state.externalData === null) {
-          return <Loader/>;
+        const { error, externalData } = this.state;
+        const handlers = merge(defaultHandlers, handlerOptions);
+        if (error) {
+          return <handlers.error {...this.props} error={error}/>;
+        }
+        if (externalData === null) {
+          return <handlers.loading {...this.props}/>;
         }
         return (
           <BaseComponent
-            {...{ [dataPropName]: this.state.externalData }}
+            {...{ [dataPropName]: externalData }}
             {...this.props}
           />
         );

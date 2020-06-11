@@ -37,6 +37,7 @@ import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
 import StaticControl from '../StaticControl';
+import { allDefined } from '../../../utils/lodash-fp-extras';
 
 
 export default class TwoDataMaps extends React.Component {
@@ -87,15 +88,22 @@ export default class TwoDataMaps extends React.Component {
     this.setState({ bounds: regionBounds(this.props.region)});
 
   render() {
-    if (!(
-      this.props.region &&
-      this.props.futureTimePeriod &&
-      this.props.variable &&
-      this.props.season
+    if (!allDefined(
+      [
+        'region.geometry',
+        'historicalTimePeriod.start_date',
+        'historicalTimePeriod.end_date',
+        'futureTimePeriod.start_date',
+        'futureTimePeriod.end_date',
+        'variable.representative',
+        'season',
+      ],
+      this.props
     )) {
       console.log('### TwoDataMaps: unsettled props', this.props)
       return <Loader/>
     }
+    console.log('### TwoDataMaps: props', this.props)
     const variableSpec = this.props.variable.representative;
     const variable = variableSpec.variable_id;
     const variableConfig = this.getConfig('variables');

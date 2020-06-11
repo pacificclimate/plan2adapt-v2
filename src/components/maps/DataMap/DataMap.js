@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Loader from 'react-loader';
 
 import axios from 'axios';
 import { xml2js } from 'xml-js';
@@ -8,6 +9,7 @@ import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
 import mapValues from 'lodash/fp/mapValues';
 import tap from 'lodash/fp/tap';
+import cond from 'lodash/fp/cond';
 
 import { BCBaseMap } from 'pcic-react-leaflet-components';
 import CanadaBaseMap from '../CanadaBaseMap';
@@ -19,6 +21,7 @@ import { fetchFileMetadata } from '../../../data-services/metadata';
 import { wmsLayerName, wmsTime, wmsClimateLayerProps } from '../map-utils';
 
 import './DataMap.css';
+import { allDefined } from '../../../utils/lodash-fp-extras';
 
 
 // Popup content getter
@@ -57,6 +60,7 @@ class DataMapDisplay extends React.Component {
     popup: PropTypes.object,
     onPopupChange: PropTypes.func,
     fileMetadata: PropTypes.object,
+    fileMetadataFetchError: PropTypes.object,
     // Any other props are passed through to CanadaBaseMap.
   };
 
@@ -110,7 +114,8 @@ class DataMapDisplay extends React.Component {
 
   render() {
     const {
-      children, region, timePeriod, season, variable, popup, fileMetadata, ...rest
+      children, region, timePeriod, season, variable, popup,
+      fileMetadata, ...rest
     } = this.props;
 
     return (
@@ -146,7 +151,8 @@ class DataMapDisplay extends React.Component {
 
 // This function returns a filter that filters the complete set of metadata
 // down to a single item that is the metadata for the layer to be displayed
-// in DataMap.
+// in DataMap. Note that it depends on the various props being well defined;
+// if not, filtering will be wonky and lead to errors.
 const metadataFilter = props => {
   const criteria = {
     // start_date, end_date
@@ -161,24 +167,24 @@ const metadataFilter = props => {
 };
 
 
+const metadataLengthErrorPromise = metadata => {
+  const error = new Error(`Expected 1 matching metadata item, found ${metadata.length}`);
+  console.error('### DataMap', error)
+  return Promise.reject(error);
+};
+
 // This function returns a promise for the file metadata needed by
-// `DataMapDisplay` for the given props.
+// `DataMapDisplay` for the given props, or for an appropriate
+// error message, depending on how many metadata items match criteria.
 const loadFileMetadata = props => {
   return flow(
     metadataFilter(props),
-    metadata => {
-      // TODO: Don't throw an error when metadata matching fails. Instead,
-      //   show an error message in the map.
-      if (metadata.length === 0) {
-        throw new Error('No matching metadata');
-      }
-      if (metadata.length > 1) {
-        console.error('Too many matching metadata', metadata);
-        throw new Error('Too many matching metadata');
-      }
-      return metadata[0].unique_id;
-    },
-    fetchFileMetadata
+    cond([
+      [m => m.length === 1, m => fetchFileMetadata(m[0].unique_id)],
+      // Do we want to just pick the first one in this case?
+      [m => m.length > 1, metadataLengthErrorPromise],
+      [() => true, metadataLengthErrorPromise],
+    ]),
   )(props.metadata);
 };
 
@@ -187,7 +193,20 @@ const loadFileMetadata = props => {
 // Load when ...
 const shouldLoadFileMetadata = (prevProps, props) =>
   // ... relevant props have settled to defined values
-  props.timePeriod && props.season && props.variable &&
+  allDefined(
+    [
+      // For an unknown reason, timePeriod can transiently be {}, which
+      // is not valid and causes errors in loading the metadata. So check
+      // its innards.
+      'timePeriod.start_date',
+      'timePeriod.end_date',
+      // season is an integer
+      'season',
+      // Let's check that variable isn't just {} either.
+      'variable.representative',
+    ],
+    props
+  ) &&
   // ... and there are either no previous props, or there is a difference
   // between previous and current relevant props
   !(prevProps &&
