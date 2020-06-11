@@ -25,7 +25,6 @@ import getOr from 'lodash/fp/getOr';
 import identity from 'lodash/fp/identity';
 import map from 'lodash/fp/map';
 import mapValues from 'lodash/fp/mapValues';
-import union from 'lodash/fp/union';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
@@ -79,9 +78,43 @@ export default class NcwmsColourbar extends React.Component {
     length: 80,
   };
 
+  // Peculiarity: We need to get the width of the container (<div/> returned by
+  // this component. The canonical way to do that is to use a React ref to the
+  // container (the DOM element), and use the value of
+  // `ref.current.offsetWidth`. However, in the `render` component, the DOM
+  // element can and sometimes does have no dimension. In particular, when
+  // changing tabs, one effect of hiding the unselected tab panels is to
+  // give their elements zero width. This dimensionless state is transient, but
+  // there appears to be no way to avoid it in `render`. React documentation
+  // (https://reactjs.org/docs/refs-and-the-dom.html#adding-a-ref-to-a-dom-element)
+  // states that "ref updates happen before componentDidMount or
+  // componentDidUpdate lifecycle methods." This suggests that valid widths
+  // might be obtainable in these hooks. Experimentation indicates this is true.
+  // Hence we store width in state, so that the component is re-rendered when
+  // width changes, and update this state in these lifecycle methods.
+
+  state = {
+    width: 0,
+  };
+
   constructor(props) {
     super(props);
     this.thing = React.createRef();
+  }
+
+  updateWidth = () => {
+    const width = getOr(0, 'current.offsetWidth', this.thing);
+    if (width > 0 && width !== this.state.width) {
+      this.setState({ width });
+    }
+  };
+
+  componentDidMount() {
+    this.updateWidth();
+  }
+
+  componentDidUpdate() {
+    this.updateWidth();
   }
 
   render() {
@@ -98,7 +131,7 @@ export default class NcwmsColourbar extends React.Component {
     const ticks = wmsTicks(displaySpec, variableSpec);
 
     const belowAboveLength = (100 - length) /2;  //%
-    const width = getOr(0, 'current.offsetWidth', this.thing);
+    const width = this.state.width;
     const imageWidth = Math.round(width * length / 100);
 
     const belowMinColor = wmsBelowMinColor(displaySpec, variableSpec);
@@ -124,7 +157,7 @@ export default class NcwmsColourbar extends React.Component {
             // Avoid this. It does not suffice to render null from this
             // component if this condition is violated; it has to have a chance
             // to render an actual DOM element: hence this.
-            imageWidth &&
+            imageWidth > 0 &&
             <img
               className={styles.image}
               style={{
