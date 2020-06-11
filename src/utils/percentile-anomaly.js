@@ -8,6 +8,7 @@ import keys from 'lodash/fp/keys';
 import find from 'lodash/fp/find';
 import isUndefined from 'lodash/fp/isUndefined';
 import map from 'lodash/fp/map';
+import { nearZero } from './math';
 
 
 // TODO: Most of this stuff should all be contained in the TimeOfYearSelector
@@ -135,6 +136,12 @@ export const getDisplayData = (response, period, display) => {
 
   // display === 'relative':
   const baselineValue = getPeriodData(response.baseline, period);
+  if (nearZero(baselineValue)) {
+    return {
+      percentiles: map(() => 0)(anomalyValues),
+      units: '%',
+    }
+  }
   return {
     percentiles: map(x => 100 * x/baselineValue)(anomalyValues),
     units: '%',
