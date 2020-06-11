@@ -219,9 +219,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       getConvertUnits(unitsConversions, variableConfig, variableId);
     const dataUnits = statistics[0].value.units;
     const convertData = convertUnits(dataUnits, displayUnits);
-    const percentileValuesByTimePeriod = map(
-      stat => convertData(stat.value.percentiles)
+    const percentileValuesByTimePeriod = flow(
+      map(stat => stat.value.percentiles),
+      map(map(convertData)),
     )(statistics);
+
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
