@@ -6,6 +6,8 @@ import Impacts from '../Impacts';
 import Rules from '../Rules';
 import withAsyncData from '../../../../HOCs/withAsyncData';
 import { loadRulesResults, shouldLoadRulesResults } from '../common';
+import { allDefined } from '../../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 class ImpactsTab extends React.Component {
@@ -24,6 +26,20 @@ class ImpactsTab extends React.Component {
   };
 
   render() {
+    if (!allDefined(
+      [
+        'rulebase',
+        'region.geometry',
+        'futureTimePeriod.start_date',
+        'futureTimePeriod.end_date',
+        'ruleValues',
+      ],
+      this.props
+    )) {
+      console.log('### ImpactsTab: unsettled props', this.props)
+      return <h1>Loading ImpactsTab</h1>
+      return <Loader/>
+    }
     return (
       <Tabs
         id={'impacts'}

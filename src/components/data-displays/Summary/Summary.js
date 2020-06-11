@@ -19,6 +19,8 @@ import {
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
+import { allDefined } from '../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 // Utility function for formatting items for display by Summary.
@@ -140,6 +142,22 @@ class Summary extends React.Component {
   };
 
   render() {
+    if (!allDefined(
+      [
+        'region.geometry',
+        'baseline.start_date',
+        'baseline.end_date',
+        'futureTimePeriod.start_date',
+        'futureTimePeriod.end_date',
+        'tableContents',
+        'variableConfig',
+        'unitsConversions',
+      ],
+      this.props
+    )) {
+      console.log('### Summary: unsettled props', this.props)
+      return <Loader/>
+    }
     const { variableConfig, unitsConversions } = this.props;
     return (
       <Table striped bordered>
@@ -267,7 +285,15 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
   // ... relevant props have settled to defined values
-  props.region && props.futureTimePeriod && props.tableContents &&
+  allDefined(
+    [
+      'region.geometry',
+      'futureTimePeriod.start_date',
+      'futureTimePeriod.end_date',
+      'tableContents',
+    ],
+    props
+  ) &&
   // ... and there are either no previous props, or there is a difference
   // between previous and current relevant props
   !(
