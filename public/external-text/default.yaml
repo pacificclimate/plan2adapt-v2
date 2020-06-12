@@ -35,6 +35,18 @@ summary:
   disabled: false
   tab: Summary
   title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
+  prologue: |
+    The table below shows projected changes in average (mean) temperature,
+    precipitation and several derived climate variables from the
+    baseline historical period
+    (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+    to the
+    ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
+    for the ${region} region.
+    The ensemble median is a mid-point value, chosen from a PCIC standard
+    set of Global Climate Model (GCM) projections (see the 'Notes' tab for
+    more information).
+    The range values represent the lowest and highest results within the set.
   # It's tempting to do this content as a Markdown table, but unfortunately
   # MD doesn't let you span table rows or columns.
   table:
@@ -52,6 +64,8 @@ summary:
       range: |
         ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
         ${format(season.percentiles[2])}${unitsSuffix(variable.units)}
+      lowBaselineMessage: |
+        Data for this row has a low baseline. See note 2 below.
     contents:
       - variable: tasmean
         display: absolute
@@ -73,6 +87,7 @@ summary:
           - fall
           - winter
           - spring
+          - summer
       - variable: gdd
         display: absolute
         precision: 3
@@ -88,24 +103,18 @@ summary:
         precision: 2
         seasons:
           - annual
-  notes:
-    general: |
-      The table below shows projected changes in average (mean) temperature,
-      precipitation and several derived climate variables from the
-      baseline historical period
-      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-      to the
-      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-      for the ${region} region.
-      The ensemble median is a mid-point value, chosen from a PCIC standard
-      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
-      more information).
-      The range values represent the lowest and highest results within the set.
+  notes: |
+    Notes:
 
-    derivedVars: |
-      &ast; These values are derived from temperature and/or precipitation.
+    1. Climate variables marked with &ast; are derived from temperature and/or
+       precipitation values, and are not direct outputs of the climate models.
 
-
+    1. Some variables are displayed as relative change (%) from baseline.
+       If the baseline is too small, relative change is meaningless,
+       and we do not display this data.
+       A small baseline can occur when the season and/or region
+       together naturally make for zero or near-zero values. For example,
+       snowfall in summer in low-lying southern areas.
 impacts:
   disabled: false
   tab: Impacts
@@ -290,6 +299,15 @@ graphs:
   disabled: false
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
+  lowBaselineMessage: |
+    This variable is displayed as relative change (%) from baseline.
+    If the baseline is too small, relative change is meaningless,
+    and we do not display this data.
+
+    A small baseline can occur when the season and/or region
+    together naturally make for zero or near-zero values. For example,
+    snowfall in summer in low-lying southern areas.
+
   config:
     foo: bar
     interpolationInterval: 1
@@ -564,6 +582,9 @@ variables:
     type: snowfall flux
     displayUnits: mm/yr
     dataUnits: kg m-2 d-1
+    lowBaseline:
+      absolute: 1e-5
+      relative: 100
   gdd:
     label: Growing Degree-Days
     derived: true

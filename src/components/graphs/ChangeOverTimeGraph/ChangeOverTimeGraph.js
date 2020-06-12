@@ -9,6 +9,9 @@ import every from 'lodash/fp/every';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
 import merge from 'lodash/fp/merge';
+import some from 'lodash/fp/some';
+import tap from 'lodash/fp/tap';
+import T from '../../../temporary/external-text';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -46,6 +49,7 @@ const pointRadiusOptions = labelValueOptions([
 
 
 class ChangeOverTimeGraphDisplay extends React.Component {
+  static contextType = T.contextType;
   // This is a pure (state-free), controlled component that renders the entire
   // content of ChangeOverTimeGraph.
   //
@@ -190,6 +194,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       );
     }
 
+    // TODO: Remove when settled
     // const graphConfig = this.props.graphConfig;
     const graphConfig = merge(
       this.props.graphConfig,
@@ -207,6 +212,14 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       },
 
     );
+
+    const fulfilledStatisticsValues = map('value', statistics);
+
+    // Handle the case where any returned value was derived from a low baseline.
+    const lowBaseline = some(v => v.lowBaseline, fulfilledStatisticsValues);
+    if (lowBaseline) {
+      return <T path={'graphs.lowBaselineMessage'}/>
+    }
 
     // Establish display units for variables, and convert data values to those
     // units.
@@ -301,7 +314,7 @@ const convertToDisplayData = curry((
   // TODO: graphConfig.variables could be unified with variableConfig
   const display = graphConfig.variables[variableId].display;
   return getDisplayData(
-    data, seasonIndexToPeriod(season), display, variableConfig
+    data, seasonIndexToPeriod(season), display, variableConfig[variableId]
   );
 });
 

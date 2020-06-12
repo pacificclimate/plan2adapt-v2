@@ -48,7 +48,7 @@ export default class App extends Component {
     futureTimePeriod: undefined,
     season: undefined,
     variable: undefined,
-    tabKey: 'graphs',
+    tabKey: 'summary',
   };
 
   componentDidMount() {
@@ -217,7 +217,7 @@ export default class App extends Component {
                 {
                   this.state.tabKey === 'summary' &&
                   <React.Fragment>
-                    <T path='summary.notes.general' data={{
+                    <T path='summary.prologue' data={{
                       region: region,
                       baselineTimePeriod,
                       futureTimePeriod,
@@ -231,7 +231,7 @@ export default class App extends Component {
                       variableConfig={this.getConfig('variables')}
                       unitsConversions={this.getConfig('units')}
                     />
-                    <T path='summary.notes.derivedVars'/>
+                    <T path='summary.notes'/>
                   </React.Fragment>
                 }
               </Tab>

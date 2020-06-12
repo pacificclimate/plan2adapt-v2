@@ -1,5 +1,3 @@
-// TODO: This module is waaaaayyyy too long. Break it up.
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
@@ -31,6 +29,16 @@ const isLong = s => s.length > 2;
 
 // Component for displaying the per-season data in a Summary table row.
 const SeasonTds = ({ data }) => {
+  if (data.season.lowBaseline) {
+    return [
+      <td className="text-center">
+        <T path='summary.table.rows.season' data={data} as='string'/>
+      </td>,
+      <td colSpan={2}>
+        <T path='summary.table.rows.lowBaselineMessage' data={data} as='string'/>
+      </td>,
+    ];
+  }
   return [
     <td className="text-center">
       <T path='summary.table.rows.season' data={data} as='string'/>
@@ -259,7 +267,9 @@ const tableContentsAndDataToSummarySpec = (
         seasons: map(season => {
           return {
             id: season,
-            ...getDisplayData(response, season, display, variableConfig),
+            ...getDisplayData(
+              response, season, display, variableConfig[variable]
+            ),
           }
         })(seasons),
       };

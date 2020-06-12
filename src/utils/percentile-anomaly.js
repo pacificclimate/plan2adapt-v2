@@ -6,7 +6,8 @@ import keys from 'lodash/fp/keys';
 import find from 'lodash/fp/find';
 import isUndefined from 'lodash/fp/isUndefined';
 import map from 'lodash/fp/map';
-import { nearZero } from './math';
+import some from 'lodash/fp/some';
+import { nearZeroAbsolute } from './math';
 
 
 // TODO: Most of the results of these period conversion functions should all
@@ -134,16 +135,33 @@ export const getDisplayData = (response, period, display, variableConfig) => {
   }
 
   // display === 'relative':
+  const units = '%';
   const baselineValue = getPeriodData(response.baseline, period);
-  // TODO: Get zero tolerance from config
-  if (nearZero(baselineValue)) {
+  const lowBaseline = variableConfig.lowBaseline;
+
+  // We *always* check for near-zero values, using lowBaseline tolerance
+  // if available, to ensure that we don't divide by zero.
+  if (nearZeroAbsolute(baselineValue, lowBaseline && lowBaseline.absolute)) {
     return {
+      lowBaseline: 'absolute',
       percentiles: map(() => 0)(anomalyValues),
-      units: '%',
-    }
+      units,
+    };
   }
+
+  const relativePercent = map(x => 100 * x/baselineValue)(anomalyValues);
+
+  if (lowBaseline && some(v => Math.abs(v) > lowBaseline.relative, relativePercent)) {
+    return {
+      lowBaseline: 'relative',
+      percentiles: relativePercent,
+      units,
+    };
+  }
+
   return {
-    percentiles: map(x => 100 * x/baselineValue)(anomalyValues),
-    units: '%',
+    lowBaseline: false,
+    percentiles: relativePercent,
+    units,
   };
 };
