@@ -219,9 +219,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       getConvertUnits(unitsConversions, variableConfig, variableId);
     const dataUnits = statistics[0].value.units;
     const convertData = convertUnits(dataUnits, displayUnits);
-    const percentileValuesByTimePeriod = map(
-      stat => convertData(stat.value.percentiles)
+    const percentileValuesByTimePeriod = flow(
+      map(stat => stat.value.percentiles),
+      map(map(convertData)),
     )(statistics);
+
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
@@ -293,22 +295,15 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 }
 
 
-const convertToDisplayData = curry((variableId, season, data) => {
-  // TODO: Replace with config
-  console.log('COT: convertToDisplayData', variableId, season, data)
-  const display = {
-    tasmean: 'absolute',
-    pr: 'relative',
-    prsn: 'relative',
-    gdd: 'absolute',
-    hdd: 'absolute',
-    ffd: 'absolute',
-  }[variableId];
+const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
+  const display = graphConfig.variables[variableId].display;
   return getDisplayData(data, seasonIndexToPeriod(season), display);
 });
 
 
-const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
+const loadSummaryStatistics = (
+  { region, variable, season, futureTimePeriods, graphConfig }
+) =>
   // Return (a promise for) the statistics to be displayed in the Graphs tab.
   // These are "summary" statistics, which are stats across the ensemble of
   // models driving this app.
@@ -324,7 +319,7 @@ const loadSummaryStatistics = ({region, variable, season, futureTimePeriods}) =>
           return fetchSummaryStatistics(
             region, futureTimePeriod, variableId, percentiles
           )
-          .then(convertToDisplayData(variableId, season))
+          .then(convertToDisplayData(graphConfig, variableId, season))
           .catch(error =>
             Promise.reject({
               error,
@@ -349,6 +344,7 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
       'historicalTimePeriod.end_date',
       'futureTimePeriods[0].start_date',
       'futureTimePeriods[0].end_date',
+      'graphConfig.variables',
     ],
     props
   ) &&

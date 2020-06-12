@@ -1,18 +1,18 @@
 // These functions convert the data we retrieve from the backend to the
-// format that Summary consumes. Essentially, it merges the data with the
-// table specification. Component Summary is responsible for displaying this
-// in the appropriate layout and formatting.
+// format that Summary and ChangeOverTimeGraph consume.
 
 import flow from 'lodash/fp/flow';
 import keys from 'lodash/fp/keys';
 import find from 'lodash/fp/find';
 import isUndefined from 'lodash/fp/isUndefined';
 import map from 'lodash/fp/map';
+import { nearZero } from './math';
 
 
-// TODO: Most of this stuff should all be contained in the TimeOfYearSelector
-//  values. Which is to say, most or all of the values that are converted
-//  should just be stored in each option value. What a mess.
+// TODO: Most of the results of these period conversion functions should all
+//  be contained in the TimeOfYearSelector values. Which is to say, most or all
+//  of the values that are converted should just be stored in each option value.
+//  What a mess.
 
 export const seasonIndexToPeriod = index => ([
   'jan', 'feb', 'mar', 'apr', 'may', 'jun',
@@ -135,6 +135,13 @@ export const getDisplayData = (response, period, display) => {
 
   // display === 'relative':
   const baselineValue = getPeriodData(response.baseline, period);
+  // TODO: Get zero tolerance from config
+  if (nearZero(baselineValue)) {
+    return {
+      percentiles: map(() => 0)(anomalyValues),
+      units: '%',
+    }
+  }
   return {
     percentiles: map(x => 100 * x/baselineValue)(anomalyValues),
     units: '%',
