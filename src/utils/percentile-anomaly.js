@@ -107,7 +107,7 @@ export const getPeriodData = (source, period) => {
 };
 
 
-export const getDisplayData = (response, period, display) => {
+export const getDisplayData = (response, period, display, variableConfig) => {
   // Return the data, with units, to be displayed from the response,
   // according to the selected period (e.g., 'spring') and display type
   // ('absolute' or 'relative'). Object returned is of the form:

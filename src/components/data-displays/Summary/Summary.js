@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
 import capitalize from 'lodash/fp/capitalize';
+import flow from 'lodash/fp/flow';
 import map from 'lodash/fp/map';
 import zip from 'lodash/fp/zip';
+import zipAll from 'lodash/fp/zipAll';
 import isEqual from 'lodash/fp/isEqual';
 import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
@@ -239,30 +241,36 @@ class Summary extends React.Component {
 }
 
 
-const tableContentsAndDataToSummarySpec =
-  // Convert the raw summary statistics data for each `tableContent` item to
+const tableContentsAndDataToSummarySpec = (
+  variableConfig, tableContents, responses
+) => {
+  // Convert the raw summary statistics response for each `tableContent` item to
   // the objects consumed by Summary via its `summary` prop. See Summary
   // for a spec of these objects.
-  // Argument of this function is `tableContents` zipped with the
-  // corresponding data fetched from the backend.
-  map(([content, data]) => {
-    const { variable, precision, display, seasons } = content;
-    return {
-      variable,
-      display,
-      precision,
-      hasData: !isUndefined(data),
-      seasons: map(season => {
-        return {
-          id: season,
-          ...getDisplayData(data, season, display),
-        }
-      })(seasons),
-    };
-  });
+  return flow(
+    zipAll,
+    map(([tableContent, response]) => {
+      const { variable, precision, display, seasons } = tableContent;
+      return {
+        variable,
+        display,
+        precision,
+        hasData: !isUndefined(response),
+        seasons: map(season => {
+          return {
+            id: season,
+            ...getDisplayData(response, season, display, variableConfig),
+          }
+        })(seasons),
+      };
+    }),
+  )([tableContents, responses]);
+};
 
 
-const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
+const loadSummaryStatistics = (
+  { region, futureTimePeriod, tableContents, variableConfig }
+  ) =>
   // Return (a promise for) the summary statistics to be displayed in the
   // Summary tab. This amounts to fetching the data for each variable from the
   // backend, then processing it into the form consumed by Summary via its
@@ -280,7 +288,9 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
       })
     )(tableContents)
   )
-  .then(data => tableContentsAndDataToSummarySpec(zip(tableContents, data)));
+  .then(responses => tableContentsAndDataToSummarySpec(
+    variableConfig, tableContents, responses
+  ));
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
@@ -291,6 +301,7 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
       'futureTimePeriod.start_date',
       'futureTimePeriod.end_date',
       'tableContents',
+      'variableConfig',
     ],
     props
   ) &&
@@ -300,7 +311,8 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
     prevProps &&
     isEqual(prevProps.region, props.region) &&
     isEqual(prevProps.futureTimePeriod, props.futureTimePeriod) &&
-    isEqual(prevProps.tableContents, props.tableContents)
+    isEqual(prevProps.tableContents, props.tableContents) &&
+    isEqual(prevProps.variableConfig, props.variableConfig)
   );
 
 

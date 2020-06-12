@@ -295,14 +295,19 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 }
 
 
-const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
+const convertToDisplayData = curry((
+  graphConfig, variableConfig, variableId, season, data
+) => {
+  // TODO: graphConfig.variables could be unified with variableConfig
   const display = graphConfig.variables[variableId].display;
-  return getDisplayData(data, seasonIndexToPeriod(season), display);
+  return getDisplayData(
+    data, seasonIndexToPeriod(season), display, variableConfig
+  );
 });
 
 
 const loadSummaryStatistics = (
-  { region, variable, season, futureTimePeriods, graphConfig }
+  { region, variable, season, futureTimePeriods, graphConfig, variableConfig }
 ) =>
   // Return (a promise for) the statistics to be displayed in the Graphs tab.
   // These are "summary" statistics, which are stats across the ensemble of
@@ -319,7 +324,9 @@ const loadSummaryStatistics = (
           return fetchSummaryStatistics(
             region, futureTimePeriod, variableId, percentiles
           )
-          .then(convertToDisplayData(graphConfig, variableId, season))
+          .then(convertToDisplayData(
+            graphConfig, variableConfig, variableId, season
+          ))
           .catch(error =>
             Promise.reject({
               error,
