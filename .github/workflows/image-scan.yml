@@ -19,9 +19,13 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: docker-publish
           ref: ${{ github.sha }}
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1
+      - name: Set Branch Name to Environment Variable
+        run: echo ::set-env name=TAG::$(echo ${BRANCH_NAME})
       - name: Scan Image
         uses: anchore/scan-action@master
         with:
-          image-reference: "pcic/plan2adapt-v2-frontend:${{ github.sha }}"
+          image-reference: "pcic/plan2adapt-v2-frontend:${{ env.TAG }}"
           fail-build: true
         if: steps.wait-for-build.outputs.conclusion == 'success'
