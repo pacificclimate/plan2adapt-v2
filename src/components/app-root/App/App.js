@@ -285,6 +285,8 @@ export default class App extends Component {
                     season={get('value', this.state.season)}
                     variable={get('value', this.state.variable)}
                     metadata={this.state.metadata}
+                    wheelDebounceTime={this.props.wheelDebounceTime}
+                    wheelPxPerZoomLevel={this.props.wheelPxPerZoomLevel}
                   />
                 }
               </Tab>

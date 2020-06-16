@@ -17,7 +17,10 @@ function AppWithQuery() {
   const query = useQuery();
 
   return (
-    <App foo={query.get('foo')}/>
+    <App
+      wheelDebounceTime={query.get('wheelDebounceTime')}
+      wheelPxPerZoomLevel={query.get('wheelPxPerZoomLevel')}
+    />
   );
 }
 

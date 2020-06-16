@@ -42,17 +42,6 @@ import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import map from 'lodash/fp/map';
 
 
-const labelValueOptions = map(n => ({ label: n, value: n }));
-
-const wheelDebounceTimeSelectorOptions = labelValueOptions([
-  40, 50, 60, 80, 100, 120, 150, 200,
-]);
-
-const wheelPxPerZoomLevelSelectorOptions = labelValueOptions([
-  60, 120, 240, 480,
-]);
-
-
 export default class TwoDataMaps extends React.Component {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
@@ -64,6 +53,8 @@ export default class TwoDataMaps extends React.Component {
     season: PropTypes.number,
     variable: PropTypes.object,
     metadata: PropTypes.array,
+    wheelDebounceTime: PropTypes.number,
+    wheelPxPerZoomLevel: PropTypes.number,
   };
 
   state = {
@@ -74,8 +65,6 @@ export default class TwoDataMaps extends React.Component {
       isOpen: false,
     },
     scrollWheelZoom: true,
-    wheelDebounceTimeOption: wheelDebounceTimeSelectorOptions[0],
-    wheelPxPerZoomLevelOption: wheelPxPerZoomLevelSelectorOptions[0],
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -101,13 +90,13 @@ export default class TwoDataMaps extends React.Component {
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
   toggleScrollWheelZoom =
     () => this.setState({ scrollWheelZoom: !this.state.scrollWheelZoom });
-  handleChangeWheelDebounceTimeOption =
-    this.handleChangeSelection.bind(this, 'wheelDebounceTimeOption');
-  handleChangeWheelPxPerZoomLevelOption =
-    this.handleChangeSelection.bind(this, 'wheelPxPerZoomLevelOption');
 
   zoomToRegion = () =>
     this.setState({ bounds: regionBounds(this.props.region)});
+
+  setMapRef = mapRef => {
+    this.mapRef = mapRef;
+  }
 
   render() {
     if (!allDefined(
@@ -169,27 +158,20 @@ export default class TwoDataMaps extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col lg={4}>
+          <Col lg={3}>
+            Zoom level: {this.mapRef && this.mapRef.leafletElement.getZoom()}
+          </Col>
+          <Col lg={3}>
             <Button onClick={this.toggleScrollWheelZoom}>
               {this.state.scrollWheelZoom ? 'Disable' : 'Enable'}
               {' '} scroll wheel zoom
             </Button>
           </Col>
-          <Col lg={4}>
-            Wheel debounce time
-            <Select
-              options={wheelDebounceTimeSelectorOptions}
-              value={this.state.wheelDebounceTimeOption}
-              onChange={this.handleChangeWheelDebounceTimeOption}
-            />
+          <Col lg={3}>
+            wheelDebounceTime: {this.props.wheelDebounceTime || 'default'}
           </Col>
-          <Col lg={4}>
-            Wheel Px Per Zoom Level
-            <Select
-              options={wheelPxPerZoomLevelSelectorOptions}
-              value={this.state.wheelPxPerZoomLevelOption}
-              onChange={this.handleChangeWheelPxPerZoomLevelOption}
-            />
+          <Col lg={3}>
+            wheelPxPerZoomLevel:{this.props.wheelPxPerZoomLevel || 'default'}
           </Col>
         </Row>
         <Row>
@@ -211,8 +193,9 @@ export default class TwoDataMaps extends React.Component {
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
               scrollWheelZoom={this.state.scrollWheelZoom}
-              wheelDebounceTime={this.state.wheelDebounceTimeOption.value}
-              wheelPxPerZoomLevel={this.state.wheelPxPerZoomLevelOption.value}
+              wheelDebounceTime={this.props.wheelDebounceTime}
+              wheelPxPerZoomLevel={this.props.wheelPxPerZoomLevel}
+              mapRef={this.setMapRef}
             >
               {zoomButton}
             </DataMap>
@@ -235,8 +218,8 @@ export default class TwoDataMaps extends React.Component {
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
               scrollWheelZoom={this.state.scrollWheelZoom}
-              wheelDebounceTime={this.state.wheelDebounceTimeOption.value}
-              wheelPxPerZoomLevel={this.state.wheelPxPerZoomLevelOption.value}
+              wheelDebounceTime={this.props.wheelDebounceTime}
+              wheelPxPerZoomLevel={this.props.wheelPxPerZoomLevel}
             >
               {zoomButton}
             </DataMap>
