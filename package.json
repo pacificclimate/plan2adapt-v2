@@ -23,6 +23,7 @@
     "react-leaflet": "^2.1.4",
     "react-loader": "^2.4.5",
     "react-markdown": "^4.0.6",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "^2.1.8",
     "react-select": "^2.3.0",
     "url-join": "^4.0.0",
