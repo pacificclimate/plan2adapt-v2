@@ -78,6 +78,7 @@ export default class App extends Component {
       return <Loader/>;
     }
     console.log('### Loaded')
+    console.log('###App: foo', this.props.foo)
     const variableConfig = this.getConfig('variables');
 
     const futureTimePeriod =

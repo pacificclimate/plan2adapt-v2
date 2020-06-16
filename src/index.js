@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './components/app-root/App';
+import App from './components/app-root/AppWrapper';
 import * as serviceWorker from './serviceWorker';
 import ExternalText from './temporary/external-text';
 import { makeYamlLoader } from './utils/external-text';
