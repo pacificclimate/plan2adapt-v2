@@ -300,7 +300,7 @@ export default class App extends Component {
                   <React.Fragment>
                     <Row>
                       <Col lg={12}>
-                        <T path='graphs.title' data={{
+                        <T path='graphs.prologue' data={{
                           season: get('label', this.state.season),
                           variable: get('label', this.state.variable),
                           region: get('label', this.state.region),

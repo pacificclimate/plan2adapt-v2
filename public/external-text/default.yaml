@@ -290,13 +290,39 @@ graphs:
   disabled: false
   tab: Graphs
   title: "## Range of projected change in ${season} ${variable} for ${region}"
+  prologue: |
+    This figure shows the range of projected change in
+    ${season} ${variable} for ${region} over three time periods
+    (2020s, 2050s, and 2080s), according to a PCIC-standard set of
+    GCM projections (see 'Notes' tab for more information).
+
+    The range of change based on this set of climate projections is indicated
+    as follows:
+
+    - The black line indicates the mid-point (median) in the set.
+    - The dark grey shading shows the middle 50% (25th to 75th percentiles),
+      of the projections in the set.
+    - The light grey shading shows the range of the central 80%
+      (10th to 90th percentiles) of projections in the set.
+
+    If you hover your mouse pointer over the graph, a popup will show values
+    for the various percentile values. These values are shown only for the
+    the central year of each averging period, since that is where we have
+    data derived directly from observations or model runs (projections).
+    Lines and bars at other years are interpolated from directly derived data
+    and should be treated as more approximate.
+
+    Note: Some variables do not come directly from the climate models
+    (see 'Notes' tab for more information).
+
   config:
     foo: bar
     interpolationInterval: 1
     c3options:
-      # CAUTION: These options *override* the ones supplied in code.
-      # The following are not supplied in code (but at present are overridden
-      # by demo selectors).
+      # CAUTION: Most of these options *override* the ones supplied in code.
+
+      # The following options are not supplied directly in code, or are used
+      # to compute what is.
       bar:
         width:
           ratio: 0.075
