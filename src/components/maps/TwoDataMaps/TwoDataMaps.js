@@ -57,6 +57,11 @@ export default class TwoDataMaps extends React.Component {
     wheelPxPerZoomLevel: PropTypes.number,
   };
 
+  static defaultProps = {
+    wheelDebounceTime: 40,
+    wheelPxPerZoomLevel: 60,
+  };
+
   state = {
     prevPropsRegion: undefined,
     bounds: undefined,
@@ -133,6 +138,9 @@ export default class TwoDataMaps extends React.Component {
       </StaticControl>
     );
 
+    const wheelDebounceTime = this.props.wheelDebounceTime || 40;
+    const wheelPxPerZoomLevel = this.props.wheelPxPerZoomLevel || 60;
+
     return (
       <React.Fragment>
         <Row>
@@ -168,10 +176,10 @@ export default class TwoDataMaps extends React.Component {
             </Button>
           </Col>
           <Col lg={3}>
-            wheelDebounceTime: {this.props.wheelDebounceTime || 'default'}
+            wheelDebounceTime={wheelDebounceTime}
           </Col>
           <Col lg={3}>
-            wheelPxPerZoomLevel:{this.props.wheelPxPerZoomLevel || 'default'}
+            wheelPxPerZoomLevel={wheelPxPerZoomLevel}
           </Col>
         </Row>
         <Row>
@@ -193,8 +201,8 @@ export default class TwoDataMaps extends React.Component {
               timePeriod={this.props.historicalTimePeriod}
               metadata={this.props.metadata}
               scrollWheelZoom={this.state.scrollWheelZoom}
-              wheelDebounceTime={this.props.wheelDebounceTime}
-              wheelPxPerZoomLevel={this.props.wheelPxPerZoomLevel}
+              wheelDebounceTime={wheelDebounceTime}
+              wheelPxPerZoomLevel={wheelPxPerZoomLevel}
               mapRef={this.setMapRef}
             >
               {zoomButton}
@@ -218,8 +226,8 @@ export default class TwoDataMaps extends React.Component {
               timePeriod={this.props.futureTimePeriod}
               metadata={this.props.metadata}
               scrollWheelZoom={this.state.scrollWheelZoom}
-              wheelDebounceTime={this.props.wheelDebounceTime}
-              wheelPxPerZoomLevel={this.props.wheelPxPerZoomLevel}
+              wheelDebounceTime={wheelDebounceTime}
+              wheelPxPerZoomLevel={wheelPxPerZoomLevel}
             >
               {zoomButton}
             </DataMap>
