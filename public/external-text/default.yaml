@@ -294,9 +294,10 @@ graphs:
     foo: bar
     interpolationInterval: 1
     c3options:
-      # CAUTION: These options *override* the ones supplied in code.
-      # The following are not supplied in code (but at present are overridden
-      # by demo selectors).
+      # CAUTION: Most of these options *override* the ones supplied in code.
+
+      # The following options are not supplied directly in code, or are used
+      # to compute what is.
       bar:
         width:
           ratio: 0.075

@@ -8,7 +8,6 @@ import map from 'lodash/fp/map';
 import every from 'lodash/fp/every';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
-import merge from 'lodash/fp/merge';
 import {
   getDisplayData,
   seasonIndexToPeriod
@@ -20,29 +19,11 @@ import {
 } from '../../../utils/variables-and-units';
 import './ChangeOverTimeGraph.css';
 import BarChart from '../BarChart';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
 
 
 const percentiles = [10, 25, 50, 75, 90];
-
-
-const labelValueOptions = map(n => ({ label: n, value: n }));
-
-const interpolationIntervalSelectorOptions = labelValueOptions([
-  1, 2, 3, 4, 5, 10
-]);
-
-const barChartWidthOptions = labelValueOptions([
-  0.05, 0.075, 0.1,
-]);
-
-const pointRadiusOptions = labelValueOptions([
-  4, 4.5, 5, 6, 8, 10,
-]);
 
 
 class ChangeOverTimeGraphDisplay extends React.Component {
@@ -117,23 +98,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // TODO: Convert this to a more explicit PropType when the layout settles.
   };
 
-  // TODO: Replace state and state management code with settings from config
-  //  when values for these parameters are settled.
-  state = {
-    interpolationInterval: interpolationIntervalSelectorOptions[0],
-    barChartWidth: barChartWidthOptions[1],
-    pointRadius: pointRadiusOptions[2],
-  };
-
-  handleChangeInterpolationInterval =
-    interpolationInterval => this.setState({ interpolationInterval });
-
-  handleChangeBarChartWidth =
-    barChartWidth => this.setState({ barChartWidth });
-
-  handleChangePointRadius =
-    pointRadius => this.setState({ pointRadius });
-
   render() {
     if (!allDefined(
       [
@@ -157,7 +121,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const {
       variable,
       historicalTimePeriod, futureTimePeriods, statistics,
-      variableConfig, unitsConversions,
+      graphConfig, variableConfig, unitsConversions,
     } = this.props;
     console.log('### COTG.render: statistics', statistics)
 
@@ -190,24 +154,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       );
     }
 
-    // const graphConfig = this.props.graphConfig;
-    const graphConfig = merge(
-      this.props.graphConfig,
-
-      {
-        interpolationInterval: this.state.interpolationInterval.value,
-        c3options: {
-          bar: {
-            width: { ratio: this.state.barChartWidth.value },
-          },
-          point: {
-            r: this.state.pointRadius.value,
-          },
-        },
-      },
-
-    );
-
     // Establish display units for variables, and convert data values to those
     // units.
     // TODO: Robusticate
@@ -228,59 +174,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
     return (
       <React.Fragment>
-        <Row>
-          <Col lg={6}>
-            <p>
-              Shows primary data percentile values as line graphs.
-            </p>
-            <p>
-              Shows 10th - 25th, 25th - 50th, 50th - 75th, and 75th - 90th
-              intervals as a stacked bar chart.
-              These intervals are interpolated temporally between each primary
-              data point.
-              Bars are coloured darker grey nearer
-              the median and lighter gray further from it.
-              The stacked bars
-              serve as fill between the primary data lines, and as error bars
-              around the median line. This is a matter of interpretation or
-              explanation, not data.
-            </p>
-          </Col>
-          <Col lg={6}>
-            <p>
-              The appearance of the graph is affected by 3 parameters.
-              You can experiment with different combinations.
-              The default is the combination currently thought to be
-              most visually effective and pleasing.
-            </p>
-            <Row>
-            <Col lg={4}>
-              Interpolation interval (yr)
-              <Select
-                options={interpolationIntervalSelectorOptions}
-                value={this.state.interpolationInterval}
-                onChange={this.handleChangeInterpolationInterval}
-              />
-            </Col>
-            <Col lg={4}>
-              Bar width
-              <Select
-                options={barChartWidthOptions}
-                value={this.state.barChartWidth}
-                onChange={this.handleChangeBarChartWidth}
-              />
-            </Col>
-            <Col lg={4}>
-              Data point radius
-              <Select
-                options={pointRadiusOptions}
-                value={this.state.pointRadius}
-                onChange={this.handleChangePointRadius}
-              />
-            </Col>
-            </Row>
-          </Col>
-        </Row>
         <BarChart
           historicalTimePeriod={historicalTimePeriod}
           futureTimePeriods={futureTimePeriods}
