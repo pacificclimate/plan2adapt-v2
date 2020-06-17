@@ -575,32 +575,31 @@ colourScale:
 variables:
   tasmean:
     label: Temperature
-    derived: true
     type: temperature
     displayUnits: °C
     dataUnits: degC
   pr:
     label: Precipitation
     type: precipitation flux
-    displayUnits: mm/yr
+    displayUnits: mm
     dataUnits: kg m-2 d-1
   prsn:
-    label: Snowfall
+    label: Precipitation as Snow
     derived: true
     type: snowfall flux
-    displayUnits: mm/yr
+    displayUnits: mm
     dataUnits: kg m-2 d-1
   gdd:
     label: Growing Degree-Days
     derived: true
     type: temperature-time
-    displayUnits: degree days
+    displayUnits: degree-days
     dataUnits: degree days
   hdd:
     label: Heating Degree-Days
     derived: true
     type: temperature-time
-    displayUnits: degree days
+    displayUnits: degree-days
     dataUnits: degree days
   ffd:
     label: Frost-Free Days
@@ -626,10 +625,12 @@ units:
     'mm/yr': 1            # nominal base unit
     'mm/d': 365           # another unit: scale: 365, offset: 0
     'kg m-2 d-1': mm/d    # synonym
+    'mm': mm/yr           # synonym
   'snowfall flux':
     'mm/yr': 1
     'mm/d': 365
     'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
+    'mm': mm/yr
   temperature:
     degC: 1
     '°C': degC
@@ -639,5 +640,6 @@ units:
     '°F': degF
   temperature-time:
     'degree days': 1
+    'degree-days': 'degree days'
   time:
     days: 1
