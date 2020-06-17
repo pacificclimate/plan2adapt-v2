@@ -70,7 +70,6 @@ summary:
         precision: 2
         seasons:
           - annual
-          - fall
           - winter
           - spring
       - variable: gdd
