@@ -8,7 +8,7 @@ selectors:
     British Columbia ...
   region:
     prefix: within the region of
-    default: alberni_clayoquot
+    default: bc
     forTabs: ['summary', 'impacts', 'maps', 'graphs']
   timePeriod:
     prefix: during the
@@ -16,7 +16,7 @@ selectors:
     forTabs: ['summary', 'impacts', 'maps']
   variable:
     prefix: with details about
-    default: prsn
+    default: tasmean
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
