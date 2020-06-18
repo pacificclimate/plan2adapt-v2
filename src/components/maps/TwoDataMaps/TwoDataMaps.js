@@ -40,6 +40,15 @@ import StaticControl from '../StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { SelectWithValueReplacement as Select } from 'pcic-react-components';
 import map from 'lodash/fp/map';
+import find from 'lodash/fp/find';
+import rangeStep from 'lodash/fp/rangeStep';
+import { setLethargicScrolling } from '../../../utils/leaflet-extensions';
+import { simpleSelectorOptions } from '../../../utils/selectors';
+
+
+const lsStabilityOptions = simpleSelectorOptions(rangeStep(2, 5, 31));
+const lsSensitivityOptions = simpleSelectorOptions(rangeStep(5, 5, 121));
+const lsToleranceOptions = simpleSelectorOptions(rangeStep(0.05, 0.05, 0.31));
 
 
 export default class TwoDataMaps extends React.Component {
@@ -70,6 +79,10 @@ export default class TwoDataMaps extends React.Component {
       isOpen: false,
     },
     scrollWheelZoom: true,
+    lethargicScrolling: true,
+    lsStabilityOption: find({ value: 7 }, lsStabilityOptions),
+    lsSensitivityOption: find({ value: 50 }, lsSensitivityOptions),
+    lsToleranceOption: find({ value: 0.05 }, lsToleranceOptions),
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -93,8 +106,18 @@ export default class TwoDataMaps extends React.Component {
     this.setState({ bounds: undefined, viewport })
   }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
+
   toggleScrollWheelZoom =
     () => this.setState({ scrollWheelZoom: !this.state.scrollWheelZoom });
+  toggleLethargicScrolling =
+    () => this.setState({ lethargicScrolling: !this.state.lethargicScrolling });
+  handleChangeLsStabity =
+    this.handleChangeSelection.bind(this, 'lsStabilityOption');
+  handleChangeLsSensitivity =
+    this.handleChangeSelection.bind(this, 'lsSensitivityOption');
+  handleChangeLsTolerance =
+    this.handleChangeSelection.bind(this, 'lsToleranceOption');
+
 
   zoomToRegion = () =>
     this.setState({ bounds: regionBounds(this.props.region)});
@@ -140,6 +163,13 @@ export default class TwoDataMaps extends React.Component {
 
     const wheelDebounceTime = this.props.wheelDebounceTime || 40;
     const wheelPxPerZoomLevel = this.props.wheelPxPerZoomLevel || 60;
+    if (this.state.lethargicScrolling) {
+      setLethargicScrolling(
+        this.state.lsStabilityOption.value,
+        this.state.lsSensitivityOption.value,
+        this.state.lsToleranceOption.value,
+      );
+    }
 
     return (
       <React.Fragment>
@@ -166,20 +196,57 @@ export default class TwoDataMaps extends React.Component {
           </Col>
         </Row>
         <Row>
-          <Col lg={3}>
+          <Col lg={1}>
             Zoom level: {this.mapRef && this.mapRef.leafletElement.getZoom()}
           </Col>
-          <Col lg={3}>
+          <Col lg={2}>
             <Button onClick={this.toggleScrollWheelZoom}>
               {this.state.scrollWheelZoom ? 'Disable' : 'Enable'}
               {' '} scroll wheel zoom
             </Button>
           </Col>
-          <Col lg={3}>
-            wheelDebounceTime={wheelDebounceTime}
-          </Col>
-          <Col lg={3}>
+          <Col lg={2}>
+            wheelDebounceTime={wheelDebounceTime},
             wheelPxPerZoomLevel={wheelPxPerZoomLevel}
+          </Col>
+          <Col lg={2}>
+            <Button onClick={this.toggleLethargicScrolling}>
+              {this.state.lethargicScrolling ? 'Disable' : 'Enable'}
+              {' '} lethargic scrolling
+            </Button>
+          </Col>
+          <Col lg={1}>
+            Stability
+            {
+              this.state.lethargicScrolling &&
+                <Select
+                  options={lsStabilityOptions}
+                  value={this.state.lsStabilityOption}
+                  onChange={this.handleChangeLsStabity}
+                />
+            }
+          </Col>
+          <Col lg={1}>
+            Sensitivity
+            {
+              this.state.lethargicScrolling &&
+                <Select
+                  options={lsSensitivityOptions}
+                  value={this.state.lsSensitivityOption}
+                  onChange={this.handleChangeLsSensitivity}
+                />
+            }
+          </Col>
+          <Col lg={1}>
+            Tolerance
+            {
+              this.state.lethargicScrolling &&
+              <Select
+                options={lsToleranceOptions}
+                value={this.state.lsToleranceOption}
+                onChange={this.handleChangeLsTolerance}
+              />
+            }
           </Col>
         </Row>
         <Row>

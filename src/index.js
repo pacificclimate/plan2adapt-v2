@@ -5,9 +5,6 @@ import App from './components/app-root/AppWrapper';
 import * as serviceWorker from './serviceWorker';
 import ExternalText from './temporary/external-text';
 import { makeYamlLoader } from './utils/external-text';
-import { setLethargicScrolling } from './utils/leaflet-extensions';
-
-setLethargicScrolling(7, 50, 0.05);
 
 console.log('index.js: App', App)
 console.log('index.js: ExternalText', ExternalText)

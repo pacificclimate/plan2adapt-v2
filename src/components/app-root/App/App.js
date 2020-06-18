@@ -48,7 +48,7 @@ export default class App extends Component {
     futureTimePeriod: undefined,
     season: undefined,
     variable: undefined,
-    tabKey: 'summary',
+    tabKey: 'maps',
   };
 
   componentDidMount() {
