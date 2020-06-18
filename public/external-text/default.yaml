@@ -261,17 +261,19 @@ maps:
       logscale: true
       belowMinColor: white
       aboveMaxColor: black
+      # NB: units mm/mon
       range:
         min: 10
-        max: 10000
-      ticks: [10, 100, 1000, 10000]
+        max: 500
+      ticks: [10, 20, 40, 100, 200, 400, 500]
     prsn:
       palette: x-Occam
       logscale: true
+      # NB: units mm/mon
       range:
         min: 10
-        max: 20000
-      ticks: [10, 100, 1000, 10000, 20000]
+        max: 2000
+      ticks: [10, 100, 1000, 2000]
     tasmax:
       palette: x-Occam
       range:
@@ -566,7 +568,8 @@ components:
     concentrations.
 
 colourScale:
-  label: ${label} (${units})
+  label: |
+    ${id === 'prsn' || id === 'pr' ? 'Monthly Average' : ''} ${label} (${units})
   note: |
     ${logscale ? $$.colourScale.logscaleNote : ''} This colour scale applies to both maps.
   logscaleNote: |
@@ -588,13 +591,13 @@ variables:
   pr:
     label: Precipitation
     type: precipitation flux
-    displayUnits: mm
+    displayUnits: mm/mon
     dataUnits: kg m-2 d-1
   prsn:
     label: Precipitation as Snow
     derived: true
     type: snowfall flux
-    displayUnits: mm
+    displayUnits: mm/mon
     dataUnits: kg m-2 d-1
   gdd:
     label: Growing Degree-Days
@@ -639,11 +642,13 @@ units:
     'mm/d': 365           # another unit: scale: 365, offset: 0
     'kg m-2 d-1': mm/d    # synonym
     'mm': mm/yr           # synonym
+    'mm/mon': 12
   'snowfall flux':
     'mm/yr': 1
     'mm/d': 365
     'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
     'mm': mm/yr
+    'mm/mon': 12
   temperature:
     degC: 1
     '°C': degC
