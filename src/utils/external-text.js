@@ -8,12 +8,12 @@ export function makeYamlLoader(url) {
   // argument `setTexts` with the resulting object. Any error thrown during
   // this process is logged to the console (and `setTexts` is not called).
   return function (setTexts) {
-    console.log('YAML loader: loading...')
+    console.log('### YAML loader: loading...')
     axios.get(url, { responseType: 'text' })
     .then(response => response.data)
     .then(yaml.safeLoad)
     .then(data => {
-      console.log('YAML loader: loaded', data);
+      console.log('### YAML loader: loaded', data);
       return data;
     })
     .then(setTexts)
