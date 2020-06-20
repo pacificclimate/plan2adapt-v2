@@ -31,7 +31,7 @@ import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
-import { setLethargicScrolling } from '../../../utils/leaflet-extensions';
+import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -84,17 +84,17 @@ export default class App extends Component {
     }
   }
 
-  setLethargicScrolling = () => {
-    // Lethargic scrolling needs to be set, just once, after context updates.
-    // We call this in componentDidMount and componentDidUpdate, and do nothing
-    // except the first time context updates. Sigh.
+  setLethargicMapScrolling = () => {
+    // Lethargic map scrolling needs to be set, just once, after context
+    // updates. We call this in componentDidMount and componentDidUpdate, and do
+    // nothing except the first time context updates. Sigh.
 
     if (!this.state.contextJustUpdated) {
       return;
     }
     const lethargicScrolling = this.getConfig('maps.lethargicScrolling');
     if (lethargicScrolling && lethargicScrolling.active) {
-      setLethargicScrolling(
+      setLethargicMapScrolling(
         lethargicScrolling.stability,
         lethargicScrolling.sensitivity,
         lethargicScrolling.tolerance,
@@ -108,12 +108,12 @@ export default class App extends Component {
       .then(metadata => this.setState({ metadata }));
     // this.setState({ context: this.context });  // ??
     this.trackContextState();
-    this.setLethargicScrolling();
+    this.setLethargicMapScrolling();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.trackContextState();
-    this.setLethargicScrolling();
+    this.setLethargicMapScrolling();
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });

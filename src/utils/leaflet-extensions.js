@@ -4,9 +4,9 @@ import L from 'leaflet';
 
 // Stop inertial scrolling from interfering with scroll wheel zooming.
 // See https://github.com/Leaflet/Leaflet/issues/4410#issuecomment-340905236
-export const setLethargicScrolling = (...args) => {
+export const setLethargicMapScrolling = (...args) => {
   const lethargy = new Lethargy(...args);
-  console.log('### setLethargicScrolling', lethargy)
+  console.log('### setLethargicMapScrolling', lethargy)
   const isInertialScroll = (e) => lethargy.check(e) === false;
   L.Map.ScrollWheelZoom.prototype._onWheelScroll = function (e) {
     L.DomEvent.stop(e);
