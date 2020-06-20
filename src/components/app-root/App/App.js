@@ -11,6 +11,7 @@ import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
+import isObject from 'lodash/fp/isObject';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
 
@@ -30,6 +31,7 @@ import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
+import { setLethargicScrolling } from '../../../utils/leaflet-extensions';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -47,11 +49,71 @@ export default class App extends Component {
     seasonOpt: undefined,
     variableOpt: undefined,
     tabKey: 'graphs',
+    context: null,
+    contextJustUpdated: null,  // null signals initial state; boolean thereafter
   };
 
+  trackContextState = () => {
+    // Context (i.e., this.context) is updated asynchronously. We want to do
+    // some actions rarely (really just once), just after context updates to a
+    // valid (non-null) value. This function updates state to track that
+    // condition, which is signalled by `this.state.contextJustUpdated`.
+    // TODO: This seems overcomplicated. Is there a better way?
+
+    if (this.state.contextJustUpdated === null) {
+      // Initialization; typically this.context is null, but we can't guarantee
+      return this.setState({
+        context: this.context,
+        contextJustUpdated: isObject(this.context),
+      });
+    }
+
+    if (isObject(this.context)) {
+      // A valid context object ...
+      if (this.state.context !== this.context) {
+        // ... which just updated
+        return this.setState({
+          context: this.context,
+          contextJustUpdated: true,
+        });
+      }
+      if (this.state.contextJustUpdated) {
+        // ... which hasn't updated, but it did the time before
+        return this.setState({ contextJustUpdated: false });
+      }
+    }
+  }
+
+  setLethargicScrolling = () => {
+    // Lethargic scrolling needs to be set, just once, after context updates.
+    // We call this in componentDidMount and componentDidUpdate, and do nothing
+    // except the first time context updates. Sigh.
+
+    if (!this.state.contextJustUpdated) {
+      return;
+    }
+    const lethargicScrolling = this.getConfig('maps.lethargicScrolling');
+    if (lethargicScrolling && lethargicScrolling.active) {
+      setLethargicScrolling(
+        lethargicScrolling.stability,
+        lethargicScrolling.sensitivity,
+        lethargicScrolling.tolerance,
+      );
+    }
+  }
+
   componentDidMount() {
+    // TODO: Inject this using `withAsyncData`
     fetchSummaryMetadata()
-      .then(metadata => this.setState({ metadata }))
+      .then(metadata => this.setState({ metadata }));
+    // this.setState({ context: this.context });  // ??
+    this.trackContextState();
+    this.setLethargicScrolling();
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.trackContextState();
+    this.setLethargicScrolling();
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
