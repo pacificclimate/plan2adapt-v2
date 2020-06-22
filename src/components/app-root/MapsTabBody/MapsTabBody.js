@@ -24,23 +24,25 @@
 // a better user experience simply to have the other viewport updated once
 // at the end of changing.
 
+// foo
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Loader from 'react-loader';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
-import BCBaseMap from '../BCBaseMap';
-import NcwmsColourbar from '../NcwmsColourbar';
-import { regionBounds, wmsLogscale } from '../map-utils';
-import styles from '../NcwmsColourbar/NcwmsColourbar.module.css';
+import BCBaseMap from '../../maps/BCBaseMap';
+import NcwmsColourbar from '../../maps/NcwmsColourbar';
+import { regionBounds, wmsLogscale } from '../../maps/map-utils';
+import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
-import StaticControl from '../StaticControl';
+import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 
 
-export default class TwoDataMaps extends React.Component {
+export default class MapsTabBody extends React.Component {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
 

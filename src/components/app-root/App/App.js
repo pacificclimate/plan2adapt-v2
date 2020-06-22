@@ -27,13 +27,13 @@ import VariableSelector from '../../selectors/VariableSelector';
 import Summary from '../../data-displays/Summary';
 import ChangeOverTimeGraph from '../../graphs/ChangeOverTimeGraph';
 import ImpactsTab from '../../data-displays/impacts/ImpactsTabs';
-import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
 import DevGraph from '../../data-displays/DevGraph';
 import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
+import MapsTabBody from '../MapsTabBody';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -243,10 +243,6 @@ export default class App extends Component {
                 }
               </Tab>
 
-              {/*
-              <Tab mountOnEnter> prevents premature initialization of
-              maps leading to incorrect appearance until window is resized.
-              */}
               <Tab
                 eventKey={'maps'}
                 title={<T as='string' path='maps.tab'/>}
@@ -256,7 +252,7 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'maps' &&
-                  <TwoDataMaps
+                  <MapsTabBody
                     region={get('value', this.state.region)}
                     historicalTimePeriod={baselineTimePeriod}
                     futureTimePeriod={futureTimePeriod}
