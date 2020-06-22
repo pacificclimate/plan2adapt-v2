@@ -36,6 +36,20 @@ summary:
   tab: Summary
   # It's tempting to do this content as a Markdown table, but unfortunately
   # MD doesn't let you span table rows or columns.
+  prologue: |
+    The table below shows projected changes in average (mean) temperature,
+    precipitation and several derived climate variables from the
+    baseline historical period
+    (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+    to the
+    ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
+    for the ${region.properties.english_na} region.
+    The ensemble median is a mid-point value, chosen from a PCIC standard
+    set of Global Climate Model (GCM) projections (see the 'Notes' tab for
+    more information).
+    The range values represent the lowest and highest results within the set.
+  lowBaselineWarning: |
+    *CAUTION: This variable may have a low baseline. See note 2 below. *
   table:
     heading:
       variable: Climate Variable
@@ -46,6 +60,9 @@ summary:
     rows:
       variable: |
         ${variable.label}${variable.derived ? '*': ''} (${variable.units})
+
+        ${variable.possibleLowBaseline && variable.units =='%' ?
+          $$.summary.lowBaselineWarning : ''}
       season: ${season.label}
       ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
       range: |
@@ -86,23 +103,17 @@ summary:
         precision: 2
         seasons:
           - annual
-  notes:
-    general: |
-      The table below shows projected changes in average (mean) temperature,
-      precipitation and several derived climate variables from the
-      baseline historical period
-      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-      to the
-      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-      for the ${region.properties.english_na} region.
-      The ensemble median is a mid-point value, chosen from a PCIC standard
-      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
-      more information).
-      The range values represent the lowest and highest results within the set.
+  notes: |
+    Notes:
 
-    derivedVars: |
-      &ast; These values are derived from temperature and/or precipitation.
+    1. Climate variables marked with &ast; are derived from temperature and/or
+       precipitation values, and are not direct outputs of the climate models.
 
+    1. CAUTION: Percent changes from a low baseline value can result in
+       deceptively large percent change values.
+       A small baseline can occur when the season and/or region
+       together naturally make for zero or near-zero values. For example,
+       snowfall in summer in low-lying southern areas.
 
 impacts:
   disabled: false
@@ -586,6 +597,7 @@ variables:
     type: snowfall flux
     displayUnits: mm
     dataUnits: kg m-2 d-1
+    possibleLowBaseline: true
   gdd:
     label: Growing Degree-Days
     derived: true
