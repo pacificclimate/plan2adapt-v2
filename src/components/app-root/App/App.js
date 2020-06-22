@@ -29,6 +29,7 @@ import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
+import { getVariableLabel } from '../../../utils/variables-and-units';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -77,20 +78,9 @@ export default class App extends Component {
     console.log('### Loaded')
     const variableConfig = this.getConfig('variables');
 
-    // TODO: Inline
-    const variableSelectorProps = {
-      bases: this.state.metadata,
-      value: this.state.variableOpt,
-      default: this.getConfig('selectors.variable.default'),
-      onChange: this.handleChangeVariable,
-      getOptionLabel: ({ value: { representative: { variable_id }}}) =>
-        `${variableConfig[variable_id].label}`,
-    };
-    const seasonSelectorProps = {
-      value: this.state.seasonOpt,
-      default: this.getConfig('selectors.season.default'),
-      onChange: this.handleChangeSeason,
-    };
+    const getVariableOptionLabel =
+      ({ value: { representative: { variable_id } } }) =>
+        getVariableLabel(variableConfig, variable_id);
 
     return (
       <Container fluid>
@@ -144,7 +134,11 @@ export default class App extends Component {
                     </Col>
                     <Col xl={12} lg={3} md={4}>
                       <VariableSelector
-                        {...variableSelectorProps}
+                        bases={this.state.metadata}
+                        value={this.state.variableOpt}
+                        default={this.getConfig('selectors.variable.default')}
+                        onChange={this.handleChangeVariable}
+                        getOptionLabel={getVariableOptionLabel}
                       />
                     </Col>
                   </React.Fragment>
@@ -157,7 +151,9 @@ export default class App extends Component {
                     </Col>
                     <Col xl={12} lg={3} md={4}>
                       <SeasonSelector
-                        {...seasonSelectorProps}
+                          value={this.state.seasonOpt}
+                          default={this.getConfig('selectors.season.default')}
+                          onChange={this.handleChangeSeason}
                       />
                     </Col>
                     <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
