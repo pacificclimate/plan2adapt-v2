@@ -39,7 +39,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     season: PropTypes.any,
     variable: PropTypes.any,
 
-    historicalTimePeriod: PropTypes.object.isRequired,
+    baselineTimePeriod: PropTypes.object.isRequired,
     // The time period of the historical baseline dataset.
 
     futureTimePeriods: PropTypes.array.isRequired,
@@ -101,13 +101,11 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   render() {
     if (!allDefined(
       [
-        'region.geometry',
+        'region',
         'season',
-        'variable.representative',
-        'historicalTimePeriod.start_date',
-        'historicalTimePeriod.end_date',
-        'futureTimePeriods[0].start_date',
-        'futureTimePeriods[0].end_date',
+        'variable',
+        'baselineTimePeriod',
+        'futureTimePeriods[0]',
         'statistics',
         'graphConfig',
         'variableConfig',
@@ -120,7 +118,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     }
     const {
       variable,
-      historicalTimePeriod, futureTimePeriods, statistics,
+      baselineTimePeriod, futureTimePeriods, statistics,
       graphConfig, variableConfig, unitsConversions,
     } = this.props;
     console.log('### COTG.render: statistics', statistics)
@@ -175,7 +173,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     return (
       <React.Fragment>
         <BarChart
-          historicalTimePeriod={historicalTimePeriod}
+          baselineTimePeriod={baselineTimePeriod}
           futureTimePeriods={futureTimePeriods}
           graphConfig={graphConfig}
           variableInfo={variableInfo}
@@ -230,14 +228,12 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
   // ... relevant props have settled to defined values
   allDefined(
     [
-      'region.geometry',
+      'region',
       'season',
-      'variable.representative',
-      'historicalTimePeriod.start_date',
-      'historicalTimePeriod.end_date',
-      'futureTimePeriods[0].start_date',
-      'futureTimePeriods[0].end_date',
-      'graphConfig.variables',
+      'variable',
+      'baselineTimePeriod',
+      'futureTimePeriods[0]',
+      'graphConfig',
     ],
     props
   ) &&
@@ -248,7 +244,7 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
     isEqual(prevProps.region, props.region) &&
     isEqual(prevProps.variable, props.variable) &&
     isEqual(prevProps.season, props.season) &&
-    isEqual(prevProps.historicalTimePeriod, props.historicalTimePeriod) &&
+    isEqual(prevProps.baselineTimePeriod, props.baselineTimePeriod) &&
     isEqual(prevProps.futureTimePeriods, props.futureTimePeriods)
   );
 

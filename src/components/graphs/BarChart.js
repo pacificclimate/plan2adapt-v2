@@ -33,7 +33,7 @@ const transpose = zipAll;
 
 export default class BarChart extends React.Component {
   static propTypes = {
-    historicalTimePeriod: PropTypes.object.isRequired,
+    baselineTimePeriod: PropTypes.object.isRequired,
     // The time period of the historical baseline dataset.
 
     futureTimePeriods: PropTypes.array.isRequired,
@@ -56,7 +56,7 @@ export default class BarChart extends React.Component {
 
   render() {
     const {
-      historicalTimePeriod, futureTimePeriods,
+      baselineTimePeriod, futureTimePeriods,
       graphConfig, variableInfo,
       percentiles, percentileValuesByTimePeriod,
     } = this.props;
@@ -103,7 +103,7 @@ export default class BarChart extends React.Component {
     // organizing the computations is a bit complicated. Hence all the
     // comments below describing the intermediate computations.
 
-    const historicalMiddleYear = middleYear(historicalTimePeriod);
+    const historicalMiddleYear = middleYear(baselineTimePeriod);
     const futureMiddleYears = map(middleYear)(futureTimePeriods);
 
     //  baseTimes: [t0, t1, ... ]
@@ -361,7 +361,7 @@ export default class BarChart extends React.Component {
             start: Number(tp.start_date),
             end: Number(tp.end_date),
             class: index ? styles.projected : styles.baseline,
-          }))(concatAll([historicalTimePeriod, futureTimePeriods])),
+          }))(concatAll([baselineTimePeriod, futureTimePeriods])),
       },
 
       graphConfig.c3options,

@@ -13,8 +13,6 @@ import map from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
 
 import { fetchSummaryMetadata } from '../../../data-services/metadata';
-import { middleDecade } from '../../../utils/time-periods';
-import rulebase from '../../../assets/rulebase';
 
 import T from '../../../temporary/external-text';
 import AppHeader from '../AppHeader';
@@ -24,14 +22,14 @@ import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
-import Summary from '../../data-displays/Summary';
-import ChangeOverTimeGraph from '../../graphs/ChangeOverTimeGraph';
-import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
-import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
-
 import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
 import DevGraph from '../../data-displays/DevGraph';
+import SummaryTabBody from '../SummaryTabBody';
+import ImpactsTabBody from '../ImpactsTabBody';
+import MapsTabBody from '../MapsTabBody';
+import GraphsTabBody from '../GraphsTabBody';
+import { getVariableLabel } from '../../../utils/variables-and-units';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -44,11 +42,11 @@ export default class App extends Component {
 
   state = {
     metadata: null,
-    region: undefined,
-    futureTimePeriod: undefined,
-    season: undefined,
-    variable: undefined,
-    tabKey: 'summary',
+    regionOpt: undefined,
+    futureTimePeriodOpt: undefined,
+    seasonOpt: undefined,
+    variableOpt: undefined,
+    tabKey: 'maps',
   };
 
   componentDidMount() {
@@ -57,13 +55,13 @@ export default class App extends Component {
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
-  handleChangeRegion = this.handleChangeSelection.bind(this, 'region');
-  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriod');
-  handleChangeSeason = this.handleChangeSelection.bind(this, 'season');
-  handleChangeVariable = this.handleChangeSelection.bind(this, 'variable');
+  handleChangeRegion = this.handleChangeSelection.bind(this, 'regionOpt');
+  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriodOpt');
+  handleChangeSeason = this.handleChangeSelection.bind(this, 'seasonOpt');
+  handleChangeVariable = this.handleChangeSelection.bind(this, 'variableOpt');
   handleChangeTab = this.handleChangeSelection.bind(this, 'tabKey');
 
-    selectorEnabled = name =>
+  selectorEnabled = name =>
     includes(this.state.tabKey)(this.getConfig(`selectors.${name}.forTabs`));
 
   render() {
@@ -80,24 +78,9 @@ export default class App extends Component {
     console.log('### Loaded')
     const variableConfig = this.getConfig('variables');
 
-    const futureTimePeriod =
-      get('futureTimePeriod.value.representative', this.state) || {};
-    const region = get('region.label', this.state) || '';
-
-    // TODO: Inline
-    const variableSelectorProps = {
-      bases: this.state.metadata,
-      value: this.state.variable,
-      default: this.getConfig('selectors.variable.default'),
-      onChange: this.handleChangeVariable,
-      getOptionLabel: ({ value: { representative: { variable_id }}}) =>
-        `${variableConfig[variable_id].label}`,
-    };
-    const seasonSelectorProps = {
-      value: this.state.season,
-      default: this.getConfig('selectors.season.default'),
-      onChange: this.handleChangeSeason,
-    };
+    const getVariableOptionLabel =
+      ({ value: { representative: { variable_id } } }) =>
+        getVariableLabel(variableConfig, variable_id);
 
     return (
       <Container fluid>
@@ -120,7 +103,7 @@ export default class App extends Component {
                     <Col xl={12} lg={3} md={6}>
                       <RegionSelector
                         default={T.get(texts, 'selectors.region.default', {}, 'raw')}
-                        value={this.state.region}
+                        value={this.state.regionOpt}
                         onChange={this.handleChangeRegion}
                       />
                     </Col>
@@ -135,7 +118,7 @@ export default class App extends Component {
                     <Col xl={12} lg={3} md={4}>
                       <TimePeriodSelector
                         bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
-                        value={this.state.futureTimePeriod}
+                        value={this.state.futureTimePeriodOpt}
                         default={T.get(texts, 'selectors.timePeriod.default', {}, 'raw')}
                         onChange={this.handleChangeTimePeriod}
                         debug
@@ -151,7 +134,11 @@ export default class App extends Component {
                     </Col>
                     <Col xl={12} lg={3} md={4}>
                       <VariableSelector
-                        {...variableSelectorProps}
+                        bases={this.state.metadata}
+                        value={this.state.variableOpt}
+                        default={this.getConfig('selectors.variable.default')}
+                        onChange={this.handleChangeVariable}
+                        getOptionLabel={getVariableOptionLabel}
                       />
                     </Col>
                   </React.Fragment>
@@ -164,7 +151,9 @@ export default class App extends Component {
                     </Col>
                     <Col xl={12} lg={3} md={4}>
                       <SeasonSelector
-                        {...seasonSelectorProps}
+                          value={this.state.seasonOpt}
+                          default={this.getConfig('selectors.season.default')}
+                          onChange={this.handleChangeSeason}
                       />
                     </Col>
                     <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
@@ -201,8 +190,8 @@ export default class App extends Component {
                 mountOnEnter
               >
                 <DevColourbar
-                  season={get('value', this.state.season)}
-                  variable={get('value', this.state.variable)}
+                  season={get('value', this.state.seasonOpt)}
+                  variable={get('value', this.state.variableOpt)}
                 />
               </Tab>
               }
@@ -216,23 +205,11 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'summary' &&
-                  <React.Fragment>
-                    <T path='summary.notes.general' data={{
-                      region: region,
-                      baselineTimePeriod,
-                      futureTimePeriod,
-                      futureDecade: middleDecade(futureTimePeriod),
-                      baselineDecade: middleDecade(baselineTimePeriod),
-                    }}/>
-                    <Summary
-                      region={get('value', this.state.region)}
-                      futureTimePeriod={futureTimePeriod}
-                      tableContents={this.getConfig('summary.table.contents')}
-                      variableConfig={this.getConfig('variables')}
-                      unitsConversions={this.getConfig('units')}
-                    />
-                    <T path='summary.notes.derivedVars'/>
-                  </React.Fragment>
+                  <SummaryTabBody
+                    regionOpt={this.state.regionOpt}
+                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                    baselineTimePeriod={baselineTimePeriod}
+                  />
                 }
               </Tab>
 
@@ -245,29 +222,14 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'impacts' &&
-                  <React.Fragment>
-                    <Row>
-                      <Col lg={12}>
-                        <T path='impacts.prologue' data={{
-                          region: region,
-                          futureDecade: middleDecade(futureTimePeriod),
-                          baselineDecade: middleDecade(baselineTimePeriod),
-                        }}/>
-                        <ImpactsTab
-                          rulebase={rulebase}
-                          region={get('value', this.state.region)}
-                          futureTimePeriod={futureTimePeriod}
-                        />
-                      </Col>
-                    </Row>
-                  </React.Fragment>
+                  <ImpactsTabBody
+                    regionOpt={this.state.regionOpt}
+                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                    baselineTimePeriod={baselineTimePeriod}
+                  />
                 }
               </Tab>
 
-              {/*
-              <Tab mountOnEnter> prevents premature initialization of
-              maps leading to incorrect appearance until window is resized.
-              */}
               <Tab
                 eventKey={'maps'}
                 title={<T as='string' path='maps.tab'/>}
@@ -277,12 +239,12 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'maps' &&
-                  <TwoDataMaps
-                    region={get('value', this.state.region)}
-                    historicalTimePeriod={baselineTimePeriod}
-                    futureTimePeriod={futureTimePeriod}
-                    season={get('value', this.state.season)}
-                    variable={get('value', this.state.variable)}
+                  <MapsTabBody
+                    regionOpt={this.state.regionOpt}
+                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                    baselineTimePeriod={baselineTimePeriod}
+                    seasonOpt={this.state.seasonOpt}
+                    variableOpt={this.state.variableOpt}
                     metadata={this.state.metadata}
                   />
                 }
@@ -297,33 +259,13 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'graphs' &&
-                  <React.Fragment>
-                    <Row>
-                      <Col lg={12}>
-                        <T path='graphs.prologue' data={{
-                          season: get('label', this.state.season),
-                          variable: get('label', this.state.variable),
-                          region: get('label', this.state.region),
-                        }}/>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg={12}>
-                        <ChangeOverTimeGraph
-                          region={get('value', this.state.region)}
-                          historicalTimePeriod={baselineTimePeriod}
-                          season={get('value', this.state.season)}
-                          variable={get('value', this.state.variable)}
-                          // TODO: This may be better obtained from metadata
-                          futureTimePeriods={
-                            this.getConfig('graphs.config.futureTimePeriods')}
-                          graphConfig={this.getConfig('graphs.config')}
-                          variableConfig={this.getConfig('variables')}
-                          unitsConversions={this.getConfig('units')}
-                        />
-                      </Col>
-                    </Row>
-                  </React.Fragment>
+                  <GraphsTabBody
+                    regionOpt={this.state.regionOpt}
+                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                    baselineTimePeriod={baselineTimePeriod}
+                    seasonOpt={this.state.seasonOpt}
+                    variableOpt={this.state.variableOpt}
+                  />
                 }
               </Tab>
 
