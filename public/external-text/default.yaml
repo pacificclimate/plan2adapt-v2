@@ -107,10 +107,9 @@ summary:
 impacts:
   disabled: false
   tab: Impacts
-  title: "## Potential Impacts for ${region} in the ${futureTimePeriod}"
   prologue: |
-    Below, you can view a list of potential impacts that may affect ${region}
-    in the ${futureDecade}s.
+    Below, you can view a list of potential impacts that may affect
+    ${region.properties.english_na} in the ${futureDecade}s.
     This is intended to provide a starting point for more detailed local
     assessment of climate change impacts.
     These are based on limited climate change information, as shown in the

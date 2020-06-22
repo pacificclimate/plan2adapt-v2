@@ -26,13 +26,14 @@ import VariableSelector from '../../selectors/VariableSelector';
 
 import Summary from '../../data-displays/Summary';
 import ChangeOverTimeGraph from '../../graphs/ChangeOverTimeGraph';
-import ImpactsTab from '../../data-displays/impacts/ImpactsTab';
+import ImpactsTab from '../../data-displays/impacts/ImpactsTabs';
 import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 
 import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
 import DevGraph from '../../data-displays/DevGraph';
 import SummaryTabBody from '../SummaryTabBody';
+import ImpactsTabBody from '../ImpactsTabBody';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -234,22 +235,11 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'impacts' &&
-                  <React.Fragment>
-                    <Row>
-                      <Col lg={12}>
-                        <T path='impacts.prologue' data={{
-                          region: region,
-                          futureDecade: middleDecade(futureTimePeriod),
-                          baselineDecade: middleDecade(baselineTimePeriod),
-                        }}/>
-                        <ImpactsTab
-                          rulebase={rulebase}
-                          region={get('value', this.state.region)}
-                          futureTimePeriod={futureTimePeriod}
-                        />
-                      </Col>
-                    </Row>
-                  </React.Fragment>
+                  <ImpactsTabBody
+                    regionOpt={this.state.region}
+                    futureTimePeriodOpt={this.state.futureTimePeriod}
+                    baselineTimePeriod={baselineTimePeriod}
+                  />
                 }
               </Tab>
 

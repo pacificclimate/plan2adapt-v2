@@ -10,9 +10,9 @@ import { allDefined } from '../../../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
 
 
-class ImpactsTab extends React.Component {
+class ImpactsTabs extends React.Component {
   // This is a pure (state-free), controlled component that renders the entire
-  // content of ImpactsTab.
+  // content of ImpactsTabs.
   //
   // This component is wrapped with `withAsyncData` to inject the rule values
   // (prop `ruleValues`) that are fetched asynchronously, according to the
@@ -29,16 +29,14 @@ class ImpactsTab extends React.Component {
     if (!allDefined(
       [
         'rulebase',
-        'region.geometry',
-        'futureTimePeriod.start_date',
-        'futureTimePeriod.end_date',
+        'region',
+        'futureTimePeriod',
         'ruleValues',
       ],
       this.props
     )) {
-      console.log('### ImpactsTab: unsettled props', this.props)
-      return <h1>Loading ImpactsTab</h1>
-      return <Loader/>
+      console.log('### ImpactsTabs: unsettled props', this.props)
+      return <Loader/>;
     }
     return (
       <Tabs
@@ -89,4 +87,4 @@ class ImpactsTab extends React.Component {
 
 export default withAsyncData(
   loadRulesResults, shouldLoadRulesResults, 'ruleValues'
-)(ImpactsTab);
+)(ImpactsTabs);
