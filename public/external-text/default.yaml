@@ -297,10 +297,10 @@ maps:
 graphs:
   disabled: false
   tab: Graphs
-  title: "## Range of projected change in ${season} ${variable} for ${region}"
   prologue: |
     This figure shows the range of projected change in
-    ${season} ${variable} for ${region} over three time periods
+    ${season} ${variable.label} for ${region.properties.english_na}
+    over three time periods
     (2020s, 2050s, and 2080s), according to a PCIC-standard set of
     GCM projections (see 'Notes' tab for more information).
 
@@ -323,6 +323,16 @@ graphs:
     Note: Some variables do not come directly from the climate models
     (see 'Notes' tab for more information).
 
+    ${variable.possibleLowBaseline && variable.units =='%' ?
+      $$.graphs.lowBaselineWarning : ''}
+
+  lowBaselineWarning: |
+    *CAUTION: This variable may have a low baseline.
+      Percent changes from a low baseline value can result in
+      deceptively large percent change values.
+      A small baseline can occur when the season and/or region
+      together naturally make for zero or near-zero values. For example,
+      snowfall in summer in low-lying southern areas.*
   config:
     foo: bar
     interpolationInterval: 1
