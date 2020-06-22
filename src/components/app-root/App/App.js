@@ -34,6 +34,7 @@ import DevGraph from '../../data-displays/DevGraph';
 import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
+import GraphsTabBody from '../GraphsTabBody';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -272,33 +273,13 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'graphs' &&
-                  <React.Fragment>
-                    <Row>
-                      <Col lg={12}>
-                        <T path='graphs.prologue' data={{
-                          season: get('label', this.state.season),
-                          variable: get('label', this.state.variable),
-                          region: get('label', this.state.region),
-                        }}/>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col lg={12}>
-                        <ChangeOverTimeGraph
-                          region={get('value', this.state.region)}
-                          historicalTimePeriod={baselineTimePeriod}
-                          season={get('value', this.state.season)}
-                          variable={get('value', this.state.variable)}
-                          // TODO: This may be better obtained from metadata
-                          futureTimePeriods={
-                            this.getConfig('graphs.config.futureTimePeriods')}
-                          graphConfig={this.getConfig('graphs.config')}
-                          variableConfig={this.getConfig('variables')}
-                          unitsConversions={this.getConfig('units')}
-                        />
-                      </Col>
-                    </Row>
-                  </React.Fragment>
+                  <GraphsTabBody
+                    regionOpt={this.state.region}
+                    futureTimePeriodOpt={this.state.futureTimePeriod}
+                    baselineTimePeriod={baselineTimePeriod}
+                    seasonOpt={this.state.season}
+                    variableOpt={this.state.variable}
+                  />
                 }
               </Tab>
 
