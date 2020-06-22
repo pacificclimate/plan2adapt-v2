@@ -61,7 +61,7 @@ class Summary extends React.Component {
   static propTypes = {
     region: PropTypes.object.isRequired,
     futureTimePeriod: PropTypes.object.isRequired,
-    baseline: PropTypes.object,
+    baselineTimePeriod: PropTypes.object,
 
     tableContents: PropTypes.array.isRequired,
     // Abstract specification of the summary table. Data is implicit in the
@@ -135,7 +135,7 @@ class Summary extends React.Component {
   };
 
   static defaultProps = {
-    baseline: {
+    baselineTimePeriod: {
       start_date: 1961,
       end_date: 1990,
     },
@@ -144,11 +144,9 @@ class Summary extends React.Component {
   render() {
     if (!allDefined(
       [
-        'region.geometry',
-        'baseline.start_date',
-        'baseline.end_date',
-        'futureTimePeriod.start_date',
-        'futureTimePeriod.end_date',
+        'region',
+        'baselineTimePeriod',
+        'futureTimePeriod',
         'tableContents',
         'variableConfig',
         'unitsConversions',
@@ -171,7 +169,7 @@ class Summary extends React.Component {
           </th>
           <th colSpan={2} className='text-center'>
             <T path='summary.table.heading.projectedChange'
-               data={this.props.baseline} as='string'/>
+               data={this.props.baselineTimePeriod} as='string'/>
           </th>
         </tr>
         <tr>

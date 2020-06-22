@@ -34,7 +34,6 @@ dev-graph:
 summary:
   disabled: false
   tab: Summary
-  title: "## Summary of Climate Change for ${region} in the ${futureTimePeriod}"
   # It's tempting to do this content as a Markdown table, but unfortunately
   # MD doesn't let you span table rows or columns.
   table:
@@ -95,7 +94,7 @@ summary:
       (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
       to the
       ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-      for the ${region} region.
+      for the ${region.properties.english_na} region.
       The ensemble median is a mid-point value, chosen from a PCIC standard
       set of Global Climate Model (GCM) projections (see the 'Notes' tab for
       more information).

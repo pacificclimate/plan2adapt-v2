@@ -32,6 +32,7 @@ import TwoDataMaps from '../../maps/TwoDataMaps/TwoDataMaps';
 import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
 import DevGraph from '../../data-displays/DevGraph';
+import SummaryTabBody from '../SummaryTabBody';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -216,23 +217,11 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'summary' &&
-                  <React.Fragment>
-                    <T path='summary.notes.general' data={{
-                      region: region,
-                      baselineTimePeriod,
-                      futureTimePeriod,
-                      futureDecade: middleDecade(futureTimePeriod),
-                      baselineDecade: middleDecade(baselineTimePeriod),
-                    }}/>
-                    <Summary
-                      region={get('value', this.state.region)}
-                      futureTimePeriod={futureTimePeriod}
-                      tableContents={this.getConfig('summary.table.contents')}
-                      variableConfig={this.getConfig('variables')}
-                      unitsConversions={this.getConfig('units')}
-                    />
-                    <T path='summary.notes.derivedVars'/>
-                  </React.Fragment>
+                  <SummaryTabBody
+                    regionOpt={this.state.region}
+                    futureTimePeriodOpt={this.state.futureTimePeriod}
+                    baselineTimePeriod={baselineTimePeriod}
+                  />
                 }
               </Tab>
 
