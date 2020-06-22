@@ -207,13 +207,8 @@ const shouldLoadFileMetadata = (prevProps, props) =>
   // ... relevant props have settled to defined values
   allDefined(
     [
-      // For an unknown reason, timePeriod can transiently be {}, which
-      // is not valid and causes errors in loading the metadata. So check
-      // its innards.
       'timePeriod',
-      // season is an integer
       'season',
-      // Let's check that variable isn't just {} either.
       'variable',
     ],
     props
