@@ -106,14 +106,9 @@ summary:
   notes: |
     Notes:
 
-    1. Climate variables marked with &ast; are derived from temperature and/or
-       precipitation values, and are not direct outputs of the climate models.
+    1. ${$$.components.notes.derivedClimateVars}
 
-    1. CAUTION: Percent changes from a low baseline value can result in
-       deceptively large percent change values.
-       A small baseline can occur when the season and/or region
-       together naturally make for zero or near-zero values. For example,
-       snowfall in summer in low-lying southern areas.
+    2. CAUTION: ${$$.components.notes.lowBaseline}
 
 impacts:
   disabled: false
@@ -320,19 +315,16 @@ graphs:
     Lines and bars at other years are interpolated from directly derived data
     and should be treated as more approximate.
 
-    Note: Some variables do not come directly from the climate models
-    (see 'Notes' tab for more information).
+    Notes:
 
+    1. ${$$.components.notes.derivedClimateVars}
     ${variable.possibleLowBaseline && variable.units =='%' ?
       $$.graphs.lowBaselineWarning : ''}
 
   lowBaselineWarning: |
-    *CAUTION: This variable may have a low baseline.
-      Percent changes from a low baseline value can result in
-      deceptively large percent change values.
-      A small baseline can occur when the season and/or region
-      together naturally make for zero or near-zero values. For example,
-      snowfall in summer in low-lying southern areas.*
+    2. *CAUTION: This variable may have a low baseline.*
+       ${$$.components.notes.lowBaseline}
+
   config:
     foo: bar
     interpolationInterval: 1
@@ -550,6 +542,16 @@ about:
           body: System administrator. Deployment and security.
 
 components:
+  notes:
+    derivedClimateVars: |
+      Climate variables marked with &ast; are derived from temperature and/or
+      precipitation values, and are not direct outputs of the climate models.
+    lowBaseline: |
+      Percent changes from a low baseline value can result in
+      deceptively large percent change values.
+      A small baseline can occur when the season and/or region
+      together naturally make for zero or near-zero values. For example,
+      snowfall in summer in low-lying southern areas.
   period: ${start_date}-${end_date}
   climdexUrl: https://www.climdex.org/learn/indices
   contacts:
