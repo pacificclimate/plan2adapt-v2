@@ -1,3 +1,9 @@
+// This component creates the content of the Maps tab.
+// It is responsible for
+//  - Filtering out unsettled props (options from App)
+//  - Layout and formatting
+//  - Marshalling data for subsidiary components
+//
 // This component renders two `DataMap`s, one with a baseline climate layer
 // and one with a user-selected climate layer. Map viewports are coordinated.
 // That is, when one map's viewport is changed (panned, zoomed), the other
@@ -24,8 +30,6 @@
 // a better user experience simply to have the other viewport updated once
 // at the end of changing.
 
-// foo
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
@@ -47,16 +51,16 @@ export default class MapsTabBody extends React.Component {
   getConfig = path => T.get(this.context, path, {}, 'raw');
 
   static propTypes = {
-    region: PropTypes.string,
-    historicalTimePeriod: PropTypes.object,
-    futureTimePeriod: PropTypes.object,
-    season: PropTypes.number,
-    variable: PropTypes.object,
+    regionOpt: PropTypes.string,
+    baselineTimePeriod: PropTypes.object,
+    futureTimePeriodOpt: PropTypes.object,
+    seasonOpt: PropTypes.number,
+    variableOpt: PropTypes.object,
     metadata: PropTypes.array,
   };
 
   state = {
-    prevPropsRegion: undefined,
+    prevPropsRegionOpt: undefined,
     bounds: undefined,
     viewport: BCBaseMap.initialViewport,
     popup: {
@@ -69,10 +73,10 @@ export default class MapsTabBody extends React.Component {
     // bounding box of the region. We are fortunate that when bounds change,
     // they override the current viewport, and vice-versa, eliminating any
     // need for logic around this on our part.
-    if (props.region !== state.prevPropsRegion) {
+    if (props.regionOpt !== state.prevPropsRegionOpt) {
       return {
-        prevPropsRegion: props.region,
-        bounds: regionBounds(props.region),
+        prevPropsRegionOpt: props.regionOpt,
+        bounds: regionBounds(props.regionOpt.value),
       }
     }
     return null;
@@ -92,25 +96,29 @@ export default class MapsTabBody extends React.Component {
   render() {
     if (!allDefined(
       [
-        'region.geometry',
-        'historicalTimePeriod.start_date',
-        'historicalTimePeriod.end_date',
-        'futureTimePeriod.start_date',
-        'futureTimePeriod.end_date',
-        'variable.representative',
-        'season',
+        'regionOpt',
+        'baselineTimePeriod',
+        'futureTimePeriodOpt',
+        'variableOpt',
+        'seasonOpt',
       ],
       this.props
     )) {
-      console.log('### TwoDataMaps: unsettled props', this.props)
-      return <Loader/>
+      console.log('### MapsTabBody: unsettled props', this.props)
+      return <Loader/>;
     }
-    console.log('### TwoDataMaps: props', this.props)
-    const variableSpec = this.props.variable.representative;
-    const variable = variableSpec.variable_id;
+    console.log('### MapsTabBody: props', this.props)
+    const region = this.props.regionOpt.value;
+    const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
+    const baselineTimePeriod = this.props.baselineTimePeriod;
+    const season = this.props.seasonOpt.value;
+    const variable = this.props.variableOpt.value;
+
+    const variableRep = variable.representative;
+    const variableId = variableRep.variable_id;
     const variableConfig = this.getConfig('variables');
     const displaySpec = this.getConfig('maps.displaySpec');
-    const logscale = wmsLogscale(displaySpec, variableSpec);
+    const logscale = wmsLogscale(displaySpec, variableRep);
     const zoomButton = (
       <StaticControl position='topright'>
         <Button
@@ -133,7 +141,7 @@ export default class MapsTabBody extends React.Component {
               length={80}
               heading={<T
                 path='colourScale.label'
-                data={getVariableInfo(variableConfig, variable, 'absolute')}
+                data={getVariableInfo(variableConfig, variableId, 'absolute')}
                 placeholder={null}
                 className={styles.label}
               />}
@@ -143,7 +151,7 @@ export default class MapsTabBody extends React.Component {
                 className={styles.note}
                 data={{ logscale }}
               />}
-              variableSpec={variableSpec}
+              variableSpec={variableRep}
               displaySpec={displaySpec}
             />
           </Col>
@@ -151,8 +159,8 @@ export default class MapsTabBody extends React.Component {
         <Row>
           <Col lg={6}>
             <T path='maps.historical.title' data={{
-              start_date: this.props.historicalTimePeriod.start_date,
-              end_date: this.props.historicalTimePeriod.end_date
+              start_date: this.props.baselineTimePeriod.start_date,
+              end_date: this.props.baselineTimePeriod.end_date
             }}/>
             <DataMap
               id={'historical'}
@@ -161,10 +169,10 @@ export default class MapsTabBody extends React.Component {
               onViewportChanged={this.handleChangeViewport}
               popup={this.state.popup}
               onPopupChange={this.handleChangePopup}
-              region={this.props.region}
-              season={this.props.season}
-              variable={this.props.variable}
-              timePeriod={this.props.historicalTimePeriod}
+              region={region}
+              season={season}
+              variable={variable}
+              timePeriod={baselineTimePeriod}
               metadata={this.props.metadata}
             >
               {zoomButton}
@@ -172,8 +180,8 @@ export default class MapsTabBody extends React.Component {
           </Col>
           <Col lg={6}>
             <T path='maps.projected.title' data={{
-              start_date: this.props.futureTimePeriod.start_date,
-              end_date: this.props.futureTimePeriod.end_date
+              start_date: futureTimePeriod.start_date,
+              end_date: futureTimePeriod.end_date
             }}/>
             <DataMap
               id={'projected'}
@@ -182,10 +190,10 @@ export default class MapsTabBody extends React.Component {
               onViewportChanged={this.handleChangeViewport}
               popup={this.state.popup}
               onPopupChange={this.handleChangePopup}
-              region={this.props.region}
-              season={this.props.season}
-              variable={this.props.variable}
-              timePeriod={this.props.futureTimePeriod}
+              region={region}
+              season={season}
+              variable={variable}
+              timePeriod={futureTimePeriod}
               metadata={this.props.metadata}
             >
               {zoomButton}

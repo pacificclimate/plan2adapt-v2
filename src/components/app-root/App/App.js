@@ -50,7 +50,7 @@ export default class App extends Component {
     futureTimePeriod: undefined,
     season: undefined,
     variable: undefined,
-    tabKey: 'summary',
+    tabKey: 'maps',
   };
 
   componentDidMount() {
@@ -253,11 +253,11 @@ export default class App extends Component {
                 {
                   this.state.tabKey === 'maps' &&
                   <MapsTabBody
-                    region={get('value', this.state.region)}
-                    historicalTimePeriod={baselineTimePeriod}
-                    futureTimePeriod={futureTimePeriod}
-                    season={get('value', this.state.season)}
-                    variable={get('value', this.state.variable)}
+                    regionOpt={this.state.region}
+                    futureTimePeriodOpt={this.state.futureTimePeriod}
+                    baselineTimePeriod={baselineTimePeriod}
+                    seasonOpt={this.state.season}
+                    variableOpt={this.state.variable}
                     metadata={this.state.metadata}
                   />
                 }

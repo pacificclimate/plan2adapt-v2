@@ -113,6 +113,18 @@ class DataMapDisplay extends React.Component {
   });
 
   render() {
+    if (!allDefined(
+      [
+        'region',
+        'timePeriod',
+        'variable',
+        'season',
+      ],
+      this.props
+    )) {
+      console.log('### DataMap: unsettled props', this.props)
+      return <Loader/>;
+    }
     const {
       children, region, timePeriod, season, variable, popup,
       fileMetadata, ...rest
@@ -198,12 +210,11 @@ const shouldLoadFileMetadata = (prevProps, props) =>
       // For an unknown reason, timePeriod can transiently be {}, which
       // is not valid and causes errors in loading the metadata. So check
       // its innards.
-      'timePeriod.start_date',
-      'timePeriod.end_date',
+      'timePeriod',
       // season is an integer
       'season',
       // Let's check that variable isn't just {} either.
-      'variable.representative',
+      'variable',
     ],
     props
   ) &&
