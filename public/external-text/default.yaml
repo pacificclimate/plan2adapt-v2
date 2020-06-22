@@ -36,6 +36,20 @@ summary:
   tab: Summary
   # It's tempting to do this content as a Markdown table, but unfortunately
   # MD doesn't let you span table rows or columns.
+  prologue: |
+    The table below shows projected changes in average (mean) temperature,
+    precipitation and several derived climate variables from the
+    baseline historical period
+    (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+    to the
+    ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
+    for the ${region.properties.english_na} region.
+    The ensemble median is a mid-point value, chosen from a PCIC standard
+    set of Global Climate Model (GCM) projections (see the 'Notes' tab for
+    more information).
+    The range values represent the lowest and highest results within the set.
+  lowBaselineWarning: |
+    *CAUTION: This variable may have a low baseline. See note 2 below. *
   table:
     heading:
       variable: Climate Variable
@@ -46,6 +60,9 @@ summary:
     rows:
       variable: |
         ${variable.label}${variable.derived ? '*': ''} (${variable.units})
+
+        ${variable.possibleLowBaseline && variable.units =='%' ?
+          $$.summary.lowBaselineWarning : ''}
       season: ${season.label}
       ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
       range: |
@@ -86,23 +103,12 @@ summary:
         precision: 2
         seasons:
           - annual
-  notes:
-    general: |
-      The table below shows projected changes in average (mean) temperature,
-      precipitation and several derived climate variables from the
-      baseline historical period
-      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-      to the
-      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-      for the ${region.properties.english_na} region.
-      The ensemble median is a mid-point value, chosen from a PCIC standard
-      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
-      more information).
-      The range values represent the lowest and highest results within the set.
+  notes: |
+    Notes:
 
-    derivedVars: |
-      &ast; These values are derived from temperature and/or precipitation.
+    1. ${$$.components.notes.derivedClimateVars}
 
+    2. CAUTION: ${$$.components.notes.lowBaseline}
 
 impacts:
   disabled: false
@@ -286,10 +292,10 @@ maps:
 graphs:
   disabled: false
   tab: Graphs
-  title: "## Range of projected change in ${season} ${variable} for ${region}"
   prologue: |
     This figure shows the range of projected change in
-    ${season} ${variable} for ${region} over three time periods
+    ${season} ${variable.label} for ${region.properties.english_na}
+    over three time periods
     (2020s, 2050s, and 2080s), according to a PCIC-standard set of
     GCM projections (see 'Notes' tab for more information).
 
@@ -309,8 +315,15 @@ graphs:
     Lines and bars at other years are interpolated from directly derived data
     and should be treated as more approximate.
 
-    Note: Some variables do not come directly from the climate models
-    (see 'Notes' tab for more information).
+    Notes:
+
+    1. ${$$.components.notes.derivedClimateVars}
+    ${variable.possibleLowBaseline && variable.units =='%' ?
+      $$.graphs.lowBaselineWarning : ''}
+
+  lowBaselineWarning: |
+    2. *CAUTION: This variable may have a low baseline.*
+       ${$$.components.notes.lowBaseline}
 
   config:
     foo: bar
@@ -529,6 +542,16 @@ about:
           body: System administrator. Deployment and security.
 
 components:
+  notes:
+    derivedClimateVars: |
+      Climate variables marked with &ast; are derived from temperature and/or
+      precipitation values, and are not direct outputs of the climate models.
+    lowBaseline: |
+      Percent changes from a low baseline value can result in
+      deceptively large percent change values.
+      A small baseline can occur when the season and/or region
+      together naturally make for zero or near-zero values. For example,
+      snowfall in summer in low-lying southern areas.
   period: ${start_date}-${end_date}
   climdexUrl: https://www.climdex.org/learn/indices
   contacts:
@@ -586,6 +609,7 @@ variables:
     type: snowfall flux
     displayUnits: mm
     dataUnits: kg m-2 d-1
+    possibleLowBaseline: true
   gdd:
     label: Growing Degree-Days
     derived: true

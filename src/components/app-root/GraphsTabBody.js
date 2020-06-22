@@ -13,6 +13,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import get from 'lodash/fp/get';
 import ChangeOverTimeGraph from '../graphs/ChangeOverTimeGraph';
+import { getVariableInfo } from '../../utils/variables-and-units';
 
 export default class GraphsTabBody extends React.Component {
   static contextType = T.contextType;
@@ -36,7 +37,7 @@ export default class GraphsTabBody extends React.Component {
       this.props
     )) {
       console.log('### GraphsTabBody: unsettled props', this.props)
-      return <Loader/>
+      return <Loader/>;
     }
 
     const region = this.props.regionOpt.value;
@@ -44,14 +45,20 @@ export default class GraphsTabBody extends React.Component {
     const season = this.props.seasonOpt.value;
     const variable = this.props.variableOpt.value;
 
+    const graphConfig = this.getConfig('graphs.config');
+    const variableConfig = this.getConfig('variables');
+    const variableId = variable.representative.variable_id;
+    const display = graphConfig.variables[variableId].display;
+    const variableInfo = getVariableInfo(variableConfig, variableId, display);
+
     return (
       <React.Fragment>
         <Row>
           <Col lg={12}>
             <T path='graphs.prologue' data={{
+              region,
+              variable: variableInfo,
               season: get('label', this.props.seasonOpt),
-              variable: get('label', this.props.variableOpt),
-              region: get('label', this.props.regionOpt),
             }}/>
           </Col>
         </Row>
@@ -60,13 +67,14 @@ export default class GraphsTabBody extends React.Component {
             <ChangeOverTimeGraph
               region={region}
               baselineTimePeriod={baselineTimePeriod}
-              season={season}
-              variable={variable}
               // TODO: This may be better obtained from metadata
               futureTimePeriods={
                 this.getConfig('graphs.config.futureTimePeriods')}
-              graphConfig={this.getConfig('graphs.config')}
-              variableConfig={this.getConfig('variables')}
+              season={season}
+              variable={variable}
+              variableInfo={variableInfo}
+              graphConfig={graphConfig}
+              variableConfig={variableConfig}
               unitsConversions={this.getConfig('units')}
             />
           </Col>

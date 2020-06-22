@@ -29,11 +29,12 @@ export const getVariableDisplayUnits =
   };
 
 
-export const getVariableInfo = (variableConfig, variable, display) => {
+export const getVariableInfo = (variableConfig, variableId, display) => {
   return {
-    id: variable,
-    label: getVariableLabel(variableConfig, variable),
-    units: getVariableDisplayUnits(variableConfig, variable, display),
+    id: variableId,
+    label: getVariableLabel(variableConfig, variableId),
+    units: getVariableDisplayUnits(variableConfig, variableId, display),
+    possibleLowBaseline: variableConfig[variableId].possibleLowBaseline,
   };
 };
 

@@ -12,11 +12,7 @@ import {
   getDisplayData,
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
-import {
-  getConvertUnits,
-  getVariableDisplayUnits,
-  getVariableInfo
-} from '../../../utils/variables-and-units';
+import { getConvertUnits } from '../../../utils/variables-and-units';
 import './ChangeOverTimeGraph.css';
 import BarChart from '../BarChart';
 import { allDefined } from '../../../utils/lodash-fp-extras';
@@ -104,6 +100,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         'region',
         'season',
         'variable',
+        'variableInfo',
         'baselineTimePeriod',
         'futureTimePeriods[0]',
         'statistics',
@@ -117,8 +114,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       return <Loader/>
     }
     const {
-      variable,
       baselineTimePeriod, futureTimePeriods, statistics,
+      variableInfo,
       graphConfig, variableConfig, unitsConversions,
     } = this.props;
     console.log('### COTG.render: statistics', statistics)
@@ -154,11 +151,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
     // Establish display units for variables, and convert data values to those
     // units.
-    // TODO: Robusticate
-    const variableId = variable.representative.variable_id;
-    const display = graphConfig.variables[variableId].display;
-    const displayUnits =
-      getVariableDisplayUnits(variableConfig, variableId, display);
+    const variableId = variableInfo.id;
+    const displayUnits = variableInfo.units;
     const convertUnits =
       getConvertUnits(unitsConversions, variableConfig, variableId);
     const dataUnits = statistics[0].value.units;
@@ -168,7 +162,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       map(map(convertData)),
     )(statistics);
 
-    const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
       <React.Fragment>
