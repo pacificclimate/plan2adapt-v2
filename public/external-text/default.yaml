@@ -250,6 +250,12 @@ maps:
         min: 0
         max: 10000
       ticks: [0, 2000, 4000, 6000, 8000, 10000]
+    cdd:
+      palette: x-Occam
+      range:
+        min: 0
+        max: 10000
+      ticks: [0, 2000, 4000, 6000, 8000, 10000]
     pr:
       palette: seq-Greens
       logscale: true
@@ -344,6 +350,8 @@ graphs:
       gdd:
         display: absolute
       hdd:
+        display: absolute
+      cdd:
         display: absolute
       pr:
         display: relative
@@ -596,6 +604,12 @@ variables:
     dataUnits: degree days
   hdd:
     label: Heating Degree-Days
+    derived: true
+    type: temperature-time
+    displayUnits: degree-days
+    dataUnits: degree days
+  cdd:
+    label: Cooling Degree-Days
     derived: true
     type: temperature-time
     displayUnits: degree-days
