@@ -254,8 +254,8 @@ maps:
       palette: x-Occam
       range:
         min: 0
-        max: 10000
-      ticks: [0, 2000, 4000, 6000, 8000, 10000]
+        max: 1000
+      ticks: [0, 250, 500, 750, 1000]
     pr:
       palette: x-Occam
 #      palette: seq-Greens
