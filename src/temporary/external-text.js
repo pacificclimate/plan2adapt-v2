@@ -42,7 +42,9 @@ export class Provider extends React.Component {
   };
 
   componentDidMount() {
-    this.setTexts(this.props.defaultTexts);
+    if (!_.isUndefined(this.props.defaultTexts)) {
+      this.setTexts(this.props.defaultTexts);
+    }
     if (this.props.loadTexts) {
       this.props.loadTexts(this.setTexts);
     }
