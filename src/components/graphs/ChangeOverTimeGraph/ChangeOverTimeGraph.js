@@ -12,7 +12,10 @@ import {
   getDisplayData,
   seasonIndexToPeriod
 } from '../../../utils/percentile-anomaly';
-import { getConvertUnits } from '../../../utils/variables-and-units';
+import {
+  getConvertUnits,
+  getVariableDisplay
+} from '../../../utils/variables-and-units';
 import './ChangeOverTimeGraph.css';
 import BarChart from '../BarChart';
 import { allDefined } from '../../../utils/lodash-fp-extras';
@@ -180,7 +183,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
 
 
 const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
-  const display = graphConfig.variables[variableId].display;
+  const display = getVariableDisplay(graphConfig.variables, variableId);
   return getDisplayData(data, seasonIndexToPeriod(season), display);
 });
 

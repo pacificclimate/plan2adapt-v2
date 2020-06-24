@@ -15,7 +15,7 @@ import {
   wmsTime
 } from '../map-utils';
 import {
-  getConvertUnits,
+  getConvertUnits, getVariableDataUnits,
   getVariableDisplayUnits
 } from '../../../utils/variables-and-units';
 
@@ -44,7 +44,7 @@ export default class ClimateLayer extends React.Component {
     const displayUnits =
       getVariableDisplayUnits(variableConfig, variableId, 'absolute');
     // TODO: dataUnits should come from metadata, not config.
-    const dataUnits = variableConfig[variableId].dataUnits;
+    const dataUnits = getVariableDataUnits(variableConfig, variableId);
     const convertUnits =
       getConvertUnits(unitsConversions, variableConfig, variableId);
     const rangeInDataUnits = mapValues(

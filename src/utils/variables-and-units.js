@@ -31,6 +31,16 @@ export const getVariableType = (variableConfig, variableId) => {
 };
 
 
+export const getVariableDisplay = (variableConfig, variableId) => {
+  return getConfigForId(variableConfig, variableId).display;
+};
+
+
+export const getVariableDataUnits = (variableConfig, variableId) => {
+  return getConfigForId(variableConfig, variableId).dataUnits;
+};
+
+
 export const getVariableDisplayUnits =
   (variableConfig, variableId, display = 'absolute') => {
     const vc = getConfigForId(variableConfig, variableId);
