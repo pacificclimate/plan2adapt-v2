@@ -8,6 +8,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import styles from './ErrorBoundary.module.css';
 
 
 export default class ErrorBoundary extends React.Component {
@@ -18,13 +19,14 @@ export default class ErrorBoundary extends React.Component {
   static defaultProps = {
     fallback: (error, errorInfo) => {
       return (
-        <div>
+        <div className={styles.errorBoundary}>
           <h1>Oops, something went wrong.</h1>
-          <p>If you see this page, please report it to the proper
-            authorities.</p>
+          <p>If you see this page, please report it
+            to <a href="mailto:pcic.support@uvic.ca">PCIC Support</a>.
+          </p>
           <p>Here's some information on the problem:</p>
           <pre>{error.error.toString()}</pre>
-          <pre>{error.errorInfo.componentStack}</pre>
+          <p>Developers, see console error log.</p>
         </div>
       )
     },
