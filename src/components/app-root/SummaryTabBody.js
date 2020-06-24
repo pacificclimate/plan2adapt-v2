@@ -35,6 +35,8 @@ export default class SummaryTabBody extends React.Component {
       return <Loader/>
     }
 
+    throw new Error('In SummaryTabBody')
+
     const region = this.props.regionOpt.value;
     const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
     const baselineTimePeriod = this.props.baselineTimePeriod;

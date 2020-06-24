@@ -32,6 +32,10 @@ import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
+import ErrorBoundary from '../../misc/ErrorBoundary';
+import ReferencesTabBody from '../ReferencesTabBody';
+import AboutTabBody from '../AboutTabBody';
+import NotesTabBody from '../NotesTabBody';
 
 const baselineTimePeriod = {
   start_date: 1961,
@@ -267,11 +271,13 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'summary' &&
-                  <SummaryTabBody
-                    regionOpt={this.state.regionOpt}
-                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                    baselineTimePeriod={baselineTimePeriod}
-                  />
+                  <ErrorBoundary>
+                    <SummaryTabBody
+                      regionOpt={this.state.regionOpt}
+                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                      baselineTimePeriod={baselineTimePeriod}
+                    />
+                  </ErrorBoundary>
                 }
               </Tab>
 
@@ -284,11 +290,13 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'impacts' &&
-                  <ImpactsTabBody
-                    regionOpt={this.state.regionOpt}
-                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                    baselineTimePeriod={baselineTimePeriod}
-                  />
+                  <ErrorBoundary>
+                    <ImpactsTabBody
+                      regionOpt={this.state.regionOpt}
+                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                      baselineTimePeriod={baselineTimePeriod}
+                    />
+                  </ErrorBoundary>
                 }
               </Tab>
 
@@ -301,14 +309,16 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'maps' &&
-                  <MapsTabBody
-                    regionOpt={this.state.regionOpt}
-                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                    baselineTimePeriod={baselineTimePeriod}
-                    seasonOpt={this.state.seasonOpt}
-                    variableOpt={this.state.variableOpt}
-                    metadata={this.state.metadata}
-                  />
+                  <ErrorBoundary>
+                    <MapsTabBody
+                      regionOpt={this.state.regionOpt}
+                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                      baselineTimePeriod={baselineTimePeriod}
+                      seasonOpt={this.state.seasonOpt}
+                      variableOpt={this.state.variableOpt}
+                      metadata={this.state.metadata}
+                    />
+                  </ErrorBoundary>
                 }
               </Tab>
 
@@ -321,13 +331,15 @@ export default class App extends Component {
               >
                 {
                   this.state.tabKey === 'graphs' &&
-                  <GraphsTabBody
-                    regionOpt={this.state.regionOpt}
-                    futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                    baselineTimePeriod={baselineTimePeriod}
-                    seasonOpt={this.state.seasonOpt}
-                    variableOpt={this.state.variableOpt}
-                  />
+                  <ErrorBoundary>
+                    <GraphsTabBody
+                      regionOpt={this.state.regionOpt}
+                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
+                      baselineTimePeriod={baselineTimePeriod}
+                      seasonOpt={this.state.seasonOpt}
+                      variableOpt={this.state.variableOpt}
+                    />
+                  </ErrorBoundary>
                 }
               </Tab>
 
@@ -337,7 +349,9 @@ export default class App extends Component {
                 disabled={this.getConfig('notes.disabled')}
                 className='pt-2'
               >
-                <T path='notes.content'/>
+                <ErrorBoundary>
+                  <NotesTabBody/>
+                </ErrorBoundary>
               </Tab>
 
               <Tab
@@ -346,7 +360,9 @@ export default class App extends Component {
                 disabled={this.getConfig('references.disabled')}
                 className='pt-2'
               >
-                <T path='references.content'/>
+                <ErrorBoundary>
+                  <ReferencesTabBody/>
+                </ErrorBoundary>
               </Tab>
 
               <Tab
@@ -355,25 +371,9 @@ export default class App extends Component {
                 disabled={this.getConfig('about.disabled')}
                 className='pt-2'
               >
-                <Tabs id={'about'} defaultActiveKey={'Plan2Adapt'}>
-                  {
-                    map(
-                      tab => (
-                        <Tab
-                          eventKey={tab.tab}
-                          title={tab.tab}
-                        >
-                          <Cards items={tab.cards}/>
-                        </Tab>
-                      )
-                    )(T.get(
-                        texts,
-                        'about.tabs',
-                        {version: process.env.REACT_APP_VERSION}
-                      )
-                    )
-                  }
-                </Tabs>
+                <ErrorBoundary>
+                  <AboutTabBody/>
+                </ErrorBoundary>
               </Tab>
             </Tabs>
           </Col>
