@@ -8,6 +8,7 @@ import withAsyncData from '../../../../HOCs/withAsyncData';
 import { loadRulesResults, shouldLoadRulesResults } from '../common';
 import { allDefined } from '../../../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
+import ErrorBoundary from '../../../misc/ErrorBoundary';
 
 
 class ImpactsTabs extends React.Component {
@@ -48,35 +49,39 @@ class ImpactsTabs extends React.Component {
           title={'By Category'}
           className='pt-2'
         >
-          <Impacts
-            {...this.props}
-            groupKey='category'
-            itemKey='sector'
-            groupHeading='Impact Category'
-            itemsHeading='Affected Sectors'
-          />
+          <ErrorBoundary>
+            <Impacts
+              {...this.props}
+              groupKey='category'
+              itemKey='sector'
+              groupHeading='Impact Category'
+              itemsHeading='Affected Sectors'
+            />
+          </ErrorBoundary>
         </Tab>
         <Tab
           eventKey={'by-sector'}
           title={'By Sector'}
           className='pt-2'
         >
-          <Impacts
-            {...this.props}
-            groupKey='sector'
-            itemKey='category'
-            groupHeading='Affected Sector'
-            itemsHeading='Impact Categories'
-          />
+          <ErrorBoundary>
+            <Impacts
+              {...this.props}
+              groupKey='sector'
+              itemKey='category'
+              groupHeading='Affected Sector'
+              itemsHeading='Impact Categories'
+            />
+          </ErrorBoundary>
         </Tab>
         <Tab
           eventKey={'rules'}
           title={'Rules Logic'}
           className='pt-2'
         >
-          <Rules
-            {...this.props}
-          />
+          <ErrorBoundary>
+            <Rules{...this.props}/>
+          </ErrorBoundary>
         </Tab>
       </Tabs>
 
