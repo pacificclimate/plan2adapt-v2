@@ -1,23 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './components/app-root/App';
 import * as serviceWorker from './serviceWorker';
-import ExternalText from './temporary/external-text';
-import { makeYamlLoader } from './utils/external-text';
-
-console.log('index.js: App', App)
-console.log('index.js: ExternalText', ExternalText)
-
-const loadTexts = makeYamlLoader(
-  `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXT}`
-);
+import AppWrapper from './components/app-root/AppWrapper';
 
 ReactDOM.render(
   (
-    <ExternalText.Provider loadTexts={loadTexts}>
-      <App/>
-    </ExternalText.Provider>
+    <AppWrapper/>
   ),
   document.getElementById('root')
 );
