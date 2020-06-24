@@ -2,11 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import AppWrapper from './components/app-root/AppWrapper';
+import ExternalText from './temporary/external-text';
+import ErrorBoundary from './components/misc/ErrorBoundary';
+import App from './components/app-root/App';
+import { makeYamlLoader } from './utils/external-text';
+
+
+const loadTexts = makeYamlLoader(
+  `${process.env.PUBLIC_URL}/${process.env.REACT_APP_EXTERNAL_TEXT}`
+);
+
 
 ReactDOM.render(
   (
-    <AppWrapper/>
+    <ExternalText.Provider loadTexts={loadTexts}>
+      <ErrorBoundary>
+        <App/>
+      </ErrorBoundary>
+    </ExternalText.Provider>
   ),
   document.getElementById('root')
 );
