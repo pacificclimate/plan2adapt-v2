@@ -15,11 +15,11 @@ const loadTexts = makeYamlLoader(
 
 ReactDOM.render(
   (
-    <ExternalText.Provider loadTexts={loadTexts}>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <ExternalText.Provider loadTexts={loadTexts}>
         <App/>
-      </ErrorBoundary>
-    </ExternalText.Provider>
+      </ExternalText.Provider>
+    </ErrorBoundary>
   ),
   document.getElementById('root')
 );
