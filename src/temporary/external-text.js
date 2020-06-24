@@ -7,6 +7,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import _ from 'lodash';
 import addMapDeep from 'deepdash/addMapDeep';
+import styles from './external-text.module.css';
 
 addMapDeep(_);
 
@@ -158,17 +159,30 @@ export function get(
   const item = (texts && _.has(texts, path)) ? _.get(texts, path) : placeholder;
 
   const render = value => {
-    if (as === 'raw') {
-      return value;
+    try {
+      if (as === 'raw') {
+        return value;
+      }
+      const source = evaluateAsTemplateLiteral(
+        _.toString(value),
+        { $$: texts, $path: path, ...data }
+      );
+      if (as === 'string') {
+        return source;
+      }
+      return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
+    } catch (e) {
+
+      const message = `Error in external text '${path}': ${e.toString()}.`;
+      if (as === 'raw' || as === 'string') {
+        return message;
+      }
+      return (
+        <div className={styles.externalTextError}>
+          {message}
+        </div>
+      );
     }
-    const source = evaluateAsTemplateLiteral(
-      _.toString(value),
-      { $$: texts, $path: path, ...data }
-    );
-    if (as === 'string') {
-      return source;
-    }
-    return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
   };
 
   return _.mapDeep(item, render, { leavesOnly: true });

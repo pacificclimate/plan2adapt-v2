@@ -1,0 +1,6 @@
+.externalTextError {
+    margin: 0.5em 0;
+    padding: 0.5em;
+    border: 1px solid darkred;
+    background: #e8bfbf;
+}
