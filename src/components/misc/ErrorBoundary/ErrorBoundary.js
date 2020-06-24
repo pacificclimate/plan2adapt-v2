@@ -21,7 +21,7 @@ export default class ErrorBoundary extends React.Component {
       return (
         <div className={styles.errorBoundary}>
           <h1>Oops, something went wrong.</h1>
-          <p>If you see this page, please report it
+          <p>If you see this message, please report it
             to <a href="mailto:pcic.support@uvic.ca">PCIC Support</a>.
           </p>
           <p>Here's some information on the problem:</p>
