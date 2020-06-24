@@ -220,6 +220,11 @@ impacts:
 maps:
   disabled: false
   tab: Maps
+  lethargicScrolling:
+    active: true
+    stability: 7
+    sensitivity: 50
+    tolerance: 0.05
   historical:
     title: "#### Historical: ${$$.components.period}"
   projected:
