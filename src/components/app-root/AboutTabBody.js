@@ -1,9 +1,9 @@
 import React from 'react';
-import T from '../../temporary/external-text';
 import Tabs from 'react-bootstrap/Tabs';
-import map from 'lodash/fp/map';
 import Tab from 'react-bootstrap/Tab';
 import Cards from '../misc/Cards';
+import map from 'lodash/fp/map';
+import T from '../../temporary/external-text';
 
 
 export default class AboutTabBody extends React.Component {
@@ -19,6 +19,7 @@ export default class AboutTabBody extends React.Component {
               <Tab
                 eventKey={tab.tab}
                 title={tab.tab}
+                className='pt-2'
               >
                 <Cards items={tab.cards}/>
               </Tab>
