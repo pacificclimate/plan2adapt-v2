@@ -9,7 +9,6 @@ import Loader from 'react-loader';
 
 import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
-import map from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
 import isObject from 'lodash/fp/isObject';
 
@@ -23,19 +22,18 @@ import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
-import Cards from '../../misc/Cards';
 import DevColourbar from '../../data-displays/DevColourbar';
 import DevGraph from '../../data-displays/DevGraph';
+import ErrorBoundary from '../../misc/ErrorBoundary';
 import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
-import { getVariableLabel } from '../../../utils/variables-and-units';
-import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
-import ErrorBoundary from '../../misc/ErrorBoundary';
+import NotesTabBody from '../NotesTabBody';
 import ReferencesTabBody from '../ReferencesTabBody';
 import AboutTabBody from '../AboutTabBody';
-import NotesTabBody from '../NotesTabBody';
+import { getVariableLabel } from '../../../utils/variables-and-units';
+import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
 
 const baselineTimePeriod = {
   start_date: 1961,
