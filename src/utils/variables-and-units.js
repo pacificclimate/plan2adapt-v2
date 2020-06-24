@@ -12,20 +12,32 @@ import isUndefined from 'lodash/fp/isUndefined';
 // Functions that encapsulate knowledge about the structure of variable
 // configuration information.
 
-export const getVariableLabel = (variableConfig, variable) =>
-  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
+const getConfigForId = (variableConfig, variableId) => {
+  const vc = variableConfig[variableId];
+  if (!vc) {
+    throw new Error(`Unconfigured variable '${variableId}'`);
+  }
+  return vc;
+};
+
+export const getVariableLabel = (variableConfig, variableId) => {
+  const vc = getConfigForId(variableConfig, variableId);
+  return `${vc.label}${vc.derived ? '*' : ''}`;
+};
 
 
-export const getVariableType = (variableConfig, variable) =>
-  variableConfig[variable].type;
+export const getVariableType = (variableConfig, variableId) => {
+  return getConfigForId(variableConfig, variableId).type;
+};
 
 
 export const getVariableDisplayUnits =
-  (variableConfig, variable, display = 'absolute') => {
+  (variableConfig, variableId, display = 'absolute') => {
+    const vc = getConfigForId(variableConfig, variableId);
     if (display === 'relative') {
       return '%';
     }
-    return variableConfig[variable].displayUnits;
+    return vc.displayUnits;
   };
 
 
