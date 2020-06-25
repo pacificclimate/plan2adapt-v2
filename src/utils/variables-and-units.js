@@ -61,9 +61,15 @@ export const getVariableInfo = (variableConfig, variableId, display) => {
 };
 
 
-export const getConvertUnits= (conversions, variableConfig, variable) => {
-  const variableType = getVariableType(variableConfig, variable);
+export const getConvertUnits= (conversions, variableConfig, variableId) => {
+  const variableType = getVariableType(variableConfig, variableId);
+  if (!variableType) {
+    throw new Error(`Unspecified variable type for ${variableId}`);
+  }
   const conversionGroup = conversions[variableType];
+  if (!conversionGroup) {
+    throw new Error(`No conversion group for ${variableType}`);
+  }
   return convertUnitsInGroup(conversionGroup);
 };
 
@@ -122,16 +128,22 @@ export const fromBaseUnits = curry((conversion, value) =>
 
 export const convertUnitsInGroup = curry((conversionGroup, fromUnits, toUnits, value) => {
   if (!conversionGroup) {
-    return undefined; // Or `value`?
+    throw new Error('Undefined conversion group');
   }
   if (fromUnits === toUnits) {  // Identity
     return value;
   }
   const fromConversion = conversionGroup[fromUnits];
+  if (!fromConversion) {
+    throw new Error(`No conversion group specified for ${fromUnits}`);
+  }
   if (isString(fromConversion)) {  // Synonym
     return convertUnitsInGroup(conversionGroup, fromConversion, toUnits, value);
   }
   const toConversion = conversionGroup[toUnits];
+  if (!toConversion) {
+    throw new Error(`No conversion group specified for ${toUnits}`);
+  }
   if (isString(toConversion)) {  // Synonym
     return convertUnitsInGroup(conversionGroup, fromUnits, toConversion, value);
   }
