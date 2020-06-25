@@ -91,7 +91,7 @@ export default class MapsTabBody extends React.Component {
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
   zoomToRegion = () =>
-    this.setState({ bounds: regionBounds(this.props.region)});
+    this.setState({ bounds: regionBounds(this.props.regionOpt.value) });
 
   render() {
     if (!allDefined(

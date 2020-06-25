@@ -156,7 +156,13 @@ export function get(
   //  </div>
   // ```
 
-  const item = (texts && _.has(texts, path)) ? _.get(texts, path) : placeholder;
+  const hasPath = texts && _.has(texts, path);
+
+  if (!hasPath && _.includes(['raw', 'string'], as)) {
+    throw new Error(`Path '${path}' not found in texts.`);
+  }
+
+  const item = hasPath ? _.get(texts, path) : placeholder;
 
   const render = value => {
     try {

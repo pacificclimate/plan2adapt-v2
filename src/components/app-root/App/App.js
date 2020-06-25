@@ -50,7 +50,7 @@ export default class App extends Component {
     futureTimePeriodOpt: undefined,
     seasonOpt: undefined,
     variableOpt: undefined,
-    tabKey: 'graphs',
+    tabKey: 'summary',
     context: null,
     contextJustUpdated: null,  // null signals initial state; boolean thereafter
   };
@@ -134,12 +134,11 @@ export default class App extends Component {
     // since extraction means introducing extra machinery for state-setting
     // callbacks, etc.
 
-    const texts = this.context;
-    if (!texts || this.state.metadata === null) {
-      console.log('### Loading ...')
+    if (!this.context || this.state.metadata === null) {
+      console.log('### App: Loading ...')
       return <Loader/>;
     }
-    console.log('### Loaded')
+    console.log('### App: Loaded')
     const variableConfig = this.getConfig('variables');
 
     const getVariableOptionLabel =
@@ -165,11 +164,13 @@ export default class App extends Component {
                       <T path='selectors.region.prefix'/>
                     </Col>
                     <Col xl={12} lg={3} md={6}>
-                      <RegionSelector
-                        default={T.get(texts, 'selectors.region.default', {}, 'raw')}
-                        value={this.state.regionOpt}
-                        onChange={this.handleChangeRegion}
-                      />
+                      <ErrorBoundary>
+                        <RegionSelector
+                          default={this.getConfig('selectors.region.default')}
+                          value={this.state.regionOpt}
+                          onChange={this.handleChangeRegion}
+                        />
+                      </ErrorBoundary>
                     </Col>
                   </React.Fragment>
                 }
@@ -180,13 +181,15 @@ export default class App extends Component {
                       <T path='selectors.timePeriod.prefix'/>
                     </Col>
                     <Col xl={12} lg={3} md={4}>
-                      <TimePeriodSelector
-                        bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
-                        value={this.state.futureTimePeriodOpt}
-                        default={T.get(texts, 'selectors.timePeriod.default', {}, 'raw')}
-                        onChange={this.handleChangeTimePeriod}
-                        debug
-                      />
+                      <ErrorBoundary>
+                          <TimePeriodSelector
+                          bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
+                          value={this.state.futureTimePeriodOpt}
+                          default={this.getConfig('selectors.timePeriod.default')}
+                          onChange={this.handleChangeTimePeriod}
+                          debug
+                        />
+                      </ErrorBoundary>
                     </Col>
                   </React.Fragment>
                 }
@@ -197,13 +200,15 @@ export default class App extends Component {
                       <T path='selectors.variable.prefix'/>
                     </Col>
                     <Col xl={12} lg={3} md={4}>
-                      <VariableSelector
-                        bases={this.state.metadata}
-                        value={this.state.variableOpt}
-                        default={this.getConfig('selectors.variable.default')}
-                        onChange={this.handleChangeVariable}
-                        getOptionLabel={getVariableOptionLabel}
-                      />
+                      <ErrorBoundary>
+                          <VariableSelector
+                          bases={this.state.metadata}
+                          value={this.state.variableOpt}
+                          default={this.getConfig('selectors.variable.default')}
+                          onChange={this.handleChangeVariable}
+                          getOptionLabel={getVariableOptionLabel}
+                        />
+                      </ErrorBoundary>
                     </Col>
                   </React.Fragment>
                 }
@@ -214,11 +219,13 @@ export default class App extends Component {
                       <T path='selectors.season.prefix'/>
                     </Col>
                     <Col xl={12} lg={3} md={4}>
-                      <SeasonSelector
+                      <ErrorBoundary>
+                          <SeasonSelector
                           value={this.state.seasonOpt}
                           default={this.getConfig('selectors.season.default')}
                           onChange={this.handleChangeSeason}
-                      />
+                        />
+                      </ErrorBoundary>
                     </Col>
                     <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
                       <T path='selectors.season.postfix'/>

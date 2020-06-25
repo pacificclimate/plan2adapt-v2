@@ -12,20 +12,42 @@ import isUndefined from 'lodash/fp/isUndefined';
 // Functions that encapsulate knowledge about the structure of variable
 // configuration information.
 
-export const getVariableLabel = (variableConfig, variable) =>
-  `${variableConfig[variable].label}${variableConfig[variable].derived ? '*' : ''}`;
+const getConfigForId = (variableConfig, variableId) => {
+  const vc = variableConfig[variableId];
+  if (!vc) {
+    throw new Error(`Unconfigured variable '${variableId}'`);
+  }
+  return vc;
+};
+
+export const getVariableLabel = (variableConfig, variableId) => {
+  const vc = getConfigForId(variableConfig, variableId);
+  return `${vc.label}${vc.derived ? '*' : ''}`;
+};
 
 
-export const getVariableType = (variableConfig, variable) =>
-  variableConfig[variable].type;
+export const getVariableType = (variableConfig, variableId) => {
+  return getConfigForId(variableConfig, variableId).type;
+};
+
+
+export const getVariableDisplay = (variableConfig, variableId) => {
+  return getConfigForId(variableConfig, variableId).display;
+};
+
+
+export const getVariableDataUnits = (variableConfig, variableId) => {
+  return getConfigForId(variableConfig, variableId).dataUnits;
+};
 
 
 export const getVariableDisplayUnits =
-  (variableConfig, variable, display = 'absolute') => {
+  (variableConfig, variableId, display = 'absolute') => {
+    const vc = getConfigForId(variableConfig, variableId);
     if (display === 'relative') {
       return '%';
     }
-    return variableConfig[variable].displayUnits;
+    return vc.displayUnits;
   };
 
 
@@ -39,9 +61,15 @@ export const getVariableInfo = (variableConfig, variableId, display) => {
 };
 
 
-export const getConvertUnits= (conversions, variableConfig, variable) => {
-  const variableType = getVariableType(variableConfig, variable);
+export const getConvertUnits= (conversions, variableConfig, variableId) => {
+  const variableType = getVariableType(variableConfig, variableId);
+  if (!variableType) {
+    throw new Error(`Unspecified variable type for ${variableId}`);
+  }
   const conversionGroup = conversions[variableType];
+  if (!conversionGroup) {
+    throw new Error(`No conversion group for ${variableType}`);
+  }
   return convertUnitsInGroup(conversionGroup);
 };
 
@@ -100,16 +128,22 @@ export const fromBaseUnits = curry((conversion, value) =>
 
 export const convertUnitsInGroup = curry((conversionGroup, fromUnits, toUnits, value) => {
   if (!conversionGroup) {
-    return undefined; // Or `value`?
+    throw new Error('Undefined conversion group');
   }
   if (fromUnits === toUnits) {  // Identity
     return value;
   }
   const fromConversion = conversionGroup[fromUnits];
+  if (!fromConversion) {
+    throw new Error(`No conversion group specified for ${fromUnits}`);
+  }
   if (isString(fromConversion)) {  // Synonym
     return convertUnitsInGroup(conversionGroup, fromConversion, toUnits, value);
   }
   const toConversion = conversionGroup[toUnits];
+  if (!toConversion) {
+    throw new Error(`No conversion group specified for ${toUnits}`);
+  }
   if (isString(toConversion)) {  // Synonym
     return convertUnitsInGroup(conversionGroup, fromUnits, toConversion, value);
   }
