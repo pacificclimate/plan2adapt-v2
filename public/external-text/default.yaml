@@ -37,7 +37,6 @@ summary:
   # It's tempting to do this content as a Markdown table, but unfortunately
   # MD doesn't let you span table rows or columns.
   prologue: |
-    ${foo}
     The table below shows projected changes in average (mean) temperature,
     precipitation and several derived climate variables from the
     baseline historical period
@@ -640,12 +639,12 @@ variables:
     type: temperature-time
     displayUnits: degree-days
     dataUnits: degree days
-#  cdd:
-#    label: Cooling Degree-Days
-#    derived: true
-#    type: temperature-time
-#    displayUnits: degree-days
-#    dataUnits: degree days
+  cdd:
+    label: Cooling Degree-Days
+    derived: true
+    type: temperature-time
+    displayUnits: degree-days
+    dataUnits: degree days
   ffd:
     label: Frost-Free Days
     derived: true
