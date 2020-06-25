@@ -51,7 +51,7 @@ export default class GraphsTabBody extends React.Component {
     const graphConfig = this.getConfig('graphs.config');
     const variableConfig = this.getConfig('variables');
     const variableId = variable.representative.variable_id;
-    const display = getVariableDisplay(variableConfig, variableId);
+    const display = getVariableDisplay(graphConfig.variables, variableId);
     const variableInfo = getVariableInfo(variableConfig, variableId, display);
 
     return (
