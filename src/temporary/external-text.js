@@ -114,6 +114,27 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 }
 
 
+function whenErrorResponse(as, whenError, message) {
+  // What to do when an error occurs in `get`.
+
+  if (whenError === 'null') {
+    return null;
+  }
+  if (whenError === 'throw') {
+    throw new Error(message);
+  }
+  // whenError == 'render'
+  if (as === 'raw' || as === 'string') {
+    return message;
+  }
+  return (
+    <div className={styles.externalTextError}>
+      {message}
+    </div>
+  );
+}
+
+
 export function get(
   texts,
   path,
@@ -157,25 +178,11 @@ export function get(
   //  </div>
   // ```
 
-  const hasPath = texts && _.has(texts, path);
-
-  // TODO: DRY this up w.r.t. render fn below.
-  if (!hasPath) {
-    if (whenError === 'null') {
-      return null;
-    }
-    const message1 = `Path '${path}' not found in external text.`;
-    if (as === 'raw' || as === 'string') {
-      return message1;
-    }
-    return (
-      <div className={styles.externalTextError}>
-        {message1}
-      </div>
+  if (!(texts && _.has(texts, path))) {
+    return whenErrorResponse(
+      as, whenError, `Path '${path}' not found in external text.`
     );
   }
-
-  const item = _.get(texts, path);
 
   const render = value => {
     try {
@@ -191,25 +198,13 @@ export function get(
       }
       return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
     } catch (e) {
-      if (whenError === 'null') {
-        return null;
-      }
-      const message = `Error in external text '${path}': ${e.toString()}.`;
-      if (whenError === 'throw') {
-        throw new Error(message);
-      }
-      if (as === 'raw' || as === 'string') {
-        return message;
-      }
-      return (
-        <div className={styles.externalTextError}>
-          {message}
-        </div>
+      return whenErrorResponse(
+        as, whenError, `Error in external text '${path}': ${e.toString()}.`
       );
     }
   };
 
-  return _.mapDeep(item, render, { leavesOnly: true });
+  return _.mapDeep(_.get(texts, path), render, { leavesOnly: true });
 }
 
 
