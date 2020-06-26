@@ -9,6 +9,7 @@ import Loader from 'react-loader';
 
 import filter from 'lodash/fp/filter';
 import get from 'lodash/fp/get';
+import map from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
 import isObject from 'lodash/fp/isObject';
 
@@ -34,11 +35,14 @@ import ReferencesTabBody from '../ReferencesTabBody';
 import AboutTabBody from '../AboutTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
+import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
+
 
 const baselineTimePeriod = {
   start_date: 1961,
   end_date: 1990,
 };
+
 
 export default class App extends Component {
   static contextType = T.contextType;
@@ -120,7 +124,7 @@ export default class App extends Component {
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeRegion = this.handleChangeSelection.bind(this, 'regionOpt');
-  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriodOpt');
+  handleChangeFutureTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriodOpt');
   handleChangeSeason = this.handleChangeSelection.bind(this, 'seasonOpt');
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variableOpt');
   handleChangeTab = this.handleChangeSelection.bind(this, 'tabKey');
@@ -145,6 +149,43 @@ export default class App extends Component {
       ({ value: { representative: { variable_id } } }) =>
         getVariableLabel(variableConfig, variable_id);
 
+    // This variable drives the construction of the selector list. It must
+    // be defined inside the component because it makes use of props and state.
+    const selectors = {
+      region: (
+        <RegionSelector
+          default={this.getConfig('selectors.region.default')}
+          value={this.state.regionOpt}
+          onChange={this.handleChangeRegion}
+        />
+      ),
+      futureTimePeriod: (
+        <TimePeriodSelector
+          bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
+          value={this.state.futureTimePeriodOpt}
+          default={this.getConfig('selectors.futureTimePeriod.default')}
+          onChange={this.handleChangeFutureTimePeriod}
+          debug
+        />
+      ),
+      variable: (
+        <VariableSelector
+          bases={this.state.metadata}
+          value={this.state.variableOpt}
+          default={this.getConfig('selectors.variable.default')}
+          onChange={this.handleChangeVariable}
+          getOptionLabel={getVariableOptionLabel}
+        />
+      ),
+      season: (
+        <SeasonSelector
+          value={this.state.seasonOpt}
+          default={this.getConfig('selectors.season.default')}
+          onChange={this.handleChangeSeason}
+        />
+      ),
+    };
+
     return (
       <Container fluid>
         <AppHeader/>
@@ -157,80 +198,34 @@ export default class App extends Component {
                   <T path='selectors.prologue'/>
                 </Col>
               </Row>
+
               <Row>
                 {
-                  this.selectorEnabled('region') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.region.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={6}>
-                      <ErrorBoundary>
-                        <RegionSelector
-                          default={this.getConfig('selectors.region.default')}
-                          value={this.state.regionOpt}
-                          onChange={this.handleChangeRegion}
+                  map(key =>
+                    this.selectorEnabled(key) &&
+                    <React.Fragment>
+                      <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                        {null}
+                      </Col>
+                      <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                        <T
+                          path={`selectors.${key}.prefix`}
+                          whenError={'null'}
                         />
-                      </ErrorBoundary>
-                    </Col>
-                  </React.Fragment>
-                }
-
-                {
-                  this.selectorEnabled('timePeriod') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.timePeriod.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={4}>
-                      <ErrorBoundary>
-                          <TimePeriodSelector
-                          bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
-                          value={this.state.futureTimePeriodOpt}
-                          default={this.getConfig('selectors.timePeriod.default')}
-                          onChange={this.handleChangeTimePeriod}
-                          debug
+                      </Col>
+                      <Col xl={12} lg={3} md={6}>
+                        <ErrorBoundary>
+                          {selectors[key]}
+                        </ErrorBoundary>
+                      </Col>
+                      <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                        <T
+                          path={`selectors.${key}.postfix`}
+                          whenError={'null'}
                         />
-                      </ErrorBoundary>
-                    </Col>
-                  </React.Fragment>
-                }
-
-                {
-                  this.selectorEnabled('variable') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.variable.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={4}>
-                      <ErrorBoundary>
-                          <VariableSelector
-                          bases={this.state.metadata}
-                          value={this.state.variableOpt}
-                          default={this.getConfig('selectors.variable.default')}
-                          onChange={this.handleChangeVariable}
-                          getOptionLabel={getVariableOptionLabel}
-                        />
-                      </ErrorBoundary>
-                    </Col>
-                  </React.Fragment>
-                }
-
-                {
-                  this.selectorEnabled('season') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.season.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={4}>
-                      <ErrorBoundary>
-                          <SeasonSelector
-                          value={this.state.seasonOpt}
-                          default={this.getConfig('selectors.season.default')}
-                          onChange={this.handleChangeSeason}
-                        />
-                      </ErrorBoundary>
-                    </Col>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.season.postfix'/>
-                    </Col>
-                  </React.Fragment>
+                      </Col>
+                    </React.Fragment>
+                  )(this.getConfig('selectors.ordering'))
                 }
               </Row>
             </div>

@@ -6,11 +6,12 @@ selectors:
   prologue: |
     I am interested in information about projected climate change in
     British Columbia ...
+  ordering: ['region', 'futureTimePeriod', 'variable', 'season']
   region:
     prefix: within the region of
     default: bc
     forTabs: ['summary', 'impacts', 'maps', 'graphs']
-  timePeriod:
+  futureTimePeriod:
     prefix: during the
     default: 2050
     forTabs: ['summary', 'impacts', 'maps']
@@ -20,8 +21,8 @@ selectors:
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
-    postfix: period
     default: 16
+    postfix: period
     forTabs: ['maps', 'graphs']
 
 dev-colourbar:
