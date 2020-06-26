@@ -119,6 +119,7 @@ export function get(
   path,
   data = {},
   as = 'string',
+  whenError = 'null',  // ??
   placeholder = '{{${$path}}}',
   props,
 ) {
@@ -158,11 +159,23 @@ export function get(
 
   const hasPath = texts && _.has(texts, path);
 
-  if (!hasPath && _.includes(['raw', 'string'], as)) {
-    throw new Error(`Path '${path}' not found in texts.`);
+  // TODO: DRY this up w.r.t. render fn below.
+  if (!hasPath) {
+    if (whenError === 'null') {
+      return null;
+    }
+    const message1 = `Path '${path}' not found in external text.`;
+    if (as === 'raw' || as === 'string') {
+      return message1;
+    }
+    return (
+      <div className={styles.externalTextError}>
+        {message1}
+      </div>
+    );
   }
 
-  const item = hasPath ? _.get(texts, path) : placeholder;
+  const item = _.get(texts, path);
 
   const render = value => {
     try {
@@ -178,8 +191,13 @@ export function get(
       }
       return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
     } catch (e) {
-
+      if (whenError === 'null') {
+        return null;
+      }
       const message = `Error in external text '${path}': ${e.toString()}.`;
+      if (whenError === 'throw') {
+        throw new Error(message);
+      }
       if (as === 'raw' || as === 'string') {
         return message;
       }
@@ -213,19 +231,23 @@ export default class ExternalText extends React.Component {
     // Data context in which to evaluate item's text.
     as: PropTypes.oneOf(['raw', 'string', 'markdown']),
     // How to render the item's text.
+    whenError: PropTypes.oneOf(['null', 'render', 'throw']),
+    // How to handle errors. When 'null' return null. When 'render' render an
+    // error message or placeholder.
     placeholder: PropTypes.string,
-    // What to render when path is not found in texts.
+    // What to render when path is not found in texts and whenError is 'render'
   };
 
   static defaultProps = {
     as: 'markdown',
+    whenError: 'render',
     placeholder: '{{${$path}}}',
   };
 
   render() {
     const texts = this.context;
-    const { path, data, as, placeholder, ...rest } = this.props;
-    return get(texts, path, data, as, placeholder, rest);
+    const { path, data, as, whenError, placeholder, ...rest } = this.props;
+    return get(texts, path, data, as, whenError, placeholder, rest);
   }
 }
 
