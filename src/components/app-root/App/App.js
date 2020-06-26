@@ -8,7 +8,6 @@ import Tab from 'react-bootstrap/Tab';
 import Loader from 'react-loader';
 
 import filter from 'lodash/fp/filter';
-import get from 'lodash/fp/get';
 import map from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
 import isObject from 'lodash/fp/isObject';
@@ -23,8 +22,6 @@ import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
-import DevColourbar from '../../data-displays/DevColourbar';
-import DevGraph from '../../data-displays/DevGraph';
 import ErrorBoundary from '../../misc/ErrorBoundary';
 import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
@@ -35,7 +32,6 @@ import ReferencesTabBody from '../ReferencesTabBody';
 import AboutTabBody from '../AboutTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
-import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 
 
 const baselineTimePeriod = {
@@ -188,6 +184,8 @@ export default class App extends Component {
     
     // This variable drives construction of the top-level tabs. It is 
     // defined inside the component because it needs context and state.
+    // Uses an alternative way to define props that allows for injection
+    // of additional (common) props in construction.
     const tabs = {
       summary: {
         Component: SummaryTabBody,
@@ -305,9 +303,7 @@ export default class App extends Component {
                       {
                         this.state.tabKey === key &&
                         <ErrorBoundary>
-                          <TabBody
-                            {...tabs[key].props}
-                          />
+                          <TabBody {...tabs[key].props} />
                         </ErrorBoundary>
                       }
                     </Tab>

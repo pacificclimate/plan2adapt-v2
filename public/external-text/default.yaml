@@ -114,8 +114,6 @@ tabs:
 
       2. CAUTION: ${$$.components.notes.lowBaseline}
 
-
-
   impacts:
     disabled: false
     label: Impacts
