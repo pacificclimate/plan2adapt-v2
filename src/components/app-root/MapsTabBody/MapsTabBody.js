@@ -140,13 +140,13 @@ export default class MapsTabBody extends React.Component {
               breadth={20}
               length={80}
               heading={<T
-                path='colourScale.label'
+                path='tabs.maps.colourScale.label'
                 data={getVariableInfo(variableConfig, variableId, 'absolute')}
                 placeholder={null}
                 className={styles.label}
               />}
               note={<T
-                path={'colourScale.note'}
+                path={'tabs.maps.colourScale.note'}
                 placeholder={null}
                 className={styles.note}
                 data={{ logscale }}

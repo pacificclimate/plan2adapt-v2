@@ -235,6 +235,15 @@ tabs:
       title: "#### Historical: ${$$.components.period}"
     projected:
       title: "#### Projected: ${$$.components.period}"
+    colourScale:
+      label: |
+        ${id === 'prsn' || id === 'pr' ? 'Average' : ''} ${label} (${units})
+      note: |
+        ${logscale ? $$.tabs.maps.colourScale.logscaleNote : ''} This colour scale applies to both maps.
+      logscaleNote: |
+        *This colour scale is logarithmic.
+        A logarithmic scale cannot include zero values;
+        these are mapped to the below-minimum colour.* <br/>
     displaySpec:
       # Organized by variable.
       # NB: range and tick values are in *display* units.
@@ -601,16 +610,6 @@ components:
     GCMs are the most advanced tools currently available for simulating the
     response of the global climate system to increasing greenhouse gas
     concentrations.
-
-colourScale:
-  label: |
-    ${id === 'prsn' || id === 'pr' ? 'Average' : ''} ${label} (${units})
-  note: |
-    ${logscale ? $$.colourScale.logscaleNote : ''} This colour scale applies to both maps.
-  logscaleNote: |
-    *This colour scale is logarithmic.
-    A logarithmic scale cannot include zero values;
-    these are mapped to the below-minimum colour.* <br/>
 
 # Application-wide information about variables and how they are to be treated.
 # Variables are identified by their short, science-y id.
