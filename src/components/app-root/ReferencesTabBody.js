@@ -6,6 +6,6 @@ export default class ReferencesTabBody extends React.Component {
   static contextType = T.contextType;
 
   render() {
-    return <T path='references.content'/>;
+    return <T path='tabs.references.content'/>;
   }
 }

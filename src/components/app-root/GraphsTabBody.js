@@ -48,7 +48,7 @@ export default class GraphsTabBody extends React.Component {
     const season = this.props.seasonOpt.value;
     const variable = this.props.variableOpt.value;
 
-    const graphConfig = this.getConfig('graphs.config');
+    const graphConfig = this.getConfig('tabs.graphs.config');
     const variableConfig = this.getConfig('variables');
     const variableId = variable.representative.variable_id;
     const display = getVariableDisplay(graphConfig.variables, variableId);
@@ -58,7 +58,7 @@ export default class GraphsTabBody extends React.Component {
       <React.Fragment>
         <Row>
           <Col lg={12}>
-            <T path='graphs.prologue' data={{
+            <T path='tabs.graphs.prologue' data={{
               region,
               variable: variableInfo,
               season: get('label', this.props.seasonOpt),
@@ -72,7 +72,7 @@ export default class GraphsTabBody extends React.Component {
               baselineTimePeriod={baselineTimePeriod}
               // TODO: This may be better obtained from metadata
               futureTimePeriods={
-                this.getConfig('graphs.config.futureTimePeriods')}
+                this.getConfig('tabs.graphs.config.futureTimePeriods')}
               season={season}
               variable={variable}
               variableInfo={variableInfo}

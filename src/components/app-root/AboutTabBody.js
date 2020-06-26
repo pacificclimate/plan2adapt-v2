@@ -26,7 +26,7 @@ export default class AboutTabBody extends React.Component {
             )
           )(T.get(
             this.context,
-            'about.tabs',
+            'tabs.about.tabs',
             {version: process.env.REACT_APP_VERSION}
             )
           )

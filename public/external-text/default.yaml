@@ -25,538 +25,545 @@ selectors:
     postfix: period
     forTabs: ['maps', 'graphs']
 
-dev-colourbar:
-  visible: false
+tabs:
+  ordering:
+    - summary
+    - impacts
+    - maps
+    - graphs
+    - notes
+    - references
+    - about
 
-dev-graph:
-  visible: false
-  charts: []
-
-summary:
-  disabled: false
-  tab: Summary
-  # It's tempting to do this content as a Markdown table, but unfortunately
-  # MD doesn't let you span table rows or columns.
-  prologue: |
-    The table below shows projected changes in average (mean) temperature,
-    precipitation and several derived climate variables from the
-    baseline historical period
-    (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-    to the
-    ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-    for the ${region.properties.english_na} region.
-    The ensemble median is a mid-point value, chosen from a PCIC standard
-    set of Global Climate Model (GCM) projections (see the 'Notes' tab for
-    more information).
-    The range values represent the lowest and highest results within the set.
-  lowBaselineWarning: |
-    *CAUTION: This variable may have a low baseline. See note 2 below. *
-  table:
-    heading:
-      variable: Climate Variable
-      season: Season
-      projectedChange: Projected Change from ${$$.components.period} Baseline
-      ensembleMedian: Ensemble Median
-      range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
-    rows:
-      variable: |
-        ${variable.label}${variable.derived ? '*': ''} (${variable.units})
-
-        ${variable.possibleLowBaseline && variable.units =='%' ?
-          $$.summary.lowBaselineWarning : ''}
-      season: ${season.label}
-      ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
-      range: |
-        ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
-        ${format(season.percentiles[2])}${unitsSuffix(variable.units)}
-    contents:
-      - variable: tasmean
-        display: absolute
-        precision: 2
-        seasons:
-          - annual
-      - variable: pr
-        display: relative
-        precision: 2
-        seasons:
-          - annual
-          - summer
-          - winter
-      - variable: prsn
-        display: relative
-        precision: 2
-        seasons:
-          - annual
-          - winter
-          - spring
-      - variable: gdd
-        display: absolute
-        precision: 3
-        seasons:
-          - annual
-      - variable: hdd
-        display: absolute
-        precision: 3
-        seasons:
-          - annual
-      - variable: ffd
-        display: absolute
-        precision: 2
-        seasons:
-          - annual
-  notes: |
-    Notes:
-
-    1. ${$$.components.notes.derivedClimateVars}
-
-    2. CAUTION: ${$$.components.notes.lowBaseline}
-
-impacts:
-  disabled: false
-  tab: Impacts
-  prologue: |
-    Below, you can view a list of potential impacts that may affect
-    ${region.properties.english_na} in the ${futureDecade}s.
-    This is intended to provide a starting point for more detailed local
-    assessment of climate change impacts.
-    These are based on limited climate change information, as shown in the
-    detailed rules logic.
-    These rules were developed based on a workshop attended by climate
-    impacts experts and subsequent review in 2012.
-    Although quite comprehensive, the rules are a work in progress, and some
-    key impacts or management implications may be missing.
-    We are planning a literature review and update to these rules in light of
-    newer impacts research and the availability of additional indices.
-  rulesLogic:
+  summary:
+    disabled: false
+    tab: Summary
+    # It's tempting to do this content as a Markdown table, but unfortunately
+    # MD doesn't let you span table rows or columns.
     prologue: |
-      The table below shows all of the rules used to determine whether to
-      display specific impacts and specific management implications in the
-      Impacts tab. This preliminary compilation of rules was developed based
-      on a workshop attended by climate impacts experts and subsequent peer
-      review. They are fairly technical and quite a bit of shorthand is used,
-      as described under terminology below. Although quite comprehensive,
-      the rules are a work in progress, and some key impacts or management
-      implications may be missing. We welcome contributions and suggestions
-      from users of Plan2Adapt.
-
-      There are two types of rules: internal rules and impacts rules.
-      The internal rules, listed first below, are used as part of the
-      conditions in many other rules, with additional information given
-      under the management implications column. The internal rule "snow",
-      for example, is true if a region has locations with hydrological regimes
-      that would be classified as snowfall-dominated based on the 1961-1990
-      climatology. This is determined by the condition of whether any
-      50km cells within the selected region have mean winter temperatures
-      below -6°C. The "hybrid" and "rain" rules are similar but for hybrid
-      and rain-dominated classifications. Note that a region may have
-      locations that meet multiple classifications.
-      The "future-..." internal rules make the same determination about the
-      region in the selected future time period.
-
-      The impacts rules display information directly in the Potential Impacts
-      table, and are also sometimes used as part of conditions for other rules.
-      Their IDs are classified by sector: For example, "2a-iv-bio", which
-      comes under the general impact of Reduced Water Supply, has management
-      implications that appear under the Biodiversity sector.
-      The rule, which is about the effect of a decrease in moisture
-      availability on habitat, displays based on the condition that at least
-      one season has a decrease in precipitation according to at least 75%
-      of the climate model projections (strong agreement) is met.
-
-      ### Notation
-
-      | Item | Meaning |
-      | - | - |
-      | s0p/s50p/s100p | Spatial minimum/median/maximum 0.5° grid box value in the region. |
-      | iastddev | Interannual standard deviation of the monthly, seasonal, or annual mean. |
-      | hist | CRU TS 2.1 1961-1990 historical baseline. |
-      | e25p/e75p | GCM ensemble 25th/75th percentile. This is always an interannual mean. |
-      | ann, djf, mam, jja, son | Annual, Dec/Jan/Feb, Mar/Apr/May, Jun/Jul/Aug, Sep/Oct/Nov. |
-      | anom | Value is an anomaly (not a percentage) from the baseline (i.e. future minus historical). |
-      | percent | Value is a percentage anomaly from the baseline. |
-      | rule_<rule-ID> | A reference to another rule. |
-      | region_oncoast | Whether the region is on the coast. |
-      | rule ? if_true : if_false | Checks whether a rule is true; if true, runs the clause represented by if_true; if false, runs the clause represented by if_false. |
-
-      ### Variables
-      
-      | Variable | Description | Units |
-      | - | - | - |
-      | temp | Mean Temperature | °C |
-      | prec | Total precipitation | mm/day |
-      | pass | Snowfall | mm snow water equivalent |
-      | dg05 | Growing DD (Degree-Days Above 5°C) | degree-days |
-      | dl18 | Heating DD (Degree-Days Below 18°C) | degree-days |
-      | nffd | Number of Frost-Free Days | days |
-
-      If not otherwise specified, values are an interannual and spatial mean,
-      and in the same units used on the maps (°C for temperatures, mm per day
-      for precipitation, etc.).
-
-      ### Rules
-
-      Given a set of projected climate data (determined by the period, region,
-      and time period you have selected), each rule evaluates to either true
-      or false. If the rule is true, then that means the effect it signals
-      is likely to occur in that scenario, and we say the rule is active.
-      The effects signalled by active rules are summarized for easy
-      interpretation in the By Category and By Sector tabs.
-
-      In the table below, rules that are true for the
-      region and time period selected have a white background;
-      rules that are false have a grey background.
-
+      The table below shows projected changes in average (mean) temperature,
+      precipitation and several derived climate variables from the
+      baseline historical period
+      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
+      to the
+      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
+      for the ${region.properties.english_na} region.
+      The ensemble median is a mid-point value, chosen from a PCIC standard
+      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
+      more information).
+      The range values represent the lowest and highest results within the set.
+    lowBaselineWarning: |
+      *CAUTION: This variable may have a low baseline. See note 2 below. *
     table:
-      showInactiveRulesButton:
-        true: Hide False-Valued Rules
-        false: Show False-Valued Rules
       heading:
-        ruleId: Rule ID
-        condition: Condition
-        category: Category
-        sector: Sector
-        effects: Effects
-        notes: Management Implications
+        variable: Climate Variable
+        season: Season
+        projectedChange: Projected Change from ${$$.components.period} Baseline
+        ensembleMedian: Ensemble Median
+        range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
+      rows:
+        variable: |
+          ${variable.label}${variable.derived ? '*': ''} (${variable.units})
 
-maps:
-  disabled: false
-  tab: Maps
-  lethargicScrolling:
-    active: true
-    stability: 7
-    sensitivity: 50
-    tolerance: 0.05
-  historical:
-    title: "#### Historical: ${$$.components.period}"
-  projected:
-    title: "#### Projected: ${$$.components.period}"
-  displaySpec:
-    # Organized by variable.
-    # NB: range and tick values are in *display* units.
-    fallback:
-      palette: seq-Oranges
-      logscale: false
-      belowMinColor: white
-      aboveMaxColor: black
-      range:
-        min: -50
-        max: 50
-      ticks: [-50, 0, 50]
-    ffd:
-      palette: x-Occam
-      range:
-        min: 0
-        max: 366
-      ticks: [0, 100, 200, 300, 365]
-    gdd:
-      palette: x-Occam
-      range:
-        min: 0
-        max: 4000
-      ticks: [0, 1000, 2000, 3000, 4000]
-    hdd:
-      palette: x-Occam
-      range:
-        min: 0
-        max: 10000
-      ticks: [0, 2000, 4000, 6000, 8000, 10000]
-    cdd:
-      palette: x-Occam
-      range:
-        min: 0
-        max: 1000
-      ticks: [0, 250, 500, 750, 1000]
-    pr:
-      palette: x-Occam
-#      palette: seq-Greens
-      logscale: true
-      belowMinColor: white
-      aboveMaxColor: black
-      # NB: units mm/month
-      range:
-        min: 10
-        max: 500
-      ticks: [10, 20, 40, 80, 100, 200, 400, 800, 500]
-    prsn:
-      palette: x-Occam
-      logscale: true
-      # NB: units mm/month
-      range:
-        min: 10
-        max: 200
-      ticks: [10, 20, 40, 80, 100, 200]
-    tasmax:
-      palette: x-Occam
-      range:
-        min: -40
-        max: 40
-      ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
-    tasmin:
-      palette: x-Occam
-      range:
-        min: -40
-        max: 40
-      ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
-    tasmean:
-      palette: x-Occam
-      range:
-        min: -40
-        max: 40
-      ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
+          ${variable.possibleLowBaseline && variable.units =='%' ?
+            $$.tabs.summary.lowBaselineWarning : ''}
+        season: ${season.label}
+        ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
+        range: |
+          ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
+          ${format(season.percentiles[2])}${unitsSuffix(variable.units)}
+      contents:
+        - variable: tasmean
+          display: absolute
+          precision: 2
+          seasons:
+            - annual
+        - variable: pr
+          display: relative
+          precision: 2
+          seasons:
+            - annual
+            - summer
+            - winter
+        - variable: prsn
+          display: relative
+          precision: 2
+          seasons:
+            - annual
+            - winter
+            - spring
+        - variable: gdd
+          display: absolute
+          precision: 3
+          seasons:
+            - annual
+        - variable: hdd
+          display: absolute
+          precision: 3
+          seasons:
+            - annual
+        - variable: ffd
+          display: absolute
+          precision: 2
+          seasons:
+            - annual
+    notes: |
+      Notes:
 
-graphs:
-  disabled: false
-  tab: Graphs
-  prologue: |
-    This figure shows the range of projected change in
-    ${season} ${variable.label} for ${region.properties.english_na}
-    over three time periods
-    (2020s, 2050s, and 2080s), according to a PCIC-standard set of
-    GCM projections (see 'Notes' tab for more information).
+      1. ${$$.components.notes.derivedClimateVars}
 
-    The range of change based on this set of climate projections is indicated
-    as follows:
+      2. CAUTION: ${$$.components.notes.lowBaseline}
 
-    - The black line indicates the mid-point (median) in the set.
-    - The dark grey shading shows the middle 50% (25th to 75th percentiles),
-      of the projections in the set.
-    - The light grey shading shows the range of the central 80%
-      (10th to 90th percentiles) of projections in the set.
 
-    If you hover your mouse pointer over the graph, a popup will show values
-    for the various percentile values. These values are shown only for the
-    the central year of each averging period, since that is where we have
-    data derived directly from observations or model runs (projections).
-    Lines and bars at other years are interpolated from directly derived data
-    and should be treated as more approximate.
 
-    Notes:
+  impacts:
+    disabled: false
+    tab: Impacts
+    prologue: |
+      Below, you can view a list of potential impacts that may affect
+      ${region.properties.english_na} in the ${futureDecade}s.
+      This is intended to provide a starting point for more detailed local
+      assessment of climate change impacts.
+      These are based on limited climate change information, as shown in the
+      detailed rules logic.
+      These rules were developed based on a workshop attended by climate
+      impacts experts and subsequent review in 2012.
+      Although quite comprehensive, the rules are a work in progress, and some
+      key impacts or management implications may be missing.
+      We are planning a literature review and update to these rules in light of
+      newer impacts research and the availability of additional indices.
+    rulesLogic:
+      prologue: |
+        The table below shows all of the rules used to determine whether to
+        display specific impacts and specific management implications in the
+        Impacts tab. This preliminary compilation of rules was developed based
+        on a workshop attended by climate impacts experts and subsequent peer
+        review. They are fairly technical and quite a bit of shorthand is used,
+        as described under terminology below. Although quite comprehensive,
+        the rules are a work in progress, and some key impacts or management
+        implications may be missing. We welcome contributions and suggestions
+        from users of Plan2Adapt.
 
-    1. ${$$.components.notes.derivedClimateVars}
-    ${variable.possibleLowBaseline && variable.units =='%' ?
-      $$.graphs.lowBaselineWarning : ''}
+        There are two types of rules: internal rules and impacts rules.
+        The internal rules, listed first below, are used as part of the
+        conditions in many other rules, with additional information given
+        under the management implications column. The internal rule "snow",
+        for example, is true if a region has locations with hydrological regimes
+        that would be classified as snowfall-dominated based on the 1961-1990
+        climatology. This is determined by the condition of whether any
+        50km cells within the selected region have mean winter temperatures
+        below -6°C. The "hybrid" and "rain" rules are similar but for hybrid
+        and rain-dominated classifications. Note that a region may have
+        locations that meet multiple classifications.
+        The "future-..." internal rules make the same determination about the
+        region in the selected future time period.
 
-  lowBaselineWarning: |
-    2. *CAUTION: This variable may have a low baseline.*
-       ${$$.components.notes.lowBaseline}
+        The impacts rules display information directly in the Potential Impacts
+        table, and are also sometimes used as part of conditions for other rules.
+        Their IDs are classified by sector: For example, "2a-iv-bio", which
+        comes under the general impact of Reduced Water Supply, has management
+        implications that appear under the Biodiversity sector.
+        The rule, which is about the effect of a decrease in moisture
+        availability on habitat, displays based on the condition that at least
+        one season has a decrease in precipitation according to at least 75%
+        of the climate model projections (strong agreement) is met.
 
-  config:
-    foo: bar
-    interpolationInterval: 1
-    c3options:
-      # CAUTION: Most of these options *override* the ones supplied in code.
+        ### Notation
 
-      # The following options are not supplied directly in code, or are used
-      # to compute what is.
-      bar:
-        width:
-          ratio: 0.075
-      point:
-        r: 5
-        focus:
-          expand:
-            factor: 1.5
+        | Item | Meaning |
+        | - | - |
+        | s0p/s50p/s100p | Spatial minimum/median/maximum 0.5° grid box value in the region. |
+        | iastddev | Interannual standard deviation of the monthly, seasonal, or annual mean. |
+        | hist | CRU TS 2.1 1961-1990 historical baseline. |
+        | e25p/e75p | GCM ensemble 25th/75th percentile. This is always an interannual mean. |
+        | ann, djf, mam, jja, son | Annual, Dec/Jan/Feb, Mar/Apr/May, Jun/Jul/Aug, Sep/Oct/Nov. |
+        | anom | Value is an anomaly (not a percentage) from the baseline (i.e. future minus historical). |
+        | percent | Value is a percentage anomaly from the baseline. |
+        | rule_<rule-ID> | A reference to another rule. |
+        | region_oncoast | Whether the region is on the coast. |
+        | rule ? if_true : if_false | Checks whether a rule is true; if true, runs the clause represented by if_true; if false, runs the clause represented by if_false. |
 
-    futureTimePeriods:
-      # This may be better obtained from metadata
-      - { start_date: "2010", end_date: "2039" }
-      - { start_date: "2040", end_date: "2069" }
-      - { start_date: "2070", end_date: "2099" }
-    variables:
+        ### Variables
+
+        | Variable | Description | Units |
+        | - | - | - |
+        | temp | Mean Temperature | °C |
+        | prec | Total precipitation | mm/day |
+        | pass | Snowfall | mm snow water equivalent |
+        | dg05 | Growing DD (Degree-Days Above 5°C) | degree-days |
+        | dl18 | Heating DD (Degree-Days Below 18°C) | degree-days |
+        | nffd | Number of Frost-Free Days | days |
+
+        If not otherwise specified, values are an interannual and spatial mean,
+        and in the same units used on the maps (°C for temperatures, mm per day
+        for precipitation, etc.).
+
+        ### Rules
+
+        Given a set of projected climate data (determined by the period, region,
+        and time period you have selected), each rule evaluates to either true
+        or false. If the rule is true, then that means the effect it signals
+        is likely to occur in that scenario, and we say the rule is active.
+        The effects signalled by active rules are summarized for easy
+        interpretation in the By Category and By Sector tabs.
+
+        In the table below, rules that are true for the
+        region and time period selected have a white background;
+        rules that are false have a grey background.
+
+      table:
+        showInactiveRulesButton:
+          true: Hide False-Valued Rules
+          false: Show False-Valued Rules
+        heading:
+          ruleId: Rule ID
+          condition: Condition
+          category: Category
+          sector: Sector
+          effects: Effects
+          notes: Management Implications
+
+  maps:
+    disabled: false
+    tab: Maps
+    lethargicScrolling:
+      active: true
+      stability: 7
+      sensitivity: 50
+      tolerance: 0.05
+    historical:
+      title: "#### Historical: ${$$.components.period}"
+    projected:
+      title: "#### Projected: ${$$.components.period}"
+    displaySpec:
+      # Organized by variable.
+      # NB: range and tick values are in *display* units.
       fallback:
-        display: absolute
+        palette: seq-Oranges
+        logscale: false
+        belowMinColor: white
+        aboveMaxColor: black
+        range:
+          min: -50
+          max: 50
+        ticks: [-50, 0, 50]
       ffd:
-        display: absolute
+        palette: x-Occam
+        range:
+          min: 0
+          max: 366
+        ticks: [0, 100, 200, 300, 365]
       gdd:
-        display: absolute
+        palette: x-Occam
+        range:
+          min: 0
+          max: 4000
+        ticks: [0, 1000, 2000, 3000, 4000]
       hdd:
-        display: absolute
+        palette: x-Occam
+        range:
+          min: 0
+          max: 10000
+        ticks: [0, 2000, 4000, 6000, 8000, 10000]
       cdd:
-        display: absolute
+        palette: x-Occam
+        range:
+          min: 0
+          max: 1000
+        ticks: [0, 250, 500, 750, 1000]
       pr:
-        display: relative
+        palette: x-Occam
+  #      palette: seq-Greens
+        logscale: true
+        belowMinColor: white
+        aboveMaxColor: black
+        # NB: units mm/month
+        range:
+          min: 10
+          max: 500
+        ticks: [10, 20, 40, 80, 100, 200, 400, 800, 500]
       prsn:
-        display: relative
+        palette: x-Occam
+        logscale: true
+        # NB: units mm/month
+        range:
+          min: 10
+          max: 200
+        ticks: [10, 20, 40, 80, 100, 200]
+      tasmax:
+        palette: x-Occam
+        range:
+          min: -40
+          max: 40
+        ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
+      tasmin:
+        palette: x-Occam
+        range:
+          min: -40
+          max: 40
+        ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
       tasmean:
-        display: absolute
+        palette: x-Occam
+        range:
+          min: -40
+          max: 40
+        ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
 
-notes:
-  disabled: false
-  tab: Notes
-  content: |
+  graphs:
+    disabled: false
+    tab: Graphs
+    prologue: |
+      This figure shows the range of projected change in
+      ${season} ${variable.label} for ${region.properties.english_na}
+      over three time periods
+      (2020s, 2050s, and 2080s), according to a PCIC-standard set of
+      GCM projections (see 'Notes' tab for more information).
 
-    1. Information for the Summary and Impacts tabs is drawn from a set of
-    projections from 12 different Global Climate Models (GCMs), each using one
-    run of the RCP 8.5 (high emissions) greenhouse gas emissions scenario.
-    This set of projections is referred to as the "ensemble." By the end of
-    the 21st century, the RCP 8.5 scenario includes an atmospheric
-    concentration of greenhouse gases, expressed as carbon dioxide (CO2)
-    equivalent, of approximately 950 ppm Each GCM comes from a different
-    modelling centre (e.g. the Hadley Centre (UK), National Centre for
-    Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA),
-    and Commonwealth Scientific and Industrial Research Organisation
-    (Australia), etc.).
+      The range of change based on this set of climate projections is indicated
+      as follows:
 
-    1. The Maps tab shows results for the ensemble average value of the
-    selected variable.
+      - The black line indicates the mid-point (median) in the set.
+      - The dark grey shading shows the middle 50% (25th to 75th percentiles),
+        of the projections in the set.
+      - The light grey shading shows the range of the central 80%
+        (10th to 90th percentiles) of projections in the set.
 
-    1. The 2020s, 2050s, and 2080s time periods are meant to be used as three
-    representative planning horizons over the 21st century. Results for these
-    three planning horizons are computed by averaging GCM projections over
-    the 2010-2039, 2040-2069, and 2070-2099 periods, respectively.
+      If you hover your mouse pointer over the graph, a popup will show values
+      for the various percentile values. These values are shown only for the
+      the central year of each averging period, since that is where we have
+      data derived directly from observations or model runs (projections).
+      Lines and bars at other years are interpolated from directly derived data
+      and should be treated as more approximate.
 
-    1. All variables shown here are computed from daily time series of
-    downscaled climate simulations. Precipitation as snow is an approximation
-    of snowfall based on total precipitation and temperature, and may provide
-    different result than if snowfall was downscaled directly.
+      Notes:
+
+      1. ${$$.components.notes.derivedClimateVars}
+      ${variable.possibleLowBaseline && variable.units =='%' ?
+        $$.tabs.graphs.lowBaselineWarning : ''}
+
+    lowBaselineWarning: |
+      2. *CAUTION: This variable may have a low baseline.*
+         ${$$.components.notes.lowBaseline}
+
+    config:
+      foo: bar
+      interpolationInterval: 1
+      c3options:
+        # CAUTION: Most of these options *override* the ones supplied in code.
+
+        # The following options are not supplied directly in code, or are used
+        # to compute what is.
+        bar:
+          width:
+            ratio: 0.075
+        point:
+          r: 5
+          focus:
+            expand:
+              factor: 1.5
+
+      futureTimePeriods:
+        # This may be better obtained from metadata
+        - { start_date: "2010", end_date: "2039" }
+        - { start_date: "2040", end_date: "2069" }
+        - { start_date: "2070", end_date: "2099" }
+      variables:
+        fallback:
+          display: absolute
+        ffd:
+          display: absolute
+        gdd:
+          display: absolute
+        hdd:
+          display: absolute
+        cdd:
+          display: absolute
+        pr:
+          display: relative
+        prsn:
+          display: relative
+        tasmean:
+          display: absolute
+
+  notes:
+    disabled: false
+    tab: Notes
+    content: |
+
+      1. Information for the Summary and Impacts tabs is drawn from a set of
+      projections from 12 different Global Climate Models (GCMs), each using one
+      run of the RCP 8.5 (high emissions) greenhouse gas emissions scenario.
+      This set of projections is referred to as the "ensemble." By the end of
+      the 21st century, the RCP 8.5 scenario includes an atmospheric
+      concentration of greenhouse gases, expressed as carbon dioxide (CO2)
+      equivalent, of approximately 950 ppm Each GCM comes from a different
+      modelling centre (e.g. the Hadley Centre (UK), National Centre for
+      Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA),
+      and Commonwealth Scientific and Industrial Research Organisation
+      (Australia), etc.).
+
+      1. The Maps tab shows results for the ensemble average value of the
+      selected variable.
+
+      1. The 2020s, 2050s, and 2080s time periods are meant to be used as three
+      representative planning horizons over the 21st century. Results for these
+      three planning horizons are computed by averaging GCM projections over
+      the 2010-2039, 2040-2069, and 2070-2099 periods, respectively.
+
+      1. All variables shown here are computed from daily time series of
+      downscaled climate simulations. Precipitation as snow is an approximation
+      of snowfall based on total precipitation and temperature, and may provide
+      different result than if snowfall was downscaled directly.
 
 
-references:
-  disabled: false
-  tab: References
-  content: |
-    Cannon, A.J., Sobie, S.R., Murdock, T.Q., 2015: _Bias correction of simulated precipitation by quantile mapping: how well do methods preserve relative changes in quantiles and extremes?_ Journal of Climate, 28(17): 6938-6959. https://doi.org/10.1175/jcli-d-14-00754.1
 
-    Government of British Columbia. _Climate Change Indicators._ (web page). https://www2.gov.bc.ca/gov/content/environment/research-monitoring-reporting/reporting/environmental-reporting-bc/climate-change-indicators
+  references:
+    disabled: false
+    tab: References
+    content: |
+      Cannon, A.J., Sobie, S.R., Murdock, T.Q., 2015: _Bias correction of simulated precipitation by quantile mapping: how well do methods preserve relative changes in quantiles and extremes?_ Journal of Climate, 28(17): 6938-6959. https://doi.org/10.1175/jcli-d-14-00754.1
 
-    Hamlet A.F., D.P. Lettenmaier. 2005. _Effects of Temperature and Precipitation Variability on Snowpack Trends in the Western U.S._ Journal of Climate, 18 (21): pp. 4545-4561.
+      Government of British Columbia. _Climate Change Indicators._ (web page). https://www2.gov.bc.ca/gov/content/environment/research-monitoring-reporting/reporting/environmental-reporting-bc/climate-change-indicators
 
-    Hamlet A.F., D.P. Lettenmaier. 2007. _Effects of 20th Century Warming and Climate Variability on Flood Risk in the Western U.S._ Water Resources Research, 43: https://doi.org/10.1029/2006wr005099.
+      Hamlet A.F., D.P. Lettenmaier. 2005. _Effects of Temperature and Precipitation Variability on Snowpack Trends in the Western U.S._ Journal of Climate, 18 (21): pp. 4545-4561.
 
-    Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
+      Hamlet A.F., D.P. Lettenmaier. 2007. _Effects of 20th Century Warming and Climate Variability on Flood Risk in the Western U.S._ Water Resources Research, 43: https://doi.org/10.1029/2006wr005099.
 
-    Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
+      Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
 
-    Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
-    https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
+      Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
 
-    Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
-    https://cran.r-project.org/web/packages/climdex.pcic/index.html
+      Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
+      https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
 
-    Rodenhuis, D.R., Bennett, K.E., Werner, A.T., Murdock, T.Q., Bronaugh, D. Revised 2009. _Hydro-climatology and future climate impacts in British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria BC, 132 pp. Provides additional information on future climate projects in British Columbia.
+      Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
+      https://cran.r-project.org/web/packages/climdex.pcic/index.html
 
-    Sobie, S.R. and T.Q. Murdock, 2017: High-Resolution Statistical Downscaling in Southwestern British Columbia. Journal of Applied Meteorology and Climatology, 56, 6, 1625–1641, https://doi.org/10.1175/jamc-d-16-0287.1
+      Rodenhuis, D.R., Bennett, K.E., Werner, A.T., Murdock, T.Q., Bronaugh, D. Revised 2009. _Hydro-climatology and future climate impacts in British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria BC, 132 pp. Provides additional information on future climate projects in British Columbia.
 
-    Taylor, K. E., R. J. Stouffer, and G. A. Meehl, 2012: _An overview of CMIP5 and the experiment design._ Bull. Amer. Meteor. Soc., 93, 485–498, https://doi.org/10.1175/bams-d-11-00094.1
+      Sobie, S.R. and T.Q. Murdock, 2017: High-Resolution Statistical Downscaling in Southwestern British Columbia. Journal of Applied Meteorology and Climatology, 56, 6, 1625–1641, https://doi.org/10.1175/jamc-d-16-0287.1
 
-    Werner, A. T. and A. J. Cannon, A. J., 2016: _Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods._ Hydrololgy and Earth System Sciences, 20, 1483-1508, https://doi.org/10.5194/hess-20-1483-2016.
+      Taylor, K. E., R. J. Stouffer, and G. A. Meehl, 2012: _An overview of CMIP5 and the experiment design._ Bull. Amer. Meteor. Soc., 93, 485–498, https://doi.org/10.1175/bams-d-11-00094.1
 
-about:
-  disabled: false
-  tab: About
-  tabs:
-    - tab: Plan2Adapt
-      cards:
-        - header: Description
-          body: |
-            Plan2Adapt generates maps, plots, and data describing projected future climate conditions
-            for regions throughout British Columbia.
-            It is designed to help you assess climate change in your region based on a
-            standard set of climate model projections.
+      Werner, A. T. and A. J. Cannon, A. J., 2016: _Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods._ Hydrololgy and Earth System Sciences, 20, 1483-1508, https://doi.org/10.5194/hess-20-1483-2016.
 
-            Plan2Adapt is similar to the [PCIC Climate Explorer](https://pacificclimate.org/analysis-tools/pcic-climate-explorer)
-            and uses the same data to generate its output.
-            With a simpler user interface and fewer configurable options Plan2Adapt is designed to
-            serve the needs of those involved in local and regional community planning.
 
-        - header: Version
-          body: ${version}
+  about:
+    disabled: false
+    tab: About
+    tabs:
+      - tab: Plan2Adapt
+        cards:
+          - header: Description
+            body: |
+              Plan2Adapt generates maps, plots, and data describing projected future climate conditions
+              for regions throughout British Columbia.
+              It is designed to help you assess climate change in your region based on a
+              standard set of climate model projections.
 
-        - header: Author
-          body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
+              Plan2Adapt is similar to the [PCIC Climate Explorer](https://pacificclimate.org/analysis-tools/pcic-climate-explorer)
+              and uses the same data to generate its output.
+              With a simpler user interface and fewer configurable options Plan2Adapt is designed to
+              serve the needs of those involved in local and regional community planning.
 
-        - header: Terms of Use
-          body: |
-            In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
-            data set is subject to the terms of use of each source organization.
-            For further details please refer to:
+          - header: Version
+            body: ${version}
 
-            * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
-            * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
+          - header: Author
+            body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
 
-        - header: No Warranty
-          bg: warning
-          body: |
-            The data in this tool are provided by the Pacific Climate Impacts Consortium with an open licence on an
-            “AS IS” basis without any warranty or representation, express or implied, as to its accuracy or completeness.
-            Any reliance you place upon the information contained here is your sole responsibility and strictly at
-            your own risk. In no event will the Pacific Climate Impacts Consortium be liable for any loss or damage
-            whatsoever, including, without limitation, indirect or consequential loss or damage, arising from reliance
-            upon the data or derived information.
+          - header: Terms of Use
+            body: |
+              In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
+              data set is subject to the terms of use of each source organization.
+              For further details please refer to:
 
-    - tab: Credits
-      cards:
-        - header: Development
-          body: |
-            Development of the original version of Plan2Adapt was been made possible through funding and
-            support provided by the
-            [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change),
-            [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
-            Forest Science Program,
-            [BC Ministry of Municipal Affairs and Housing](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/municipal-affairs-housing),
-            and
-            Natural Resources Canada's
-            [British Columbia Regional Adaptation Collaborative](https://www.fraserbasin.bc.ca/ccaq_bcrac.html).
+              * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
+              * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
 
-        - header: Data
-          body: |
+          - header: No Warranty
+            bg: warning
+            body: |
+              The data in this tool are provided by the Pacific Climate Impacts Consortium with an open licence on an
+              “AS IS” basis without any warranty or representation, express or implied, as to its accuracy or completeness.
+              Any reliance you place upon the information contained here is your sole responsibility and strictly at
+              your own risk. In no event will the Pacific Climate Impacts Consortium be liable for any loss or damage
+              whatsoever, including, without limitation, indirect or consequential loss or damage, arising from reliance
+              upon the data or derived information.
 
-            #### [Natural Resources Canada](https://www.nrcan.gc.ca)
+      - tab: Credits
+        cards:
+          - header: Development
+            body: |
+              Development of the original version of Plan2Adapt was been made possible through funding and
+              support provided by the
+              [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change),
+              [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+              Forest Science Program,
+              [BC Ministry of Municipal Affairs and Housing](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/municipal-affairs-housing),
+              and
+              Natural Resources Canada's
+              [British Columbia Regional Adaptation Collaborative](https://www.fraserbasin.bc.ca/ccaq_bcrac.html).
 
-            We thank the Landscape Analysis and Applications section of the
-            Canadian Forest Service, Natural Resources Canada, for developing
-            and making available the Canada-wide historical daily gridded
-            climate dataset used as the downscaling target.
+          - header: Data
+            body: |
 
-            #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
+              #### [Natural Resources Canada](https://www.nrcan.gc.ca)
 
-            PCIC gratefully acknowledges support from
-            Environment and Climate Change Canada
-            for the development of the statistically downscaled GCM
-            scenarios on which much of the data presented here is based.
+              We thank the Landscape Analysis and Applications section of the
+              Canadian Forest Service, Natural Resources Canada, for developing
+              and making available the Canada-wide historical daily gridded
+              climate dataset used as the downscaling target.
 
-            #### [World Climate Research Programme](https://www.wcrp-climate.org/)
+              #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
 
-            We acknowledge the World Climate Research Programme’s
-            Working Group on Coupled Modelling, which is responsible for
-            CMIP5, and we thank the climate modeling groups for producing
-            and making available their GCM output.
+              PCIC gratefully acknowledges support from
+              Environment and Climate Change Canada
+              for the development of the statistically downscaled GCM
+              scenarios on which much of the data presented here is based.
 
-            #### [U.S. Department of Energy](https://www.energy.gov/)
+              #### [World Climate Research Programme](https://www.wcrp-climate.org/)
 
-            For CMIP, the U.S. Department of Energy’s Program for
-            Climate Model Diagnosis and Intercomparison provides coordinating
-            support and led development of software infrastructure in
-            partnership with the Global Organization for
-            Earth System Science Portals.
+              We acknowledge the World Climate Research Programme’s
+              Working Group on Coupled Modelling, which is responsible for
+              CMIP5, and we thank the climate modeling groups for producing
+              and making available their GCM output.
 
-    - tab: Contact
-      cards:
-        - header: Feedback on Application
-          body: |
-            Please address questions and suggestions on the functioning of this
-            tool (the application proper) to ${$$.components.contacts.support.link}.
-        - header: Scientific Questions
-          body: |
-            Please address questions about science and interpretation of the
-            data presented in this tool to ${$$.components.contacts.science.link}.
-        - header: Pacific Climate Impacts Consortium
-          body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
+              #### [U.S. Department of Energy](https://www.energy.gov/)
 
-    - tab: Team
-      cards:
-        - header: '[Trevor Murdock](https://pacificclimate.org/about-pcic/people/trevor-murdock)'
-          body: Climate science lead.
-        - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
-          body: Development team lead.
-        - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
-          body: Backend engineer. Data wrangling.
-        - header: '[Nikola Radoš](https://pacificclimate.org/about-pcic/people/nikola-rados)'
-          body: DevOps specialist. Implementor of Impacts rules engine.
-        - header: '[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)'
-          body: Front-end engineer. UI design and implementation.
-        - header: '[Matthew Benstead](https://pacificclimate.org/about-pcic/people/matthew-benstead)'
-          body: System administrator. Deployment and security.
+              For CMIP, the U.S. Department of Energy’s Program for
+              Climate Model Diagnosis and Intercomparison provides coordinating
+              support and led development of software infrastructure in
+              partnership with the Global Organization for
+              Earth System Science Portals.
+
+      - tab: Contact
+        cards:
+          - header: Feedback on Application
+            body: |
+              Please address questions and suggestions on the functioning of this
+              tool (the application proper) to ${$$.components.contacts.support.link}.
+          - header: Scientific Questions
+            body: |
+              Please address questions about science and interpretation of the
+              data presented in this tool to ${$$.components.contacts.science.link}.
+          - header: Pacific Climate Impacts Consortium
+            body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
+
+      - tab: Team
+        cards:
+          - header: '[Trevor Murdock](https://pacificclimate.org/about-pcic/people/trevor-murdock)'
+            body: Climate science lead.
+          - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
+            body: Development team lead.
+          - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
+            body: Backend engineer. Data wrangling.
+          - header: '[Nikola Radoš](https://pacificclimate.org/about-pcic/people/nikola-rados)'
+            body: DevOps specialist. Implementor of Impacts rules engine.
+          - header: '[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)'
+            body: Front-end engineer. UI design and implementation.
+          - header: '[Matthew Benstead](https://pacificclimate.org/about-pcic/people/matthew-benstead)'
+            body: System administrator. Deployment and security.
 
 components:
   notes:

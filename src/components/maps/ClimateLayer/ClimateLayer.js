@@ -33,7 +33,8 @@ export default class ClimateLayer extends React.Component {
   render() {
     const { fileMetadata, variableSpec, season } = this.props;
     const variableId = variableSpec.variable_id;
-    const displaySpec = this.getConfig('maps.displaySpec');
+    // TODO: Pull config up
+    const displaySpec = this.getConfig('tabs.maps.displaySpec');
     const variableConfig = this.getConfig('variables');
     const unitsConversions = this.getConfig('units');
 

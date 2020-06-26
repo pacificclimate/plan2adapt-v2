@@ -149,8 +149,8 @@ export default class App extends Component {
       ({ value: { representative: { variable_id } } }) =>
         getVariableLabel(variableConfig, variable_id);
 
-    // This variable drives the construction of the selector list. It must
-    // be defined inside the component because it makes use of props and state.
+    // This variable drives the construction of the selector list. It is 
+    // defined inside the component because it needs context and state.
     const selectors = {
       region: (
         <RegionSelector
@@ -184,6 +184,60 @@ export default class App extends Component {
           onChange={this.handleChangeSeason}
         />
       ),
+    };
+    
+    // This variable drives construction of the top-level tabs. It is 
+    // defined inside the component because it needs context and state.
+    const tabs = {
+      summary: {
+        Component: SummaryTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+        },
+      },      
+      impacts: {
+        Component: ImpactsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+        },
+      },
+      maps: {
+        Component: MapsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+            futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+            baselineTimePeriod: baselineTimePeriod,
+            seasonOpt: this.state.seasonOpt,
+            variableOpt: this.state.variableOpt,
+            metadata: this.state.metadata,
+          },
+      },
+      graphs: {
+        Component: GraphsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+          seasonOpt: this.state.seasonOpt,
+          variableOpt: this.state.variableOpt,
+        },
+      },
+      notes: {
+        Component: NotesTabBody,
+        props: {},
+      },
+      references: {
+        Component: ReferencesTabBody,
+        props: {},
+      },
+      about: {
+        Component: AboutTabBody,
+        props: {},
+      },
     };
 
     return (
@@ -237,144 +291,29 @@ export default class App extends Component {
               activeKey={this.state.tabKey}
               onSelect={this.handleChangeTab}
             >
-              {this.getConfig('dev-graph.visible') &&
-              <Tab
-                eventKey={'dev-graph'}
-                title={'Dev Graph'}
-                className='pt-2'
-                mountOnEnter
-              >
-                <DevGraph/>
-              </Tab>
+              {
+                map(key => {
+                  const TabBody = tabs[key].Component;
+                  return (
+                    <Tab
+                      eventKey={key}
+                      title={<T as='string' path={`tabs.${key}.tab`}/>}
+                      disabled={this.getConfig(`tabs.${key}.disabled`)}
+                      className='pt-2'
+                      mountOnEnter
+                    >
+                      {
+                        this.state.tabKey === key &&
+                        <ErrorBoundary>
+                          <TabBody
+                            {...tabs[key].props}
+                          />
+                        </ErrorBoundary>
+                      }
+                    </Tab>
+                  );
+                })(this.getConfig('tabs.ordering'))
               }
-
-              {this.getConfig('dev-colourbar.visible') &&
-              <Tab
-                eventKey={'dev-colourbar'}
-                title={'Dev Colourbar'}
-                className='pt-2'
-                mountOnEnter
-              >
-                <DevColourbar
-                  season={get('value', this.state.seasonOpt)}
-                  variable={get('value', this.state.variableOpt)}
-                />
-              </Tab>
-              }
-
-              <Tab
-                eventKey={'summary'}
-                title={<T as='string' path='summary.tab'/>}
-                disabled={this.getConfig('summary.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'summary' &&
-                  <ErrorBoundary>
-                    <SummaryTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'impacts'}
-                title={<T as='string' path='impacts.tab'/>}
-                disabled={this.getConfig('impacts.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'impacts' &&
-                  <ErrorBoundary>
-                    <ImpactsTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'maps'}
-                title={<T as='string' path='maps.tab'/>}
-                disabled={this.getConfig('maps.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'maps' &&
-                  <ErrorBoundary>
-                    <MapsTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                      seasonOpt={this.state.seasonOpt}
-                      variableOpt={this.state.variableOpt}
-                      metadata={this.state.metadata}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'graphs'}
-                title={<T as='string' path='graphs.tab'/>}
-                disabled={this.getConfig('graphs.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'graphs' &&
-                  <ErrorBoundary>
-                    <GraphsTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                      seasonOpt={this.state.seasonOpt}
-                      variableOpt={this.state.variableOpt}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'notes'}
-                title={<T as='string' path='notes.tab'/>}
-                disabled={this.getConfig('notes.disabled')}
-                className='pt-2'
-              >
-                <ErrorBoundary>
-                  <NotesTabBody/>
-                </ErrorBoundary>
-              </Tab>
-
-              <Tab
-                eventKey={'references'}
-                title={<T as='string' path='references.tab'/>}
-                disabled={this.getConfig('references.disabled')}
-                className='pt-2'
-              >
-                <ErrorBoundary>
-                  <ReferencesTabBody/>
-                </ErrorBoundary>
-              </Tab>
-
-              <Tab
-                eventKey={'about'}
-                title={<T as='string' path='about.tab'/>}
-                disabled={this.getConfig('about.disabled')}
-                className='pt-2'
-              >
-                <ErrorBoundary>
-                  <AboutTabBody/>
-                </ErrorBoundary>
-              </Tab>
             </Tabs>
           </Col>
         </Row>

@@ -41,7 +41,7 @@ export default class SummaryTabBody extends React.Component {
 
     return (
       <React.Fragment>
-        <T path='summary.prologue' data={{
+        <T path='tabs.summary.prologue' data={{
           region,
           baselineTimePeriod,
           futureTimePeriod,
@@ -51,11 +51,11 @@ export default class SummaryTabBody extends React.Component {
         <Summary
           region={region}
           futureTimePeriod={futureTimePeriod}
-          tableContents={this.getConfig('summary.table.contents')}
+          tableContents={this.getConfig('tabs.summary.table.contents')}
           variableConfig={this.getConfig('variables')}
           unitsConversions={this.getConfig('units')}
         />
-        <T path='summary.notes'/>
+        <T path='tabs.summary.notes'/>
       </React.Fragment>
     );
   }
