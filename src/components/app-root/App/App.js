@@ -297,7 +297,7 @@ export default class App extends Component {
                   return (
                     <Tab
                       eventKey={key}
-                      title={<T as='string' path={`tabs.${key}.tab`}/>}
+                      title={<T as='string' path={`tabs.${key}.label`}/>}
                       disabled={this.getConfig(`tabs.${key}.disabled`)}
                       className='pt-2'
                       mountOnEnter

@@ -37,7 +37,7 @@ tabs:
 
   summary:
     disabled: false
-    tab: Summary
+    label: Summary
     # It's tempting to do this content as a Markdown table, but unfortunately
     # MD doesn't let you span table rows or columns.
     prologue: |
@@ -118,7 +118,7 @@ tabs:
 
   impacts:
     disabled: false
-    tab: Impacts
+    label: Impacts
     prologue: |
       Below, you can view a list of potential impacts that may affect
       ${region.properties.english_na} in the ${futureDecade}s.
@@ -225,7 +225,7 @@ tabs:
 
   maps:
     disabled: false
-    tab: Maps
+    label: Maps
     lethargicScrolling:
       active: true
       stability: 7
@@ -311,7 +311,7 @@ tabs:
 
   graphs:
     disabled: false
-    tab: Graphs
+    label: Graphs
     prologue: |
       This figure shows the range of projected change in
       ${season} ${variable.label} for ${region.properties.english_na}
@@ -387,7 +387,7 @@ tabs:
 
   notes:
     disabled: false
-    tab: Notes
+    label: Notes
     content: |
 
       1. Information for the Summary and Impacts tabs is drawn from a set of
@@ -419,7 +419,7 @@ tabs:
 
   references:
     disabled: false
-    tab: References
+    label: References
     content: |
       Cannon, A.J., Sobie, S.R., Murdock, T.Q., 2015: _Bias correction of simulated precipitation by quantile mapping: how well do methods preserve relative changes in quantiles and extremes?_ Journal of Climate, 28(17): 6938-6959. https://doi.org/10.1175/jcli-d-14-00754.1
 
@@ -450,9 +450,9 @@ tabs:
 
   about:
     disabled: false
-    tab: About
+    label: About
     tabs:
-      - tab: Plan2Adapt
+      - label: Plan2Adapt
         cards:
           - header: Description
             body: |
@@ -491,7 +491,7 @@ tabs:
               whatsoever, including, without limitation, indirect or consequential loss or damage, arising from reliance
               upon the data or derived information.
 
-      - tab: Credits
+      - label: Credits
         cards:
           - header: Development
             body: |
@@ -537,7 +537,7 @@ tabs:
               partnership with the Global Organization for
               Earth System Science Portals.
 
-      - tab: Contact
+      - label: Contact
         cards:
           - header: Feedback on Application
             body: |
@@ -550,7 +550,7 @@ tabs:
           - header: Pacific Climate Impacts Consortium
             body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
 
-      - tab: Team
+      - label: Team
         cards:
           - header: '[Trevor Murdock](https://pacificclimate.org/about-pcic/people/trevor-murdock)'
             body: Climate science lead.
