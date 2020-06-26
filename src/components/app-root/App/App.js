@@ -50,16 +50,17 @@ export default class App extends Component {
     futureTimePeriodOpt: undefined,
     seasonOpt: undefined,
     variableOpt: undefined,
-    tabKey: 'summary',
+    tabKey: undefined,
     context: null,
     contextJustUpdated: null,  // null signals initial state; boolean thereafter
   };
 
-  trackContextState = () => {
+  trackContextState = actions => {
     // Context (i.e., this.context) is updated asynchronously. We want to do
     // some actions rarely (really just once), just after context updates to a
     // valid (non-null) value. This function updates state to track that
-    // condition, which is signalled by `this.state.contextJustUpdated`.
+    // condition, which is signalled by `this.state.contextJustUpdated`,
+    // and invokes each of it actions arguments when it becomes true.
     // TODO: This seems overcomplicated. Is there a better way?
 
     if (this.state.contextJustUpdated === null) {
@@ -74,6 +75,7 @@ export default class App extends Component {
       // A valid context object ...
       if (this.state.context !== this.context) {
         // ... which just updated
+        map(action => action())(actions);
         return this.setState({
           context: this.context,
           contextJustUpdated: true,
@@ -84,17 +86,10 @@ export default class App extends Component {
         return this.setState({ contextJustUpdated: false });
       }
     }
-  }
+  };
 
   setLethargicMapScrolling = () => {
-    // Lethargic map scrolling needs to be set, just once, after context
-    // updates. We call this in componentDidMount and componentDidUpdate, and do
-    // nothing except the first time context updates. Sigh.
-
-    if (!this.state.contextJustUpdated) {
-      return;
-    }
-    const lethargicScrolling = this.getConfig('maps.lethargicScrolling');
+    const lethargicScrolling = this.getConfig('tabs.maps.lethargicScrolling');
     if (lethargicScrolling && lethargicScrolling.active) {
       setLethargicMapScrolling(
         lethargicScrolling.stability,
@@ -102,20 +97,27 @@ export default class App extends Component {
         lethargicScrolling.tolerance,
       );
     }
-  }
+  };
+
+  setDefaultTab = () => {
+    this.setState({ tabKey: this.getConfig('app.tabs.default') });
+  };
+
+  contextStateActions = [
+    this.setLethargicMapScrolling,
+    this.setDefaultTab,
+  ];
 
   componentDidMount() {
     // TODO: Inject this using `withAsyncData`
     fetchSummaryMetadata()
       .then(metadata => this.setState({ metadata }));
     // this.setState({ context: this.context });  // ??
-    this.trackContextState();
-    this.setLethargicMapScrolling();
+    this.trackContextState(this.contextStateActions);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    this.trackContextState();
-    this.setLethargicMapScrolling();
+    this.trackContextState(this.contextStateActions);
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });

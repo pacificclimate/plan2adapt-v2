@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: graph  # Not working again, sigh
+    default: summary
 
 selectors:
   prologue: |
