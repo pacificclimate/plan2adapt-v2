@@ -69,7 +69,7 @@ describe('toCanonicalUnitSpec', () => {
     ],
   ]).test('for %p', (unitId, expected) => {
     expect(
-      toCanonicalUnitSpec(unitsGroup, unitId, unitsGroup[unitId])
+      toCanonicalUnitSpec(unitsGroup, unitId)
     ).toEqual(expected);
   });
 });
@@ -132,11 +132,11 @@ describe('groupToCanonicalUnitsSpecs', () => {
 //     expect(thing(input)).toEqual(expected);
 //   });
 // });
-
-
-describe('thing', () => {
-  each([
-  ]).test('test', (input, expected) => {
-    expect(thing(input)).toEqual(expected);
-  });
-});
+//
+//
+// describe('thing', () => {
+//   each([
+//   ]).test('test', (input, expected) => {
+//     expect(thing(input)).toEqual(expected);
+//   });
+// });

@@ -73,11 +73,11 @@ import isString from 'lodash/fp/isString';
 import { mapValuesWithKey } from './lodash-fp-extras';
 
 
-export const toCanonicalUnitSpec = (group, unitId, spec) => {
+export const toCanonicalUnitSpec = (group, unitId) => {
   // Convert a single unit spec within a group to its canonical form.
-  // Note: `spec` need not be in `group`, but anything it refers to must be.
-  // This simplifies handling synonyms.
+  // The spec converted is selected from `group` by `unitId`.
 
+  const spec = group[unitId];
   if (isUndefined(spec)) {
     throw new Error(`Undefined units spec for unit id '${unitId}'`);
   }
@@ -89,14 +89,14 @@ export const toCanonicalUnitSpec = (group, unitId, spec) => {
     };
   }
   if (isString(spec)) {
-    return toCanonicalUnitSpec(group, unitId, {
-      synonymFor: spec,
+    return {
+      ...toCanonicalUnitSpec(group, spec),
       label: unitId,
-    });
+    };
   }
   if (spec.synonymFor) {
     return {
-      ...toCanonicalUnitSpec(group, unitId, group[spec.synonymFor]),
+      ...toCanonicalUnitSpec(group, spec.synonymFor),
       label: spec.label || unitId,
     };
   }
@@ -111,7 +111,7 @@ export const toCanonicalUnitSpec = (group, unitId, spec) => {
 export const groupToCanonicalUnitsSpecs = group => {
   // Convert all units specs in a group to canonical form.
   return mapValuesWithKey(
-    (spec, unitId) => toCanonicalUnitSpec(group, unitId, spec),
+    (spec, unitId) => toCanonicalUnitSpec(group, unitId),
     group
   );
 };
@@ -120,5 +120,4 @@ export const groupToCanonicalUnitsSpecs = group => {
 export const collectionToCanonicalUnitsSpecs =
   // Convert all groups of units specs in a collection to canonical form.
   mapValues(groupToCanonicalUnitsSpecs);
-
 
