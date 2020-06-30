@@ -73,6 +73,19 @@ tabs:
           ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
           ${format(season.percentileValues[2])}${unitsSuffix(variable.unitsSpec.label)}
       contents:
+        - variable: tasmean
+          display: absolute
+          precision: 2
+          seasons:
+            - annual
+        - variable: pr
+          display: relative
+          displayUnits: '%'
+          precision: 2
+          seasons:
+            - annual
+            - summer
+            - winter
         # TODO: remove pr absolute; for testing only
         - variable: pr
           display: absolute
@@ -84,40 +97,29 @@ tabs:
               displayUnits: mm/season (cum)
             - season: winter
               displayUnits: mm/season (cum)
-        - variable: tasmean
+        - variable: prsn
+          display: relative
+          displayUnits: '%'
+          precision: 2
+          seasons:
+            - annual
+            - winter
+            - spring
+        - variable: gdd
+          display: absolute
+          precision: 3
+          seasons:
+            - annual
+        - variable: hdd
+          display: absolute
+          precision: 3
+          seasons:
+            - annual
+        - variable: ffd
           display: absolute
           precision: 2
           seasons:
             - annual
-#        - variable: pr
-#          display: relative
-#          precision: 2
-#          seasons:
-#            - annual
-#            - summer
-#            - winter
-#        - variable: prsn
-#          display: relative
-#          precision: 2
-#          seasons:
-#            - annual
-#            - winter
-#            - spring
-#        - variable: gdd
-#          display: absolute
-#          precision: 3
-#          seasons:
-#            - annual
-#        - variable: hdd
-#          display: absolute
-#          precision: 3
-#          seasons:
-#            - annual
-#        - variable: ffd
-#          display: absolute
-#          precision: 2
-#          seasons:
-#            - annual
     notes: |
       Notes:
 
@@ -715,3 +717,6 @@ units:
     'degree-days': 'degree days'
   time:
     days: 1
+  relative:
+    '%': 1     # base unit; only relative unit ever used so far
+    ppm: 1e7   # just for lulz

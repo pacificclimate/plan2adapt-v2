@@ -27,8 +27,12 @@ export const getVariableLabel = (variableConfig, variableId) => {
 };
 
 
-export const getVariableType = (variableConfig, variableId) => {
-  return getConfigForId(variableConfig, variableId).type;
+export const getVariableType = (variableConfig, variableId, display = 'absolute') => {
+  const vc = getConfigForId(variableConfig, variableId);
+  if (display === 'relative') {
+    return 'relative';
+  }
+  return vc.type;
 };
 
 
@@ -37,6 +41,7 @@ export const getVariableDisplay = (variableConfig, variableId) => {
 };
 
 
+// TODO: This should be defunct by the time all is done here. Remove.
 export const getVariableDataUnits =
   (variableConfig, variableId, display = 'absolute') => {
     const vc = getConfigForId(variableConfig, variableId);
@@ -51,7 +56,7 @@ export const getVariableDisplayUnits =
   (variableConfig, variableId, display = 'absolute') => {
     const vc = getConfigForId(variableConfig, variableId);
     if (display === 'relative') {
-      return '%';
+      return vc.displayUnits || '%';  // Bombproofing
     }
     return vc.displayUnits;
   };
