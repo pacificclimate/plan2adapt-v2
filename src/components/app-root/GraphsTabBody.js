@@ -50,20 +50,18 @@ export default class GraphsTabBody extends React.Component {
     const season = this.props.seasonOpt.value;
     const variable = this.props.variableOpt.value;
 
-    const variableId = variable.representative.variable_id;
     const graphConfig = this.getConfig('tabs.graphs.config');
     const variableConfig = merge(
       this.getConfig('variables'),
       graphConfig.variables,
     );
-    console.log('###  COTG: variableConfig', variable, variableConfig)
 
     const unitsConversions =
       collectionToCanonicalUnitsSpecs(this.getConfig('units'));
 
+    const variableId = variable.representative.variable_id;
     const display = getVariableDisplay(variableConfig, variableId);
     const variableInfo = getVariableInfo(unitsConversions, variableConfig, variableId, display);
-    console.log('###  COTG: variableInfo', variableInfo)
 
     return (
       <React.Fragment>

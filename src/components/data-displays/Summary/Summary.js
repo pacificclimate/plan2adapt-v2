@@ -9,7 +9,6 @@ import merge from 'lodash/fp/merge';
 import zip from 'lodash/fp/zip';
 import isEqual from 'lodash/fp/isEqual';
 import isString from 'lodash/fp/isString';
-import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
 import { getDisplayData } from '../../../utils/percentile-anomaly';
 import {
@@ -181,15 +180,13 @@ class Summary extends React.Component {
         <tbody>
         {
           map(([row, rowSummaryStatistics]) => {
-            console.log('### row', row)
             const { variable, display, precision, seasons } = row;
             return map(season => {
-              console.log('###  row season', season)
               const seasonSpec = isString(season) ? { season } : season;
 
-              // Create a variableConfig that includes display units info
-              // merged from the original variable config, and those specified
-              // in either the row or the row season of the tableContents.
+              // Create a `variableConfig` that includes display units info
+              // from `variableConfig`, and that specified in `row` or
+              // `row.season` of `tableContents`.
               const displayUnits = row.displayUnits || seasonSpec.displayUnits;
               const variableConfig = merge(
                 this.props.variableConfig,
@@ -197,27 +194,17 @@ class Summary extends React.Component {
                   [variable]: { displayUnits },
                 }
               );
-              console.log('###  variableConfig', variable, variableConfig)
-
-              // From here on, we want to deal not in units ids which
-              // `displayUnits` in its various forms is, but in units specs,
-              // which must be retrieved from unitsConversions using the
-              // information in variableConfig.
 
               // `variableInfo` describes the variable completely. It is built
               // using config info, and includes a full units spec.
               const variableInfo = getVariableInfo(
                 unitsConversions, variableConfig, variable, display
               );
-              console.log('###  variableInfo', variableInfo)
 
-
-              // Extract data for this row from prop `summaryStatistics`
-              console.log('###  rowSummaryStatistics', rowSummaryStatistics)
+              // Extract data for this row
               const displayData = getDisplayData(
                 rowSummaryStatistics, seasonSpec.season, display
               );
-              console.log('###  displayData', displayData)
 
               // Convert data to display units
               const convertUnits =
@@ -226,7 +213,6 @@ class Summary extends React.Component {
                 convertUnits(displayData.units, variableInfo.unitsSpec.id);
               const displayPercentileValues =
                 map(convertData)(displayData.percentiles);
-              console.log('### displayPercentileValues', displayPercentileValues)
 
               // Const `data` is provided as context data to the external text.
               // The external text implements the formatting of this data for
@@ -274,31 +260,6 @@ class Summary extends React.Component {
 }
 
 
-const tableContentsAndDataToSummarySpec =
-  // Convert the raw summary statistics data for each `tableContent` item to
-  // the objects consumed by Summary via its `summary` prop. See Summary
-  // for a spec of these objects.
-  // Argument of this function is `tableContents` zipped with the
-  // corresponding data fetched from the backend.
-  map(([content, data]) => {
-    const { display, seasons, ...rest } = content;
-    return {
-      ...rest,
-      display,
-      hasData: !isUndefined(data),
-      seasons: map(season => {
-        const seasonId = isString(season) ? season : season.season;
-        const { units, ...rest } = getDisplayData(data, seasonId, display);
-        return {
-          id: seasonId,
-          units,
-          ...rest,
-        }
-      })(seasons),
-    };
-  });
-
-
 const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
   // Return (a promise for) the summary statistics to be displayed in the
   // Summary tab. This amounts to fetching the data for each variable from the
@@ -317,7 +278,6 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
       })
     )(tableContents)
   );
-  // .then(data => tableContentsAndDataToSummarySpec(zip(tableContents, data)));
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>

@@ -121,7 +121,6 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       variableInfo,
       graphConfig, variableConfig, unitsConversions,
     } = this.props;
-    console.log('### COTG.render: statistics', statistics)
 
     // The data-fetcher always returns a fulfilled promise, but with an array of
     // results that indicate whether each sub-request promise was fulfilled or
