@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: summary
+    default: graphs
 
 selectors:
   prologue: |
@@ -75,6 +75,7 @@ tabs:
       contents:
         - variable: tasmean
           display: absolute
+          displayUnits: °C
           precision: 2
           seasons:
             - annual
@@ -107,16 +108,19 @@ tabs:
             - spring
         - variable: gdd
           display: absolute
+          displayUnits: degree-days
           precision: 3
           seasons:
             - annual
         - variable: hdd
           display: absolute
+          displayUnits: degree-days
           precision: 3
           seasons:
             - annual
         - variable: ffd
           display: absolute
+          displayUnits: days
           precision: 2
           seasons:
             - annual
@@ -388,22 +392,30 @@ tabs:
         - { start_date: "2040", end_date: "2069" }
         - { start_date: "2070", end_date: "2099" }
       variables:
+        # TODO: Remove fallback
         fallback:
           display: absolute
         ffd:
           display: absolute
+          displayUnits: days
         gdd:
           display: absolute
+          displayUnits: degree-days
         hdd:
           display: absolute
+          displayUnits: degree-days
         cdd:
           display: absolute
+          displayUnits: degree-days
         pr:
           display: relative
+          displayUnits: '%'
         prsn:
           display: relative
+          displayUnits: '%'
         tasmean:
           display: absolute
+          displayUnits: °C
 
   notes:
     disabled: false
@@ -631,25 +643,21 @@ variables:
   tasmean:
     label: Temperature
     type: temperature
-    displayUnits: °C
     dataUnits: degC
   pr:
     label: Precipitation
     type: precipitation flux
-    displayUnits: mm/month
     dataUnits: kg m-2 d-1
   prsn:
     label: Precipitation as Snow
     derived: true
     type: precipitation flux
-    displayUnits: mm/month
     dataUnits: kg m-2 d-1
     possibleLowBaseline: true
   gdd:
     label: Growing Degree-Days
     derived: true
     type: temperature-time
-    displayUnits: degree-days
     dataUnits: degree days
   hdd:
     label: Heating Degree-Days
@@ -667,7 +675,6 @@ variables:
     label: Frost-Free Days
     derived: true
     type: time
-    displayUnits: days
     dataUnits: days
 
 # Application-wide information about units of measure, mainly consisting of

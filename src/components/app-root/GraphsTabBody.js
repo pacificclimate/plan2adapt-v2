@@ -12,11 +12,13 @@ import PropTypes from 'prop-types';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import get from 'lodash/fp/get';
+import merge from 'lodash/fp/merge';
 import ChangeOverTimeGraph from '../graphs/ChangeOverTimeGraph';
 import {
   getVariableDisplay,
   getVariableInfo
 } from '../../utils/variables-and-units';
+import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
 
 export default class GraphsTabBody extends React.Component {
   static contextType = T.contextType;
@@ -48,11 +50,20 @@ export default class GraphsTabBody extends React.Component {
     const season = this.props.seasonOpt.value;
     const variable = this.props.variableOpt.value;
 
-    const graphConfig = this.getConfig('tabs.graphs.config');
-    const variableConfig = this.getConfig('variables');
     const variableId = variable.representative.variable_id;
-    const display = getVariableDisplay(graphConfig.variables, variableId);
-    const variableInfo = getVariableInfo(variableConfig, variableId, display);
+    const graphConfig = this.getConfig('tabs.graphs.config');
+    const variableConfig = merge(
+      this.getConfig('variables'),
+      graphConfig.variables,
+    );
+    console.log('###  COTG: variableConfig', variable, variableConfig)
+
+    const unitsConversions =
+      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+
+    const display = getVariableDisplay(variableConfig, variableId);
+    const variableInfo = getVariableInfo(unitsConversions, variableConfig, variableId, display);
+    console.log('###  COTG: variableInfo', variableInfo)
 
     return (
       <React.Fragment>
@@ -78,7 +89,7 @@ export default class GraphsTabBody extends React.Component {
               variableInfo={variableInfo}
               graphConfig={graphConfig}
               variableConfig={variableConfig}
-              unitsConversions={this.getConfig('units')}
+              unitsConversions={unitsConversions}
             />
           </Col>
         </Row>
