@@ -46,7 +46,7 @@ export default class ImpactsTabBody extends React.Component {
       <React.Fragment>
         <Row>
           <Col lg={12}>
-            <T path='impacts.prologue' data={{
+            <T path='tabs.impacts.prologue' data={{
               region,
               futureDecade: middleDecade(futureTimePeriod),
               baselineDecade: middleDecade(baselineTimePeriod),

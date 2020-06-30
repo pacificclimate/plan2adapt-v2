@@ -114,11 +114,33 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
 }
 
 
+function whenErrorResponse(as, whenError, message) {
+  // What to do when an error occurs in `get`.
+
+  if (whenError === 'null') {
+    return null;
+  }
+  if (whenError === 'throw') {
+    throw new Error(message);
+  }
+  // whenError == 'render'
+  if (as === 'raw' || as === 'string') {
+    return message;
+  }
+  return (
+    <div className={styles.externalTextError}>
+      {message}
+    </div>
+  );
+}
+
+
 export function get(
   texts,
   path,
   data = {},
   as = 'string',
+  whenError = 'null',  // ??
   placeholder = '{{${$path}}}',
   props,
 ) {
@@ -156,13 +178,11 @@ export function get(
   //  </div>
   // ```
 
-  const hasPath = texts && _.has(texts, path);
-
-  if (!hasPath && _.includes(['raw', 'string'], as)) {
-    throw new Error(`Path '${path}' not found in texts.`);
+  if (!(texts && _.has(texts, path))) {
+    return whenErrorResponse(
+      as, whenError, `Path '${path}' not found in external text.`
+    );
   }
-
-  const item = hasPath ? _.get(texts, path) : placeholder;
 
   const render = value => {
     try {
@@ -178,20 +198,13 @@ export function get(
       }
       return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
     } catch (e) {
-
-      const message = `Error in external text '${path}': ${e.toString()}.`;
-      if (as === 'raw' || as === 'string') {
-        return message;
-      }
-      return (
-        <div className={styles.externalTextError}>
-          {message}
-        </div>
+      return whenErrorResponse(
+        as, whenError, `Error in external text '${path}': ${e.toString()}.`
       );
     }
   };
 
-  return _.mapDeep(item, render, { leavesOnly: true });
+  return _.mapDeep(_.get(texts, path), render, { leavesOnly: true });
 }
 
 
@@ -213,19 +226,23 @@ export default class ExternalText extends React.Component {
     // Data context in which to evaluate item's text.
     as: PropTypes.oneOf(['raw', 'string', 'markdown']),
     // How to render the item's text.
+    whenError: PropTypes.oneOf(['null', 'render', 'throw']),
+    // How to handle errors. When 'null' return null. When 'render' render an
+    // error message or placeholder.
     placeholder: PropTypes.string,
-    // What to render when path is not found in texts.
+    // What to render when path is not found in texts and whenError is 'render'
   };
 
   static defaultProps = {
     as: 'markdown',
+    whenError: 'render',
     placeholder: '{{${$path}}}',
   };
 
   render() {
     const texts = this.context;
-    const { path, data, as, placeholder, ...rest } = this.props;
-    return get(texts, path, data, as, placeholder, rest);
+    const { path, data, as, whenError, placeholder, ...rest } = this.props;
+    return get(texts, path, data, as, whenError, placeholder, rest);
   }
 }
 

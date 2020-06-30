@@ -17,8 +17,8 @@ export default class AboutTabBody extends React.Component {
           map(
             tab => (
               <Tab
-                eventKey={tab.tab}
-                title={tab.tab}
+                eventKey={tab.label}
+                title={tab.label}
                 className='pt-2'
               >
                 <Cards items={tab.cards}/>
@@ -26,7 +26,7 @@ export default class AboutTabBody extends React.Component {
             )
           )(T.get(
             this.context,
-            'about.tabs',
+            'tabs.about.tabs',
             {version: process.env.REACT_APP_VERSION}
             )
           )

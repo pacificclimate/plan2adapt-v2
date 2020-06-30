@@ -32,13 +32,13 @@ const isLong = s => s.length > 2;
 const SeasonTds = ({ data }) => {
   return [
     <td className="text-center">
-      <T path='summary.table.rows.season' data={data} as='string'/>
+      <T path='tabs.summary.table.rows.season' data={data} as='string'/>
     </td>,
     <td>
-      <T path='summary.table.rows.ensembleMedian' data={data} as='string'/>
+      <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string'/>
     </td>,
     <td>
-      <T path='summary.table.rows.range' data={data} as='string'/>
+      <T path='tabs.summary.table.rows.range' data={data} as='string'/>
     </td>,
   ];
 };
@@ -163,22 +163,22 @@ class Summary extends React.Component {
         <thead>
         <tr>
           <th rowSpan={2} className='align-middle'>
-            <T path='summary.table.heading.variable'/>
+            <T path='tabs.summary.table.heading.variable'/>
           </th>
           <th rowSpan={2} className='align-middle text-center'>
-            <T path='summary.table.heading.season'/>
+            <T path='tabs.summary.table.heading.season'/>
           </th>
           <th colSpan={2} className='text-center'>
-            <T path='summary.table.heading.projectedChange'
+            <T path='tabs.summary.table.heading.projectedChange'
                data={this.props.baselineTimePeriod}/>
           </th>
         </tr>
         <tr>
           <th>
-            <T path='summary.table.heading.ensembleMedian'/>
+            <T path='tabs.summary.table.heading.ensembleMedian'/>
           </th>
           <th>
-            <T path='summary.table.heading.range' data={{percentiles}}/>
+            <T path='tabs.summary.table.heading.range' data={{percentiles}}/>
           </th>
         </tr>
         </thead>
@@ -219,7 +219,7 @@ class Summary extends React.Component {
                       rowSpan={row.seasons.length}
                       className='align-middle'
                     >
-                      <T path='summary.table.rows.variable' data={data}/>
+                      <T path='tabs.summary.table.rows.variable' data={data}/>
                     </td>
                   }
                   <SeasonTds data={data}/>

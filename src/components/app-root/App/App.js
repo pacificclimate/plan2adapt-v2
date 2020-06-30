@@ -8,7 +8,7 @@ import Tab from 'react-bootstrap/Tab';
 import Loader from 'react-loader';
 
 import filter from 'lodash/fp/filter';
-import get from 'lodash/fp/get';
+import map from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
 import isObject from 'lodash/fp/isObject';
 
@@ -22,8 +22,6 @@ import TimePeriodSelector from '../../selectors/TimePeriodSelector';
 import SeasonSelector from '../../selectors/SeasonSelector';
 import VariableSelector from '../../selectors/VariableSelector';
 
-import DevColourbar from '../../data-displays/DevColourbar';
-import DevGraph from '../../data-displays/DevGraph';
 import ErrorBoundary from '../../misc/ErrorBoundary';
 import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
@@ -35,10 +33,12 @@ import AboutTabBody from '../AboutTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
 
+
 const baselineTimePeriod = {
   start_date: 1961,
   end_date: 1990,
 };
+
 
 export default class App extends Component {
   static contextType = T.contextType;
@@ -50,16 +50,17 @@ export default class App extends Component {
     futureTimePeriodOpt: undefined,
     seasonOpt: undefined,
     variableOpt: undefined,
-    tabKey: 'summary',
+    tabKey: undefined,
     context: null,
     contextJustUpdated: null,  // null signals initial state; boolean thereafter
   };
 
-  trackContextState = () => {
+  trackContextState = actions => {
     // Context (i.e., this.context) is updated asynchronously. We want to do
     // some actions rarely (really just once), just after context updates to a
     // valid (non-null) value. This function updates state to track that
-    // condition, which is signalled by `this.state.contextJustUpdated`.
+    // condition, which is signalled by `this.state.contextJustUpdated`,
+    // and invokes each of it actions arguments when it becomes true.
     // TODO: This seems overcomplicated. Is there a better way?
 
     if (this.state.contextJustUpdated === null) {
@@ -74,6 +75,7 @@ export default class App extends Component {
       // A valid context object ...
       if (this.state.context !== this.context) {
         // ... which just updated
+        map(action => action())(actions);
         return this.setState({
           context: this.context,
           contextJustUpdated: true,
@@ -84,17 +86,10 @@ export default class App extends Component {
         return this.setState({ contextJustUpdated: false });
       }
     }
-  }
+  };
 
   setLethargicMapScrolling = () => {
-    // Lethargic map scrolling needs to be set, just once, after context
-    // updates. We call this in componentDidMount and componentDidUpdate, and do
-    // nothing except the first time context updates. Sigh.
-
-    if (!this.state.contextJustUpdated) {
-      return;
-    }
-    const lethargicScrolling = this.getConfig('maps.lethargicScrolling');
+    const lethargicScrolling = this.getConfig('tabs.maps.lethargicScrolling');
     if (lethargicScrolling && lethargicScrolling.active) {
       setLethargicMapScrolling(
         lethargicScrolling.stability,
@@ -102,25 +97,32 @@ export default class App extends Component {
         lethargicScrolling.tolerance,
       );
     }
-  }
+  };
+
+  setDefaultTab = () => {
+    this.setState({ tabKey: this.getConfig('app.tabs.default') });
+  };
+
+  contextStateActions = [
+    this.setLethargicMapScrolling,
+    this.setDefaultTab,
+  ];
 
   componentDidMount() {
     // TODO: Inject this using `withAsyncData`
     fetchSummaryMetadata()
       .then(metadata => this.setState({ metadata }));
     // this.setState({ context: this.context });  // ??
-    this.trackContextState();
-    this.setLethargicMapScrolling();
+    this.trackContextState(this.contextStateActions);
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    this.trackContextState();
-    this.setLethargicMapScrolling();
+    this.trackContextState(this.contextStateActions);
   }
 
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeRegion = this.handleChangeSelection.bind(this, 'regionOpt');
-  handleChangeTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriodOpt');
+  handleChangeFutureTimePeriod = this.handleChangeSelection.bind(this, 'futureTimePeriodOpt');
   handleChangeSeason = this.handleChangeSelection.bind(this, 'seasonOpt');
   handleChangeVariable = this.handleChangeSelection.bind(this, 'variableOpt');
   handleChangeTab = this.handleChangeSelection.bind(this, 'tabKey');
@@ -145,6 +147,99 @@ export default class App extends Component {
       ({ value: { representative: { variable_id } } }) =>
         getVariableLabel(variableConfig, variable_id);
 
+    // This variable drives the construction of the selector list. It is 
+    // defined inside the component because it needs context and state.
+    const selectors = {
+      region: (
+        <RegionSelector
+          default={this.getConfig('selectors.region.default')}
+          value={this.state.regionOpt}
+          onChange={this.handleChangeRegion}
+        />
+      ),
+      futureTimePeriod: (
+        <TimePeriodSelector
+          bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
+          value={this.state.futureTimePeriodOpt}
+          default={this.getConfig('selectors.futureTimePeriod.default')}
+          onChange={this.handleChangeFutureTimePeriod}
+          debug
+        />
+      ),
+      variable: (
+        <VariableSelector
+          bases={this.state.metadata}
+          value={this.state.variableOpt}
+          default={this.getConfig('selectors.variable.default')}
+          onChange={this.handleChangeVariable}
+          getOptionLabel={getVariableOptionLabel}
+        />
+      ),
+      season: (
+        <SeasonSelector
+          value={this.state.seasonOpt}
+          default={this.getConfig('selectors.season.default')}
+          onChange={this.handleChangeSeason}
+        />
+      ),
+    };
+    
+    // This variable drives construction of the top-level tabs. It is 
+    // defined inside the component because it needs context and state.
+    // Uses an alternative way to define props that allows for injection
+    // of additional (common) props in construction.
+    const tabs = {
+      summary: {
+        Component: SummaryTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+        },
+      },      
+      impacts: {
+        Component: ImpactsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+        },
+      },
+      maps: {
+        Component: MapsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+            futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+            baselineTimePeriod: baselineTimePeriod,
+            seasonOpt: this.state.seasonOpt,
+            variableOpt: this.state.variableOpt,
+            metadata: this.state.metadata,
+          },
+      },
+      graphs: {
+        Component: GraphsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+          seasonOpt: this.state.seasonOpt,
+          variableOpt: this.state.variableOpt,
+        },
+      },
+      notes: {
+        Component: NotesTabBody,
+        props: {},
+      },
+      references: {
+        Component: ReferencesTabBody,
+        props: {},
+      },
+      about: {
+        Component: AboutTabBody,
+        props: {},
+      },
+    };
+
     return (
       <Container fluid>
         <AppHeader/>
@@ -157,80 +252,34 @@ export default class App extends Component {
                   <T path='selectors.prologue'/>
                 </Col>
               </Row>
+
               <Row>
                 {
-                  this.selectorEnabled('region') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.region.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={6}>
-                      <ErrorBoundary>
-                        <RegionSelector
-                          default={this.getConfig('selectors.region.default')}
-                          value={this.state.regionOpt}
-                          onChange={this.handleChangeRegion}
+                  map(key =>
+                    this.selectorEnabled(key) &&
+                    <React.Fragment>
+                      <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                        {null}
+                      </Col>
+                      <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                        <T
+                          path={`selectors.${key}.prefix`}
+                          whenError={'null'}
                         />
-                      </ErrorBoundary>
-                    </Col>
-                  </React.Fragment>
-                }
-
-                {
-                  this.selectorEnabled('timePeriod') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.timePeriod.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={4}>
-                      <ErrorBoundary>
-                          <TimePeriodSelector
-                          bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
-                          value={this.state.futureTimePeriodOpt}
-                          default={this.getConfig('selectors.timePeriod.default')}
-                          onChange={this.handleChangeTimePeriod}
-                          debug
+                      </Col>
+                      <Col xl={12} lg={3} md={6}>
+                        <ErrorBoundary>
+                          {selectors[key]}
+                        </ErrorBoundary>
+                      </Col>
+                      <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
+                        <T
+                          path={`selectors.${key}.postfix`}
+                          whenError={'null'}
                         />
-                      </ErrorBoundary>
-                    </Col>
-                  </React.Fragment>
-                }
-
-                {
-                  this.selectorEnabled('variable') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.variable.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={4}>
-                      <ErrorBoundary>
-                          <VariableSelector
-                          bases={this.state.metadata}
-                          value={this.state.variableOpt}
-                          default={this.getConfig('selectors.variable.default')}
-                          onChange={this.handleChangeVariable}
-                          getOptionLabel={getVariableOptionLabel}
-                        />
-                      </ErrorBoundary>
-                    </Col>
-                  </React.Fragment>
-                }
-
-                {
-                  this.selectorEnabled('season') && <React.Fragment>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.season.prefix'/>
-                    </Col>
-                    <Col xl={12} lg={3} md={4}>
-                      <ErrorBoundary>
-                          <SeasonSelector
-                          value={this.state.seasonOpt}
-                          default={this.getConfig('selectors.season.default')}
-                          onChange={this.handleChangeSeason}
-                        />
-                      </ErrorBoundary>
-                    </Col>
-                    <Col xl={12} lg={'auto'} md={'auto'} className='pr-0'>
-                      <T path='selectors.season.postfix'/>
-                    </Col>
-                  </React.Fragment>
+                      </Col>
+                    </React.Fragment>
+                  )(this.getConfig('selectors.ordering'))
                 }
               </Row>
             </div>
@@ -242,144 +291,27 @@ export default class App extends Component {
               activeKey={this.state.tabKey}
               onSelect={this.handleChangeTab}
             >
-              {this.getConfig('dev-graph.visible') &&
-              <Tab
-                eventKey={'dev-graph'}
-                title={'Dev Graph'}
-                className='pt-2'
-                mountOnEnter
-              >
-                <DevGraph/>
-              </Tab>
+              {
+                map(key => {
+                  const TabBody = tabs[key].Component;
+                  return (
+                    <Tab
+                      eventKey={key}
+                      title={<T as='string' path={`tabs.${key}.label`}/>}
+                      disabled={this.getConfig(`tabs.${key}.disabled`)}
+                      className='pt-2'
+                      mountOnEnter
+                    >
+                      {
+                        this.state.tabKey === key &&
+                        <ErrorBoundary>
+                          <TabBody {...tabs[key].props} />
+                        </ErrorBoundary>
+                      }
+                    </Tab>
+                  );
+                })(this.getConfig('tabs.ordering'))
               }
-
-              {this.getConfig('dev-colourbar.visible') &&
-              <Tab
-                eventKey={'dev-colourbar'}
-                title={'Dev Colourbar'}
-                className='pt-2'
-                mountOnEnter
-              >
-                <DevColourbar
-                  season={get('value', this.state.seasonOpt)}
-                  variable={get('value', this.state.variableOpt)}
-                />
-              </Tab>
-              }
-
-              <Tab
-                eventKey={'summary'}
-                title={<T as='string' path='summary.tab'/>}
-                disabled={this.getConfig('summary.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'summary' &&
-                  <ErrorBoundary>
-                    <SummaryTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'impacts'}
-                title={<T as='string' path='impacts.tab'/>}
-                disabled={this.getConfig('impacts.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'impacts' &&
-                  <ErrorBoundary>
-                    <ImpactsTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'maps'}
-                title={<T as='string' path='maps.tab'/>}
-                disabled={this.getConfig('maps.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'maps' &&
-                  <ErrorBoundary>
-                    <MapsTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                      seasonOpt={this.state.seasonOpt}
-                      variableOpt={this.state.variableOpt}
-                      metadata={this.state.metadata}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'graphs'}
-                title={<T as='string' path='graphs.tab'/>}
-                disabled={this.getConfig('graphs.disabled')}
-                className='pt-2'
-                mountOnEnter
-              >
-                {
-                  this.state.tabKey === 'graphs' &&
-                  <ErrorBoundary>
-                    <GraphsTabBody
-                      regionOpt={this.state.regionOpt}
-                      futureTimePeriodOpt={this.state.futureTimePeriodOpt}
-                      baselineTimePeriod={baselineTimePeriod}
-                      seasonOpt={this.state.seasonOpt}
-                      variableOpt={this.state.variableOpt}
-                    />
-                  </ErrorBoundary>
-                }
-              </Tab>
-
-              <Tab
-                eventKey={'notes'}
-                title={<T as='string' path='notes.tab'/>}
-                disabled={this.getConfig('notes.disabled')}
-                className='pt-2'
-              >
-                <ErrorBoundary>
-                  <NotesTabBody/>
-                </ErrorBoundary>
-              </Tab>
-
-              <Tab
-                eventKey={'references'}
-                title={<T as='string' path='references.tab'/>}
-                disabled={this.getConfig('references.disabled')}
-                className='pt-2'
-              >
-                <ErrorBoundary>
-                  <ReferencesTabBody/>
-                </ErrorBoundary>
-              </Tab>
-
-              <Tab
-                eventKey={'about'}
-                title={<T as='string' path='about.tab'/>}
-                disabled={this.getConfig('about.disabled')}
-                className='pt-2'
-              >
-                <ErrorBoundary>
-                  <AboutTabBody/>
-                </ErrorBoundary>
-              </Tab>
             </Tabs>
           </Col>
         </Row>

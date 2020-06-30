@@ -29,18 +29,18 @@ export default class RulesTable extends React.Component {
       <React.Fragment>
         <Button onClick={this.toggleShowInactiveRules}>
           <T as='string'
-             path={`impacts.rulesLogic.table.showInactiveRulesButton.${this.state.showInactiveRules}`}/>
+             path={`tabs.impacts.rulesLogic.table.showInactiveRulesButton.${this.state.showInactiveRules}`}/>
         </Button>
 
         <Table bordered className='Rules-table'>
           <thead>
           <tr>
-            <th><T path='impacts.rulesLogic.table.heading.ruleId'/></th>
-            <th><T path='impacts.rulesLogic.table.heading.condition'/></th>
-            <th><T path='impacts.rulesLogic.table.heading.category'/></th>
-            <th><T path='impacts.rulesLogic.table.heading.sector'/></th>
-            <th><T path='impacts.rulesLogic.table.heading.effects'/></th>
-            <th><T path='impacts.rulesLogic.table.heading.notes'/></th>
+            <th><T path='tabs.impacts.rulesLogic.table.heading.ruleId'/></th>
+            <th><T path='tabs.impacts.rulesLogic.table.heading.condition'/></th>
+            <th><T path='tabs.impacts.rulesLogic.table.heading.category'/></th>
+            <th><T path='tabs.impacts.rulesLogic.table.heading.sector'/></th>
+            <th><T path='tabs.impacts.rulesLogic.table.heading.effects'/></th>
+            <th><T path='tabs.impacts.rulesLogic.table.heading.notes'/></th>
           </tr>
           </thead>
           <tbody>

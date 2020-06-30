@@ -16,7 +16,7 @@ export default class Rules extends React.Component {
   render() {
     return (
       <div className='Rules'>
-        <T path='impacts.rulesLogic.prologue'/>
+        <T path='tabs.impacts.rulesLogic.prologue'/>
         <RulesTable {...this.props}/>
       </div>
     );

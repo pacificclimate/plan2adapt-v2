@@ -117,7 +117,7 @@ export default class MapsTabBody extends React.Component {
     const variableRep = variable.representative;
     const variableId = variableRep.variable_id;
     const variableConfig = this.getConfig('variables');
-    const displaySpec = this.getConfig('maps.displaySpec');
+    const displaySpec = this.getConfig('tabs.maps.displaySpec');
     const logscale = wmsLogscale(displaySpec, variableRep);
     const zoomButton = (
       <StaticControl position='topright'>
@@ -140,13 +140,13 @@ export default class MapsTabBody extends React.Component {
               breadth={20}
               length={80}
               heading={<T
-                path='colourScale.label'
+                path='tabs.maps.colourScale.label'
                 data={getVariableInfo(variableConfig, variableId, 'absolute')}
                 placeholder={null}
                 className={styles.label}
               />}
               note={<T
-                path={'colourScale.note'}
+                path={'tabs.maps.colourScale.note'}
                 placeholder={null}
                 className={styles.note}
                 data={{ logscale }}
@@ -158,7 +158,7 @@ export default class MapsTabBody extends React.Component {
         </Row>
         <Row>
           <Col lg={6}>
-            <T path='maps.historical.title' data={{
+            <T path='tabs.maps.historical.title' data={{
               start_date: this.props.baselineTimePeriod.start_date,
               end_date: this.props.baselineTimePeriod.end_date
             }}/>
@@ -179,7 +179,7 @@ export default class MapsTabBody extends React.Component {
             </DataMap>
           </Col>
           <Col lg={6}>
-            <T path='maps.projected.title' data={{
+            <T path='tabs.maps.projected.title' data={{
               start_date: futureTimePeriod.start_date,
               end_date: futureTimePeriod.end_date
             }}/>
