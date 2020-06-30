@@ -70,22 +70,22 @@ export const getVariableInfo = (unitsConversions, variableConfig, variableId, di
   return {
     id: variableId,
     label: getVariableLabel(variableConfig, variableId),
-    units: getVariableDisplayUnits(variableConfig, variableId, display),
+    unitsSpec: getVariableDisplayUnitsSpec(unitsConversions, variableConfig, variableId, display),
     possibleLowBaseline: variableConfig[variableId].possibleLowBaseline,
   };
 };
 
 
-export const getConvertUnits= (conversions, variableConfig, variableId) => {
+export const getConvertUnits= (unitsSpecs, variableConfig, variableId) => {
   const variableType = getVariableType(variableConfig, variableId);
   if (!variableType) {
     throw new Error(`Unspecified variable type for ${variableId}`);
   }
-  const conversionGroup = conversions[variableType];
-  if (!conversionGroup) {
-    throw new Error(`No conversion group for ${variableType}`);
+  const unitsGroup = unitsSpecs[variableType];
+  if (!unitsGroup) {
+    throw new Error(`No units group for ${variableType}`);
   }
-  return convertUnitsInGroup(conversionGroup);
+  return convertUnitsInGroup(unitsGroup);
 };
 
 
