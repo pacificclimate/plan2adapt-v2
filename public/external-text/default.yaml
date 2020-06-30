@@ -252,7 +252,7 @@ tabs:
       title: "#### Projected: ${$$.components.period}"
     colourScale:
       label: |
-        ${label} (${unitsSpec.label})
+        ${ (id === 'pr' || id === 'prsn') ? 'Total' : '' } ${label} (${unitsSpec.label})
       note: |
         ${logscale ? $$.tabs.maps.colourScale.logscaleNote : ''} This colour scale applies to both maps.
       logscaleNote: |
