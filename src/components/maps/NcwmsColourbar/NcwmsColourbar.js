@@ -69,6 +69,7 @@ export default class NcwmsColourbar extends React.Component {
 
     variableSpec: PropTypes.object,
 
+    // TODO: Rename to variableConfig
     displaySpec: PropTypes.object,
     // Display spec
   };

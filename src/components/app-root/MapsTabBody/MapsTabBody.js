@@ -34,6 +34,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Loader from 'react-loader';
+import merge from 'lodash/fp/merge';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
@@ -44,6 +45,7 @@ import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
 import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
+import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 
 
 export default class MapsTabBody extends React.Component {
@@ -116,9 +118,25 @@ export default class MapsTabBody extends React.Component {
 
     const variableRep = variable.representative;
     const variableId = variableRep.variable_id;
-    const variableConfig = this.getConfig('variables');
-    const displaySpec = this.getConfig('tabs.maps.displaySpec');
-    const logscale = wmsLogscale(displaySpec, variableRep);
+
+    const mapsConfig = this.getConfig('tabs.maps.config');
+    const variableConfig = merge(
+      this.getConfig('variables'),
+      mapsConfig.variables,
+    );
+    console.log('### MapsTabBody: variableConfig', variableConfig)
+
+    // TODO: replace usages of `mapsConfig` with `variableConfig`?
+    const logscale = wmsLogscale(variableConfig, variableRep);
+
+    const unitsConversions =
+      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+
+    const variableInfo = getVariableInfo(
+      unitsConversions, variableConfig, variableId, 'absolute'
+    );
+    console.log('### MapsTabBody: variableInfo', variableInfo)
+
     const zoomButton = (
       <StaticControl position='topright'>
         <Button
@@ -141,7 +159,7 @@ export default class MapsTabBody extends React.Component {
               length={80}
               heading={<T
                 path='tabs.maps.colourScale.label'
-                data={getVariableInfo(variableConfig, variableId, 'absolute')}
+                data={variableInfo}
                 placeholder={null}
                 className={styles.label}
               />}
@@ -152,7 +170,7 @@ export default class MapsTabBody extends React.Component {
                 data={{ logscale }}
               />}
               variableSpec={variableRep}
-              displaySpec={displaySpec}
+              displaySpec={variableConfig}
             />
           </Col>
         </Row>

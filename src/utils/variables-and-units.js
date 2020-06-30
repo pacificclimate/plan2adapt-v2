@@ -41,13 +41,9 @@ export const getVariableDisplay = (variableConfig, variableId) => {
 };
 
 
-// TODO: This should be defunct by the time all is done here. Remove.
 export const getVariableDataUnits =
-  (variableConfig, variableId, display = 'absolute') => {
+  (variableConfig, variableId) => {
     const vc = getConfigForId(variableConfig, variableId);
-    if (display === 'relative') {
-      return 'relative';
-    }
     return vc.dataUnits;
   };
 

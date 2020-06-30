@@ -15,9 +15,11 @@ import {
   wmsTime
 } from '../map-utils';
 import {
-  getConvertUnits, getVariableDataUnits,
+  getConvertUnits, getVariableDataUnits, getVariableDisplay,
   getVariableDisplayUnits
 } from '../../../utils/variables-and-units';
+import merge from 'lodash/fp/merge';
+import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 
 
 export default class ClimateLayer extends React.Component {
@@ -33,21 +35,28 @@ export default class ClimateLayer extends React.Component {
   render() {
     const { fileMetadata, variableSpec, season } = this.props;
     const variableId = variableSpec.variable_id;
-    // TODO: Pull config up
-    const displaySpec = this.getConfig('tabs.maps.displaySpec');
-    const variableConfig = this.getConfig('variables');
-    const unitsConversions = this.getConfig('units');
+    // TODO: Pull config up!!!! We're repeating far too much here.
+    const mapsConfig = this.getConfig('tabs.maps.config');
+    const variableConfig = merge(
+      this.getConfig('variables'),
+      mapsConfig.variables,
+    );
+    console.log('### ClimateLayer: variableConfig', variableConfig)
+    const unitsConversions =
+      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
 
     // Convert the data range for the climate layer from display units, which
     // are convenient for the user to specify (in the config file), to data
     // units, which is what the data actually comes in.
-    const rangeInDisplayUnits = wmsDataRange(displaySpec, variableSpec);
+    const display = getVariableDisplay(variableConfig, variableId);
     const displayUnits =
-      getVariableDisplayUnits(variableConfig, variableId, 'absolute');
+      getVariableDisplayUnits(variableConfig, variableId, display);
     // TODO: dataUnits should come from metadata, not config.
     const dataUnits = getVariableDataUnits(variableConfig, variableId);
     const convertUnits =
       getConvertUnits(unitsConversions, variableConfig, variableId);
+
+    const rangeInDisplayUnits = wmsDataRange(variableConfig, variableSpec);
     const rangeInDataUnits = mapValues(
       convertUnits(displayUnits, dataUnits)
     )(rangeInDisplayUnits);
@@ -56,18 +65,18 @@ export default class ClimateLayer extends React.Component {
       <WMSTileLayer
         url={process.env.REACT_APP_NCWMS_URL}
         format={'image/png'}
-        logscale={wmsLogscale(displaySpec, variableSpec)}
+        logscale={wmsLogscale(variableConfig, variableSpec)}
         noWrap={true}
         numcolorbands={wmsNumcolorbands}
         opacity={0.7}
         // srs={"EPSG:3005"}
         transparent={true}
         version={'1.1.1'}
-        abovemaxcolor={wmsAboveMaxColor(displaySpec, variableSpec)}
-        belowmincolor={wmsBelowMinColor(displaySpec, variableSpec)}
+        abovemaxcolor={wmsAboveMaxColor(variableConfig, variableSpec)}
+        belowmincolor={wmsBelowMinColor(variableConfig, variableSpec)}
         layers={wmsLayerName(fileMetadata, variableSpec)}
         time={wmsTime(fileMetadata, season)}
-        styles={wmsStyle(displaySpec, variableSpec)}
+        styles={wmsStyle(variableConfig, variableSpec)}
         colorscalerange={wmsColorScaleRange(rangeInDataUnits)}
       />
     );
