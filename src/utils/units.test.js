@@ -3,6 +3,9 @@ import {
   collectionToCanonicalUnitsSpecs,
   groupToCanonicalUnitsSpecs,
   toCanonicalUnitSpec,
+  convertUnitsInGroup,
+  fromBaseUnits,
+  toBaseUnits,
 } from './units';
 
 
@@ -35,33 +38,65 @@ describe('toCanonicalUnitSpec', () => {
 
   each([
     // Full
-    [ 'full', unitsGroup.full ],
+    ['full', { id: 'full', ...unitsGroup.full }],
 
     // Defaults
-    [ 'empty', { label: 'empty', scale: 1, offset: 0 } ],
-    [ 'labelOnly', { label: unitsGroup.labelOnly.label, scale: 1, offset: 0 } ],
-    [ 'scaleOnly', { label: 'scaleOnly', scale: unitsGroup.scaleOnly.scale, offset: 0 } ],
-    [ 'offsetOnly', { label: 'offsetOnly', scale: 1, offset: unitsGroup.offsetOnly.offset } ],
+    ['empty', { id: 'empty', label: 'empty', scale: 1, offset: 0 }],
+    [
+      'labelOnly',
+      {
+        id: 'labelOnly',
+        label: unitsGroup.labelOnly.label,
+        scale: 1,
+        offset: 0
+      }
+    ],
+    [
+      'scaleOnly',
+      {
+        id: 'scaleOnly',
+        label: 'scaleOnly',
+        scale: unitsGroup.scaleOnly.scale,
+        offset: 0
+      }
+    ],
+    [
+      'offsetOnly',
+      {
+        id: 'offsetOnly',
+        label: 'offsetOnly',
+        scale: 1,
+        offset: unitsGroup.offsetOnly.offset
+      }
+    ],
 
     // Synonyms
-    [ 'synLong', { ...unitsGroup.full, label: 'synLong' } ],
-    [ 'synShort', { ...unitsGroup.full, label: 'synShort' } ],
-    [ 'synClosure', { ...unitsGroup.full, label: 'synClosure' } ],
+    ['synLong', { ...unitsGroup.full, id: 'synLong', label: 'synLong' }],
+    ['synShort', { ...unitsGroup.full, id: 'synShort', label: 'synShort' }],
+    [
+      'synClosure',
+      {
+        ...unitsGroup.full,
+        id: 'synClosure',
+        label: 'synClosure'
+      }],
 
     // Scale shorthand
     [
       'scaleShorthand',
       {
+        id: 'scaleShorthand',
         label: 'scaleShorthand',
         scale: unitsGroup.scaleShorthand,
         offset: 0
-      } ,
+      },
     ],
 
     // Others
     [
       'synScaleShorthand',
       {
+        id: 'synScaleShorthand',
         label: 'synScaleShorthand',
         scale: unitsGroup.scaleShorthand,
         offset: 0
@@ -91,14 +126,14 @@ describe('mappers', () => {
 
   const expectedCollection = {
     length: {
-      m: { label: 'm', scale: 1, offset: 0 },
-      cm: { label: 'cm', scale: 1/100, offset: 0 },
-      centimetre: { label: 'centimetre', scale: 1/100, offset: 0 },
+      m: { id: 'm', label: 'm', scale: 1, offset: 0 },
+      cm: { id: 'cm', label: 'cm', scale: 1/100, offset: 0 },
+      centimetre: { id: 'centimetre', label: 'centimetre', scale: 1/100, offset: 0 },
     },
     time: {
-      s: { label: 's', scale: 1, offset: 0 },
-      minute: { label: 'minute', scale: 60, offset: 0 },
-      min:  { label: 'min', scale: 60, offset: 0 },
+      s: { id: 's', label: 's', scale: 1, offset: 0 },
+      minute: { id: 'minute',label: 'minute', scale: 60, offset: 0 },
+      min:  { id: 'min', label: 'min', scale: 60, offset: 0 },
     },
   };
 
@@ -114,29 +149,63 @@ describe('mappers', () => {
 });
 
 
-describe('groupToCanonicalUnitsSpecs', () => {
+describe('value conversions', () => {
+  const collection = collectionToCanonicalUnitsSpecs({
+    'precipitation flux': {
+      'mm/yr': 1,
+      'mm/d': 365,
+      'kg m-1 d-1': 'mm/d',
+    },
+    temperature: {
+      degC: 1,
+      '°C': 'degC',
+      'degF': {
+        scale: 0.55555,
+        offset: -32 * 0.55555,
+      },
+      '°F': 'degF',
+    }
+  });
+
+  const tGroup = collection['temperature'];
+  const degFconversion = tGroup['degF'];
+
+
+  describe('toBaseUnits', () => {
+    each([
+      [1, 0, 2, 2],
+      [1, 1, 2, 3],
+      [10, 1, 2, 21],
+      [degFconversion.scale, degFconversion.offset, 50, 10],
+    ]).it('scale: %d, offset: %d, value: %d', (scale, offset, value, expected) => {
+      expect(toBaseUnits({ scale, offset }, value)).toBeCloseTo(expected);
+    });
+  });
+
+  describe('fromBaseUnits', () => {
+    each([
+      [1, 0, 2, 2],
+      [1, 1, 3, 2],
+      [10, 1, 21, 2],
+      [degFconversion.scale, degFconversion.offset, 10, 50],
+    ]).it('scale: %d, offset: %d, value: %d', (scale, offset, value, expected) => {
+      expect(fromBaseUnits({ scale, offset }, value)).toBeCloseTo(expected);
+    });
+  });
+
+  describe('convertUnitsInGroup', () => {
+    each([
+      [3, 'degC', 3, 'degC', tGroup],
+      [4, 'degC', 4, '°C', tGroup],
+      [5, '°C', 5, 'degC', tGroup],
+      [10, 'degC', 50, 'degF', tGroup],
+      [10, '°C', 50, 'degF', tGroup],
+      [50, 'degF', 10, 'degC', tGroup],
+      [50, '°F', 10, 'degC', tGroup],
+      [50, '°F', 10, '°C', tGroup],
+    ]).it('%d %s = %d %s', (value, fromUnits, expected, toUnits, group) => {
+      expect(convertUnitsInGroup(group, fromUnits, toUnits, value))
+      .toBeCloseTo(expected);
+    });
+  });
 });
-
-
-// describe('thing', () => {
-//   each([
-//   ]).test('test', (input, expected) => {
-//     expect(thing(input)).toEqual(expected);
-//   });
-// });
-//
-//
-// describe('thing', () => {
-//   each([
-//   ]).test('test', (input, expected) => {
-//     expect(thing(input)).toEqual(expected);
-//   });
-// });
-//
-//
-// describe('thing', () => {
-//   each([
-//   ]).test('test', (input, expected) => {
-//     expect(thing(input)).toEqual(expected);
-//   });
-// });

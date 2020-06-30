@@ -32,6 +32,7 @@
 // where unit spec is canonically the following structure:
 //
 //        <unit id>: {
+//          id: String; === <unit id>  (do not change this)
 //          label: String; default <unit id>
 //          scale: Number; default 1
 //          offset: Number; default 0
@@ -71,19 +72,23 @@ import isUndefined from 'lodash/fp/isUndefined';
 import isNumber from 'lodash/fp/isNumber';
 import isString from 'lodash/fp/isString';
 import { mapValuesWithKey } from './lodash-fp-extras';
+import curry from 'lodash/fp/curry';
 
 
-export const toCanonicalUnitSpec = (group, unitId) => {
+// Units specs
+
+export const toCanonicalUnitSpec = (group, unitsId) => {
   // Convert a single unit spec within a group to its canonical form.
-  // The spec converted is selected from `group` by `unitId`.
+  // The spec converted is selected from `group` by `unitsId`.
 
-  const spec = group[unitId];
+  const spec = group[unitsId];
   if (isUndefined(spec)) {
-    throw new Error(`Undefined units spec for unit id '${unitId}'`);
+    throw new Error(`Undefined units spec for units id '${unitsId}'`);
   }
   if (isNumber(spec)) {
     return {
-      label: unitId,
+      id: unitsId,
+      label: unitsId,
       scale: spec,
       offset: 0,
     };
@@ -91,17 +96,20 @@ export const toCanonicalUnitSpec = (group, unitId) => {
   if (isString(spec)) {
     return {
       ...toCanonicalUnitSpec(group, spec),
-      label: unitId,
+      id: unitsId,
+      label: unitsId,
     };
   }
   if (spec.synonymFor) {
     return {
       ...toCanonicalUnitSpec(group, spec.synonymFor),
-      label: spec.label || unitId,
+      id: unitsId,
+      label: spec.label || unitsId,
     };
   }
   return {
-    label: spec.label || unitId,
+    id: unitsId,
+    label: spec.label || unitsId,
     scale: spec.scale || 1,
     offset: spec.offset || 0,
   };
@@ -111,7 +119,7 @@ export const toCanonicalUnitSpec = (group, unitId) => {
 export const groupToCanonicalUnitsSpecs = group => {
   // Convert all units specs in a group to canonical form.
   return mapValuesWithKey(
-    (spec, unitId) => toCanonicalUnitSpec(group, unitId),
+    (spec, unitsId) => toCanonicalUnitSpec(group, unitsId),
     group
   );
 };
@@ -120,4 +128,31 @@ export const groupToCanonicalUnitsSpecs = group => {
 export const collectionToCanonicalUnitsSpecs =
   // Convert all groups of units specs in a collection to canonical form.
   mapValues(groupToCanonicalUnitsSpecs);
+
+
+// Value conversions
+
+export const toBaseUnits = curry((unitsSpec, value) =>
+  unitsSpec.scale * value + unitsSpec.offset
+);
+
+
+export const fromBaseUnits = curry((unitsSpec, value) =>
+  (value - unitsSpec.offset) / unitsSpec.scale
+);
+
+
+export const convertUnitsInGroup = curry((
+  group, fromUnitsId, toUnitsId, value
+) => {
+  if (!group) {
+    throw new Error('Undefined units group');
+  }
+  if (fromUnitsId === toUnitsId) {  // Identity; short circuit
+    return value;
+  }
+  const fromUnitsSpec = group[fromUnitsId];
+  const toUnitsSpec = group[toUnitsId];
+  return fromBaseUnits(toUnitsSpec, toBaseUnits(fromUnitsSpec, value));
+});
 
