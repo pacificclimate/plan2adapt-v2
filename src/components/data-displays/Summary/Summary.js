@@ -13,10 +13,8 @@ import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
 import { getDisplayData } from '../../../utils/percentile-anomaly';
 import {
-  canonicalConversion,
   displayFormat,
   getConvertUnits,
-  getVariableDisplayUnits, getVariableDisplayUnitsSpec,
   getVariableInfo,
   unitsSuffix,
 } from '../../../utils/variables-and-units';
@@ -70,8 +68,8 @@ class Summary extends React.Component {
     tableContents: PropTypes.array.isRequired,
     // Abstract specification of the summary table. Data is implicit in the
     // variable and season specifications, and is fetched by the data loader
-    // to construct the concrete table specification. Rows are specified
-    // in order of display, "depth first" by variable then seasons.
+    // accordingly. Rows are specified in order of display, "depth first" by
+    // variable then seasons.
     //
     // TODO: Convert this to a more explicit PropType when the layout settles.
     // Example value of this prop:
@@ -81,44 +79,37 @@ class Summary extends React.Component {
     //      variable: 'tasmean',
     //      display: 'absolute',
     //      precision: 2
+    //      displayUnits: '°C',   // Optional
     //      seasons: ['annual']
     //    },
     //    {
     //      variable: 'pr',
     //      display: 'relative',
     //      precision: 2
-    //      seasons: ['annual', 'summer', 'winter']
+    //      seasons: [
+    //        {
+    //          season: 'annual',
+    //          displayUnits: 'mm/year (cum)'
+    //        },
+    //        {
+    //          season: 'summer',
+    //          displayUnits: 'mm/season (cum)'
+    //        },
+    //        {
+    //          season: 'winter',
+    //          displayUnits: 'mm/season (cum)'
+    //        },
+    //      ]
     //    },
     //  ]
 
-    tableContentsWithData: PropTypes.array,
-    // Abstract specification of the summary table, with data fetched from the
-    // backend.
+    summaryStatistics: PropTypes.array,
+    // Data fetched from the backend in accordance with prop `tableContents`.
     //
     // Note: This prop is injected via `withAsyncData`. Users should not be
     // specifying this prop directly, only `tableContents`.
     //
     // TODO: Convert this to a more explicit PropType when the layout settles.
-    // Example value:
-    //  [
-    //    {
-    //      variable: 'pr',
-    //      display: 'absolute',
-    //      precision: 2,
-    //      seasons: [
-    //        {
-    //          name: 'annual',
-    //          percentiles: [2, 6, 12]
-    //        },
-    //        {
-    //          name: 'summer',
-    //          percentiles: [-1, 8, 6]
-    //        },
-    //        ...
-    //      ]
-    //    },
-    //    ...
-    //  ]
 
     variableConfig: PropTypes.object,
     // Object mapping (scientific) variable names (e.g., 'tasmean') to
@@ -161,7 +152,7 @@ class Summary extends React.Component {
       return <Loader/>
     }
 
-    const { tableContentsWithData, unitsConversions } = this.props;
+    const { tableContents, summaryStatistics, unitsConversions } = this.props;
 
     return (
       <Table striped bordered className={styles.summaryTable}>
@@ -189,48 +180,72 @@ class Summary extends React.Component {
         </thead>
         <tbody>
         {
-          map(row => {
+          map(([row, rowSummaryStatistics]) => {
             console.log('### row', row)
             const { variable, display, precision, seasons } = row;
             return map(season => {
               console.log('###  row season', season)
-              // Const `data` is provided as context data to the external text.
-              // The external text implements the structure and formatting of
-              // this data for display. Slightly tricky, very flexible.
-              // In addition to the data items it might want (e.g.,
-              // `variable.label`, we also include utility functions (e.g.,
-              // `format`).
+              const seasonSpec = isString(season) ? { season } : season;
+
+              // Create a variableConfig that includes display units info
+              // merged from the original variable config, and those specified
+              // in either the row or the row season of the tableContents.
+              const displayUnits = row.displayUnits || seasonSpec.displayUnits;
               const variableConfig = merge(
                 this.props.variableConfig,
                 {
-                  [variable]: {
-                    displayUnits: season.displayUnits,
-                  }
+                  [variable]: { displayUnits },
                 }
               );
               console.log('###  variableConfig', variable, variableConfig)
-              // We deal in units specs from here on in, so convert from
-              // simple string units to units spec.
-              const displayUnitsSpec = getVariableDisplayUnitsSpec(
+
+              // From here on, we want to deal not in units ids which
+              // `displayUnits` in its various forms is, but in units specs,
+              // which must be retrieved from unitsConversions using the
+              // information in variableConfig.
+
+              // `variableInfo` describes the variable completely. It is built
+              // using config info, and includes a full units spec.
+              const variableInfo = getVariableInfo(
                 unitsConversions, variableConfig, variable, display
               );
-              console.log('###  displayUnitsSpec', displayUnitsSpec)
+              console.log('###  variableInfo', variableInfo)
+
+
+              // Extract data for this row from prop `summaryStatistics`
+              console.log('###  rowSummaryStatistics', rowSummaryStatistics)
+              const displayData = getDisplayData(
+                rowSummaryStatistics, seasonSpec.season, display
+              );
+              console.log('###  displayData', displayData)
+
+              // Convert data to display units
               const convertUnits =
                 getConvertUnits(unitsConversions, variableConfig, variable);
-              console.log('###  convertUnits', convertUnits)
-              const convertData = convertUnits(season.units, displayUnitsSpec.id);
-              const percentiles = map(convertData)(season.percentiles);
+              const convertData =
+                convertUnits(displayData.units, variableInfo.unitsSpec.id);
+              const displayPercentileValues =
+                map(convertData)(displayData.percentiles);
+              console.log('### displayPercentileValues', displayPercentileValues)
+
+              // Const `data` is provided as context data to the external text.
+              // The external text implements the formatting of this data for
+              // display. Slightly tricky, very flexible.
+              // In addition to the data items it might want (e.g.,
+              // `variable.label`, we also include some utility functions (e.g.,
+              // `format`).
               const data = {
-                variable: getVariableInfo(unitsConversions, variableConfig, variable, display),
+                variable: variableInfo,
                 season: {
-                  ...season,
-                  label: capitalize(season.id),
-                  percentiles,
+                  ...seasonSpec,
+                  label: capitalize(seasonSpec.season),
+                  percentileValues: displayPercentileValues,
                 },
                 format: displayFormat(precision),
                 isLong,
                 unitsSuffix,
               };
+
               return (
                 <tr>
                   {
@@ -246,7 +261,11 @@ class Summary extends React.Component {
                 </tr>
               )
             })(seasons);
-          })(tableContentsWithData)
+          })(
+            // summaryStatistics items correspond 1:1 with tableContents items
+            // TODO: Put into loader?
+            zip(tableContents, summaryStatistics)
+          )
         }
         </tbody>
       </Table>
@@ -297,8 +316,8 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
         return undefined;
       })
     )(tableContents)
-  )
-  .then(data => tableContentsAndDataToSummarySpec(zip(tableContents, data)));
+  );
+  // .then(data => tableContentsAndDataToSummarySpec(zip(tableContents, data)));
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
@@ -324,5 +343,5 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
 
 // Wrap the display component with data injection.
 export default withAsyncData(
-  loadSummaryStatistics, shouldLoadSummaryStatistics, 'tableContentsWithData'
+  loadSummaryStatistics, shouldLoadSummaryStatistics, 'summaryStatistics'
 )(Summary);

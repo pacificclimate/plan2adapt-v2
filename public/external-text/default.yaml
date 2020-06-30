@@ -63,29 +63,32 @@ tabs:
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
       rows:
         variable: |
-          ${variable.label}${variable.derived ? '*': ''} (${variable.units})
+          ${variable.label}${variable.derived ? '*': ''} (${variable.unitsSpec.label})
 
           ${variable.possibleLowBaseline && variable.units =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
         season: ${season.label}
-        ensembleMedian: ${format(season.percentiles[1])}${unitsSuffix(variable.units)}
+        ensembleMedian: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
         range: |
-          ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
-          ${format(season.percentiles[2])}${unitsSuffix(variable.units)}
+          ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
+          ${format(season.percentileValues[2])}${unitsSuffix(variable.unitsSpec.label)}
       contents:
+        # TODO: remove pr absolute; for testing only
         - variable: pr
           display: absolute
           precision: 2
           seasons:
             - season: annual
               displayUnits: mm/year (cum)
-#            - season: summer
-#              displayUnits: mm/season (cum)
-#        - variable: tasmean
-#          display: absolute
-#          precision: 2
-#          seasons:
-#            - annual
+            - season: summer
+              displayUnits: mm/season (cum)
+            - season: winter
+              displayUnits: mm/season (cum)
+        - variable: tasmean
+          display: absolute
+          precision: 2
+          seasons:
+            - annual
 #        - variable: pr
 #          display: relative
 #          precision: 2
@@ -678,11 +681,11 @@ variables:
 # Note the distinction between precipitation flux and snowfall flux: The
 # conversion from mass flux units to depth flux units differs.
 units:
-  'precipitation flux':   # variable type
-    'mm/yr': 1            # nominal base unit
-    'mm/d': 365           # another unit: scale: 365, offset: 0
-    'kg m-2 d-1': mm/d    # synonym
-    'mm': mm/yr           # synonym
+  'precipitation flux':
+    'mm/yr': 1
+    'mm/d': 365.25
+    'kg m-2 d-1': mm/d
+    'mm': mm/yr
     'mm/season': 4
     'mm/month': 12
     'mm/year (cum)':
