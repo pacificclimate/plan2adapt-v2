@@ -11,6 +11,7 @@ import Summary from '../data-displays/Summary';
 import { allDefined } from '../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
 import PropTypes from 'prop-types';
+import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
 
 export default class SummaryTabBody extends React.Component {
   static contextType = T.contextType;
@@ -39,6 +40,9 @@ export default class SummaryTabBody extends React.Component {
     const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
     const baselineTimePeriod = this.props.baselineTimePeriod;
 
+    const unitsConversions =
+      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+
     return (
       <React.Fragment>
         <T path='tabs.summary.prologue' data={{
@@ -53,7 +57,7 @@ export default class SummaryTabBody extends React.Component {
           futureTimePeriod={futureTimePeriod}
           tableContents={this.getConfig('tabs.summary.table.contents')}
           variableConfig={this.getConfig('variables')}
-          unitsConversions={this.getConfig('units')}
+          unitsConversions={unitsConversions}
         />
         <T path='tabs.summary.notes'/>
       </React.Fragment>
