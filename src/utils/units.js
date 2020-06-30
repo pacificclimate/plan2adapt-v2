@@ -142,17 +142,27 @@ export const fromBaseUnits = curry((unitsSpec, value) =>
 );
 
 
+export const getUnitsSpec = (group, unitsId) => {
+  const unitsSpec = group[unitsId];
+  if (!unitsSpec) {
+    throw new Error(`Units group contains no spec for '${unitsId}'`);
+  }
+  return unitsSpec;
+};
+
+
 export const convertUnitsInGroup = curry((
   group, fromUnitsId, toUnitsId, value
 ) => {
+  console.log('### convertUnitsInGroup: group, fromUnitsId, toUnitsId, value', group, fromUnitsId, toUnitsId, value)
   if (!group) {
     throw new Error('Undefined units group');
   }
   if (fromUnitsId === toUnitsId) {  // Identity; short circuit
     return value;
   }
-  const fromUnitsSpec = group[fromUnitsId];
-  const toUnitsSpec = group[toUnitsId];
+  const fromUnitsSpec = getUnitsSpec(group, fromUnitsId);
+  const toUnitsSpec = getUnitsSpec(group, toUnitsId);
   return fromBaseUnits(toUnitsSpec, toBaseUnits(fromUnitsSpec, value));
 });
 

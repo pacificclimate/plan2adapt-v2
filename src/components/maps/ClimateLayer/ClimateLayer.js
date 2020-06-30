@@ -20,6 +20,8 @@ import {
 } from '../../../utils/variables-and-units';
 import merge from 'lodash/fp/merge';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
+import { allDefined } from '../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 export default class ClimateLayer extends React.Component {
@@ -30,20 +32,31 @@ export default class ClimateLayer extends React.Component {
     fileMetadata: PropTypes.object,
     variableSpec: PropTypes.object,
     season: PropTypes.number,
+    variableConfig: PropTypes.object,
+    unitsConversions: PropTypes.object,
   };
 
   render() {
-    const { fileMetadata, variableSpec, season } = this.props;
+    if (!allDefined(
+      [
+        'fileMetadata',
+        'variableSpec',
+        'season',
+        'variableConfig',
+        'unitsConversions',
+      ],
+      this.props
+    )) {
+      console.log('### ClimateLayer: unsettled props', this.props)
+      return <Loader/>;
+    }
+    const {
+      fileMetadata, variableSpec, season, variableConfig, unitsConversions,
+    } = this.props;
     const variableId = variableSpec.variable_id;
-    // TODO: Pull config up!!!! We're repeating far too much here.
-    const mapsConfig = this.getConfig('tabs.maps.config');
-    const variableConfig = merge(
-      this.getConfig('variables'),
-      mapsConfig.variables,
-    );
+    console.log('### ClimateLayer: variableId', variableId)
     console.log('### ClimateLayer: variableConfig', variableConfig)
-    const unitsConversions =
-      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+    console.log('### ClimateLayer: unitsConversions', unitsConversions)
 
     // Convert the data range for the climate layer from display units, which
     // are convenient for the user to specify (in the config file), to data
@@ -53,6 +66,7 @@ export default class ClimateLayer extends React.Component {
       getVariableDisplayUnits(variableConfig, variableId, display);
     // TODO: dataUnits should come from metadata, not config.
     const dataUnits = getVariableDataUnits(variableConfig, variableId);
+    console.log('### ClimateLayer: unitsConversions: display, displayUnits, dataUnits', display, displayUnits, dataUnits)
     const convertUnits =
       getConvertUnits(unitsConversions, variableConfig, variableId);
 

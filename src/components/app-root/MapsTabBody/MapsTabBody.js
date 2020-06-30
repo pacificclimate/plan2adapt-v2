@@ -34,7 +34,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Loader from 'react-loader';
+import mapValues from 'lodash/fp/mapValues';
 import merge from 'lodash/fp/merge';
+import isString from 'lodash/fp/isString';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
@@ -46,6 +48,8 @@ import Button from 'react-bootstrap/Button';
 import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
+import ClimateLayer from '../../maps/ClimateLayer';
+import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 
 
 export default class MapsTabBody extends React.Component {
@@ -120,9 +124,24 @@ export default class MapsTabBody extends React.Component {
     const variableId = variableRep.variable_id;
 
     const mapsConfig = this.getConfig('tabs.maps.config');
+    const seasonId = seasonIndexToPeriod(season);
+    const mapsVariableConfigForTimescale = mapValues(
+      value => {
+        const {
+          displayUnits, range, ticks,
+
+        } = value.seasons ? value.seasons[seasonId] : value;
+        return ({
+          ...value,
+          displayUnits,
+          range,
+          ticks,
+        });
+      },
+    )(mapsConfig.variables);
     const variableConfig = merge(
       this.getConfig('variables'),
-      mapsConfig.variables,
+      mapsVariableConfigForTimescale,
     );
     console.log('### MapsTabBody: variableConfig', variableConfig)
 
@@ -191,6 +210,8 @@ export default class MapsTabBody extends React.Component {
               variable={variable}
               timePeriod={baselineTimePeriod}
               metadata={this.props.metadata}
+              variableConfig={variableConfig}
+              unitsConversions={unitsConversions}
             >
               {zoomButton}
             </DataMap>
@@ -212,6 +233,8 @@ export default class MapsTabBody extends React.Component {
               variable={variable}
               timePeriod={futureTimePeriod}
               metadata={this.props.metadata}
+              variableConfig={variableConfig}
+              unitsConversions={unitsConversions}
             >
               {zoomButton}
             </DataMap>

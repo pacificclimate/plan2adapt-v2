@@ -86,6 +86,7 @@ export const getConvertUnits= (unitsSpecs, variableConfig, variableId) => {
   if (!unitsGroup) {
     throw new Error(`No units group for ${variableType}`);
   }
+  console.log('### getConvertUnits: variableType, unitsGroup', variableType, unitsGroup)
   return convertUnitsInGroup(unitsGroup);
 };
 

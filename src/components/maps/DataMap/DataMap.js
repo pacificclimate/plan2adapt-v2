@@ -61,6 +61,8 @@ class DataMapDisplay extends React.Component {
     onPopupChange: PropTypes.func,
     fileMetadata: PropTypes.object,
     fileMetadataFetchError: PropTypes.object,
+    variableConfig: PropTypes.object,
+    unitsConversions: PropTypes.object,
     // Any other props are passed through to CanadaBaseMap.
   };
 
@@ -119,6 +121,8 @@ class DataMapDisplay extends React.Component {
         'timePeriod',
         'variable',
         'season',
+        'variableConfig',
+        'unitsConversions',
       ],
       this.props
     )) {
@@ -127,12 +131,13 @@ class DataMapDisplay extends React.Component {
     }
     const {
       children, region, timePeriod, season, variable, popup,
-      fileMetadata, ...rest
+      fileMetadata, variableConfig, unitsConversions,
+      ...baseMapProps
     } = this.props;
 
     return (
       <CanadaBaseMap
-        {...rest}
+        {...baseMapProps}
         // FIXME: Popups are disabled because the CE ncWMS does not allow
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
@@ -141,6 +146,8 @@ class DataMapDisplay extends React.Component {
           fileMetadata={fileMetadata}
           variableSpec={variable.representative}
           season={season}
+          variableConfig={variableConfig}
+          unitsConversions={unitsConversions}
         />
         {
           popup.isOpen &&
