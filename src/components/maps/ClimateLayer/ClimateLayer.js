@@ -4,15 +4,15 @@ import { WMSTileLayer } from 'react-leaflet';
 import mapValues from 'lodash/fp/mapValues';
 import T from '../../../temporary/external-text';
 import {
-  wmsAboveMaxColor,
-  wmsBelowMinColor,
-  wmsColorScaleRange,
-  wmsDataRange,
-  wmsLayerName,
-  wmsLogscale,
+  getWmsAboveMaxColor,
+  getWmsBelowMinColor,
+  formatWmsColorScaleRange,
+  getWmsDataRange,
+  getWmsLayerName,
+  getWmsLogscale,
   wmsNumcolorbands,
-  wmsStyle,
-  wmsTime
+  getWmsStyle,
+  getWmsTime
 } from '../map-utils';
 import {
   getConvertUnits, getVariableDataUnits, getVariableDisplay,
@@ -56,7 +56,7 @@ export default class ClimateLayer extends React.Component {
     const convertUnits =
       getConvertUnits(unitsConversions, variableConfig, variableId);
 
-    const rangeInDisplayUnits = wmsDataRange(variableConfig, variableSpec);
+    const rangeInDisplayUnits = getWmsDataRange(variableConfig, variableId);
     const rangeInDataUnits = mapValues(
       convertUnits(displayUnits, dataUnits)
     )(rangeInDisplayUnits);
@@ -65,19 +65,19 @@ export default class ClimateLayer extends React.Component {
       <WMSTileLayer
         url={process.env.REACT_APP_NCWMS_URL}
         format={'image/png'}
-        logscale={wmsLogscale(variableConfig, variableSpec)}
+        logscale={getWmsLogscale(variableConfig, variableId)}
         noWrap={true}
         numcolorbands={wmsNumcolorbands}
         opacity={0.7}
         // srs={"EPSG:3005"}
         transparent={true}
         version={'1.1.1'}
-        abovemaxcolor={wmsAboveMaxColor(variableConfig, variableSpec)}
-        belowmincolor={wmsBelowMinColor(variableConfig, variableSpec)}
-        layers={wmsLayerName(fileMetadata, variableSpec)}
-        time={wmsTime(fileMetadata, season)}
-        styles={wmsStyle(variableConfig, variableSpec)}
-        colorscalerange={wmsColorScaleRange(rangeInDataUnits)}
+        abovemaxcolor={getWmsAboveMaxColor(variableConfig, variableId)}
+        belowmincolor={getWmsBelowMinColor(variableConfig, variableId)}
+        layers={getWmsLayerName(fileMetadata, variableId)}
+        time={getWmsTime(fileMetadata, season)}
+        styles={getWmsStyle(variableConfig, variableId)}
+        colorscalerange={formatWmsColorScaleRange(rangeInDataUnits)}
       />
     );
   }

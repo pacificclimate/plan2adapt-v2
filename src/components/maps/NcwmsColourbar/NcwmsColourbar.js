@@ -28,18 +28,18 @@ import mapValues from 'lodash/fp/mapValues';
 import styles from './NcwmsColourbar.module.css';
 import { makeURI } from '../../../utils/uri';
 import {
-  wmsDataRange,
-  wmsLogscale,
+  getWmsDataRange,
+  getWmsLogscale,
   wmsNumcolorbands,
-  wmsPalette,
-  wmsTicks,
-  wmsAboveMaxColor,
-  wmsBelowMinColor,
+  getWmsPalette,
+  getWmsTicks,
+  getWmsAboveMaxColor,
+  getWmsBelowMinColor,
 } from '../map-utils';
 
 
 // TODO: Move to data-services.
-const getColorbarURI = (displaySpec, variableSpec, width, height) =>
+const getColorbarURI = (displaySpec, variableId, width, height) =>
   makeURI(
     process.env.REACT_APP_NCWMS_URL,
     {
@@ -47,7 +47,7 @@ const getColorbarURI = (displaySpec, variableSpec, width, height) =>
       colorbaronly: 'true',
       width,
       height,
-      palette: wmsPalette(displaySpec, variableSpec),
+      palette: getWmsPalette(displaySpec, variableId),
       numcolorbands: wmsNumcolorbands,
     }
   );
@@ -124,19 +124,23 @@ export default class NcwmsColourbar extends React.Component {
       heading, note, displaySpec, variableSpec,
     } = this.props;
 
-    const logscale = wmsLogscale(displaySpec, variableSpec);
+    console.log('### NcwmsColourbar: displaySpec', displaySpec)
+    const variableId = variableSpec.variable_id;
+    console.log('### NcwmsColourbar: variableSpec', variableSpec)
+
+    const logscale = getWmsLogscale(displaySpec, variableId);
     const scaleOperator = logscale ? Math.log : identity;
-    const range = wmsDataRange(displaySpec, variableSpec);
+    const range = getWmsDataRange(displaySpec, variableId);
     const rangeScale = mapValues(scaleOperator, range);
     const rangeSpan = rangeScale.max - rangeScale.min;
-    const ticks = wmsTicks(displaySpec, variableSpec);
+    const ticks = getWmsTicks(displaySpec, variableId);
 
     const belowAboveLength = (100 - length) /2;  //%
     const width = this.state.width;
     const imageWidth = Math.round(width * length / 100);
 
-    const belowMinColor = wmsBelowMinColor(displaySpec, variableSpec);
-    const aboveMaxColor = wmsAboveMaxColor(displaySpec, variableSpec);
+    const belowMinColor = getWmsBelowMinColor(displaySpec, variableId);
+    const aboveMaxColor = getWmsAboveMaxColor(displaySpec, variableId);
 
     return (
       <div className={styles.all} ref={this.thing}>
@@ -168,7 +172,7 @@ export default class NcwmsColourbar extends React.Component {
                 'margin-left': -breadth,
                 'margin-right': `${length}%`,
               }}
-              src={getColorbarURI(displaySpec, variableSpec, breadth, imageWidth)}
+              src={getColorbarURI(displaySpec, variableId, breadth, imageWidth)}
             />
           }
           <span

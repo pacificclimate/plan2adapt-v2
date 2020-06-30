@@ -39,7 +39,7 @@ import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
 import NcwmsColourbar from '../../maps/NcwmsColourbar';
-import { regionBounds, wmsLogscale } from '../../maps/map-utils';
+import { regionBounds, getWmsLogscale } from '../../maps/map-utils';
 import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
@@ -126,8 +126,7 @@ export default class MapsTabBody extends React.Component {
     );
     console.log('### MapsTabBody: variableConfig', variableConfig)
 
-    // TODO: replace usages of `mapsConfig` with `variableConfig`?
-    const logscale = wmsLogscale(variableConfig, variableRep);
+    const logscale = getWmsLogscale(variableConfig, variableId);
 
     const unitsConversions =
       collectionToCanonicalUnitsSpecs(this.getConfig('units'));

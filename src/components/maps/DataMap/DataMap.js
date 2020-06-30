@@ -18,7 +18,7 @@ import LayerValuePopup from '../LayerValuePopup';
 import SimpleGeoJSON from '../SimpleGeoJSON';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchFileMetadata } from '../../../data-services/metadata';
-import { wmsLayerName, wmsTime, wmsClimateLayerProps } from '../map-utils';
+import { getWmsLayerName, getWmsTime, wmsClimateLayerProps } from '../map-utils';
 
 import './DataMap.css';
 import { allDefined } from '../../../utils/lodash-fp-extras';
@@ -35,8 +35,8 @@ const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
         exceptions: 'application/vnd.ogc.se_xml',
         ...xy,
         info_format: 'text/xml', // f**k, only xml is available
-        query_layers: wmsLayerName(layerSpec),
-        time: wmsTime(layerSpec),
+        query_layers: getWmsLayerName(layerSpec),
+        time: getWmsTime(layerSpec),
         feature_count: 50,  // ??
         version: '1.1.1',
       },

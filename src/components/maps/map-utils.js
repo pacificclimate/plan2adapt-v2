@@ -51,11 +51,11 @@ export const generateResolutions = (maxRes, count) =>
 export const wmsNumcolorbands = 249;
 
 
-export const wmsLayerName = (fileMetadata, variableSpec) =>
-  `${fileMetadata.unique_id}/${variableSpec.variable_id}`;
+export const getWmsLayerName = (fileMetadata, variableId) =>
+  `${fileMetadata.unique_id}/${variableId}`;
 
 
-export const wmsTime = (fileMetadata, season) => {
+export const getWmsTime = (fileMetadata, season) => {
   const timeIndexOffset = {
     'yearly': 16, 'seasonal': 12, 'monthly': 0
   }[fileMetadata.timescale];
@@ -64,28 +64,28 @@ export const wmsTime = (fileMetadata, season) => {
 };
 
 
-export const getDisplaySpecItem = curry(
-  // Extract the relevant item (e.g., 'palette') from a display spec, which
-  // is a configuration object retrieved from the external text file.
-  (item, displaySpec, variableSpec) => getOr(
-      displaySpec.fallback[item],
-      [variableSpec.variable_id, item],
-      displaySpec
+export const getVariableSpecItem = curry(
+  // Extract the relevant item (e.g., 'palette') from a variable spec, which
+  // is a configuration object.
+  (item, variableSpec, variableId) => getOr(
+      variableSpec.fallback[item],
+      [variableId, item],
+      variableSpec
     )
 );
 
-export const wmsLogscale = getDisplaySpecItem('logscale');
-export const wmsPalette = getDisplaySpecItem('palette');
-export const wmsDataRange = getDisplaySpecItem('range');
-export const wmsTicks = getDisplaySpecItem('ticks');
-export const wmsAboveMaxColor = getDisplaySpecItem('aboveMaxColor');
-export const wmsBelowMinColor = getDisplaySpecItem('belowMinColor');
+export const getWmsLogscale = getVariableSpecItem('logscale');
+export const getWmsPalette = getVariableSpecItem('palette');
+export const getWmsDataRange = getVariableSpecItem('range');
+export const getWmsTicks = getVariableSpecItem('ticks');
+export const getWmsAboveMaxColor = getVariableSpecItem('aboveMaxColor');
+export const getWmsBelowMinColor = getVariableSpecItem('belowMinColor');
 
 
-export const wmsStyle = (displaySpec, variableSpec) =>
-  `default-scalar/${wmsPalette(displaySpec, variableSpec)}`;
+export const getWmsStyle = (displaySpec, variableId) =>
+  `default-scalar/${getWmsPalette(displaySpec, variableId)}`;
 
 
-export const wmsColorScaleRange = range => {
+export const formatWmsColorScaleRange = range => {
   return `${range.min},${range.max}`
 };
