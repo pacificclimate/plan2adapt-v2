@@ -5,15 +5,18 @@ import React from 'react';
 import Table from 'react-bootstrap/Table';
 import capitalize from 'lodash/fp/capitalize';
 import map from 'lodash/fp/map';
+import merge from 'lodash/fp/merge';
 import zip from 'lodash/fp/zip';
 import isEqual from 'lodash/fp/isEqual';
+import isString from 'lodash/fp/isString';
 import isUndefined from 'lodash/fp/isUndefined';
 import T from '../../../temporary/external-text';
 import { getDisplayData } from '../../../utils/percentile-anomaly';
 import {
+  canonicalConversion,
   displayFormat,
   getConvertUnits,
-  getVariableDisplayUnits,
+  getVariableDisplayUnits, getVariableDisplayUnitsSpec,
   getVariableInfo,
   unitsSuffix,
 } from '../../../utils/variables-and-units';
@@ -157,7 +160,9 @@ class Summary extends React.Component {
       console.log('### Summary: unsettled props', this.props)
       return <Loader/>
     }
-    const { variableConfig, unitsConversions } = this.props;
+
+    const { tableContentsWithData, unitsConversions } = this.props;
+
     return (
       <Table striped bordered className={styles.summaryTable}>
         <thead>
@@ -185,23 +190,38 @@ class Summary extends React.Component {
         <tbody>
         {
           map(row => {
-            // TODO: Extract as component
-            const { variable, display, precision } = row;
-            const displayUnits =
-              getVariableDisplayUnits(variableConfig, variable, display);
-            const convertUnits =
-              getConvertUnits(unitsConversions, variableConfig, variable);
+            console.log('### row', row)
+            const { variable, display, precision, seasons } = row;
             return map(season => {
+              console.log('###  row season', season)
               // Const `data` is provided as context data to the external text.
               // The external text implements the structure and formatting of
               // this data for display. Slightly tricky, very flexible.
               // In addition to the data items it might want (e.g.,
               // `variable.label`, we also include utility functions (e.g.,
               // `format`).
-              const convertData = convertUnits(season.units, displayUnits);
+              const variableConfig = merge(
+                this.props.variableConfig,
+                {
+                  [variable]: {
+                    displayUnits: season.displayUnits,
+                  }
+                }
+              );
+              console.log('###  variableConfig', variable, variableConfig)
+              // We deal in units specs from here on in, so convert from
+              // simple string units to units spec.
+              const displayUnitsSpec = getVariableDisplayUnitsSpec(
+                unitsConversions, variableConfig, variable, display
+              );
+              console.log('###  displayUnitsSpec', displayUnitsSpec)
+              const convertUnits =
+                getConvertUnits(unitsConversions, variableConfig, variable);
+              console.log('###  convertUnits', convertUnits)
+              const convertData = convertUnits(season.units, displayUnitsSpec.id);
               const percentiles = map(convertData)(season.percentiles);
               const data = {
-                variable: getVariableInfo(variableConfig, variable, display),
+                variable: getVariableInfo(unitsConversions, variableConfig, variable, display),
                 season: {
                   ...season,
                   label: capitalize(season.id),
@@ -225,8 +245,8 @@ class Summary extends React.Component {
                   <SeasonTds data={data}/>
                 </tr>
               )
-            })(row.seasons);
-          })(this.props.tableContentsWithData)
+            })(seasons);
+          })(tableContentsWithData)
         }
         </tbody>
       </Table>
@@ -242,16 +262,18 @@ const tableContentsAndDataToSummarySpec =
   // Argument of this function is `tableContents` zipped with the
   // corresponding data fetched from the backend.
   map(([content, data]) => {
-    const { variable, precision, display, seasons } = content;
+    const { display, seasons, ...rest } = content;
     return {
-      variable,
+      ...rest,
       display,
-      precision,
       hasData: !isUndefined(data),
       seasons: map(season => {
+        const seasonId = isString(season) ? season : season.season;
+        const { units, ...rest } = getDisplayData(data, seasonId, display);
         return {
-          id: season,
-          ...getDisplayData(data, season, display),
+          id: seasonId,
+          units,
+          ...rest,
         }
       })(seasons),
     };

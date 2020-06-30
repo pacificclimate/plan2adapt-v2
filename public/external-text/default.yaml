@@ -73,40 +73,48 @@ tabs:
           ${format(season.percentiles[0])}${isLong(variable.units) ? '': unitsSuffix(variable.units)} to
           ${format(season.percentiles[2])}${unitsSuffix(variable.units)}
       contents:
-        - variable: tasmean
-          display: absolute
-          precision: 2
-          seasons:
-            - annual
         - variable: pr
-          display: relative
-          precision: 2
-          seasons:
-            - annual
-            - summer
-            - winter
-        - variable: prsn
-          display: relative
-          precision: 2
-          seasons:
-            - annual
-            - winter
-            - spring
-        - variable: gdd
-          display: absolute
-          precision: 3
-          seasons:
-            - annual
-        - variable: hdd
-          display: absolute
-          precision: 3
-          seasons:
-            - annual
-        - variable: ffd
           display: absolute
           precision: 2
           seasons:
-            - annual
+            - season: annual
+              displayUnits: mm/year (cum)
+#            - season: summer
+#              displayUnits: mm/season (cum)
+#        - variable: tasmean
+#          display: absolute
+#          precision: 2
+#          seasons:
+#            - annual
+#        - variable: pr
+#          display: relative
+#          precision: 2
+#          seasons:
+#            - annual
+#            - summer
+#            - winter
+#        - variable: prsn
+#          display: relative
+#          precision: 2
+#          seasons:
+#            - annual
+#            - winter
+#            - spring
+#        - variable: gdd
+#          display: absolute
+#          precision: 3
+#          seasons:
+#            - annual
+#        - variable: hdd
+#          display: absolute
+#          precision: 3
+#          seasons:
+#            - annual
+#        - variable: ffd
+#          display: absolute
+#          precision: 2
+#          seasons:
+#            - annual
     notes: |
       Notes:
 
@@ -675,7 +683,17 @@ units:
     'mm/d': 365           # another unit: scale: 365, offset: 0
     'kg m-2 d-1': mm/d    # synonym
     'mm': mm/yr           # synonym
+    'mm/season': 4
     'mm/month': 12
+    'mm/year (cum)':
+      label: 'mm'
+      scale: 1
+    'mm/season (cum)':
+      label: 'mm'
+      scale: 4
+    'mm/month (cum)':
+      label: 'mm'
+      scale: 12
   'snowfall flux':
     'mm/yr': 1
     'mm/d': 365

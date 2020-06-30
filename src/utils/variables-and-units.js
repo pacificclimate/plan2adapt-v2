@@ -7,6 +7,7 @@ import flow from 'lodash/fp/flow';
 import isNumber from 'lodash/fp/isNumber';
 import isString from 'lodash/fp/isString';
 import isUndefined from 'lodash/fp/isUndefined';
+import { convertUnitsInGroup } from './units'
 
 
 // Functions that encapsulate knowledge about the structure of variable
@@ -36,9 +37,14 @@ export const getVariableDisplay = (variableConfig, variableId) => {
 };
 
 
-export const getVariableDataUnits = (variableConfig, variableId) => {
-  return getConfigForId(variableConfig, variableId).dataUnits;
-};
+export const getVariableDataUnits =
+  (variableConfig, variableId, display = 'absolute') => {
+    const vc = getConfigForId(variableConfig, variableId);
+    if (display === 'relative') {
+      return 'relative';
+    }
+    return vc.dataUnits;
+  };
 
 
 export const getVariableDisplayUnits =
@@ -51,7 +57,16 @@ export const getVariableDisplayUnits =
   };
 
 
-export const getVariableInfo = (variableConfig, variableId, display) => {
+export const getVariableDisplayUnitsSpec =
+  (unitsSpec, variableConfig, variableId, display = 'absolute') => {
+    const type = getVariableType(variableConfig, variableId, display);
+    const displayUnits =
+      getVariableDisplayUnits(variableConfig, variableId, display);
+    return unitsSpec[type][displayUnits];
+  };
+
+
+export const getVariableInfo = (unitsConversions, variableConfig, variableId, display) => {
   return {
     id: variableId,
     label: getVariableLabel(variableConfig, variableId),
