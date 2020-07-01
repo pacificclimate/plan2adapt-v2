@@ -62,7 +62,7 @@ class DataMapDisplay extends React.Component {
     fileMetadata: PropTypes.object,
     fileMetadataFetchError: PropTypes.object,
     variableConfig: PropTypes.object,
-    unitsConversions: PropTypes.object,
+    unitsSpecs: PropTypes.object,
     // Any other props are passed through to CanadaBaseMap.
   };
 
@@ -122,7 +122,7 @@ class DataMapDisplay extends React.Component {
         'variable',
         'season',
         'variableConfig',
-        'unitsConversions',
+        'unitsSpecs',
       ],
       this.props
     )) {
@@ -131,7 +131,7 @@ class DataMapDisplay extends React.Component {
     }
     const {
       children, region, timePeriod, season, variable, popup,
-      fileMetadata, variableConfig, unitsConversions,
+      fileMetadata, variableConfig, unitsSpecs,
       ...baseMapProps
     } = this.props;
 
@@ -147,7 +147,7 @@ class DataMapDisplay extends React.Component {
           variableSpec={variable.representative}
           season={season}
           variableConfig={variableConfig}
-          unitsConversions={unitsConversions}
+          unitsSpecs={unitsSpecs}
         />
         {
           popup.isOpen &&

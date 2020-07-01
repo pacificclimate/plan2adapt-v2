@@ -67,11 +67,11 @@ export const getVariableDisplayUnitsSpec =
   };
 
 
-export const getVariableInfo = (unitsConversions, variableConfig, variableId, display) => {
+export const getVariableInfo = (unitsSpecs, variableConfig, variableId, display) => {
   return {
     id: variableId,
     label: getVariableLabel(variableConfig, variableId),
-    unitsSpec: getVariableDisplayUnitsSpec(unitsConversions, variableConfig, variableId, display),
+    unitsSpec: getVariableDisplayUnitsSpec(unitsSpecs, variableConfig, variableId, display),
     possibleLowBaseline: variableConfig[variableId].possibleLowBaseline,
   };
 };

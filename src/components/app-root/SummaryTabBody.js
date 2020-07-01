@@ -40,7 +40,7 @@ export default class SummaryTabBody extends React.Component {
     const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
     const baselineTimePeriod = this.props.baselineTimePeriod;
 
-    const unitsConversions =
+    const unitsSpecs =
       collectionToCanonicalUnitsSpecs(this.getConfig('units'));
 
     return (
@@ -57,7 +57,7 @@ export default class SummaryTabBody extends React.Component {
           futureTimePeriod={futureTimePeriod}
           tableContents={this.getConfig('tabs.summary.table.contents')}
           variableConfig={this.getConfig('variables')}
-          unitsConversions={unitsConversions}
+          unitsSpecs={unitsSpecs}
         />
         <T path='tabs.summary.notes'/>
       </React.Fragment>

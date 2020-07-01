@@ -119,7 +119,7 @@ class Summary extends React.Component {
     // Example value: See configuration file, key 'variables'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
 
-    unitsConversions: PropTypes.object,
+    unitsSpecs: PropTypes.object,
     // Object containing units conversions information.Typically this
     // object will be retrieved from a configuration file, but that is not the
     // job of this component.
@@ -143,7 +143,7 @@ class Summary extends React.Component {
         'futureTimePeriod',
         'tableContents',
         'variableConfig',
-        'unitsConversions',
+        'unitsSpecs',
       ],
       this.props
     )) {
@@ -151,7 +151,7 @@ class Summary extends React.Component {
       return <Loader/>
     }
 
-    const { tableContents, summaryStatistics, unitsConversions } = this.props;
+    const { tableContents, summaryStatistics, unitsSpecs } = this.props;
 
     return (
       <Table striped bordered className={styles.summaryTable}>
@@ -198,7 +198,7 @@ class Summary extends React.Component {
               // `variableInfo` describes the variable completely. It is built
               // using config info, and includes a full units spec.
               const variableInfo = getVariableInfo(
-                unitsConversions, variableConfig, variable, display
+                unitsSpecs, variableConfig, variable, display
               );
 
               // Extract data for this row
@@ -208,7 +208,7 @@ class Summary extends React.Component {
 
               // Convert data to display units
               const convertUnits =
-                getConvertUnits(unitsConversions, variableConfig, variable);
+                getConvertUnits(unitsSpecs, variableConfig, variable);
               const convertData =
                 convertUnits(displayData.units, variableInfo.unitsSpec.id);
               const displayPercentileValues =

@@ -56,12 +56,14 @@ export default class GraphsTabBody extends React.Component {
       graphConfig.variables,
     );
 
-    const unitsConversions =
+    const unitsSpecs =
       collectionToCanonicalUnitsSpecs(this.getConfig('units'));
 
     const variableId = variable.representative.variable_id;
     const display = getVariableDisplay(variableConfig, variableId);
-    const variableInfo = getVariableInfo(unitsConversions, variableConfig, variableId, display);
+    const variableInfo = getVariableInfo(
+      unitsSpecs, variableConfig, variableId, display
+    );
 
     return (
       <React.Fragment>
@@ -87,7 +89,7 @@ export default class GraphsTabBody extends React.Component {
               variableInfo={variableInfo}
               graphConfig={graphConfig}
               variableConfig={variableConfig}
-              unitsConversions={unitsConversions}
+              unitsSpecs={unitsSpecs}
             />
           </Col>
         </Row>

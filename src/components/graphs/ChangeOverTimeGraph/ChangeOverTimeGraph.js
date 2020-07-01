@@ -88,7 +88,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // Example value: See configuration file, key 'variables'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
 
-    unitsConversions: PropTypes.object.isRequired,
+    unitsSpecs: PropTypes.object.isRequired,
     // Object containing units conversions information.Typically this
     // object will be retrieved from a configuration file, but that is not the
     // job of this component.
@@ -109,7 +109,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         'statistics',
         'graphConfig',
         'variableConfig',
-        'unitsConversions',
+        'unitsSpecs',
       ],
       this.props
     )) {
@@ -119,7 +119,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const {
       baselineTimePeriod, futureTimePeriods, statistics,
       variableInfo,
-      graphConfig, variableConfig, unitsConversions,
+      graphConfig, variableConfig, unitsSpecs,
     } = this.props;
 
     // The data-fetcher always returns a fulfilled promise, but with an array of
@@ -157,7 +157,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const variableId = variableInfo.id;
     const displayUnits = variableInfo.unitsSpec.id;
     const convertUnits =
-      getConvertUnits(unitsConversions, variableConfig, variableId);
+      getConvertUnits(unitsSpecs, variableConfig, variableId);
     const dataUnits = statistics[0].value.units;
     const convertData = convertUnits(dataUnits, displayUnits);
     const percentileValuesByTimePeriod = flow(

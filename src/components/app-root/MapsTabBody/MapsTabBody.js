@@ -136,11 +136,11 @@ export default class MapsTabBody extends React.Component {
 
     const logscale = getWmsLogscale(variableConfig, variableId);
 
-    const unitsConversions =
+    const unitsSpecs =
       collectionToCanonicalUnitsSpecs(this.getConfig('units'));
 
     const variableInfo = getVariableInfo(
-      unitsConversions, variableConfig, variableId, 'absolute'
+      unitsSpecs, variableConfig, variableId, 'absolute'
     );
     console.log('### MapsTabBody: variableInfo', variableInfo)
 
@@ -200,7 +200,7 @@ export default class MapsTabBody extends React.Component {
               timePeriod={baselineTimePeriod}
               metadata={this.props.metadata}
               variableConfig={variableConfig}
-              unitsConversions={unitsConversions}
+              unitsSpecs={unitsSpecs}
             >
               {zoomButton}
             </DataMap>
@@ -223,7 +223,7 @@ export default class MapsTabBody extends React.Component {
               timePeriod={futureTimePeriod}
               metadata={this.props.metadata}
               variableConfig={variableConfig}
-              unitsConversions={unitsConversions}
+              unitsSpecs={unitsSpecs}
             >
               {zoomButton}
             </DataMap>

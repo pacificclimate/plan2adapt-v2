@@ -33,7 +33,7 @@ export default class ClimateLayer extends React.Component {
     variableSpec: PropTypes.object,
     season: PropTypes.number,
     variableConfig: PropTypes.object,
-    unitsConversions: PropTypes.object,
+    unitsSpecs: PropTypes.object,
   };
 
   render() {
@@ -43,7 +43,7 @@ export default class ClimateLayer extends React.Component {
         'variableSpec',
         'season',
         'variableConfig',
-        'unitsConversions',
+        'unitsSpecs',
       ],
       this.props
     )) {
@@ -51,12 +51,12 @@ export default class ClimateLayer extends React.Component {
       return <Loader/>;
     }
     const {
-      fileMetadata, variableSpec, season, variableConfig, unitsConversions,
+      fileMetadata, variableSpec, season, variableConfig, unitsSpecs,
     } = this.props;
     const variableId = variableSpec.variable_id;
     console.log('### ClimateLayer: variableId', variableId)
     console.log('### ClimateLayer: variableConfig', variableConfig)
-    console.log('### ClimateLayer: unitsConversions', unitsConversions)
+    console.log('### ClimateLayer: unitsSpecs', unitsSpecs)
 
     // Convert the data range for the climate layer from display units, which
     // are convenient for the user to specify (in the config file), to data
@@ -66,9 +66,9 @@ export default class ClimateLayer extends React.Component {
       getVariableDisplayUnits(variableConfig, variableId, display);
     // TODO: dataUnits should come from metadata, not config.
     const dataUnits = getVariableDataUnits(variableConfig, variableId);
-    console.log('### ClimateLayer: unitsConversions: display, displayUnits, dataUnits', display, displayUnits, dataUnits)
+    console.log('### ClimateLayer: unitsSpecs: display, displayUnits, dataUnits', display, displayUnits, dataUnits)
     const convertUnits =
-      getConvertUnits(unitsConversions, variableConfig, variableId);
+      getConvertUnits(unitsSpecs, variableConfig, variableId);
 
     const rangeInDisplayUnits = getWmsDataRange(variableConfig, variableId);
     const rangeInDataUnits = mapValues(
