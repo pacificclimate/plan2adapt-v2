@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: maps
+    default: graphs
 
 selectors:
   prologue: |
@@ -65,7 +65,7 @@ tabs:
         variable: |
           ${variable.label}${variable.derived ? '*': ''} (${variable.unitsSpec.label})
 
-          ${variable.possibleLowBaseline && variable.units =='%' ?
+          ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
         season: ${season.label}
         ensembleMedian: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
@@ -435,7 +435,7 @@ tabs:
       Notes:
 
       1. ${$$.components.notes.derivedClimateVars}
-      ${variable.possibleLowBaseline && variable.units =='%' ?
+      ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
         $$.tabs.graphs.lowBaselineWarning : ''}
 
     lowBaselineWarning: |
