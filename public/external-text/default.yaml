@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: graphs
+    default: maps
 
 selectors:
   prologue: |
@@ -13,11 +13,11 @@ selectors:
     forTabs: ['summary', 'impacts', 'maps', 'graphs']
   futureTimePeriod:
     prefix: during the
-    default: 2050
+    default: 2080
     forTabs: ['summary', 'impacts', 'maps']
   variable:
     prefix: with details about
-    default: prsn
+    default: tasmean
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
@@ -277,34 +277,122 @@ tabs:
           display: absolute
           displayUnits: days
           palette: x-Occam
-          range:
-            min: 0
-            max: 366
-          ticks: [0, 100, 200, 300, 365]
+          seasons:
+            annual:
+              range:
+                min: 0
+                max: 350
+              ticks: [0, 100, 200, 300, 350]
+            winter:
+              range:
+                min: 0
+                max: 90
+              ticks: [0, 30, 60, 90]
+            spring:
+              range:
+                min: 0
+                max: 90
+              ticks: [0, 30, 60, 90]
+            summer:
+              range:
+                min: 0
+                max: 90
+              ticks: [0, 30, 60, 90]
+            fall:
+              range:
+                min: 0
+                max: 90
+              ticks: [0, 30, 60, 90]
         gdd:
           display: absolute
           displayUnits: degree-days
           palette: x-Occam
-          range:
-            min: 0
-            max: 4000
-          ticks: [0, 1000, 2000, 3000, 4000]
+          seasons:
+            annual:
+              range:
+                min: 0
+                max: 3500
+              ticks: [0, 1000, 2000, 3000, 4000]
+            winter:
+              range:
+                min: 0
+                max: 250
+              ticks: [0, 50, 100, 150, 200, 250]
+            spring:
+              range:
+                min: 0
+                max: 800
+              ticks: [0, 200, 400, 600, 800]
+            summer:
+              range:
+                min: 0
+                max: 1500
+              ticks: [0, 500, 1000, 1500]
+            fall:
+              range:
+                min: 0
+                max: 800
+              ticks: [0, 200, 400, 600, 800]
         hdd:
           display: absolute
           displayUnits: degree-days
           palette: x-Occam
-          range:
-            min: 0
-            max: 10000
-          ticks: [0, 2000, 4000, 6000, 8000, 10000]
+          seasons:
+            winter:
+              range:
+                min: 0
+                max: 3500
+              ticks: [0, 1000, 2000, 4000, 3000, 3500]
+            spring:
+              range:
+                min: 0
+                max: 2000
+              ticks: [0, 500, 1000, 1500, 2000]
+            summer:
+              range:
+                min: 0
+                max: 1000
+              ticks: [0, 250, 500, 750, 1000]
+            fall:
+              range:
+                min: 0
+                max: 2000
+              ticks: [0, 500, 1000, 1500, 2000]
+            annual:
+              range:
+                min: 0
+                max: 8000
+              ticks: [0, 2000, 4000, 6000, 8000]
         cdd:
           display: absolute
           displayUnits: degree-days
           palette: x-Occam
-          range:
-            min: 0
-            max: 1000
-          ticks: [0, 250, 500, 750, 1000]
+          seasons:
+            winter:
+              range:
+                min: 0
+                max: 10
+              ticks: [0, 5, 10]
+            spring:
+              range:
+                min: 0
+                max: 40
+              ticks: [0, 10, 20, 30, 40]
+            summer:
+              range:
+                min: 0
+                max: 300
+              ticks: [0, 100, 200, 300]
+            fall:
+              range:
+                min: 0
+                max: 100
+              ticks: [0, 20, 40, 60, 80, 100]
+            annual:
+              range:
+                min: 0
+                max: 500
+              ticks: [0, 100, 200, 300, 400, 500]
         pr:
           display: absolute
           palette: x-Occam
@@ -346,10 +434,6 @@ tabs:
           display: absolute
           palette: x-Occam
           logscale: true
-          range:
-            min: 10
-            max: 200
-          ticks: [10, 20, 40, 80, 100, 200]
           seasons:
             annual:
               displayUnits: mm/year (cum)
@@ -381,30 +465,36 @@ tabs:
                 min: 10
                 max: 200
               ticks: [10, 20, 40, 80, 100, 200]
-        tasmax:
-          display: absolute
-          displayUnits: °C
-          palette: x-Occam
-          range:
-            min: -40
-            max: 40
-          ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
-        tasmin:
-          display: absolute
-          displayUnits: °C
-          palette: x-Occam
-          range:
-            min: -40
-            max: 40
-          ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
         tasmean:
           display: absolute
           displayUnits: °C
           palette: x-Occam
-          range:
-            min: -40
-            max: 40
-          ticks: [-40, -30, -20, -10, 0, 10, 20, 30, 40]
+          seasons:
+            winter:
+              range:
+                min: -20
+                max: 10
+              ticks: [-20, -15, -10, -5, 0, 5, 10]
+            spring:
+              range:
+                min: -5
+                max: 10
+              ticks: [-5, 0, 5, 10]
+            summer:
+              range:
+                min: 5
+                max: 25
+              ticks: [5, 10, 15, 20, 25]
+            fall:
+              range:
+                min: -5
+                max: 15
+              ticks: [-5, 0, 5, 10, 15]
+            annual:
+              range:
+                min: -5
+                max: 15
+              ticks: [-5, 0, 5, 10, 15]
 
   graphs:
     disabled: false
