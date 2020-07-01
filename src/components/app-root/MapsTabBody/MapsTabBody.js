@@ -126,12 +126,7 @@ export default class MapsTabBody extends React.Component {
     const mapsConfig = this.getConfig('tabs.maps.config');
     const seasonId = seasonIndexToPeriod(season);
     const mapsVariableConfigForTimescale = mapValues(
-      value => {
-        const {
-          displayUnits, range, ticks,
-        } = value.seasons ? value.seasons[seasonId] : value;
-        return merge(value, { displayUnits, range, ticks });
-      },
+      value => value.seasons ? merge(value, value.seasons[seasonId]) : value
     )(mapsConfig.variables);
     const variableConfig = merge(
       this.getConfig('variables'),
