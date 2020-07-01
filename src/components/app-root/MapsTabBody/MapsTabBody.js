@@ -129,14 +129,8 @@ export default class MapsTabBody extends React.Component {
       value => {
         const {
           displayUnits, range, ticks,
-
         } = value.seasons ? value.seasons[seasonId] : value;
-        return ({
-          ...value,
-          displayUnits,
-          range,
-          ticks,
-        });
+        return merge(value, { displayUnits, range, ticks });
       },
     )(mapsConfig.variables);
     const variableConfig = merge(
