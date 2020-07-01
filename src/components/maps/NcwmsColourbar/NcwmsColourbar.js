@@ -124,9 +124,7 @@ export default class NcwmsColourbar extends React.Component {
       heading, note, displaySpec, variableSpec,
     } = this.props;
 
-    console.log('### NcwmsColourbar: displaySpec', displaySpec)
     const variableId = variableSpec.variable_id;
-    console.log('### NcwmsColourbar: variableSpec', variableSpec)
 
     const logscale = getWmsLogscale(displaySpec, variableId);
     const scaleOperator = logscale ? Math.log : identity;

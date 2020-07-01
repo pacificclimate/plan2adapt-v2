@@ -154,7 +154,6 @@ export const getUnitsSpec = (group, unitsId) => {
 export const convertUnitsInGroup = curry((
   group, fromUnitsId, toUnitsId, value
 ) => {
-  console.log('### convertUnitsInGroup: group, fromUnitsId, toUnitsId, value', group, fromUnitsId, toUnitsId, value)
   if (!group) {
     throw new Error('Undefined units group');
   }

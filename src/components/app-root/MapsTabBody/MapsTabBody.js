@@ -113,7 +113,7 @@ export default class MapsTabBody extends React.Component {
       console.log('### MapsTabBody: unsettled props', this.props)
       return <Loader/>;
     }
-    console.log('### MapsTabBody: props', this.props)
+
     const region = this.props.regionOpt.value;
     const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
     const baselineTimePeriod = this.props.baselineTimePeriod;
@@ -132,7 +132,6 @@ export default class MapsTabBody extends React.Component {
       this.getConfig('variables'),
       mapsVariableConfigForTimescale,
     );
-    console.log('### MapsTabBody: variableConfig', variableConfig)
 
     const logscale = getWmsLogscale(variableConfig, variableId);
 
@@ -142,7 +141,6 @@ export default class MapsTabBody extends React.Component {
     const variableInfo = getVariableInfo(
       unitsSpecs, variableConfig, variableId, 'absolute'
     );
-    console.log('### MapsTabBody: variableInfo', variableInfo)
 
     const zoomButton = (
       <StaticControl position='topright'>

@@ -54,9 +54,6 @@ export default class ClimateLayer extends React.Component {
       fileMetadata, variableSpec, season, variableConfig, unitsSpecs,
     } = this.props;
     const variableId = variableSpec.variable_id;
-    console.log('### ClimateLayer: variableId', variableId)
-    console.log('### ClimateLayer: variableConfig', variableConfig)
-    console.log('### ClimateLayer: unitsSpecs', unitsSpecs)
 
     // Convert the data range for the climate layer from display units, which
     // are convenient for the user to specify (in the config file), to data
@@ -66,7 +63,6 @@ export default class ClimateLayer extends React.Component {
       getVariableDisplayUnits(variableConfig, variableId, display);
     // TODO: dataUnits should come from metadata, not config.
     const dataUnits = getVariableDataUnits(variableConfig, variableId);
-    console.log('### ClimateLayer: unitsSpecs: display, displayUnits, dataUnits', display, displayUnits, dataUnits)
     const convertUnits =
       getConvertUnits(unitsSpecs, variableConfig, variableId);
 
