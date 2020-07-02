@@ -1,6 +1,6 @@
 app:
   tabs:
-    default: maps
+    default: summary
 
 selectors:
   prologue: |
@@ -13,7 +13,7 @@ selectors:
     forTabs: ['summary', 'impacts', 'maps', 'graphs']
   futureTimePeriod:
     prefix: during the
-    default: 2080
+    default: 2050
     forTabs: ['summary', 'impacts', 'maps']
   variable:
     prefix: with details about
@@ -21,7 +21,7 @@ selectors:
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
-    default: 12
+    default: 16
     postfix: period
     forTabs: ['maps', 'graphs']
 
@@ -87,17 +87,6 @@ tabs:
             - annual
             - summer
             - winter
-        # TODO: remove pr absolute; for testing only
-        - variable: pr
-          display: absolute
-          precision: 2
-          seasons:
-            - season: annual
-              displayUnits: mm/year (cum)
-            - season: summer
-              displayUnits: mm/season (cum)
-            - season: winter
-              displayUnits: mm/season (cum)
         - variable: prsn
           display: relative
           displayUnits: '%'
