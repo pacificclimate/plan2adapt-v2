@@ -19,6 +19,7 @@ import {
   getVariableInfo
 } from '../../utils/variables-and-units';
 import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
+import { getSeasonLabel } from '../../utils/seasons';
 
 export default class GraphsTabBody extends React.Component {
   static contextType = T.contextType;
@@ -56,8 +57,8 @@ export default class GraphsTabBody extends React.Component {
       graphConfig.variables,
     );
 
-    const unitsSpecs =
-      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+    const seasonConfig = this.getConfig('seasons');
+    const unitsSpecs = collectionToCanonicalUnitsSpecs(this.getConfig('units'));
 
     const variableId = variable.representative.variable_id;
     const display = getVariableDisplay(variableConfig, variableId);
@@ -72,7 +73,7 @@ export default class GraphsTabBody extends React.Component {
             <T path='tabs.graphs.prologue' data={{
               region,
               variable: variableInfo,
-              season: get('label', this.props.seasonOpt),
+              season: getSeasonLabel(seasonConfig, this.props.seasonOpt.value),
             }}/>
           </Col>
         </Row>
