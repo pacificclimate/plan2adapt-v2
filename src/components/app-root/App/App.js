@@ -32,6 +32,7 @@ import ReferencesTabBody from '../ReferencesTabBody';
 import AboutTabBody from '../AboutTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
 import { setLethargicMapScrolling } from '../../../utils/leaflet-extensions';
+import { getSeasonLabel } from '../../../utils/seasons';
 
 
 const baselineTimePeriod = {
@@ -141,11 +142,15 @@ export default class App extends Component {
       return <Loader/>;
     }
     console.log('### App: Loaded')
-    const variableConfig = this.getConfig('variables');
 
+    const variableConfig = this.getConfig('variables');
     const getVariableOptionLabel =
       ({ value: { representative: { variable_id } } }) =>
         getVariableLabel(variableConfig, variable_id);
+
+    const seasonConfig = this.getConfig('seasons');
+    const getSeasonOptionLabel =
+      ({ value: seasonIndex }) => getSeasonLabel(seasonConfig, seasonIndex);
 
     // This variable drives the construction of the selector list. It is 
     // defined inside the component because it needs context and state.
@@ -180,6 +185,7 @@ export default class App extends Component {
           value={this.state.seasonOpt}
           default={this.getConfig('selectors.season.default')}
           onChange={this.handleChangeSeason}
+          getOptionLabel={getSeasonOptionLabel}
         />
       ),
     };
