@@ -786,6 +786,27 @@ components:
     response of the global climate system to increasing greenhouse gas
     concentrations.
 
+# Application-wide naming for seasons. Seasons are identified by their internal
+# id number (:eye roll:), hence this spec is an array.
+seasons:
+  - January
+  - February
+  - March
+  - April
+  - May
+  - June
+  - July
+  - August
+  - September
+  - October
+  - November
+  - December
+  - Winter (DJF)
+  - Spring (MAM)
+  - Summer (JJA)
+  - Fall (SON)
+  - Annual
+
 # Application-wide information about variables and how they are to be treated.
 # Variables are identified by their short, science-y id.
 # The `type` key is used to locate the appropriate units conversion data
