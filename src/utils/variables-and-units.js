@@ -7,6 +7,7 @@ import flow from 'lodash/fp/flow';
 import isNumber from 'lodash/fp/isNumber';
 import isString from 'lodash/fp/isString';
 import isUndefined from 'lodash/fp/isUndefined';
+import { convertUnitsInGroup } from './units'
 
 
 // Functions that encapsulate knowledge about the structure of variable
@@ -26,8 +27,12 @@ export const getVariableLabel = (variableConfig, variableId) => {
 };
 
 
-export const getVariableType = (variableConfig, variableId) => {
-  return getConfigForId(variableConfig, variableId).type;
+export const getVariableType = (variableConfig, variableId, display = 'absolute') => {
+  const vc = getConfigForId(variableConfig, variableId);
+  if (display === 'relative') {
+    return 'relative';
+  }
+  return vc.type;
 };
 
 
@@ -36,41 +41,52 @@ export const getVariableDisplay = (variableConfig, variableId) => {
 };
 
 
-export const getVariableDataUnits = (variableConfig, variableId) => {
-  return getConfigForId(variableConfig, variableId).dataUnits;
-};
+export const getVariableDataUnits =
+  (variableConfig, variableId) => {
+    const vc = getConfigForId(variableConfig, variableId);
+    return vc.dataUnits;
+  };
 
 
 export const getVariableDisplayUnits =
   (variableConfig, variableId, display = 'absolute') => {
     const vc = getConfigForId(variableConfig, variableId);
     if (display === 'relative') {
-      return '%';
+      return vc.displayUnits || '%';  // Bombproofing
     }
     return vc.displayUnits;
   };
 
 
-export const getVariableInfo = (variableConfig, variableId, display) => {
+export const getVariableDisplayUnitsSpec =
+  (unitsSpec, variableConfig, variableId, display = 'absolute') => {
+    const type = getVariableType(variableConfig, variableId, display);
+    const displayUnits =
+      getVariableDisplayUnits(variableConfig, variableId, display);
+    return unitsSpec[type][displayUnits];
+  };
+
+
+export const getVariableInfo = (unitsSpecs, variableConfig, variableId, display) => {
   return {
     id: variableId,
     label: getVariableLabel(variableConfig, variableId),
-    units: getVariableDisplayUnits(variableConfig, variableId, display),
+    unitsSpec: getVariableDisplayUnitsSpec(unitsSpecs, variableConfig, variableId, display),
     possibleLowBaseline: variableConfig[variableId].possibleLowBaseline,
   };
 };
 
 
-export const getConvertUnits= (conversions, variableConfig, variableId) => {
+export const getConvertUnits= (unitsSpecs, variableConfig, variableId) => {
   const variableType = getVariableType(variableConfig, variableId);
   if (!variableType) {
     throw new Error(`Unspecified variable type for ${variableId}`);
   }
-  const conversionGroup = conversions[variableType];
-  if (!conversionGroup) {
-    throw new Error(`No conversion group for ${variableType}`);
+  const unitsGroup = unitsSpecs[variableType];
+  if (!unitsGroup) {
+    throw new Error(`No units group for ${variableType}`);
   }
-  return convertUnitsInGroup(conversionGroup);
+  return convertUnitsInGroup(unitsGroup);
 };
 
 
@@ -104,49 +120,3 @@ export const displayFormat = curry((sigfigs , value) => {
   }
   return `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 });
-
-
-// Functions for units conversions. These functions are all curried so that
-// partial application is greatly simplified. Note that assumptions about the
-// layout of units conversion information is embedded in these functions.
-// TODO: Place in separate module.
-
-export const canonicalConversion = (conversion) => {
-  return isNumber(conversion) ? { scale: conversion, offset: 0 } : conversion;
-};
-
-
-export const toBaseUnits = curry((conversion, value) =>
-  conversion.scale * value + conversion.offset
-);
-
-
-export const fromBaseUnits = curry((conversion, value) =>
-  (value - conversion.offset) / conversion.scale
-);
-
-
-export const convertUnitsInGroup = curry((conversionGroup, fromUnits, toUnits, value) => {
-  if (!conversionGroup) {
-    throw new Error('Undefined conversion group');
-  }
-  if (fromUnits === toUnits) {  // Identity
-    return value;
-  }
-  const fromConversion = conversionGroup[fromUnits];
-  if (!fromConversion) {
-    throw new Error(`No conversion group specified for ${fromUnits}`);
-  }
-  if (isString(fromConversion)) {  // Synonym
-    return convertUnitsInGroup(conversionGroup, fromConversion, toUnits, value);
-  }
-  const toConversion = conversionGroup[toUnits];
-  if (!toConversion) {
-    throw new Error(`No conversion group specified for ${toUnits}`);
-  }
-  if (isString(toConversion)) {  // Synonym
-    return convertUnitsInGroup(conversionGroup, fromUnits, toConversion, value);
-  }
-  return fromBaseUnits(canonicalConversion(toConversion), toBaseUnits(canonicalConversion(fromConversion), value));
-});
-

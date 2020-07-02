@@ -7,6 +7,7 @@ import placeholder from 'lodash/fp/placeholder';
 import isUndefined from 'lodash/fp/isUndefined';
 import curry from 'lodash/fp/curry';
 import map from 'lodash/fp/map';
+import mapValues from 'lodash/fp/mapValues';
 import get from 'lodash/fp/get';
 import every from 'lodash/fp/every';
 
@@ -16,6 +17,8 @@ import { concatAll as stdConcatAll } from './lodash-extras';
 export const concatAll = convert('concatAll', stdConcatAll);
 concatAll.placeholder = placeholder;
 
+export const mapWithKey = map.convert({ cap: false });
+export const mapValuesWithKey = mapValues.convert({ cap: false });
 
 export const isDefined = v => !isUndefined(v);
 

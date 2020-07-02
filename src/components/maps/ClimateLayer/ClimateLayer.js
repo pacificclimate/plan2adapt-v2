@@ -4,20 +4,24 @@ import { WMSTileLayer } from 'react-leaflet';
 import mapValues from 'lodash/fp/mapValues';
 import T from '../../../temporary/external-text';
 import {
-  wmsAboveMaxColor,
-  wmsBelowMinColor,
-  wmsColorScaleRange,
-  wmsDataRange,
-  wmsLayerName,
-  wmsLogscale,
+  getWmsAboveMaxColor,
+  getWmsBelowMinColor,
+  formatWmsColorScaleRange,
+  getWmsDataRange,
+  getWmsLayerName,
+  getWmsLogscale,
   wmsNumcolorbands,
-  wmsStyle,
-  wmsTime
+  getWmsStyle,
+  getWmsTime
 } from '../map-utils';
 import {
-  getConvertUnits, getVariableDataUnits,
+  getConvertUnits, getVariableDataUnits, getVariableDisplay,
   getVariableDisplayUnits
 } from '../../../utils/variables-and-units';
+import merge from 'lodash/fp/merge';
+import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
+import { allDefined } from '../../../utils/lodash-fp-extras';
+import Loader from 'react-loader';
 
 
 export default class ClimateLayer extends React.Component {
@@ -28,26 +32,41 @@ export default class ClimateLayer extends React.Component {
     fileMetadata: PropTypes.object,
     variableSpec: PropTypes.object,
     season: PropTypes.number,
+    variableConfig: PropTypes.object,
+    unitsSpecs: PropTypes.object,
   };
 
   render() {
-    const { fileMetadata, variableSpec, season } = this.props;
+    if (!allDefined(
+      [
+        'fileMetadata',
+        'variableSpec',
+        'season',
+        'variableConfig',
+        'unitsSpecs',
+      ],
+      this.props
+    )) {
+      console.log('### ClimateLayer: unsettled props', this.props)
+      return <Loader/>;
+    }
+    const {
+      fileMetadata, variableSpec, season, variableConfig, unitsSpecs,
+    } = this.props;
     const variableId = variableSpec.variable_id;
-    // TODO: Pull config up
-    const displaySpec = this.getConfig('tabs.maps.displaySpec');
-    const variableConfig = this.getConfig('variables');
-    const unitsConversions = this.getConfig('units');
 
     // Convert the data range for the climate layer from display units, which
     // are convenient for the user to specify (in the config file), to data
     // units, which is what the data actually comes in.
-    const rangeInDisplayUnits = wmsDataRange(displaySpec, variableSpec);
+    const display = getVariableDisplay(variableConfig, variableId);
     const displayUnits =
-      getVariableDisplayUnits(variableConfig, variableId, 'absolute');
+      getVariableDisplayUnits(variableConfig, variableId, display);
     // TODO: dataUnits should come from metadata, not config.
     const dataUnits = getVariableDataUnits(variableConfig, variableId);
     const convertUnits =
-      getConvertUnits(unitsConversions, variableConfig, variableId);
+      getConvertUnits(unitsSpecs, variableConfig, variableId);
+
+    const rangeInDisplayUnits = getWmsDataRange(variableConfig, variableId);
     const rangeInDataUnits = mapValues(
       convertUnits(displayUnits, dataUnits)
     )(rangeInDisplayUnits);
@@ -56,19 +75,19 @@ export default class ClimateLayer extends React.Component {
       <WMSTileLayer
         url={process.env.REACT_APP_NCWMS_URL}
         format={'image/png'}
-        logscale={wmsLogscale(displaySpec, variableSpec)}
+        logscale={getWmsLogscale(variableConfig, variableId)}
         noWrap={true}
         numcolorbands={wmsNumcolorbands}
         opacity={0.7}
         // srs={"EPSG:3005"}
         transparent={true}
         version={'1.1.1'}
-        abovemaxcolor={wmsAboveMaxColor(displaySpec, variableSpec)}
-        belowmincolor={wmsBelowMinColor(displaySpec, variableSpec)}
-        layers={wmsLayerName(fileMetadata, variableSpec)}
-        time={wmsTime(fileMetadata, season)}
-        styles={wmsStyle(displaySpec, variableSpec)}
-        colorscalerange={wmsColorScaleRange(rangeInDataUnits)}
+        abovemaxcolor={getWmsAboveMaxColor(variableConfig, variableId)}
+        belowmincolor={getWmsBelowMinColor(variableConfig, variableId)}
+        layers={getWmsLayerName(fileMetadata, variableId)}
+        time={getWmsTime(fileMetadata, season)}
+        styles={getWmsStyle(variableConfig, variableId)}
+        colorscalerange={formatWmsColorScaleRange(rangeInDataUnits)}
       />
     );
   }

@@ -18,7 +18,7 @@ import LayerValuePopup from '../LayerValuePopup';
 import SimpleGeoJSON from '../SimpleGeoJSON';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchFileMetadata } from '../../../data-services/metadata';
-import { wmsLayerName, wmsTime, wmsClimateLayerProps } from '../map-utils';
+import { getWmsLayerName, getWmsTime, wmsClimateLayerProps } from '../map-utils';
 
 import './DataMap.css';
 import { allDefined } from '../../../utils/lodash-fp-extras';
@@ -35,8 +35,8 @@ const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
         exceptions: 'application/vnd.ogc.se_xml',
         ...xy,
         info_format: 'text/xml', // f**k, only xml is available
-        query_layers: wmsLayerName(layerSpec),
-        time: wmsTime(layerSpec),
+        query_layers: getWmsLayerName(layerSpec),
+        time: getWmsTime(layerSpec),
         feature_count: 50,  // ??
         version: '1.1.1',
       },
@@ -61,6 +61,8 @@ class DataMapDisplay extends React.Component {
     onPopupChange: PropTypes.func,
     fileMetadata: PropTypes.object,
     fileMetadataFetchError: PropTypes.object,
+    variableConfig: PropTypes.object,
+    unitsSpecs: PropTypes.object,
     // Any other props are passed through to CanadaBaseMap.
   };
 
@@ -119,6 +121,8 @@ class DataMapDisplay extends React.Component {
         'timePeriod',
         'variable',
         'season',
+        'variableConfig',
+        'unitsSpecs',
       ],
       this.props
     )) {
@@ -127,12 +131,13 @@ class DataMapDisplay extends React.Component {
     }
     const {
       children, region, timePeriod, season, variable, popup,
-      fileMetadata, ...rest
+      fileMetadata, variableConfig, unitsSpecs,
+      ...baseMapProps
     } = this.props;
 
     return (
       <CanadaBaseMap
-        {...rest}
+        {...baseMapProps}
         // FIXME: Popups are disabled because the CE ncWMS does not allow
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
@@ -141,6 +146,8 @@ class DataMapDisplay extends React.Component {
           fileMetadata={fileMetadata}
           variableSpec={variable.representative}
           season={season}
+          variableConfig={variableConfig}
+          unitsSpecs={unitsSpecs}
         />
         {
           popup.isOpen &&

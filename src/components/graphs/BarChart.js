@@ -304,7 +304,7 @@ export default class BarChart extends React.Component {
               format: d => `${d-offset}`,
             },
             label: {
-              text: `Change in ${variableInfo.label} (${variableInfo.units})`,
+              text: `Change in ${variableInfo.label} (${variableInfo.unitsSpec.label})`,
               position: 'outer-middle',
             },
           },

@@ -34,16 +34,22 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Loader from 'react-loader';
+import mapValues from 'lodash/fp/mapValues';
+import merge from 'lodash/fp/merge';
+import isString from 'lodash/fp/isString';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
 import NcwmsColourbar from '../../maps/NcwmsColourbar';
-import { regionBounds, wmsLogscale } from '../../maps/map-utils';
+import { regionBounds, getWmsLogscale } from '../../maps/map-utils';
 import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
 import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
+import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
+import ClimateLayer from '../../maps/ClimateLayer';
+import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 
 
 export default class MapsTabBody extends React.Component {
@@ -107,7 +113,7 @@ export default class MapsTabBody extends React.Component {
       console.log('### MapsTabBody: unsettled props', this.props)
       return <Loader/>;
     }
-    console.log('### MapsTabBody: props', this.props)
+
     const region = this.props.regionOpt.value;
     const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
     const baselineTimePeriod = this.props.baselineTimePeriod;
@@ -116,9 +122,26 @@ export default class MapsTabBody extends React.Component {
 
     const variableRep = variable.representative;
     const variableId = variableRep.variable_id;
-    const variableConfig = this.getConfig('variables');
-    const displaySpec = this.getConfig('tabs.maps.displaySpec');
-    const logscale = wmsLogscale(displaySpec, variableRep);
+
+    const mapsConfig = this.getConfig('tabs.maps.config');
+    const seasonId = seasonIndexToPeriod(season);
+    const mapsVariableConfigForTimescale = mapValues(
+      value => value.seasons ? merge(value, value.seasons[seasonId]) : value
+    )(mapsConfig.variables);
+    const variableConfig = merge(
+      this.getConfig('variables'),
+      mapsVariableConfigForTimescale,
+    );
+
+    const logscale = getWmsLogscale(variableConfig, variableId);
+
+    const unitsSpecs =
+      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+
+    const variableInfo = getVariableInfo(
+      unitsSpecs, variableConfig, variableId, 'absolute'
+    );
+
     const zoomButton = (
       <StaticControl position='topright'>
         <Button
@@ -141,7 +164,7 @@ export default class MapsTabBody extends React.Component {
               length={80}
               heading={<T
                 path='tabs.maps.colourScale.label'
-                data={getVariableInfo(variableConfig, variableId, 'absolute')}
+                data={variableInfo}
                 placeholder={null}
                 className={styles.label}
               />}
@@ -152,7 +175,7 @@ export default class MapsTabBody extends React.Component {
                 data={{ logscale }}
               />}
               variableSpec={variableRep}
-              displaySpec={displaySpec}
+              displaySpec={variableConfig}
             />
           </Col>
         </Row>
@@ -174,6 +197,8 @@ export default class MapsTabBody extends React.Component {
               variable={variable}
               timePeriod={baselineTimePeriod}
               metadata={this.props.metadata}
+              variableConfig={variableConfig}
+              unitsSpecs={unitsSpecs}
             >
               {zoomButton}
             </DataMap>
@@ -195,6 +220,8 @@ export default class MapsTabBody extends React.Component {
               variable={variable}
               timePeriod={futureTimePeriod}
               metadata={this.props.metadata}
+              variableConfig={variableConfig}
+              unitsSpecs={unitsSpecs}
             >
               {zoomButton}
             </DataMap>

@@ -14,7 +14,7 @@ import {
 } from '../../../utils/percentile-anomaly';
 import {
   getConvertUnits,
-  getVariableDisplay
+  getVariableDisplay, getVariableInfo
 } from '../../../utils/variables-and-units';
 import './ChangeOverTimeGraph.css';
 import BarChart from '../BarChart';
@@ -88,7 +88,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // Example value: See configuration file, key 'variables'.
     // TODO: Convert this to a more explicit PropType when the layout settles.
 
-    unitsConversions: PropTypes.object.isRequired,
+    unitsSpecs: PropTypes.object.isRequired,
     // Object containing units conversions information.Typically this
     // object will be retrieved from a configuration file, but that is not the
     // job of this component.
@@ -109,7 +109,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         'statistics',
         'graphConfig',
         'variableConfig',
-        'unitsConversions',
+        'unitsSpecs',
       ],
       this.props
     )) {
@@ -119,15 +119,15 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     const {
       baselineTimePeriod, futureTimePeriods, statistics,
       variableInfo,
-      graphConfig, variableConfig, unitsConversions,
+      graphConfig, variableConfig, unitsSpecs,
     } = this.props;
-    console.log('### COTG.render: statistics', statistics)
 
     // The data-fetcher always returns a fulfilled promise, but with an array of
     // results that indicate whether each sub-request promise was fulfilled or
-    // rejected. We must therefore handle the case that one or more was
     // rejected.
-    // In this case we return a detailed error indicator within the app. This is
+    //
+    // We must therefore handle the case that one or more was rejected. In this
+    // case we display a detailed error indicator within the app. This is
     // probably not useful to the user. Instead perhaps we should be cagier and
     // print such detailed error info to the console instead.
     if (!every({ status: 'fulfilled' })(statistics)) {
@@ -155,9 +155,9 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // Establish display units for variables, and convert data values to those
     // units.
     const variableId = variableInfo.id;
-    const displayUnits = variableInfo.units;
+    const displayUnits = variableInfo.unitsSpec.id;
     const convertUnits =
-      getConvertUnits(unitsConversions, variableConfig, variableId);
+      getConvertUnits(unitsSpecs, variableConfig, variableId);
     const dataUnits = statistics[0].value.units;
     const convertData = convertUnits(dataUnits, displayUnits);
     const percentileValuesByTimePeriod = flow(

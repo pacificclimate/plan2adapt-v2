@@ -12,11 +12,13 @@ import PropTypes from 'prop-types';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import get from 'lodash/fp/get';
+import merge from 'lodash/fp/merge';
 import ChangeOverTimeGraph from '../graphs/ChangeOverTimeGraph';
 import {
   getVariableDisplay,
   getVariableInfo
 } from '../../utils/variables-and-units';
+import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
 
 export default class GraphsTabBody extends React.Component {
   static contextType = T.contextType;
@@ -49,10 +51,19 @@ export default class GraphsTabBody extends React.Component {
     const variable = this.props.variableOpt.value;
 
     const graphConfig = this.getConfig('tabs.graphs.config');
-    const variableConfig = this.getConfig('variables');
+    const variableConfig = merge(
+      this.getConfig('variables'),
+      graphConfig.variables,
+    );
+
+    const unitsSpecs =
+      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+
     const variableId = variable.representative.variable_id;
-    const display = getVariableDisplay(graphConfig.variables, variableId);
-    const variableInfo = getVariableInfo(variableConfig, variableId, display);
+    const display = getVariableDisplay(variableConfig, variableId);
+    const variableInfo = getVariableInfo(
+      unitsSpecs, variableConfig, variableId, display
+    );
 
     return (
       <React.Fragment>
@@ -78,7 +89,7 @@ export default class GraphsTabBody extends React.Component {
               variableInfo={variableInfo}
               graphConfig={graphConfig}
               variableConfig={variableConfig}
-              unitsConversions={this.getConfig('units')}
+              unitsSpecs={unitsSpecs}
             />
           </Col>
         </Row>
