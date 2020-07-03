@@ -49,16 +49,17 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import Loader from 'react-loader';
 import Measure from 'react-measure';
 import mapValues from 'lodash/fp/mapValues';
 import merge from 'lodash/fp/merge';
+import isEqual from 'lodash/fp/isEqual';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
 import NcwmsColourbar from '../../maps/NcwmsColourbar';
-import { regionBounds, getWmsLogscale } from '../../maps/map-utils';
+import { getWmsLogscale, regionBounds } from '../../maps/map-utils';
 import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
@@ -66,6 +67,12 @@ import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
+
+
+const boundsToViewport = (map, bounds) => ({
+  center: bounds.getCenter(),
+  zoom: map.getBoundsZoom(bounds),
+});
 
 
 export default class MapsTabBody extends React.PureComponent {
@@ -83,12 +90,13 @@ export default class MapsTabBody extends React.PureComponent {
 
   state = {
     prevPropsRegionOpt: undefined,
-    bounds: undefined,
     viewport: BCBaseMap.initialViewport,
     popup: {
       isOpen: false,
     },
     resizeCount: 0,
+    baselineMapRef: React.createRef(),
+    projectedMapRef: React.createRef(),
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -96,11 +104,19 @@ export default class MapsTabBody extends React.PureComponent {
     // bounding box of the region. We are fortunate that when bounds change,
     // they override the current viewport, and vice-versa, eliminating any
     // need for logic around this on our part.
-    if (props.regionOpt !== state.prevPropsRegionOpt) {
-      return {
+    // TODO: This does not take effect on first render because map refs are
+    //  not yet defined. Set a bounds state, and do this dynamically when
+    //  bounds change. cdM, cdu: bounds -> viewport
+    if (props.regionOpt !== state.prevPropsRegionOpt && state.baselineMapRef.current) {
+      const newState = {
         prevPropsRegionOpt: props.regionOpt,
-        bounds: regionBounds(props.regionOpt.value),
-      }
+        viewport: boundsToViewport(
+          state.baselineMapRef.current.leafletElement,
+          regionBounds(props.regionOpt.value)
+        ),
+      };
+      console.log('### Maps: resetting bounds', newState)
+      return newState;
     }
     return null;
   }
@@ -108,28 +124,39 @@ export default class MapsTabBody extends React.PureComponent {
   handleChangeSelection = (name, value) => this.setState({ [name]: value });
   handleChangeViewport = viewport => {
     // When viewport is changed, remove bounds so that viewport takes
-    // precedence.
-    this.setState({ bounds: undefined, viewport })
+    // precedence. Don't update viewport more often than necessary.
+    if (!isEqual(viewport, this.state.viewport)) {
+      console.log('### Maps: handleChangeViewport', viewport)
+      this.setState({ viewport });
+    }
   }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
 
   // These items handle redrawing the map when the size changes.
   // The redraw depends on using a Leaflet "private" method `Map._onResize`,
   // which may be fragile, but Map doesn't expose a public `redraw` method.
-  baselineMapRef = React.createRef();
-  projectedMapRef = React.createRef();
   redrawMap = mapRef => {
     if (mapRef.current) {
       mapRef.current.leafletElement._onResize();
     }
   };
   handleResize = () => {
-    this.redrawMap(this.baselineMapRef);
-    this.redrawMap(this.projectedMapRef);
+    // alert('resize')
+    console.log('### Maps: resize, viewport = ', this.state.viewport)
+    this.redrawMap(this.state.baselineMapRef);
+    this.redrawMap(this.state.projectedMapRef);
   };
 
-  zoomToRegion = () =>
-    this.setState({ bounds: regionBounds(this.props.regionOpt.value) });
+  zoomToRegion = () => {
+    const newState = {
+      viewport: boundsToViewport(
+        this.state.baselineMapRef.current.leafletElement,
+        regionBounds(this.props.regionOpt.value),
+      ),
+    };
+    console.log('### Maps: zoomToRegion', newState)
+    this.setState(newState);
+  };
 
   render() {
     if (!allDefined(
@@ -194,6 +221,19 @@ export default class MapsTabBody extends React.PureComponent {
         {({ measureRef }) => (
           <div ref={measureRef}>
             <Row>
+              <Col lg={2}>
+                <Button onClick={this.handleResize}>Resize</Button>
+              </Col>
+              <Col lg={4}>
+                bounds:
+                <pre>{JSON.stringify(this.state.bounds, undefined, 2)}</pre>
+              </Col>
+              <Col lg={4}>
+                viewport:
+                <pre>{JSON.stringify(this.state.viewport, undefined, 2)}</pre>
+              </Col>
+            </Row>
+            <Row>
               <Col lg={12}>
                 <NcwmsColourbar
                   breadth={20}
@@ -224,8 +264,7 @@ export default class MapsTabBody extends React.PureComponent {
                 />
                 <DataMap
                   id={'historical'}
-                  mapRef={this.baselineMapRef}
-                  bounds={this.state.bounds}
+                  mapRef={this.state.baselineMapRef}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
@@ -248,8 +287,7 @@ export default class MapsTabBody extends React.PureComponent {
                 }}/>
                 <DataMap
                   id={'projected'}
-                  mapRef={this.projectedMapRef}
-                  bounds={this.state.bounds}
+                  mapRef={this.state.projectedMapRef}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
