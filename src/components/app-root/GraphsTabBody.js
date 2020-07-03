@@ -21,7 +21,7 @@ import {
 import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
 import { getSeasonLabel } from '../../utils/seasons';
 
-export default class GraphsTabBody extends React.Component {
+export default class GraphsTabBody extends React.PureComponent {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
 

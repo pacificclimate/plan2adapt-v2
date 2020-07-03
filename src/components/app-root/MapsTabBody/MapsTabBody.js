@@ -68,7 +68,7 @@ import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 
 
-export default class MapsTabBody extends React.Component {
+export default class MapsTabBody extends React.PureComponent {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
 

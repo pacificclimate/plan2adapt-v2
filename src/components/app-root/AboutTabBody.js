@@ -6,7 +6,7 @@ import map from 'lodash/fp/map';
 import T from '../../temporary/external-text';
 
 
-export default class AboutTabBody extends React.Component {
+export default class AboutTabBody extends React.PureComponent {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
 
