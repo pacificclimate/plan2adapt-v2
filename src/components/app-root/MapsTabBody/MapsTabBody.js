@@ -140,22 +140,23 @@ export default class MapsTabBody extends React.PureComponent {
       mapRef.current.leafletElement._onResize();
     }
   };
-  handleResize = () => {
-    // alert('resize')
-    console.log('### Maps: resize, viewport = ', this.state.viewport)
-    this.redrawMap(this.state.baselineMapRef);
-    this.redrawMap(this.state.projectedMapRef);
+  handleResize = contentRect => {
+    console.log('### Maps.handleResize, contentRect = ', contentRect)
+    // Only redraw if content has non-zero size.
+    if (contentRect.bounds.width !== 0) {
+      console.log('### Maps.handleResize: redrawing')
+      this.redrawMap(this.state.baselineMapRef);
+      this.redrawMap(this.state.projectedMapRef);
+    }
   };
 
   zoomToRegion = () => {
-    const newState = {
+    this.setState({
       viewport: boundsToViewport(
         this.state.baselineMapRef.current.leafletElement,
         regionBounds(this.props.regionOpt.value),
       ),
-    };
-    console.log('### Maps: zoomToRegion', newState)
-    this.setState(newState);
+    });
   };
 
   render() {
@@ -215,9 +216,7 @@ export default class MapsTabBody extends React.PureComponent {
     );
 
     return (
-      <Measure
-        onResize={this.handleResize}
-      >
+      <Measure bounds onResize={this.handleResize}>
         {({ measureRef }) => (
           <div ref={measureRef}>
             <Row>
