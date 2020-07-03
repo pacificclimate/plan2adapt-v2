@@ -29,14 +29,31 @@
 // jerky, laggy tracking of one viewport by the other. It was judged
 // a better user experience simply to have the other viewport updated once
 // at the end of changing.
+//
+// Note on size changes.
+//
+// When a React Bootstrap tab is deselected, its contents lose dimension.
+// In this tab (Maps), that causes Leaflet to get confused: When the Maps tab is
+// deselected, if map updates are required (e.g., by change of variable tab),
+// the maps look and behave weirdly when the Maps tab is selected again.
+//
+// There are several possible approaches to this problem, but the one that so
+// far has yielded the best results is to monitor the size of an (really any)
+// element in the Maps tab and redraw the maps when the size changes. This may
+// cause some unnecessary redraws when the window size is changed, but that
+// is irrelevant, and may not even be causing Leaflet to do any actual work.
+//
+// To monitor element size, we use React Measure, which has a very convenient
+// `onResize()` callback prop.
+
 
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Loader from 'react-loader';
+import Measure from 'react-measure';
 import mapValues from 'lodash/fp/mapValues';
 import merge from 'lodash/fp/merge';
-import isString from 'lodash/fp/isString';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
@@ -48,7 +65,6 @@ import Button from 'react-bootstrap/Button';
 import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
-import ClimateLayer from '../../maps/ClimateLayer';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 
 
@@ -72,6 +88,7 @@ export default class MapsTabBody extends React.Component {
     popup: {
       isOpen: false,
     },
+    resizeCount: 0,
   };
 
   static getDerivedStateFromProps(props, state) {
@@ -95,6 +112,21 @@ export default class MapsTabBody extends React.Component {
     this.setState({ bounds: undefined, viewport })
   }
   handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
+
+  // These items handle redrawing the map when the size changes.
+  // The redraw depends on using a Leaflet "private" method `Map._onResize`,
+  // which may be fragile, but Map doesn't expose a public `redraw` method.
+  baselineMapRef = React.createRef();
+  projectedMapRef = React.createRef();
+  redrawMap = mapRef => {
+    if (mapRef.current) {
+      mapRef.current.leafletElement._onResize();
+    }
+  };
+  handleResize = () => {
+    this.redrawMap(this.baselineMapRef);
+    this.redrawMap(this.projectedMapRef);
+  };
 
   zoomToRegion = () =>
     this.setState({ bounds: regionBounds(this.props.regionOpt.value) });
@@ -156,78 +188,87 @@ export default class MapsTabBody extends React.Component {
     );
 
     return (
-      <React.Fragment>
-        <Row>
-          <Col lg={12}>
-            <NcwmsColourbar
-              breadth={20}
-              length={80}
-              heading={<T
-                path='tabs.maps.colourScale.label'
-                data={variableInfo}
-                placeholder={null}
-                className={styles.label}
-              />}
-              note={<T
-                path={'tabs.maps.colourScale.note'}
-                placeholder={null}
-                className={styles.note}
-                data={{ logscale }}
-              />}
-              variableSpec={variableRep}
-              displaySpec={variableConfig}
-            />
-          </Col>
-        </Row>
-        <Row>
-          <Col lg={6}>
-            <T path='tabs.maps.historical.title' data={{
-              start_date: this.props.baselineTimePeriod.start_date,
-              end_date: this.props.baselineTimePeriod.end_date
-            }}/>
-            <DataMap
-              id={'historical'}
-              bounds={this.state.bounds}
-              viewport={this.state.viewport}
-              onViewportChanged={this.handleChangeViewport}
-              popup={this.state.popup}
-              onPopupChange={this.handleChangePopup}
-              region={region}
-              season={season}
-              variable={variable}
-              timePeriod={baselineTimePeriod}
-              metadata={this.props.metadata}
-              variableConfig={variableConfig}
-              unitsSpecs={unitsSpecs}
-            >
-              {zoomButton}
-            </DataMap>
-          </Col>
-          <Col lg={6}>
-            <T path='tabs.maps.projected.title' data={{
-              start_date: futureTimePeriod.start_date,
-              end_date: futureTimePeriod.end_date
-            }}/>
-            <DataMap
-              id={'projected'}
-              bounds={this.state.bounds}
-              viewport={this.state.viewport}
-              onViewportChanged={this.handleChangeViewport}
-              popup={this.state.popup}
-              onPopupChange={this.handleChangePopup}
-              region={region}
-              season={season}
-              variable={variable}
-              timePeriod={futureTimePeriod}
-              metadata={this.props.metadata}
-              variableConfig={variableConfig}
-              unitsSpecs={unitsSpecs}
-            >
-              {zoomButton}
-            </DataMap>
-          </Col>
-        </Row>
-      </React.Fragment>
+      <Measure
+        onResize={this.handleResize}
+      >
+        {({ measureRef }) => (
+          <div ref={measureRef}>
+            <Row>
+              <Col lg={12}>
+                <NcwmsColourbar
+                  breadth={20}
+                  length={80}
+                  heading={<T
+                    path='tabs.maps.colourScale.label'
+                    data={variableInfo}
+                    placeholder={null}
+                    className={styles.label}
+                  />}
+                  note={<T
+                    path={'tabs.maps.colourScale.note'}
+                    placeholder={null}
+                    className={styles.note}
+                    data={{ logscale }}
+                  />}
+                  variableSpec={variableRep}
+                  displaySpec={variableConfig}
+                />
+              </Col>
+            </Row>
+            <Row>
+              <Col lg={6}>
+                <T path='tabs.maps.historical.title' data={{
+                  start_date: this.props.baselineTimePeriod.start_date,
+                  end_date: this.props.baselineTimePeriod.end_date
+                }}
+                />
+                <DataMap
+                  id={'historical'}
+                  mapRef={this.baselineMapRef}
+                  bounds={this.state.bounds}
+                  viewport={this.state.viewport}
+                  onViewportChanged={this.handleChangeViewport}
+                  popup={this.state.popup}
+                  onPopupChange={this.handleChangePopup}
+                  region={region}
+                  season={season}
+                  variable={variable}
+                  timePeriod={baselineTimePeriod}
+                  metadata={this.props.metadata}
+                  variableConfig={variableConfig}
+                  unitsSpecs={unitsSpecs}
+                >
+                  {zoomButton}
+                </DataMap>
+              </Col>
+              <Col lg={6}>
+                <T path='tabs.maps.projected.title' data={{
+                  start_date: futureTimePeriod.start_date,
+                  end_date: futureTimePeriod.end_date
+                }}/>
+                <DataMap
+                  id={'projected'}
+                  mapRef={this.projectedMapRef}
+                  bounds={this.state.bounds}
+                  viewport={this.state.viewport}
+                  onViewportChanged={this.handleChangeViewport}
+                  popup={this.state.popup}
+                  onPopupChange={this.handleChangePopup}
+                  region={region}
+                  season={season}
+                  variable={variable}
+                  timePeriod={futureTimePeriod}
+                  metadata={this.props.metadata}
+                  variableConfig={variableConfig}
+                  unitsSpecs={unitsSpecs}
+                >
+                  {zoomButton}
+                </DataMap>
+              </Col>
+            </Row>
+          </div>
+        )}
+      </Measure>
     );
   }
 }

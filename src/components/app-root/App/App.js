@@ -308,12 +308,9 @@ export default class App extends Component {
                       className='pt-2'
                       mountOnEnter
                     >
-                      {
-                        this.state.tabKey === key &&
-                        <ErrorBoundary>
-                          <TabBody {...tabs[key].props} />
-                        </ErrorBoundary>
-                      }
+                      <ErrorBoundary>
+                        <TabBody {...tabs[key].props} />
+                      </ErrorBoundary>
                     </Tab>
                   );
                 })(this.getConfig('tabs.ordering'))
