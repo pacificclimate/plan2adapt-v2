@@ -2,7 +2,7 @@ import React from 'react';
 import T from '../../temporary/external-text';
 
 
-export default class NotesTabBody extends React.Component {
+export default class NotesTabBody extends React.PureComponent {
   static contextType = T.contextType;
 
   render() {

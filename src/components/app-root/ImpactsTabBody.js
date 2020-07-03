@@ -15,7 +15,7 @@ import Col from 'react-bootstrap/Col';
 import ImpactsTabs from '../data-displays/impacts/ImpactsTabs';
 import rulebase from '../../assets/rulebase';
 
-export default class ImpactsTabBody extends React.Component {
+export default class ImpactsTabBody extends React.PureComponent {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
 

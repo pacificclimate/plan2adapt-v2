@@ -13,7 +13,7 @@ import Loader from 'react-loader';
 import PropTypes from 'prop-types';
 import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
 
-export default class SummaryTabBody extends React.Component {
+export default class SummaryTabBody extends React.PureComponent {
   static contextType = T.contextType;
   getConfig = path => T.get(this.context, path, {}, 'raw');
 
