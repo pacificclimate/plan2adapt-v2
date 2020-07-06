@@ -17,7 +17,7 @@ jobs:
         id: wait-for-build
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: docker-publish
+          checkName: publish
           ref: ${{ github.sha }}
       - name: Get branch name
         uses: nelonoel/branch-name@v1
