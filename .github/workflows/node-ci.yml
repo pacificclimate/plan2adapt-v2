@@ -1,9 +1,9 @@
-name: CI Tests
+name: Node CI
 
 on: push
 
 jobs:
-  node-test:
+  test:
 
     runs-on: ubuntu-18.04
 

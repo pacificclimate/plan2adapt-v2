@@ -1,7 +1,7 @@
 # Plan2Adapt Version 2
 
-[![Build Status](https://travis-ci.org/pacificclimate/plan2adapt-v2.svg?branch=master)](https://travis-ci.org/pacificclimate/plan2adapt-v2)
-![Image Scan](https://github.com/pacificclimate/plan2adapt-v2/workflows/Image%20Scan/badge.svg?branch=master)
+![Node CI](https://github.com/pacificclimate/plan2adapt-v2/workflows/Node%20CI/badge.svg)
+![Docker Publishing](https://github.com/pacificclimate/plan2adapt-v2/workflows/Docker%20Publishing/badge.svg)
 
 Plan2Adapt Version 2 is an updated and improved version of the original
 [Plan2Adapt v1](https://pacificclimate.org/analysis-tools/plan2adapt)
@@ -169,9 +169,9 @@ git push --follow-tags
 
 ### Error handling in the app
 
-React provides a very useful feature called an 
+React provides a very useful feature called an
 [error boundaries](https://reactjs.org/docs/error-boundaries.html)
-for catching and handling errors raised inside app components. 
+for catching and handling errors raised inside app components.
 It's a declarative version of a try-catch block, and allows rendering an
 alternate UI when an error occurs in a component subtree enclosed by
 an error boundary component.
@@ -183,27 +183,27 @@ the error caught. It logs more information to the console for debugging.
 
 #### Caveat
 
-_**In development mode**_ (i.e., `npm start`), a React feature called 
+_**In development mode**_ (i.e., `npm start`), a React feature called
 [strict mode](https://reactjs.org/docs/strict-mode.html) appears to be in force,
 despite documentation stating that it is optional and none of our code opting in.
-The consequence for error boundaries is that strict mode causes component `render` 
-(and other lifecylce methods) to be called twice for each nominal render. 
-(Read about why in the documentation.) 
+The consequence for error boundaries is that strict mode causes component `render`
+(and other lifecylce methods) to be called twice for each nominal render.
+(Read about why in the documentation.)
 Unfortunately, this has the effect of making most errors (exceptions) thrown in a
 component subtree be thrown twice, and the second time somehow evades the error boundary.
 
-What you will see is: 
+What you will see is:
 
 1. The error boundary fallback (error) UI appears. The app is still running.
 2. A short time later (second render), a standard JavaScript error appears, replacing
 the entire app (which has crashed).
 
 This is annoying and makes it hard to develop error boundary code, because you only see
-the results briefly. 
+the results briefly.
 
 However, _**in production mode**_ (i.e., `npm build`), strict mode is off, and the UI
 renders properly, including error boundary fallbacks. To make it easier on developers,
-we have added an npm script `npm run build-serve` that builds the app and serves it on 
+we have added an npm script `npm run build-serve` that builds the app and serves it on
 `localhost:3001`. It doesn't hot update like `npm start`, but it does allow you to see
 production behaviour. When you want to see the effects of code changes, stop the script
 and re-run it.
@@ -211,7 +211,7 @@ and re-run it.
 ### Externalized text content
 
 TL;DR: We've externalized almost all the text in this app. That text can be hot-updated
-in production by changing the contents of a file not managed by Webpack, specifically 
+in production by changing the contents of a file not managed by Webpack, specifically
 `/build/external-text/default.yaml`, and restarting the Docker image.
 
 This project is very text-heavy. We'd rather not release a new version every time we tweak some punctuation,
