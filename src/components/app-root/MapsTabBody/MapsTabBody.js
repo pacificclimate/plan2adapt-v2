@@ -7,16 +7,20 @@
 //  - Managing the bounds vs the viewport (see notes below)
 //
 // This component renders two `DataMap`s, one with a baseline climate layer
-// and one with a user-selected climate layer. Map viewports are coordinated.
-// That is, when one map's viewport is changed (panned, zoomed), the other
-// map's viewport is set to the same value.
+// and one with a user-selected climate layer.
+//
+// Map viewports are coordinated. That is, when one map's viewport is changed
+// (panned, zoomed), the other map's viewport is set to the same value.
+//
+// When a new region is selected, the map viewport is set to the bounds of the
+// new region. Thereafter the user can pan and zoom as usual.
 //
 // Note on viewport coordination.
 //
-// We pass in a simple handler as `onViewportChanged` to each `DataMap`.
-// This callback is called when a change of viewport (pan, zoom) is
-// complete, and does not fire continuously during such changes, as
-// `onViewportChange` (no "d") does.
+// We pass in a handler as prop `onViewportChanged` to each `DataMap`.
+// It is is called when a change of viewport (pan, zoom) is complete, and does
+// not fire continuously during such changes, as `onViewportChange` (no "d")
+// does.
 //
 // User experience would be smoother if we used the callback `onViewportChange`,
 // but viewport change events are generated at a very high rate during panning,
