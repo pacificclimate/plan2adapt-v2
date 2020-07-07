@@ -3,18 +3,20 @@
 //  - Filtering out unsettled props (options from App)
 //  - Layout and formatting
 //  - Marshalling data for subsidiary components
+//  - Coordinating the common viewport shared by the two maps
+//  - Managing the bounds vs the viewport (see notes below)
 //
 // This component renders two `DataMap`s, one with a baseline climate layer
 // and one with a user-selected climate layer. Map viewports are coordinated.
 // That is, when one map's viewport is changed (panned, zoomed), the other
 // map's viewport is set to the same value.
 //
-// Note on viewport coordination code.
+// Note on viewport coordination.
 //
 // We pass in a simple handler as `onViewportChanged` to each `DataMap`.
 // This callback is called when a change of viewport (pan, zoom) is
 // complete, and does not fire continuously during such changes, as
-// `onViewportChange` (no d) does.
+// `onViewportChange` (no "d") does.
 //
 // User experience would be smoother if we used the callback `onViewportChange`,
 // but viewport change events are generated at a very high rate during panning,
@@ -30,12 +32,47 @@
 // a better user experience simply to have the other viewport updated once
 // at the end of changing.
 //
+// Note on map viewport vs bounds.
+//
+// React Leaflet `Map` components accept both `viewport` and `bounds` props.
+// *Most of the time*, `bounds` supersedes `viewport`; the viewport change
+// caused by setting a `bounds` value is communicated via the `onChangeViewport`
+// callback. Unfortunately, it is not quite consistent, causing buggy behaviour
+// in our maps. Therefore we have to manage bounds and viewport on our own.
+//
+// This code passes *only* the `viewport` prop to the maps, and manages the
+// coordination between bounds and viewport itself. In particular, a defined
+// value for `state.bounds` causes this component to update `state.viewport`
+// from that value accordingly (and hence re-render), then reset `bounds` to
+// undefined.
+//
+// `state.viewport` is the sole source of truth. `state.bounds` is a transient
+// value that mediates between the *intention* to update the viewport according
+// to some bounds and the *availability* of the map ref, which is required to
+// convert bounds to a viewport for a given map. Map refs are not always
+// available when bounds conversions are needed, hence this rather complicated
+// arrangement with transient `state.bounds` values.
+//
+// Note on map refs.
+//
+// In order to do a couple of key operations, namely bounds conversions and map
+// refreshes, we need to access the underlying Leaflet map object. We can do
+// that with React refs to the components in question. React offers two ways to
+// obtain refs; the shorter `React.createRef()` utility, or the callback method.
+// It turns out that the callback method is the only one that delivers map refs
+// properly up to date with React lifecycle hook calls, which latter we need to
+// use to coordinate certain bounds to viewport updates. *Sigh*.
+//
+// We keep the map refs in state so that their becoming available can trigger
+// an update -- e.g., converting bounds to viewport (see note above).
+//
 // Note on size changes.
 //
 // When a React Bootstrap tab is deselected, its contents lose dimension.
 // In this tab (Maps), that causes Leaflet to get confused: When the Maps tab is
-// deselected, if map updates are required (e.g., by change of variable tab),
-// the maps look and behave weirdly when the Maps tab is selected again.
+// deselected, if map updates are required (e.g., by change of variable
+// selection), the maps look and behave weirdly when the Maps tab is selected
+// again.
 //
 // There are several possible approaches to this problem, but the one that so
 // far has yielded the best results is to monitor the size of an (really any)
@@ -69,6 +106,7 @@ import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 
 
+// TODO: Move to map-utils
 const boundsToViewport = (map, bounds) => ({
   center: bounds.getCenter(),
   zoom: map.getBoundsZoom(bounds),
@@ -95,56 +133,72 @@ export default class MapsTabBody extends React.PureComponent {
       isOpen: false,
     },
     resizeCount: 0,
-    baselineMapRef: React.createRef(),
-    projectedMapRef: React.createRef(),
+    baselineMapRef: undefined,
+    projectedMapRef: undefined,
   };
 
   static getDerivedStateFromProps(props, state) {
     // Any time the current region changes, reset the bounds to the
-    // bounding box of the region. We are fortunate that when bounds change,
-    // they override the current viewport, and vice-versa, eliminating any
-    // need for logic around this on our part.
-    // TODO: This does not take effect on first render because map refs are
-    //  not yet defined. Set a bounds state, and do this dynamically when
-    //  bounds change. cdM, cdu: bounds -> viewport
-    if (props.regionOpt !== state.prevPropsRegionOpt && state.baselineMapRef.current) {
+    // bounding box of the region. It would be better to set `state.viewport`
+    // directly here, but because this is a static method, we cannot access the
+    // map ref required for that conversion. Therefore we store the bounds in
+    // state and a different lifecycle method is responsible for updating the
+    // viewport from it.
+    if (props.regionOpt !== state.prevPropsRegionOpt) {
       const newState = {
         prevPropsRegionOpt: props.regionOpt,
-        viewport: boundsToViewport(
-          state.baselineMapRef.current.leafletElement,
-          regionBounds(props.regionOpt.value)
-        ),
+        bounds: regionBounds(props.regionOpt.value),
       };
-      console.log('### Maps: resetting bounds', newState)
       return newState;
     }
     return null;
   }
 
-  handleChangeSelection = (name, value) => this.setState({ [name]: value });
+  componentDidMount() {
+    this.updateViewportFromBounds(this.state.bounds);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.updateViewportFromBounds(this.state.bounds);
+  }
+
+  updateViewportFromBounds = (bounds) => {
+    if (bounds && this.state.baselineMapRef) {
+      this.setState({
+        viewport: boundsToViewport(
+          this.state.baselineMapRef.leafletElement,
+          bounds,
+        ),
+        bounds: undefined,
+      });
+    }
+  };
+
+  handleChangeSimple = (name, value) => this.setState({ [name]: value });
   handleChangeViewport = viewport => {
-    // When viewport is changed, remove bounds so that viewport takes
-    // precedence. Don't update viewport more often than necessary.
+    // The `onViewportChanged` callback fires several times for any given
+    // viewport change (presumably because of the interaction between the two
+    // maps). This filters out any unnecessary updates.
     if (!isEqual(viewport, this.state.viewport)) {
-      console.log('### Maps: handleChangeViewport', viewport)
       this.setState({ viewport });
     }
   }
-  handleChangePopup = this.handleChangeSelection.bind(this, 'popup');
+  handleChangePopup = this.handleChangeSimple.bind(this, 'popup');
+  handleChangeBaselineMapRef =
+    this.handleChangeSimple.bind(this, 'baselineMapRef');
+  handleChangeProjectedMapRef =
+    this.handleChangeSimple.bind(this, 'projectedMapRef');
 
   // These items handle redrawing the map when the size changes.
   // The redraw depends on using a Leaflet "private" method `Map._onResize`,
   // which may be fragile, but Map doesn't expose a public `redraw` method.
   redrawMap = mapRef => {
-    if (mapRef.current) {
-      mapRef.current.leafletElement._onResize();
+    if (mapRef) {
+      mapRef.leafletElement._onResize();
     }
   };
   handleResize = contentRect => {
-    console.log('### Maps.handleResize, contentRect = ', contentRect)
-    // Only redraw if content has non-zero size.
     if (contentRect.bounds.width !== 0) {
-      console.log('### Maps.handleResize: redrawing')
       this.redrawMap(this.state.baselineMapRef);
       this.redrawMap(this.state.projectedMapRef);
     }
@@ -153,7 +207,7 @@ export default class MapsTabBody extends React.PureComponent {
   zoomToRegion = () => {
     this.setState({
       viewport: boundsToViewport(
-        this.state.baselineMapRef.current.leafletElement,
+        this.state.baselineMapRef.leafletElement,
         regionBounds(this.props.regionOpt.value),
       ),
     });
@@ -220,19 +274,6 @@ export default class MapsTabBody extends React.PureComponent {
         {({ measureRef }) => (
           <div ref={measureRef}>
             <Row>
-              <Col lg={2}>
-                <Button onClick={this.handleResize}>Resize</Button>
-              </Col>
-              <Col lg={4}>
-                bounds:
-                <pre>{JSON.stringify(this.state.bounds, undefined, 2)}</pre>
-              </Col>
-              <Col lg={4}>
-                viewport:
-                <pre>{JSON.stringify(this.state.viewport, undefined, 2)}</pre>
-              </Col>
-            </Row>
-            <Row>
               <Col lg={12}>
                 <NcwmsColourbar
                   breadth={20}
@@ -263,7 +304,7 @@ export default class MapsTabBody extends React.PureComponent {
                 />
                 <DataMap
                   id={'historical'}
-                  mapRef={this.state.baselineMapRef}
+                  mapRef={this.handleChangeBaselineMapRef}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
@@ -286,7 +327,7 @@ export default class MapsTabBody extends React.PureComponent {
                 }}/>
                 <DataMap
                   id={'projected'}
-                  mapRef={this.state.projectedMapRef}
+                  mapRef={this.handleChangeProjectedMapRef}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
