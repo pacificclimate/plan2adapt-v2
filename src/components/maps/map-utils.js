@@ -27,6 +27,8 @@ export const geometryPositionDepth = geometryType => {
 export const reverse = a => [a[1], a[0]];
 
 
+// Leaflet-specific helpers
+
 // Return a Leaflet LatLngBounds object bounding the GeoJSON geometry object.
 export const geometryBounds = geometry => {
   const depth = geometryPositionDepth(geometry.type);
@@ -38,6 +40,13 @@ export const geometryBounds = geometry => {
 
 // Return a Leaflet LatLngBounds object bounding the GeoJSON region object.
 export const regionBounds = region => geometryBounds(region.geometry);
+
+// Return a viewport object for a given map corresponding to the given bounds.
+export const boundsToViewport = (map, bounds) => ({
+  center: bounds.getCenter(),
+  zoom: map.getBoundsZoom(bounds),
+});
+
 
 
 // Generic map helpers

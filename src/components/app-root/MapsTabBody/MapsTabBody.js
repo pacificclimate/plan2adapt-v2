@@ -100,7 +100,7 @@ import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
 import BCBaseMap from '../../maps/BCBaseMap';
 import NcwmsColourbar from '../../maps/NcwmsColourbar';
-import { getWmsLogscale, regionBounds } from '../../maps/map-utils';
+import { getWmsLogscale, regionBounds, boundsToViewport } from '../../maps/map-utils';
 import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
@@ -108,13 +108,6 @@ import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
-
-
-// TODO: Move to map-utils
-const boundsToViewport = (map, bounds) => ({
-  center: bounds.getCenter(),
-  zoom: map.getBoundsZoom(bounds),
-});
 
 
 export default class MapsTabBody extends React.PureComponent {
