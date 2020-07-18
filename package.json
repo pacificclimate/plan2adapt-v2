@@ -10,7 +10,7 @@
     "js-yaml": "^3.13.1",
     "leaflet": "^1.4.0",
     "lethargy": "^1.0.9",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.19",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git",
