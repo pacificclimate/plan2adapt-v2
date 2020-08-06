@@ -2,7 +2,6 @@
 // format that Summary and ChangeOverTimeGraph consume.
 
 import flow from 'lodash/fp/flow';
-import keys from 'lodash/fp/keys';
 import find from 'lodash/fp/find';
 import isUndefined from 'lodash/fp/isUndefined';
 import map from 'lodash/fp/map';
@@ -78,32 +77,19 @@ export const getPeriodData = (source, period) => {
   // `period` is one of the period indicator strings, e.g., 'annual', 'winter',
   // 'spring', ... 'jan', 'feb', ...
   //
-  // `source` is keyed first by timescale (e.g., 'seasonal') and
-  // then within timescale by a timestamp centered on the period (e.g.,
-  // "2055-04-16 00:00:00" for period == 'spring'.
-  // The item is matched only to the centre *month* of the period.
+  // The sought-after item is matched only to the centre *month* of the period.
   // Therefore this function is robust to little calendar and computational
   // quirks that can vary the centre date by a day or two. It is independent of
   // year.
-  const timescaleItems = source[periodToTimescale(period)];
-  if (!timescaleItems) {
-    throw new Error(
-      `No data for timescale '${periodToTimescale(period)}' 
-      (period '${period}')`
-    );
-  }
+
+  const timescale = periodToTimescale(period);
+  const month = periodToMonth(period);
   return flow(
-    keys,
-    find(key => key.substring(5, 7) === periodToMonth(period)),
-    dataKey => {
-      if (!dataKey) {
-        throw new Error(
-          `No data for period '${period}' (month ${periodToMonth(period)})`
-        );
-      }
-      return timescaleItems[dataKey]
-    },
-  )(timescaleItems);
+    find(item =>
+      item.timescale === timescale && item.date.substring(5, 7) === month
+    ),
+    item => item.values,
+  )(source);
 };
 
 
@@ -120,7 +106,7 @@ export const getDisplayData = (response, period, display) => {
     // TODO: Probably better to return just undefined here.
     return {
       // Empty array -> undefined when subscripted; possibly better to return undefined
-      percentiles: [],
+      values: [],
       units: '??',
     };
   }
@@ -128,7 +114,7 @@ export const getDisplayData = (response, period, display) => {
   const anomalyValues = getPeriodData(response.anomaly, period);
   if (display === 'absolute') {
     return {
-      percentiles: anomalyValues,
+      values: anomalyValues,
       units: response.units,
     };
   }
@@ -138,12 +124,12 @@ export const getDisplayData = (response, period, display) => {
   // TODO: Get zero tolerance from config
   if (nearZero(baselineValue)) {
     return {
-      percentiles: map(() => 0)(anomalyValues),
+      values: map(() => 0)(anomalyValues),
       units: '%',
     }
   }
   return {
-    percentiles: map(x => 100 * x/baselineValue)(anomalyValues),
+    values: map(x => 100 * x/baselineValue)(anomalyValues),
     units: '%',
   };
 };

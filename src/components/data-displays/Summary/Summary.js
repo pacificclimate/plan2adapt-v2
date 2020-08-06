@@ -212,7 +212,7 @@ class Summary extends React.Component {
               const convertData =
                 convertUnits(displayData.units, variableInfo.unitsSpec.id);
               const displayPercentileValues =
-                map(convertData)(displayData.percentiles);
+                map(convertData)(displayData.values);
 
               // Const `data` is provided as context data to the external text.
               // The external text implements the formatting of this data for
