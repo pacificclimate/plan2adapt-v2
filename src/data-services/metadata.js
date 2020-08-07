@@ -51,6 +51,7 @@ export function fetchSummaryMetadataForModel(model) {
       params: {
         ensemble_name: process.env.REACT_APP_ENSEMBLE_NAME,
         model: model,
+        extras: "filepath",
       },
       // transformResponse: [JSON.parse, standardizeSummaryMetadata],
     },
@@ -112,6 +113,7 @@ export function fetchFileMetadata(unique_id) {
         // Note misleading naming: API param `model_id` should actually be
         // named `unique_id`.
         model_id: unique_id,
+        extras: "filepath",
       },
       transformResponse: [JSON.parse, normalizeFileMetadata],
     },
