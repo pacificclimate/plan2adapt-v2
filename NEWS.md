@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 2.0.0
+*2020-Aug-07*
+
+This release makes Plan2Adapt compatible with the updated Climate Explorer backend,
+version 3.0.1. This version of Plan2Adapt is not compatible with CE backend < 2.0.0.
+
+- [Update to accept new `/percentilanomaly` response format](https://github.com/pacificclimate/plan2adapt-v2/pull/204)
+
 ## 1.2.0
 *2020-Jul-24*
 
