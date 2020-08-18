@@ -110,9 +110,96 @@ docker run --restart=unless-stopped -d \
   plan2adapt-v2-frontend:<tag>
 ```
 
-### Updating configuration files
+## Configuration
 
-Certain parts of Plan2Adapt are configured in external configuration files.
+Plan2Adapt is configured using two mechanisms: 
+environment variables (for basic configuration such as backend URLs) and
+a configuration file (for more complex configuration, including text content).
+
+### Environment variables
+
+In a Create React App app, [environment variables are managed carefully](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables).
+Therefore, most of the environment variables below begin with `REACT_APP_`, as required by CRA.
+
+CRA also provides a convenient system for setting default values of environment variables
+in various contexts (development, production, etc.).
+
+Brief summary:
+
+* `.env`: Global default settings
+* `.env.development`: Development-specific settings (`npm start`)
+* `.env.production`: Production-specific settings (`npm run build`)
+
+For more details, see the
+[CRA documentation](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)).
+
+Environment variables for configuring the app are:
+
+`PUBLIC_URL`
+* Base **URL** for CE frontend app.
+* For production, set this to the URL for Plan2Adapt configured in our proxy
+server.
+
+`REACT_APP_VERSION`
+* Version of the app.
+* This value should be set using `generate-commitish.sh` when the Docker image 
+is built (see below).
+* It is _not_ recommended to manually override the automatically generated 
+value when the image is run.
+* No default value for this variable is provided in any `.env` file.
+
+`REACT_APP_CE_BACKEND_URL`
+* Publicly accessible URL for backend climate data.
+
+`REACT_APP_TILECACHE_URL`
+* URL of tilecache  providing basemap layers.
+
+`REACT_APP_ENSEMBLE_NAME`
+* Ensemble name to use for CE backend requests.
+
+`REACT_APP_MODEL_ID`
+* Identifiers of model(s) to be requested from the CE backend.
+* A semicolon-separated list of identifiers; spaces are part of identifiers.
+* Standard value: `REACT_APP_MODEL_ID=PCIC12;anusplin`
+
+`REACT_APP_EMISSIONS_SCENARIOS`
+* Identifiers of emissions scenarios to request from the CE backend.
+* A semicolon-separated list of identifiers; spaces are part of identifiers.
+* Standard value: `REACT_APP_EMISSIONS_SCENARIOS=historical,rcp85;historical, rcp85;historical`
+
+`REACT_APP_REGIONS_SERVICE_URL`
+* URL of geographic regions service.
+
+`REACT_APP_RULES_ENGINE_URL`
+* URL of rules engine service.
+
+`REACT_APP_NCWMS_URL`
+* URL of ncWMS instance providing climate layers.
+
+`REACT_APP_MAP_LAYER_ID_TYPE`
+* Type of identifier used by the app in requests for map climate layers.
+   * Value `dynamic` selects the dynamic dataset identifier type.
+     A dynamic dataset identifier is formed by prefixing the value of 
+     `REACT_APP_MAP_LAYER_ID_PREFIX` to the filepath of the dataset 
+     (obtained from the metadata).
+   * Any other values selects static (preconfigured) dataset identifier type.
+     A simple dataset identifier is the unqiue_id of the dataset
+     (obtained from the metadata).
+     
+`REACT_APP_MAP_LAYER_ID_PREFIX`
+* Prefix used to form a dynamic dataset identifier, if requested.
+  (See item above.)
+
+`REACT_APP_EXTERNAL_TEXT`
+* Path within the `public` folder of the external text file.
+
+`NODE_ENV`
+* [**Automatically set; cannot be overridden manually.**](https://facebook.github.io/create-react-app/docs/adding-custom-environment-variables)
+
+
+### Configuration file
+
+Much of of Plan2Adapt is configured in external configuration files.
 These configuration files are stored in [the `public` folder](https://facebook.github.io/create-react-app/docs/using-the-public-folder).
 The path to each configuration file inside this folder specified by an environment variable.
 Specifically:
