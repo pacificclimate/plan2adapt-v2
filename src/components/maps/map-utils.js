@@ -60,9 +60,15 @@ export const generateResolutions = (maxRes, count) =>
 export const wmsNumcolorbands = 249;
 
 
-export const getWmsLayerName = (fileMetadata, variableId) =>
-  `${fileMetadata.unique_id}/${variableId}`;
-
+export const getWmsLayerName = (fileMetadata, variableId) => {
+  // The dataset identifier can be either a dynamic dataset identifier, which
+  // involves the full filepath, or a simple dataset identifier, which uses
+  // just the dataset unique_id. Default behaviour is "simple".
+  const datasetId = process.env.REACT_APP_MAP_LAYER_ID_TYPE === 'dynamic' ?
+    `${process.env.REACT_APP_MAP_LAYER_ID_PREFIX}${fileMetadata.filepath}` :
+    fileMetadata.unique_id;
+  return `${datasetId}/${variableId}`;
+}
 
 export const getWmsTime = (fileMetadata, season) => {
   const timeIndexOffset = {
