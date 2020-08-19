@@ -136,7 +136,7 @@ For more details, see the
 Environment variables for configuring the app are:
 
 `PUBLIC_URL`
-* Base **URL** for CE frontend app.
+* Base URL for for Plan2Adapt frontend app.
 * For production, set this to the URL for Plan2Adapt configured in our proxy
 server.
 
