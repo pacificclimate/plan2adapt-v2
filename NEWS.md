@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 2.1.0
+*2020-Aug-19*
+
+This release adds the option to request climate layers from ncWMS as dynamic
+datasets.
+
+- [Add capability for dynamic dataset map layers](https://github.com/pacificclimate/plan2adapt-v2/pull/200)
+
 ## 2.0.0
 *2020-Aug-07*
 
