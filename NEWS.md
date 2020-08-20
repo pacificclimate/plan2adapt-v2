@@ -8,6 +8,12 @@ datasets.
 
 - [Add capability for dynamic dataset map layers](https://github.com/pacificclimate/plan2adapt-v2/pull/200)
 
+Backend requirements:
+- Climate Explorer Backend 
+  - if using dynamic datasets CEB >= 3.1.0
+  - otherwise CEB >= 3.0.1
+
+
 ## 2.0.0
 *2020-Aug-07*
 
@@ -15,6 +21,9 @@ This release makes Plan2Adapt compatible with the updated Climate Explorer backe
 version 3.0.1. This version of Plan2Adapt is not compatible with CE backend < 2.0.0.
 
 - [Update to accept new `/percentilanomaly` response format](https://github.com/pacificclimate/plan2adapt-v2/pull/204)
+
+Backend requirements:
+- Climate Explorer Backend >= 3.0.1
 
 ## 1.2.0
 *2020-Jul-24*
@@ -38,6 +47,8 @@ configuration simpler.
 - [Make app more robust to missing or invalid config data](https://github.com/pacificclimate/plan2adapt-v2/issues/85)
 - Miscellaneous code maintainability improvements.
 
+Backend requirements:
+- Climate Explorer Backend <= 1.3.0
 
 ## 1.1.0
 *2020-Jun-17*
