@@ -6,6 +6,7 @@ import ExternalText from './temporary/external-text';
 import ErrorBoundary from './components/misc/ErrorBoundary';
 import App from './components/app-root/App';
 import { makeYamlLoader } from './utils/external-text';
+import 'promise-polyfill/src/polyfill';
 
 
 const loadTexts = makeYamlLoader(
