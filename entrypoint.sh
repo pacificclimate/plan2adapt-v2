@@ -4,5 +4,7 @@
 # container a lot heavier, but we don't spin up many instances, or often,
 # so it doesn't matter.
 
-npm run build
-serve -s build -l 8080
+#npm run build
+#serve -s build -l 8080
+
+npm start -- --port 8080
