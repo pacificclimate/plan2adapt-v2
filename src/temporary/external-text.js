@@ -198,6 +198,7 @@ export function get(
       }
       return (<ReactMarkdown escapeHtml={false} source={source} {...props}/>);
     } catch (e) {
+      console.trace();
       return whenErrorResponse(
         as, whenError, `Error in external text '${path}': ${e.toString()}.`
       );
