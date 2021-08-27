@@ -8,17 +8,15 @@ import isEqual from 'lodash/fp/isEqual';
 import flow from 'lodash/fp/flow';
 import filter from 'lodash/fp/filter';
 import mapValues from 'lodash/fp/mapValues';
-import tap from 'lodash/fp/tap';
 import cond from 'lodash/fp/cond';
 
 import { BCBaseMap } from 'pcic-react-leaflet-components';
-import CanadaBaseMap from '../CanadaBaseMap';
 import ClimateLayer from '../ClimateLayer';
 import LayerValuePopup from '../LayerValuePopup';
 import SimpleGeoJSON from '../SimpleGeoJSON';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchFileMetadata } from '../../../data-services/metadata';
-import { getWmsLayerName, getWmsTime, wmsClimateLayerProps } from '../map-utils';
+import { getWmsLayerName, getWmsTime } from '../map-utils';
 
 import './DataMap.css';
 import { allDefined } from '../../../utils/lodash-fp-extras';
@@ -136,7 +134,7 @@ class DataMapDisplay extends React.Component {
     } = this.props;
 
     return (
-      <CanadaBaseMap
+      <BCBaseMap
         {...baseMapProps}
         // FIXME: Popups are disabled because the CE ncWMS does not allow
         //  GetFeatureInfo requests, which are required to fill the popup.
@@ -155,7 +153,7 @@ class DataMapDisplay extends React.Component {
         }
         <SimpleGeoJSON data={region} fill={false}/>
         { children }
-      </CanadaBaseMap>
+      </BCBaseMap>
     );
   }
 }
