@@ -13,7 +13,7 @@
     "lodash": "^4.17.11",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
-    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git",
+    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#1.2.2",
     "proj4": "^2.5.0",
     "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.2",
