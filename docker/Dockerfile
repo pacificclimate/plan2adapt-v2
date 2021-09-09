@@ -27,4 +27,4 @@ EXPOSE 8080
 ARG REACT_APP_VERSION
 ENV REACT_APP_VERSION $REACT_APP_VERSION
 
-CMD ["/bin/bash", "./entrypoint.sh"]
+CMD ["/bin/bash", "docker/entrypoint.sh"]
