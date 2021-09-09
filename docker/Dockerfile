@@ -8,16 +8,15 @@
 
 FROM node:10-alpine
 
-ADD . /app
 WORKDIR /app
+RUN chown node /app
+COPY --chown=node:node . /app
 
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json /app/package.json
 
 RUN apk add --no-cache git bash && \
     npm install --quiet && \
     npm install -g serve
-COPY . /app
 
 EXPOSE 8080
 
@@ -27,4 +26,5 @@ EXPOSE 8080
 ARG REACT_APP_VERSION
 ENV REACT_APP_VERSION $REACT_APP_VERSION
 
+USER node
 CMD ["/bin/bash", "docker/entrypoint.sh"]
