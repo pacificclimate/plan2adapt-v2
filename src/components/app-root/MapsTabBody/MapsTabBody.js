@@ -302,6 +302,8 @@ export default class MapsTabBody extends React.PureComponent {
                 <DataMap
                   id={'historical'}
                   mapRef={this.handleChangeBaselineMapRef}
+                  minZoom={mapsConfig.minZoom}
+                  maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
@@ -325,6 +327,8 @@ export default class MapsTabBody extends React.PureComponent {
                 <DataMap
                   id={'projected'}
                   mapRef={this.handleChangeProjectedMapRef}
+                  minZoom={mapsConfig.minZoom}
+                  maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}

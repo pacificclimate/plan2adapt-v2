@@ -249,6 +249,8 @@ tabs:
         A logarithmic scale cannot include zero values;
         these are mapped to the below-minimum colour.* <br/>
     config:
+      minZoom: 6
+      maxBounds: [ [65, -150], [45, -100] ]
       variables:
         # NB: range and tick values are in *display* units.
         fallback:
