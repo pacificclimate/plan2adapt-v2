@@ -61,7 +61,7 @@ class DataMapDisplay extends React.Component {
     fileMetadataFetchError: PropTypes.object,
     variableConfig: PropTypes.object,
     unitsSpecs: PropTypes.object,
-    // Any other props are passed through to CanadaBaseMap.
+    // Any other props are passed through to the base map.
   };
 
   // TODO: This code is currently disabled because the CE ncWMS does not allow
