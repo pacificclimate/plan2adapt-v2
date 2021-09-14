@@ -98,7 +98,7 @@ import merge from 'lodash/fp/merge';
 import isEqual from 'lodash/fp/isEqual';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
-import BCBaseMap from '../../maps/BCBaseMap';
+import { BCBaseMap } from 'pcic-react-leaflet-components';
 import NcwmsColourbar from '../../maps/NcwmsColourbar';
 import { getWmsLogscale, regionBounds, boundsToViewport } from '../../maps/map-utils';
 import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
@@ -302,6 +302,8 @@ export default class MapsTabBody extends React.PureComponent {
                 <DataMap
                   id={'historical'}
                   mapRef={this.handleChangeBaselineMapRef}
+                  minZoom={mapsConfig.minZoom}
+                  maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
@@ -325,6 +327,8 @@ export default class MapsTabBody extends React.PureComponent {
                 <DataMap
                   id={'projected'}
                   mapRef={this.handleChangeProjectedMapRef}
+                  minZoom={mapsConfig.minZoom}
+                  maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
