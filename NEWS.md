@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 2.2.0
+*2021-Oct-18*
+
+- [Use BC Albers basemap ](https://github.com/pacificclimate/plan2adapt-v2/pull/234)
+- [Update deployment infrastructure](https://github.com/pacificclimate/plan2adapt-v2/pull/238)
+- [Add IE detection and deprecation message ](https://github.
+com/pacificclimate/plan2adapt-v2/pull/210)
+- Update DevOps infrastructure
+
 ## 2.1.0
 *2020-Aug-19*
 
