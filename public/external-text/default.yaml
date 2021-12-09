@@ -101,16 +101,22 @@ tabs:
           precision: 3
           seasons:
             - annual
+        - variable: ffd
+          display: absolute
+          displayUnits: days
+          precision: 2
+          seasons:
+            - annual
         - variable: hdd
           display: absolute
           displayUnits: degree-days
           precision: 3
           seasons:
             - annual
-        - variable: ffd
+        - variable: cdd
           display: absolute
-          displayUnits: days
-          precision: 2
+          displayUnits: degree-days
+          precision: 3
           seasons:
             - annual
     notes: |
