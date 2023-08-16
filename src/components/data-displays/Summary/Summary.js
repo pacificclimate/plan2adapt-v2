@@ -32,13 +32,13 @@ const isLong = s => s.length > 2;
 const SeasonTds = ({ data }) => {
   return [
     <td className="text-center">
-      <T path='tabs.summary.table.rows.season' data={data} as='string'/>
+      <T path='tabs.summary.table.rows.season' data={data} as='string' />
     </td>,
     <td>
-      <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string'/>
+      <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string' />
     </td>,
     <td>
-      <T path='tabs.summary.table.rows.range' data={data} as='string'/>
+      <T path='tabs.summary.table.rows.range' data={data} as='string' />
     </td>,
   ];
 };
@@ -148,7 +148,7 @@ class Summary extends React.Component {
       this.props
     )) {
       console.log('### Summary: unsettled props', this.props)
-      return <Loader/>
+      return <Loader />
     }
 
     const { tableContents, summaryStatistics, unitsSpecs } = this.props;
@@ -156,103 +156,103 @@ class Summary extends React.Component {
     return (
       <Table striped bordered className={styles.summaryTable}>
         <thead>
-        <tr>
-          <th rowSpan={2} className='align-middle'>
-            <T path='tabs.summary.table.heading.variable'/>
-          </th>
-          <th rowSpan={2} className='align-middle text-center'>
-            <T path='tabs.summary.table.heading.season'/>
-          </th>
-          <th colSpan={2} className='text-center'>
-            <T path='tabs.summary.table.heading.projectedChange'
-               data={this.props.baselineTimePeriod}/>
-          </th>
-        </tr>
-        <tr>
-          <th>
-            <T path='tabs.summary.table.heading.ensembleMedian'/>
-          </th>
-          <th>
-            <T path='tabs.summary.table.heading.range' data={{percentiles}}/>
-          </th>
-        </tr>
+          <tr>
+            <th rowSpan={2} className='align-middle'>
+              <T path='tabs.summary.table.heading.variable' />
+            </th>
+            <th rowSpan={2} className='align-middle text-center'>
+              <T path='tabs.summary.table.heading.season' />
+            </th>
+            <th colSpan={2} className='text-center'>
+              <T path='tabs.summary.table.heading.projectedChange'
+                data={this.props.baselineTimePeriod} />
+            </th>
+          </tr>
+          <tr>
+            <th>
+              <T path='tabs.summary.table.heading.ensembleMedian' />
+            </th>
+            <th>
+              <T path='tabs.summary.table.heading.range' data={{ percentiles }} />
+            </th>
+          </tr>
         </thead>
         <tbody>
-        {
-          map(([row, rowSummaryStatistics]) => {
-            const { variable, display, precision, seasons } = row;
-            return map(season => {
-              const seasonSpec = isString(season) ? { season } : season;
+          {
+            map(([row, rowSummaryStatistics]) => {
+              const { variable, display, precision, seasons } = row;
+              return map(season => {
+                const seasonSpec = isString(season) ? { season } : season;
 
-              // Create a `variableConfig` that includes display units info
-              // from `variableConfig`, and that specified in `row` or
-              // `row.season` of `tableContents`.
-              const displayUnits = row.displayUnits || seasonSpec.displayUnits;
-              const variableConfig = merge(
-                this.props.variableConfig,
-                {
-                  [variable]: { displayUnits },
-                }
-              );
-
-              // `variableInfo` describes the variable completely. It is built
-              // using config info, and includes a full units spec.
-              const variableInfo = getVariableInfo(
-                unitsSpecs, variableConfig, variable, display
-              );
-
-              // Extract data for this row
-              const displayData = getDisplayData(
-                rowSummaryStatistics, seasonSpec.season, display
-              );
-
-              // Convert data to display units
-              const convertUnits =
-                getConvertUnits(unitsSpecs, variableConfig, variable);
-              const convertData =
-                convertUnits(displayData.units, variableInfo.unitsSpec.id);
-              const displayPercentileValues =
-                map(convertData)(displayData.values);
-
-              // Const `data` is provided as context data to the external text.
-              // The external text implements the formatting of this data for
-              // display. Slightly tricky, very flexible.
-              // In addition to the data items it might want (e.g.,
-              // `variable.label`, we also include some utility functions (e.g.,
-              // `format`).
-              const data = {
-                variable: variableInfo,
-                season: {
-                  ...seasonSpec,
-                  label: capitalize(seasonSpec.season),
-                  percentileValues: displayPercentileValues,
-                },
-                format: displayFormat(precision),
-                isLong,
-                unitsSuffix,
-              };
-
-              return (
-                <tr>
+                // Create a `variableConfig` that includes display units info
+                // from `variableConfig`, and that specified in `row` or
+                // `row.season` of `tableContents`.
+                const displayUnits = row.displayUnits || seasonSpec.displayUnits;
+                const variableConfig = merge(
+                  this.props.variableConfig,
                   {
-                    season === row.seasons[0] &&
-                    <td
-                      rowSpan={row.seasons.length}
-                      className='align-middle'
-                    >
-                      <T path='tabs.summary.table.rows.variable' data={data}/>
-                    </td>
+                    [variable]: { displayUnits },
                   }
-                  <SeasonTds data={data}/>
-                </tr>
-              )
-            })(seasons);
-          })(
-            // summaryStatistics items correspond 1:1 with tableContents items
-            // TODO: Put into loader?
-            zip(tableContents, summaryStatistics)
-          )
-        }
+                );
+
+                // `variableInfo` describes the variable completely. It is built
+                // using config info, and includes a full units spec.
+                const variableInfo = getVariableInfo(
+                  unitsSpecs, variableConfig, variable, display
+                );
+
+                // Extract data for this row
+                const displayData = getDisplayData(
+                  rowSummaryStatistics, seasonSpec.season, display
+                );
+
+                // Convert data to display units
+                const convertUnits =
+                  getConvertUnits(unitsSpecs, variableConfig, variable);
+                const convertData =
+                  convertUnits(displayData.units, variableInfo.unitsSpec.id);
+                const displayPercentileValues =
+                  map(convertData)(displayData.values);
+
+                // Const `data` is provided as context data to the external text.
+                // The external text implements the formatting of this data for
+                // display. Slightly tricky, very flexible.
+                // In addition to the data items it might want (e.g.,
+                // `variable.label`, we also include some utility functions (e.g.,
+                // `format`).
+                const data = {
+                  variable: variableInfo,
+                  season: {
+                    ...seasonSpec,
+                    label: capitalize(seasonSpec.season),
+                    percentileValues: displayPercentileValues,
+                  },
+                  format: displayFormat(precision),
+                  isLong,
+                  unitsSuffix,
+                };
+
+                return (
+                  <tr>
+                    {
+                      season === row.seasons[0] &&
+                      <td
+                        rowSpan={row.seasons.length}
+                        className='align-middle'
+                      >
+                        <T path='tabs.summary.table.rows.variable' data={data} />
+                      </td>
+                    }
+                    <SeasonTds data={data} />
+                  </tr>
+                )
+              })(seasons);
+            })(
+              // summaryStatistics items correspond 1:1 with tableContents items
+              // TODO: Put into loader?
+              zip(tableContents, summaryStatistics)
+            )
+          }
         </tbody>
       </Table>
     );
@@ -260,7 +260,7 @@ class Summary extends React.Component {
 }
 
 
-const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
+const loadSummaryStatistics = ({ region, futureTimePeriod, tableContents }) =>
   // Return (a promise for) the summary statistics to be displayed in the
   // Summary tab. This amounts to fetching the data for each variable from the
   // backend, then processing it into the form consumed by Summary via its
@@ -270,12 +270,12 @@ const loadSummaryStatistics = ({region, futureTimePeriod, tableContents}) =>
       content => fetchSummaryStatistics(
         region, futureTimePeriod, content.variable, percentiles
       )
-      // Unavailable or otherwise problematic fetches are returned as undefined.
-      // Data display elements are responsible for showing a message.
-      .catch(err => {
-        console.error('Failed to fetch summary statistics:\n', err);
-        return undefined;
-      })
+        // Unavailable or otherwise problematic fetches are returned as undefined.
+        // Data display elements are responsible for showing a message.
+        .catch(err => {
+          console.error('Failed to fetch summary statistics:\n', err);
+          return undefined;
+        })
     )(tableContents)
   );
 

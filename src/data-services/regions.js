@@ -10,11 +10,11 @@ export function fetchRegions() {
         version: '1.0.0',
         service: 'WFS',
         request: 'GetFeature',
-        typeName: 'bc_regions:bc-regions-polygon',
+        typeName: 'bc_regions:bc-regions-polygon-test',
         maxFeatures: 100,
         outputFormat: 'application/json',
       }
     }
   )
-  .then(response => response.data)
+    .then(response => response.data)
 }
