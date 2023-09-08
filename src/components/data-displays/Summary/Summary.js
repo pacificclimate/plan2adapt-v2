@@ -152,7 +152,7 @@ class Summary extends React.Component {
     }
 
     const { tableContents, summaryStatistics, unitsSpecs } = this.props;
-    let stripes = '';
+    let isStripe = false;
     let lastVariable = null;
     return (
       <Table bordered className={styles.summaryTable}>
@@ -233,15 +233,11 @@ class Summary extends React.Component {
                   unitsSuffix,
                 };
 
-                const isDifferentVariable = row.variable !== lastVariable;
-
-                if (isDifferentVariable) {
-                  stripes = stripes == 'striped-row' ? '' : 'striped-row';
-                }
-                lastVariable = row.variable
+                isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
+                lastVariable = row.variable;
 
                 return (
-                  <tr className={stripes}>
+                  <tr className={isStripe ? 'striped-row' : ''} >
                     {
                       season === row.seasons[0] &&
                       <td
