@@ -31,15 +31,21 @@ const isLong = s => s.length > 2;
 // Component for displaying the per-season data in a Summary table row.
 const SeasonTds = ({ data }) => {
   return [
-    <td className="text-center">
-      <T path='tabs.summary.table.rows.season' data={data} as='string' />
-    </td>,
-    <td>
-      <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string' />
-    </td>,
-    <td>
-      <T path='tabs.summary.table.rows.range' data={data} as='string' />
-    </td>,
+    <React.Fragment key="season">
+      <td className="text-center">
+        <T path='tabs.summary.table.rows.season' data={data} as='string' />
+      </td>
+    </React.Fragment>,
+    <React.Fragment key="ensembleMedian">
+      <td>
+        <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string' />
+      </td>
+    </React.Fragment>,
+    <React.Fragment key="range">
+      <td>
+        <T path='tabs.summary.table.rows.range' data={data} as='string' />
+      </td>
+    </React.Fragment>
   ];
 };
 
@@ -182,7 +188,7 @@ class Summary extends React.Component {
           {
             map(([row, rowSummaryStatistics]) => {
               const { variable, display, precision, seasons } = row;
-              return map(season => {
+              return map((season) => {
                 const seasonSpec = isString(season) ? { season } : season;
 
                 // Create a `variableConfig` that includes display units info
@@ -235,9 +241,9 @@ class Summary extends React.Component {
 
                 isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
                 lastVariable = row.variable;
-
+                const rowKey = `row-${row.variable}-season-${season}}`;
                 return (
-                  <tr className={isStripe ? 'striped-row' : ''} >
+                  <tr key={rowKey} className={isStripe ? 'striped-row' : ''}>
                     {
                       season === row.seasons[0] &&
                       <td
