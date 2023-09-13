@@ -188,7 +188,7 @@ class Summary extends React.Component {
           {
             map(([row, rowSummaryStatistics]) => {
               const { variable, display, precision, seasons } = row;
-              return map((season) => {
+              return map(season => {
                 const seasonSpec = isString(season) ? { season } : season;
 
                 // Create a `variableConfig` that includes display units info
