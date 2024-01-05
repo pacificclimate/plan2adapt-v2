@@ -1,3 +1,7 @@
 .summaryTable p {
     margin: 0;
 }
+
+.striped-row {
+    background-color: #f2f2f2;
+}

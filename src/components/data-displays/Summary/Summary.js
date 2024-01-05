@@ -152,9 +152,10 @@ class Summary extends React.Component {
     }
 
     const { tableContents, summaryStatistics, unitsSpecs } = this.props;
-
+    let isStripe = false;
+    let lastVariable = null;
     return (
-      <Table striped bordered className={styles.summaryTable}>
+      <Table bordered className={styles.summaryTable}>
         <thead>
           <tr>
             <th rowSpan={2} className='align-middle'>
@@ -232,8 +233,11 @@ class Summary extends React.Component {
                   unitsSuffix,
                 };
 
+                isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
+                lastVariable = row.variable;
+
                 return (
-                  <tr>
+                  <tr className={isStripe ? 'striped-row' : ''} >
                     {
                       season === row.seasons[0] &&
                       <td
