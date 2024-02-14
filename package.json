@@ -18,7 +18,7 @@
     "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.2",
     "react": "^16.13.1",
-    "react-bootstrap": "^1.0.1",
+    "react-bootstrap": "^1.6.1",
     "react-dom": "^16.13.1",
     "react-icons": "^3.5.0",
     "react-leaflet": "^2.1.4",
