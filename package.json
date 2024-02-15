@@ -3,17 +3,23 @@
   "version": "2.2.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^7.1.0",
+    "assert": "^2.1.0",
     "axios": "^0.21.3",
     "bootstrap": "^4.3.1",
+    "buffer": "npm:buffer@^6.0.3",
     "c3": "^0.7.15",
     "classnames": "^2.2.6",
     "js-yaml": "^3.13.1",
     "leaflet": "^1.4.0",
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
+    "path": "^0.12.7",
+    "path-browserify": "npm:path-browserify@^1.0.1",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#1.2.2",
+    "process": "^0.11.10",
     "proj4": "^2.7.5",
     "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.2",
@@ -25,8 +31,10 @@
     "react-loader": "^2.4.5",
     "react-markdown": "^4.0.6",
     "react-measure": "^2.3.0",
-    "react-scripts": "^4.0.0",
+    "react-scripts": "^5.0.1",
     "react-select": "^2.3.0",
+    "stream": "0.0.2",
+    "stream-browserify": "npm:stream-browserify@^3.0.0",
     "url-join": "^4.0.0",
     "xml-js": "^1.6.9"
   },
@@ -36,14 +44,14 @@
     "react-test-renderer": "^16.8.6"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start-env": "REACT_APP_VERSION=\"$(./generate-commitish.sh)\" react-scripts start",
-    "build": "react-scripts build",
-    "build-serve": "react-scripts build && serve -s build -l 3001",
+    "start": "craco start",
+    "start-env": "REACT_APP_VERSION=\"$(./generate-commitish.sh)\" craco start",
+    "build": "craco build",
+    "build-serve": "craco build && serve -s build -l 3001",
     "build-update": "cp ./public/external-text/default.yaml ./build/external-text/default.yaml",
-    "test": "react-scripts test",
+    "test": "craco test",
     "eject": "react-scripts eject",
-    "reinstall": "rm -rf ./node_modules; npm install"
+    "reinstall": "rm -rf ./node_modules && npm install"
   },
   "eslintConfig": {
     "extends": "react-app"
