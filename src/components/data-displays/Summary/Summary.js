@@ -130,8 +130,8 @@ class Summary extends React.Component {
 
   static defaultProps = {
     baselineTimePeriod: {
-      start_date: 1961,
-      end_date: 1990,
+      start_date: 1981,
+      end_date: 2010,
     },
   };
 
