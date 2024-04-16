@@ -6,7 +6,7 @@
 #
 # docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
 
-FROM node:21-alpine
+FROM node:14-alpine
 
 WORKDIR /app
 RUN chown node /app
@@ -15,7 +15,7 @@ COPY --chown=node:node . /app
 ENV PATH /app/node_modules/.bin:$PATH
 
 RUN apk add --no-cache git bash && \
-    npm ci --quiet && \
+    npm install --quiet && \
     npm install -g serve@13.0.0
 
 EXPOSE 8080
@@ -27,4 +27,4 @@ ARG REACT_APP_VERSION
 ENV REACT_APP_VERSION $REACT_APP_VERSION
 
 USER node
-CMD ["/bin/bash", "/docker/entrypoint.sh"]
+CMD ["/bin/bash", "docker/entrypoint.sh"]
