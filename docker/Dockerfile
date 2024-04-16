@@ -27,4 +27,4 @@ ARG REACT_APP_VERSION
 ENV REACT_APP_VERSION $REACT_APP_VERSION
 
 USER node
-CMD ["/bin/bash", "docker/entrypoint.sh"]
+CMD ["/bin/bash", "/docker/entrypoint.sh"]
