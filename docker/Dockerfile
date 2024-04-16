@@ -18,6 +18,9 @@ RUN apk add --no-cache git bash && \
     npm install --quiet && \
     npm install -g serve@13.0.0
 
+RUN mkdir -p /app/node_modules/.cache && \
+    chown -R node:node /app/node_modules/.cache
+
 EXPOSE 8080
 
 # Move the Docker build arg REACT_APP_VERSION into an
