@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@craco/craco": "^7.1.0",
-    "axios": "^0.21.3",
+    "axios": "^0.28.0",
     "bootstrap": "^4.3.1",
     "buffer": "^6.0.3",
     "c3": "^0.7.20",
@@ -38,7 +38,8 @@
   "devDependencies": {
     "jest-each": "^24.7.1",
     "prettier": "^1.16.4",
-    "react-test-renderer": "^16.8.6"
+    "react-test-renderer": "^16.8.6",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "scripts": {
     "start": "craco start",
