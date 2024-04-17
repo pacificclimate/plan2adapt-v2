@@ -17,7 +17,7 @@ selectors:
     forTabs: ['summary', 'impacts', 'maps']
   variable:
     prefix: with details about
-    default: tasmean
+    default: tas
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
@@ -73,7 +73,7 @@ tabs:
           ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
           ${format(season.percentileValues[2])}${unitsSuffix(variable.unitsSpec.label)}
       contents:
-        - variable: tasmean
+        - variable: tas
           display: absolute
           displayUnits: °C
           precision: 2
@@ -463,7 +463,7 @@ tabs:
                 min: 10
                 max: 200
               ticks: [10, 20, 40, 80, 100, 200]
-        tasmean:
+        tas:
           display: absolute
           displayUnits: °C
           palette: x-Occam
@@ -574,7 +574,7 @@ tabs:
         snow:
           display: relative
           displayUnits: '%'
-        tasmean:
+        tas:
           display: absolute
           displayUnits: °C
 
@@ -843,7 +843,7 @@ seasons:
 # in the `units` config, below.
 # TODO: Remove `dataUnits` and supply from metadata.
 variables:
-  tasmean:
+  tas:
     label: Temperature
     type: temperature
     dataUnits: degC
