@@ -139,7 +139,7 @@ export default class App extends Component {
 
     if (!this.context || this.state.metadata === null) {
       console.log('### App: Loading ...')
-      return <Loader/>;
+      return <Loader />;
     }
     console.log('### App: Loaded')
 
@@ -164,7 +164,7 @@ export default class App extends Component {
       ),
       futureTimePeriod: (
         <TimePeriodSelector
-          bases={filter(m => +m.start_date >= 2010)(this.state.metadata)}
+          bases={filter(m => +m.start_date >= 2020)(this.state.metadata)}
           value={this.state.futureTimePeriodOpt}
           default={this.getConfig('selectors.futureTimePeriod.default')}
           onChange={this.handleChangeFutureTimePeriod}
@@ -189,7 +189,7 @@ export default class App extends Component {
         />
       ),
     };
-    
+
     // This variable drives construction of the top-level tabs. It is 
     // defined inside the component because it needs context and state.
     // Uses an alternative way to define props that allows for injection
@@ -202,7 +202,7 @@ export default class App extends Component {
           futureTimePeriodOpt: this.state.futureTimePeriodOpt,
           baselineTimePeriod: baselineTimePeriod,
         },
-      },      
+      },
       impacts: {
         Component: ImpactsTabBody,
         props: {
@@ -215,12 +215,12 @@ export default class App extends Component {
         Component: MapsTabBody,
         props: {
           regionOpt: this.state.regionOpt,
-            futureTimePeriodOpt: this.state.futureTimePeriodOpt,
-            baselineTimePeriod: baselineTimePeriod,
-            seasonOpt: this.state.seasonOpt,
-            variableOpt: this.state.variableOpt,
-            metadata: this.state.metadata,
-          },
+          futureTimePeriodOpt: this.state.futureTimePeriodOpt,
+          baselineTimePeriod: baselineTimePeriod,
+          seasonOpt: this.state.seasonOpt,
+          variableOpt: this.state.variableOpt,
+          metadata: this.state.metadata,
+        },
       },
       graphs: {
         Component: GraphsTabBody,
@@ -248,14 +248,14 @@ export default class App extends Component {
 
     return (
       <Container fluid>
-        <AppHeader/>
+        <AppHeader />
 
         <Row>
           <Col xl={2} lg={12} md={12}>
             <div className='MainSelectors'>
               <Row>
                 <Col>
-                  <T path='selectors.prologue'/>
+                  <T path='selectors.prologue' />
                 </Col>
               </Row>
 
@@ -303,7 +303,7 @@ export default class App extends Component {
                   return (
                     <Tab
                       eventKey={key}
-                      title={<T as='string' path={`tabs.${key}.label`}/>}
+                      title={<T as='string' path={`tabs.${key}.label`} />}
                       disabled={this.getConfig(`tabs.${key}.disabled`)}
                       className='pt-2'
                       mountOnEnter

@@ -22,7 +22,9 @@ export const fetchSummaryStatistics = (
         region: regionId(region),
         climatology: middleDecade(timePeriod),
         variable,
-        percentile: percentiles.join(',')
+        percentile: percentiles.join(','),
+        baseline_model:"PCIC_BLEND_v1",
+        baseline_climatology:"8110"
       }
     }
   )

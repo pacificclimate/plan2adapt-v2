@@ -87,7 +87,7 @@ tabs:
             - annual
             - summer
             - winter
-        - variable: prsn
+        - variable: snow
           display: relative
           displayUnits: '%'
           precision: 2
@@ -247,7 +247,7 @@ tabs:
       title: "#### Projected: ${$$.components.period}"
     colourScale:
       label: |
-        ${ (id === 'pr' || id === 'prsn') ? 'Total' : '' } ${label} (${unitsSpec.label})
+        ${ (id === 'pr' || id === 'snow') ? 'Total' : '' } ${label} (${unitsSpec.label})
       note: |
         ${logscale ? $$.tabs.maps.colourScale.logscaleNote : ''} This colour scale applies to both maps.
       logscaleNote: |
@@ -428,7 +428,7 @@ tabs:
                 min: 10
                 max: 2000
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
-        prsn:
+        snow:
           display: absolute
           palette: x-Occam
           logscale: true
@@ -571,7 +571,7 @@ tabs:
         pr:
           display: relative
           displayUnits: '%'
-        prsn:
+        snow:
           display: relative
           displayUnits: '%'
         tasmean:
@@ -851,7 +851,7 @@ variables:
     label: Precipitation
     type: precipitation flux
     dataUnits: kg m-2 d-1
-  prsn:
+  snow:
     label: Precipitation as Snow
     derived: true
     type: precipitation flux
