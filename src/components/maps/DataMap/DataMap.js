@@ -171,6 +171,7 @@ class DataMapDisplay extends React.Component {
 // in DataMap. Note that it depends on the various props being well defined;
 // if not, filtering will be wonky and lead to errors.
 const metadataFilter = props => {
+
   const criteria = {
     // start_date, end_date
     ...mapValues(v => v.toString())(props.timePeriod),
@@ -180,6 +181,7 @@ const metadataFilter = props => {
     // is very well suited to our purposes here.
     timescale: props.season === 16 ? 'yearly' : 'seasonal',
   };
+  console.log('Filtering Criteria:', criteria);
   return filter(criteria)
 };
 
@@ -194,6 +196,7 @@ const metadataLengthErrorPromise = metadata => {
 // `DataMapDisplay` for the given props, or for an appropriate
 // error message, depending on how many metadata items match criteria.
 const loadFileMetadata = props => {
+  console.log('All Metadata:', props.metadata);
   const filteredMetadata = metadataFilter(props)(props.metadata);
   console.log('Filtered Metadata:', filteredMetadata);
 
