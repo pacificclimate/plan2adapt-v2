@@ -14,7 +14,7 @@ export const regionId = (region) => {
       return `${name.toLowerCase().replace(/\W+/g, '_')}_FR`;
     }
     case 'Kootenay / Boundary': if (group === 'Forestry Regions') {
-      return `kootenay_boundary_FR'`;
+      return 'kootenay_boundary_FR';
     }
     default:
       return name.toLowerCase().replace(/\W+/g, '_');
