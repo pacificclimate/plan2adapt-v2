@@ -35,7 +35,10 @@ const SeasonTds = ({ data }) => {
       <T path='tabs.summary.table.rows.season' data={data} as='string' />
     </td>,
     <td>
-      <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string' />
+      <T path='tabs.summary.table.rows.ensembleMedianVal' data={data} as='string' />
+    </td>,
+    <td>
+      <T path='tabs.summary.table.rows.ensembleMedianPerc' data={data} as='string' />
     </td>,
     <td>
       <T path='tabs.summary.table.rows.range' data={data} as='string' />
@@ -164,6 +167,9 @@ class Summary extends React.Component {
             <th rowSpan={2} className='align-middle text-center'>
               <T path='tabs.summary.table.heading.season' />
             </th>
+            <th rowSpan={2} className='align-middle text-center'>
+              <T path='tabs.summary.table.heading.ensembleMedianVal' />
+            </th>
             <th colSpan={2} className='text-center'>
               <T path='tabs.summary.table.heading.projectedChange'
                 data={this.props.baselineTimePeriod} />
@@ -171,7 +177,7 @@ class Summary extends React.Component {
           </tr>
           <tr>
             <th>
-              <T path='tabs.summary.table.heading.ensembleMedian' />
+              <T path='tabs.summary.table.heading.ensembleMedianPerc' />
             </th>
             <th>
               <T path='tabs.summary.table.heading.range' data={{ percentiles }} />
