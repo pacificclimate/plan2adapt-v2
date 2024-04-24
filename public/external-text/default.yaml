@@ -1,4 +1,4 @@
-app:
+aapp:
   tabs:
     default: summary
 
@@ -41,25 +41,20 @@ tabs:
     # It's tempting to do this content as a Markdown table, but unfortunately
     # MD doesn't let you span table rows or columns.
     prologue: |
-      The table below shows projected changes in average (mean) temperature,
-      precipitation and several derived climate variables from the
-      baseline historical period
-      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-      to the
-      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-      for the ${region.properties.english_na} region.
-      The ensemble median is a mid-point value, chosen from a PCIC standard
-      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
-      more information).
-      The range values represent the lowest and highest results within the set.
+      This table shows projected changes in regional average temperature, 
+      precipitation and derived climate variables from the baseline historical period to the specified future period under a high emissions scenario (SSP5-8.5). 
+      The results are drawn from an ensemble of 12 global climate models downscaled over Canada (PCIC12), characterized by both a median value and a likely range. 
+      See the Notes below and PCIC's Statistically Downscaled Climate Scenarios page for more information.
+
     lowBaselineWarning: |
       *CAUTION: This variable may have a low baseline. See note 2 below. *
     table:
       heading:
         variable: Climate Variable
         season: Season
+        ensembleMedianVal: Ensemble Median
         projectedChange: Projected Change from ${$$.components.period} Baseline
-        ensembleMedian: Ensemble Median
+        ensembleMedianPerc: Ensemble Median
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
       rows:
         variable: |
@@ -68,7 +63,7 @@ tabs:
           ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
         season: ${season.label}
-        ensembleMedian: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
+        ensembleMedian2: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
         range: |
           ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
           ${format(season.percentileValues[2])}${unitsSuffix(variable.unitsSpec.label)}
@@ -79,14 +74,20 @@ tabs:
           precision: 2
           seasons:
             - annual
+            - winter
+            - spring
+            - summer
+            - fall
+
         - variable: pr
           display: relative
           displayUnits: '%'
           precision: 2
           seasons:
-            - annual
-            - summer
             - winter
+            - spring
+            - summer
+            - fall
         - variable: snow
           display: relative
           displayUnits: '%'
@@ -121,10 +122,10 @@ tabs:
             - annual
     notes: |
       Notes:
-
-      1. ${$$.components.notes.derivedClimateVars}
-
-      2. CAUTION: ${$$.components.notes.lowBaseline}
+      1. Climate indices are derived from daily temperature and/or precipitation values, and are not direct outputs of the climate models.
+      2. Precipitation as snow is an approximation of snowfall based on total precipitation and temperature, and may provide a different result than if snowfall was downscaled directly. CAUTION: Percent changes from a low baseline value can result in deceptively large percent change values. Low baseline values occur, for example, for snowfall in spring.
+      3. The selectable future time periods are meant to represent possible planning horizons over the 21st century. Results for these planning horizons are computed by averaging GCM projections over the 2021-2050, 2041-2070, and 2071-2100 periods, respectively.
+      4. The Plan2Adapt Maps tab shows results for the ensemble average value of the selected variable.
 
   impacts:
     disabled: false
@@ -549,9 +550,9 @@ tabs:
 
       futureTimePeriods:
         # This may be better obtained from metadata
-        - { start_date: "2010", end_date: "2039" }
-        - { start_date: "2040", end_date: "2069" }
-        - { start_date: "2070", end_date: "2099" }
+        - { start_date: "2021", end_date: "2050" }
+        - { start_date: "2041", end_date: "2070" }
+        - { start_date: "2071", end_date: "2100" }
       variables:
         # TODO: Remove fallback
         fallback:
