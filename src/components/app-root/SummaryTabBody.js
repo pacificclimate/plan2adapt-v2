@@ -33,7 +33,7 @@ export default class SummaryTabBody extends React.PureComponent {
       this.props
     )) {
       console.log('### SummaryTabBody: unsettled props', this.props)
-      return <Loader/>
+      return <Loader />
     }
 
     const region = this.props.regionOpt.value;
@@ -51,15 +51,16 @@ export default class SummaryTabBody extends React.PureComponent {
           futureTimePeriod,
           futureDecade: middleDecade(futureTimePeriod),
           baselineDecade: middleDecade(baselineTimePeriod),
-        }}/>
+        }} />
         <Summary
           region={region}
           futureTimePeriod={futureTimePeriod}
+          baselineTimePeriod={baselineTimePeriod}
           tableContents={this.getConfig('tabs.summary.table.contents')}
           variableConfig={this.getConfig('variables')}
           unitsSpecs={unitsSpecs}
         />
-        <T path='tabs.summary.notes'/>
+        <T path='tabs.summary.notes' />
       </React.Fragment>
     );
   }

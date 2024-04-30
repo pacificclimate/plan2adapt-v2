@@ -1,5 +1,3 @@
-// TODO: This module is waaaaayyyy too long. Break it up.
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
@@ -16,6 +14,7 @@ import {
   getConvertUnits,
   getVariableInfo,
   unitsSuffix,
+  baselineFormat
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
@@ -35,7 +34,7 @@ const SeasonTds = ({ data }) => {
       <T path='tabs.summary.table.rows.season' data={data} as='string' />
     </td>,
     <td>
-      <T path='tabs.summary.table.rows.ensembleMedianVal' data={data} as='string' />
+      <T path='tabs.summary.table.rows.baselineMedianVal' data={data} as='string' />
     </td>,
     <td>
       <T path='tabs.summary.table.rows.ensembleMedianPerc' data={data} as='string' />
@@ -168,7 +167,7 @@ class Summary extends React.Component {
               <T path='tabs.summary.table.heading.season' />
             </th>
             <th rowSpan={2} className='align-middle text-center'>
-              <T path='tabs.summary.table.heading.ensembleMedianVal' />
+              <T path='tabs.summary.table.heading.baselineMedianVal' />
             </th>
             <th colSpan={2} className='text-center'>
               <T path='tabs.summary.table.heading.projectedChange'
@@ -221,6 +220,8 @@ class Summary extends React.Component {
                 const displayPercentileValues =
                   map(convertData)(displayData.values);
 
+                const displayBaselineValues = Number.parseFloat([displayData.baseline])
+
                 // Const `data` is provided as context data to the external text.
                 // The external text implements the formatting of this data for
                 // display. Slightly tricky, very flexible.
@@ -233,6 +234,7 @@ class Summary extends React.Component {
                     ...seasonSpec,
                     label: capitalize(seasonSpec.season),
                     percentileValues: displayPercentileValues,
+                    baselineMedianVal: baselineFormat(precision, displayBaselineValues),
                   },
                   format: displayFormat(precision),
                   isLong,
@@ -241,6 +243,7 @@ class Summary extends React.Component {
 
                 isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
                 lastVariable = row.variable;
+                data.baselineMedianVal = Number.parseFloat([data.baselineMedianVal])
 
                 return (
                   <tr className={isStripe ? 'striped-row' : ''} >

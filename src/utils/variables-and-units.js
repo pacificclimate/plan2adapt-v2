@@ -120,3 +120,11 @@ export const displayFormat = curry((sigfigs, value) => {
   }
   return `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 });
+
+
+export const baselineFormat = (sigfigs, value) => {
+  if (!isNumber(value)) {
+    return '--';
+  }
+  return expToFixed(value.toPrecision(sigfigs));
+};

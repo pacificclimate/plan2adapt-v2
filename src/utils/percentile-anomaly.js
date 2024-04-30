@@ -107,29 +107,37 @@ export const getDisplayData = (response, period, display) => {
     return {
       // Empty array -> undefined when subscripted; possibly better to return undefined
       values: [],
+      baseline: [],
       units: '??',
     };
   }
 
   const anomalyValues = getPeriodData(response.anomaly, period);
+  const baselineValue = getPeriodData(response.baseline, period);
+
+  console.log('Baseline data:', baselineValue);
+
   if (display === 'absolute') {
     return {
       values: anomalyValues,
+      baseline: baselineValue,
       units: response.units,
     };
   }
 
   // display === 'relative':
-  const baselineValue = getPeriodData(response.baseline, period);
+
   // TODO: Get zero tolerance from config
   if (nearZero(baselineValue)) {
     return {
       values: map(() => 0)(anomalyValues),
+      baseline: baselineValue,
       units: '%',
     }
   }
   return {
     values: map(x => 100 * x / baselineValue)(anomalyValues),
+    baseline: baselineValue,
     units: '%',
   };
 };
