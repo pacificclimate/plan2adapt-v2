@@ -64,10 +64,10 @@ export default class BarChart extends React.Component {
     const percentileIndices = range(0, percentiles.length);
 
     const basePercentileValueNames =
-      map(p =>`${p}th`)(percentiles);
+      map(p => `${p}th`)(percentiles);
 
     const interpPercentileValueDiffNames = map(
-      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (interp)`
+      i => `${i ? percentiles[i - 1] : 0}-${percentiles[i]}th (interp)`
     )(percentileIndices);
 
     // In order to display negative values as stacked bars, we have to add
@@ -208,7 +208,7 @@ export default class BarChart extends React.Component {
     const interpPercentileValuesByTime =
       transpose(interpPercentileValuesByPercentile);
     const diffs = pileValues => map(
-      i => i ? (pileValues[i] - pileValues[i-1]) : pileValues[i]
+      i => i ? (pileValues[i] - pileValues[i - 1]) : pileValues[i]
     )(percentileIndices);
     const interpPercentileValueDiffsByTime =
       map(diffs)(interpPercentileValuesByTime);
@@ -301,7 +301,7 @@ export default class BarChart extends React.Component {
             min: yMin,
             max: yMax,
             tick: {
-              format: d => `${d-offset}`,
+              format: d => `${d - offset}`,
             },
             label: {
               text: `Change in ${variableInfo.label} (${variableInfo.unitsSpec.label})`,
@@ -350,7 +350,7 @@ export default class BarChart extends React.Component {
                 && includes(year, futureMiddleYears)
               ) {
                 const displayValue = displayFormat(2, value - offset);
-                return `${displayValue} ${variableInfo.units}`;
+                return `${displayValue} ${variableInfo.unitsSpec.id}`;
               }
             },
           },
@@ -369,9 +369,9 @@ export default class BarChart extends React.Component {
     console.log('### BarChart.render: c3options', c3options)
 
     return (
-        <C3Chart
-          {...c3options}
-        />
+      <C3Chart
+        {...c3options}
+      />
     )
   }
 }
