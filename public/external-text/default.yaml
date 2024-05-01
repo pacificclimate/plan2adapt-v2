@@ -122,7 +122,14 @@ tabs:
           seasons:
             - annual
     notes: |
+      #### Thresholds for Degree-Day Indices
+      - Growing Degree-Days: Sum of degree-days during the specified time period above 5°C
+      - Frost-Free Days: Number of days in a year with minimum temperatures above 0°C
+      - Heating Degree-Days: Sum of degree-days during the specified time period below 18°C
+      - Cooling Degree-Days: Sum of degree-days during the specified time period above 18°C
+
       Notes:
+
       1. ${$$.components.notes.derivedClimateVars}
       2. ${$$.components.notes.lowBaseline}
       3. ${$$.components.notes.gcmPeriods}
