@@ -1,4 +1,4 @@
-aapp:
+app:
   tabs:
     default: summary
 
@@ -52,7 +52,7 @@ tabs:
       heading:
         variable: Climate Variable
         season: Season
-        ensembleMedianVal: Ensemble Median
+        baselineMedianVal: Baseline Media Value
         projectedChange: Projected Change from ${$$.components.period} Baseline
         ensembleMedianPerc: Ensemble Median
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
@@ -63,7 +63,8 @@ tabs:
           ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
         season: ${season.label}
-        ensembleMedian2: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
+        baselineMedianVal: ${(season.baselineMedianVal)} ${(variable.unitsSpec.id =='%') ? 'mm/day':variable.unitsSpec.id}
+        ensembleMedianPerc: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
         range: |
           ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
           ${format(season.percentileValues[2])}${unitsSuffix(variable.unitsSpec.label)}
@@ -122,10 +123,10 @@ tabs:
             - annual
     notes: |
       Notes:
-      1. Climate indices are derived from daily temperature and/or precipitation values, and are not direct outputs of the climate models.
-      2. Precipitation as snow is an approximation of snowfall based on total precipitation and temperature, and may provide a different result than if snowfall was downscaled directly. CAUTION: Percent changes from a low baseline value can result in deceptively large percent change values. Low baseline values occur, for example, for snowfall in spring.
-      3. The selectable future time periods are meant to represent possible planning horizons over the 21st century. Results for these planning horizons are computed by averaging GCM projections over the 2021-2050, 2041-2070, and 2071-2100 periods, respectively.
-      4. The Plan2Adapt Maps tab shows results for the ensemble average value of the selected variable.
+      1. ${$$.components.notes.derivedClimateVars}
+      2. ${$$.components.notes.lowBaseline}
+      3. ${$$.components.notes.gcmPeriods}
+      4. ${$$.components.notes.mapTabNote}
 
   impacts:
     disabled: false
@@ -433,6 +434,8 @@ tabs:
           display: absolute
           palette: x-Occam
           logscale: true
+          belowMinColor: white
+          aboveMaxColor: black
           seasons:
             annual:
               displayUnits: mm/year (cum)
@@ -528,8 +531,7 @@ tabs:
         $$.tabs.graphs.lowBaselineWarning : ''}
 
     lowBaselineWarning: |
-      2. *CAUTION: This variable may have a low baseline.*
-         ${$$.components.notes.lowBaseline}
+      2. ${$$.components.notes.lowBaseline}
 
     config:
       foo: bar
@@ -584,30 +586,11 @@ tabs:
     label: Notes
     content: |
 
-      1. Information for the Summary and Impacts tabs is drawn from a set of
-      projections from 12 different Global Climate Models (GCMs), each using one
-      run of the SSP 5-8.5 (high emissions) greenhouse gas emissions scenario.
-      This set of projections is referred to as the "ensemble." By the end of
-      the 21st century, the RCP 8.5 scenario includes an atmospheric
-      concentration of greenhouse gases, expressed as carbon dioxide (CO2)
-      equivalent, of approximately 950 ppm Each GCM comes from a different
-      modelling centre (e.g. the Hadley Centre (UK), National Centre for
-      Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA),
-      and Commonwealth Scientific and Industrial Research Organisation
-      (Australia), etc.).
+      1. ${$$.components.notes.derivedClimateVars}
+      2. ${$$.components.notes.lowBaseline}
+      3. ${$$.components.notes.gcmPeriods}
+      4. ${$$.components.notes.mapTabNote}
 
-      1. The Maps tab shows results for the ensemble average value of the
-      selected variable.
-
-      1. The 2020s, 2050s, and 2080s time periods are meant to be used as three
-      representative planning horizons over the 21st century. Results for these
-      three planning horizons are computed by averaging GCM projections over
-      the 2010-2039, 2040-2069, and 2070-2099 periods, respectively.
-
-      1. All variables shown here are computed from daily time series of
-      downscaled climate simulations. Precipitation as snow is an approximation
-      of snowfall based on total precipitation and temperature, and may provide
-      different result than if snowfall was downscaled directly.
 
 
 
@@ -783,14 +766,19 @@ tabs:
 components:
   notes:
     derivedClimateVars: |
-      Climate variables marked with &ast; are derived from temperature and/or
-      precipitation values, and are not direct outputs of the climate models.
+      Climate indices are derived from daily temperature and/or precipitation values, 
+      and are not direct outputs of the climate models.
     lowBaseline: |
-      Percent changes from a low baseline value can result in
-      deceptively large percent change values.
-      A small baseline can occur when the season and/or region
-      together naturally make for zero or near-zero values. For example,
-      snowfall in summer in low-lying southern areas.
+      Precipitation as snow is an approximation of snowfall based on total precipitation and temperature, 
+      and may provide a different result than if snowfall was downscaled directly. 
+      CAUTION: Percent changes from a low baseline value can result in deceptively large percent change values. 
+      Low baseline values occur, for example, for snowfall in spring.
+    gcmPeriods:
+      The selectable future time periods are meant to represent possible planning horizons over the 21st century. 
+      Results for these planning horizons are computed by averaging GCM projections 
+      over the 2021-2050, 2041-2070, and 2071-2100 periods, respectively.
+    mapTabNote:
+      The Plan2Adapt Maps tab shows results for the ensemble average value of the selected variable.
   period: ${start_date}-${end_date}
   climdexUrl: https://www.climdex.org/learn/indices
   contacts:
@@ -855,7 +843,7 @@ variables:
   snow:
     label: Precipitation as Snow
     derived: true
-    type: precipitation flux
+    type: snowfall flux
     dataUnits: kg m-2 d-1
     possibleLowBaseline: true
   gdd:
@@ -915,8 +903,17 @@ units:
     'mm/yr': 1
     'mm/d': 365
     'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
-    'mm': mm/yr
-    'mm/month': 12
+    'mm': mm/d
+    'mm/month': 365
+    'mm/year (cum)':
+      label: 'mm'
+      scale: 1
+    'mm/season (cum)':
+      label: 'mm'
+      scale: 365
+    'mm/month (cum)':
+      label: 'mm'
+      scale: 365
   temperature:
     degC: 1
     '°C': degC

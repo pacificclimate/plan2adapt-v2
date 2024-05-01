@@ -17,7 +17,7 @@ import {
   baselineFormat
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
-import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
+import { fetchSummaryStatistics, fetchCsvStats } from '../../../data-services/summary-stats';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
 import styles from './Summary.module.css';
@@ -64,7 +64,7 @@ class Summary extends React.Component {
   static propTypes = {
     region: PropTypes.object.isRequired,
     futureTimePeriod: PropTypes.object.isRequired,
-    baselineTimePeriod: PropTypes.object,
+    baselineTimePeriod: PropTypes.object.isRequired,
 
     tableContents: PropTypes.array.isRequired,
     // Abstract specification of the summary table. Data is implicit in the
@@ -206,10 +206,9 @@ class Summary extends React.Component {
                 const variableInfo = getVariableInfo(
                   unitsSpecs, variableConfig, variable, display
                 );
-
                 // Extract data for this row
                 const displayData = getDisplayData(
-                  rowSummaryStatistics, seasonSpec.season, display
+                  rowSummaryStatistics.summaryStats, seasonSpec.season, display
                 );
 
                 // Convert data to display units
@@ -220,7 +219,9 @@ class Summary extends React.Component {
                 const displayPercentileValues =
                   map(convertData)(displayData.values);
 
-                const displayBaselineValues = Number.parseFloat([displayData.baseline])
+                // Retrieve the season median from the seasonMediansMap
+                const medians = rowSummaryStatistics.summaryStats.seasonMedians;
+                const displayBaselineMedians = baselineFormat(precision, Number.parseFloat([medians[seasonSpec.season]]));
 
                 // Const `data` is provided as context data to the external text.
                 // The external text implements the formatting of this data for
@@ -234,12 +235,13 @@ class Summary extends React.Component {
                     ...seasonSpec,
                     label: capitalize(seasonSpec.season),
                     percentileValues: displayPercentileValues,
-                    baselineMedianVal: baselineFormat(precision, displayBaselineValues),
+                    baselineMedianVal: displayBaselineMedians,
                   },
                   format: displayFormat(precision),
                   isLong,
                   unitsSuffix,
                 };
+
 
                 isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
                 lastVariable = row.variable;
@@ -272,25 +274,39 @@ class Summary extends React.Component {
   }
 }
 
-
-const loadSummaryStatistics = ({ region, futureTimePeriod, tableContents }) =>
+const loadSummaryStatistics = async ({ region, futureTimePeriod, tableContents }) => {
   // Return (a promise for) the summary statistics to be displayed in the
   // Summary tab. This amounts to fetching the data for each variable from the
   // backend, then processing it into the form consumed by Summary via its
   // prop `summary`.
-  Promise.all(
-    map(
-      content => fetchSummaryStatistics(
-        region, futureTimePeriod, content.variable, percentiles
+  const dataFetches = tableContents.map(content =>
+    Promise.all([
+      fetchSummaryStatistics(region, futureTimePeriod, content.variable, percentiles),
+      ...content.seasons.map(season =>
+        fetchCsvStats(region, content.variable, season)
+          .then(median => ({ season, median }))
+          .catch(err => {
+            console.error(`Failed to fetch median for ${content.variable} in ${season}:`, err);
+            return { season, median: null };  // Return null median on error
+          })
       )
-        // Unavailable or otherwise problematic fetches are returned as undefined.
-        // Data display elements are responsible for showing a message.
-        .catch(err => {
-          console.error('Failed to fetch summary statistics:\n', err);
-          return undefined;
-        })
-    )(tableContents)
+    ])
+      .then(([summaryStats, ...seasonMedians]) => {
+        // Map from season names to median values
+        const seasonMediansMap = seasonMedians.reduce((acc, { season, median }) => {
+          acc[season] = median;
+          return acc;
+        }, {});
+        summaryStats.seasonMedians = seasonMediansMap;
+        return {
+          variable: content.variable,
+          summaryStats,
+        };
+      })
   );
+
+  return Promise.all(dataFetches);
+};
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
@@ -300,6 +316,8 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
       'region.geometry',
       'futureTimePeriod.start_date',
       'futureTimePeriod.end_date',
+      'baselineTimePeriod.start_date',
+      'baselineTimePeriod.end_date',
       'tableContents',
     ],
     props
