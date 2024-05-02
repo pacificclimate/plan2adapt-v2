@@ -22,7 +22,7 @@ import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import flatten from 'lodash/fp/flatten';
-import { displayFormat } from '../../utils/variables-and-units';
+import { displayFormat, baselineFormat } from '../../utils/variables-and-units';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
 
@@ -52,6 +52,8 @@ export default class BarChart extends React.Component {
 
     percentiles: PropTypes.array,
     percentileValuesByTimePeriod: PropTypes.array,
+    median: PropTypes.object,
+    variableConfig: PropTypes.object
   };
 
   render() {
@@ -59,6 +61,7 @@ export default class BarChart extends React.Component {
       baselineTimePeriod, futureTimePeriods,
       graphConfig, variableInfo,
       percentiles, percentileValuesByTimePeriod,
+      median, variableConfig,
     } = this.props;
 
     const percentileIndices = range(0, percentiles.length);
@@ -342,7 +345,9 @@ export default class BarChart extends React.Component {
                 index === 0
                 && id === basePercentileValueNames[0]
               ) {
-                return 'no change';
+                const precision = variableConfig[variableInfo.id].precision
+                const medianUnit = variableConfig[variableInfo.id].medianUnit
+                return `${baselineFormat(precision, Number.parseFloat(median))} ${medianUnit}`;
               }
               const year = baseTimes[index];
               if (

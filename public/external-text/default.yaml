@@ -85,6 +85,7 @@ tabs:
           displayUnits: '%'
           precision: 2
           seasons:
+            - annual
             - winter
             - spring
             - summer
@@ -569,24 +570,38 @@ tabs:
         ffd:
           display: absolute
           displayUnits: days
+          precision: 3
+          medianUnit: days
         gdd:
           display: absolute
           displayUnits: degree-days
+          precision: 3
+          medianUnit: degree-days
         hdd:
           display: absolute
           displayUnits: degree-days
+          precision: 3
+          medianUnit: degree-days
         cdd:
           display: absolute
           displayUnits: degree-days
+          precision: 3
+          medianUnit: degree-days
         pr:
           display: relative
           displayUnits: '%'
+          precision: 2
+          medianUnit: mm/day
         snow:
           display: relative
           displayUnits: '%'
+          precision: 2
+          medianUnit: mm/day
         tas:
           display: absolute
           displayUnits: °C
+          precision: 2
+          medianUnit: °C
 
   notes:
     disabled: false
