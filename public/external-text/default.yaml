@@ -861,12 +861,12 @@ variables:
   pr:
     label: Precipitation
     type: precipitation flux
-    dataUnits: kg m-2 d-1
+    dataUnits: mm d-1
   snow:
     label: Precipitation as Snow
     derived: true
-    type: snowfall flux
-    dataUnits: kg m-2 d-1
+    type: precipitation flux
+    dataUnits: mm d-1
     possibleLowBaseline: true
   gdd:
     label: Growing Degree-Days
@@ -907,35 +907,25 @@ units:
   'precipitation flux':
     'mm/yr': 1
     'mm/d': 365.25
-    'kg m-2 d-1': mm/d
+    'mm d-1': mm/d
     'mm': mm/yr
     'mm/year': mm/yr
-    'mm/season': 4
+    'mm/season': 90
     'mm/month': 12
     'mm/year (cum)':
       label: 'mm'
       scale: 1
     'mm/season (cum)':
       label: 'mm'
-      scale: 4
+      scale: 90
     'mm/month (cum)':
       label: 'mm'
       scale: 12
-  'snowfall flux':
-    'mm/yr': 1
-    'mm/d': 365
-    'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
-    'mm': mm/d
-    'mm/month': 365
-    'mm/year (cum)':
-      label: 'mm'
-      scale: 1
-    'mm/season (cum)':
-      label: 'mm'
-      scale: 365
-    'mm/month (cum)':
-      label: 'mm'
-      scale: 365
+  # 'snowfall flux':
+  #   'mm/yr': 1
+  #   'mm d-1': 365.25
+  #'kg m-2 d-1': 365    # approximation that converts mass to snow depth
+
   temperature:
     degC: 1
     '°C': degC
