@@ -52,7 +52,7 @@ tabs:
       heading:
         variable: Climate Variable
         season: Season
-        baselineMedianVal: Baseline Media Value
+        baselineMedianVal: Baseline Median Value
         projectedChange: Projected Change from ${$$.components.period} Baseline
         ensembleMedianPerc: Ensemble Median
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
@@ -411,31 +411,31 @@ tabs:
             annual:
               displayUnits: mm/year (cum)
               range:
-                min: 10
-                max: 4000
+                min: 200
+                max: 6000
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000, 4000]
             winter:
               displayUnits: mm/season (cum)
               range:
-                min: 10
+                min: 40
                 max: 2000
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
             spring:
               displayUnits: mm/season (cum)
               range:
-                min: 10
+                min: 40
                 max: 1000
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000]
             summer:
               displayUnits: mm/season (cum)
               range:
-                min: 10
-                max: 500
+                min: 40
+                max: 1000
               ticks: [10, 20, 40, 80, 100, 200, 400, 500]
             fall:
               displayUnits: mm/season (cum)
               range:
-                min: 10
+                min: 40
                 max: 2000
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
         snow:
@@ -449,19 +449,19 @@ tabs:
               displayUnits: mm/year (cum)
               range:
                 min: 10
-                max: 1000
+                max: 5000
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000]
             winter:
               displayUnits: mm/season (cum)
               range:
                 min: 10
-                max: 500
+                max: 2000
               ticks: [10, 20, 40, 80, 100, 200, 400, 500]
             spring:
               displayUnits: mm/season (cum)
               range:
                 min: 10
-                max: 200
+                max: 500
               ticks: [10, 20, 40, 80, 100, 200]
             summer:
               displayUnits: mm/season (cum)
@@ -473,7 +473,7 @@ tabs:
               displayUnits: mm/season (cum)
               range:
                 min: 10
-                max: 200
+                max: 1000
               ticks: [10, 20, 40, 80, 100, 200]
         tas:
           display: absolute
@@ -910,14 +910,14 @@ units:
     'mm d-1': mm/d
     'mm': mm/yr
     'mm/year': mm/yr
-    'mm/season': 90
+    'mm/season': 4
     'mm/month': 12
     'mm/year (cum)':
       label: 'mm'
       scale: 1
     'mm/season (cum)':
       label: 'mm'
-      scale: 90
+      scale: 4
     'mm/month (cum)':
       label: 'mm'
       scale: 12

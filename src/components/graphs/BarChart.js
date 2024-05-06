@@ -347,7 +347,7 @@ export default class BarChart extends React.Component {
               ) {
                 const precision = variableConfig[variableInfo.id].precision
                 const medianUnit = variableConfig[variableInfo.id].medianUnit
-                return `${baselineFormat(precision, Number.parseFloat(median))} ${medianUnit}`;
+                return `Median Value\n ${baselineFormat(precision, Number.parseFloat(median))} ${medianUnit}`;
               }
               const year = baseTimes[index];
               if (
