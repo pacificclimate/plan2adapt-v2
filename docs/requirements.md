@@ -2,7 +2,7 @@
 
 ## Execution environment
 
-Node.js >= 9.2.0 (**important**)
+Node.js = 22.x.x (**important**)
 
 All other package requirements are specified in `package.json`.
 
