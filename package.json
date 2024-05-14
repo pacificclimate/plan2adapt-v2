@@ -33,6 +33,7 @@
     "react-select": "^2.3.0",
     "stream-browserify": "^3.0.0",
     "url-join": "^4.0.0",
+    "wkt": "^0.1.1",
     "xml-js": "^1.6.9"
   },
   "devDependencies": {

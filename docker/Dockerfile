@@ -6,7 +6,7 @@
 #
 # docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
 
-FROM node:14-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 RUN chown node /app
@@ -16,7 +16,10 @@ ENV PATH /app/node_modules/.bin:$PATH
 
 RUN apk add --no-cache git bash && \
     npm install --quiet && \
-    npm install -g serve
+    npm install -g serve@13.0.0
+
+RUN mkdir -p /app/node_modules/.cache && \
+    chown -R node:node /app/node_modules/.cache
 
 EXPOSE 8080
 
