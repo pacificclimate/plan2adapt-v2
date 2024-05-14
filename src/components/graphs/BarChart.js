@@ -22,7 +22,7 @@ import zipAll from 'lodash/fp/zipAll';
 import merge from 'lodash/fp/merge';
 import includes from 'lodash/fp/includes';
 import flatten from 'lodash/fp/flatten';
-import { displayFormat } from '../../utils/variables-and-units';
+import { displayFormat, baselineFormat } from '../../utils/variables-and-units';
 import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
 import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
 
@@ -52,6 +52,8 @@ export default class BarChart extends React.Component {
 
     percentiles: PropTypes.array,
     percentileValuesByTimePeriod: PropTypes.array,
+    median: PropTypes.object,
+    variableConfig: PropTypes.object
   };
 
   render() {
@@ -59,15 +61,16 @@ export default class BarChart extends React.Component {
       baselineTimePeriod, futureTimePeriods,
       graphConfig, variableInfo,
       percentiles, percentileValuesByTimePeriod,
+      median, variableConfig,
     } = this.props;
 
     const percentileIndices = range(0, percentiles.length);
 
     const basePercentileValueNames =
-      map(p =>`${p}th`)(percentiles);
+      map(p => `${p}th`)(percentiles);
 
     const interpPercentileValueDiffNames = map(
-      i => `${i ? percentiles[i-1] : 0}-${percentiles[i]}th (interp)`
+      i => `${i ? percentiles[i - 1] : 0}-${percentiles[i]}th (interp)`
     )(percentileIndices);
 
     // In order to display negative values as stacked bars, we have to add
@@ -208,7 +211,7 @@ export default class BarChart extends React.Component {
     const interpPercentileValuesByTime =
       transpose(interpPercentileValuesByPercentile);
     const diffs = pileValues => map(
-      i => i ? (pileValues[i] - pileValues[i-1]) : pileValues[i]
+      i => i ? (pileValues[i] - pileValues[i - 1]) : pileValues[i]
     )(percentileIndices);
     const interpPercentileValueDiffsByTime =
       map(diffs)(interpPercentileValuesByTime);
@@ -301,7 +304,7 @@ export default class BarChart extends React.Component {
             min: yMin,
             max: yMax,
             tick: {
-              format: d => `${d-offset}`,
+              format: d => `${d - offset}`,
             },
             label: {
               text: `Change in ${variableInfo.label} (${variableInfo.unitsSpec.label})`,
@@ -342,7 +345,9 @@ export default class BarChart extends React.Component {
                 index === 0
                 && id === basePercentileValueNames[0]
               ) {
-                return 'no change';
+                const precision = variableConfig[variableInfo.id].precision
+                const medianUnit = variableConfig[variableInfo.id].medianUnit
+                return `Median Value\n ${baselineFormat(precision, Number.parseFloat(median))} ${medianUnit}`;
               }
               const year = baseTimes[index];
               if (
@@ -350,7 +355,7 @@ export default class BarChart extends React.Component {
                 && includes(year, futureMiddleYears)
               ) {
                 const displayValue = displayFormat(2, value - offset);
-                return `${displayValue} ${variableInfo.units}`;
+                return `${displayValue} ${variableInfo.unitsSpec.id}`;
               }
             },
           },
@@ -369,9 +374,9 @@ export default class BarChart extends React.Component {
     console.log('### BarChart.render: c3options', c3options)
 
     return (
-        <C3Chart
-          {...c3options}
-        />
+      <C3Chart
+        {...c3options}
+      />
     )
   }
 }

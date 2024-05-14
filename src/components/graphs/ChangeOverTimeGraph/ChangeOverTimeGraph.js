@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
+import { fetchSummaryStatistics, fetchCsvStats } from '../../../data-services/summary-stats';
 import isEqual from 'lodash/fp/isEqual';
 import withAsyncData from '../../../HOCs/withAsyncData';
 import curry from 'lodash/fp/curry';
@@ -32,6 +32,28 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   // This component is wrapped with `withAsyncData` to inject the
   // statistics that are fetched asynchronously, according to the
   // selected region and climatological time period.
+  constructor(props) {
+    super(props);
+    this.state = {
+      median: null
+    };
+  }
+
+  componentDidMount() {
+    this.fetchMedian();
+  }
+
+  fetchMedian = async () => {
+    const { region, variable, season } = this.props;
+    const variableId = variable.representative.variable_id;
+    const seasonPeriod = seasonIndexToPeriod(season);
+    try {
+      const medianResult = await fetchCsvStats(region, variableId, seasonPeriod);
+      this.setState({ median: medianResult });
+    } catch (error) {
+      console.error('Failed to fetch median:', error);
+    }
+  };
 
   static propTypes = {
     region: PropTypes.any,
@@ -98,6 +120,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   };
 
   render() {
+    const { median } = this.state;
     if (!allDefined(
       [
         'region',
@@ -114,7 +137,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       this.props
     )) {
       console.log('### COTG: unsettled props', this.props)
-      return <Loader/>
+      return <Loader />
     }
     const {
       baselineTimePeriod, futureTimePeriods, statistics,
@@ -175,6 +198,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           variableInfo={variableInfo}
           percentiles={percentiles}
           percentileValuesByTimePeriod={percentileValuesByTimePeriod}
+          median={median}
+          variableConfig={variableConfig}
         />
       </React.Fragment>
     );
@@ -191,21 +216,21 @@ const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
 const loadSummaryStatistics = (
   { region, variable, season, futureTimePeriods, graphConfig }
 ) =>
-  // Return (a promise for) the statistics to be displayed in the Graphs tab.
-  // These are "summary" statistics, which are stats across the ensemble of
-  // models driving this app.
-  {
-    const variableId = variable.representative.variable_id;
-    // Note use of Promise.allSettled, which always returns a fulfilled promise,
-    // containing an array of values indicating fulfillment or rejection of
-    // each subpromise. We convert raw fetch rejections to a more informative
-    // rejected promise.
-    return Promise.allSettled(
-      map(
-        futureTimePeriod => {
-          return fetchSummaryStatistics(
-            region, futureTimePeriod, variableId, percentiles
-          )
+// Return (a promise for) the statistics to be displayed in the Graphs tab.
+// These are "summary" statistics, which are stats across the ensemble of
+// models driving this app.
+{
+  const variableId = variable.representative.variable_id;
+  // Note use of Promise.allSettled, which always returns a fulfilled promise,
+  // containing an array of values indicating fulfillment or rejection of
+  // each subpromise. We convert raw fetch rejections to a more informative
+  // rejected promise.
+  return Promise.allSettled(
+    map(
+      futureTimePeriod => {
+        return fetchSummaryStatistics(
+          region, futureTimePeriod, variableId, percentiles
+        )
           .then(convertToDisplayData(graphConfig, variableId, season))
           .catch(error =>
             Promise.reject({
@@ -213,11 +238,11 @@ const loadSummaryStatistics = (
               parameters: { region, futureTimePeriod, variable, percentiles }
             })
           )
-        }
-      )(futureTimePeriods)
-    );
-  }
-;
+      }
+    )(futureTimePeriods)
+  );
+}
+  ;
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>

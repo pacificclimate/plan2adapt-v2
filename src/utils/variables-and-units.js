@@ -23,7 +23,7 @@ const getConfigForId = (variableConfig, variableId) => {
 
 export const getVariableLabel = (variableConfig, variableId) => {
   const vc = getConfigForId(variableConfig, variableId);
-  return `${vc.label}${vc.derived ? '*' : ''}`;
+  return `${vc.label}`;
 };
 
 
@@ -77,7 +77,7 @@ export const getVariableInfo = (unitsSpecs, variableConfig, variableId, display)
 };
 
 
-export const getConvertUnits= (unitsSpecs, variableConfig, variableId) => {
+export const getConvertUnits = (unitsSpecs, variableConfig, variableId) => {
   const variableType = getVariableType(variableConfig, variableId);
   if (!variableType) {
     throw new Error(`Unspecified variable type for ${variableId}`);
@@ -113,10 +113,18 @@ export const expToFixed = s => {
 };
 
 
-export const displayFormat = curry((sigfigs , value) => {
+export const displayFormat = curry((sigfigs, value) => {
   // Convert a number value to a string in the display format we prefer.
   if (!isNumber(value)) {
     return '--';
   }
   return `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
 });
+
+
+export const baselineFormat = (sigfigs, value) => {
+  if (!isNumber(value)) {
+    return '--';
+  }
+  return expToFixed(value.toPrecision(sigfigs));
+};

@@ -2,7 +2,7 @@ import axios from 'axios';
 import urljoin from 'url-join';
 import { regionId } from '../utils/regions';
 import { middleDecade } from '../utils/time-periods';
-
+import { periodToTimescale } from '../utils/percentile-anomaly';
 
 export const fetchSummaryStatistics = (
   region, timePeriod, variable, percentiles
@@ -22,9 +22,72 @@ export const fetchSummaryStatistics = (
         region: regionId(region),
         climatology: middleDecade(timePeriod),
         variable,
-        percentile: percentiles.join(',')
+        percentile: percentiles.join(','),
+        baseline_model: "PCIC_BLEND_v1",
+        baseline_climatology: "8110"
       }
     }
   )
-  .then(response => response.data);
+    .then(response => response.data);
 };
+
+
+const seasonToIndex = {
+  'winter': 0,
+  'spring': 1,
+  'summer': 2,
+  'fall': 3,
+  'annual': 0
+};
+
+// Fetch and parse CSV data
+export const fetchCsvStats = (region, variable, season) => {
+  const csvUrl = urljoin(
+    process.env.REACT_APP_STATS_URL,
+    `${regionId(region)}.csv`
+  );
+
+  return axios.get(csvUrl)
+    .then(response => {
+      return parseCSV(response.data);
+    })
+    .then(data => {
+      const medianEntry = data.find(row =>
+        row.variable === variable &&
+        row.model === "PCIC_BLEND_v1" &&
+        row.timescale === periodToTimescale(season) &&
+        parseInt(row.timeidx, 10) === seasonToIndex[season]
+      );
+      if (!medianEntry) {
+        console.error(`No matching entry found for ${variable} in season ${season}`);
+        return null;
+      }
+      return medianEntry.median;
+    })
+    .catch(error => {
+      console.error(`Error fetching or parsing CSV data from ${csvUrl} for ${variable}, season ${season}:`, error);
+      return null;
+    });
+};
+
+function parseCSV(data) {
+  const lines = data.split('\n');
+  const result = [];
+  const headers = lines[0].split(',').map(header => header.trim());
+
+  //console.log(`CSV headers: ${headers.join(', ')}`);
+
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i].trim() === "") {
+      continue; // Skip empty lines to avoid parsing errors
+    }
+    const obj = {};
+    const currentline = lines[i].split(',');
+
+    for (let j = 0; j < headers.length; j++) {
+      obj[headers[j]] = currentline[j] && currentline[j].trim();
+    }
+    result.push(obj);
+  }
+  return result;
+}
