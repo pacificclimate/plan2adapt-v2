@@ -26,5 +26,5 @@ export const fetchSummaryStatistics = (
       }
     }
   )
-  .then(response => response.data);
+    .then(response => response.data);
 };

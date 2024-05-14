@@ -129,7 +129,7 @@ export const getDisplayData = (response, period, display) => {
     }
   }
   return {
-    values: map(x => 100 * x/baselineValue)(anomalyValues),
+    values: map(x => 100 * x / baselineValue)(anomalyValues),
     units: '%',
   };
 };

@@ -4,8 +4,10 @@ export const regionId = region => {
   switch (name) {
     case 'British Columbia': return 'bc';
     case 'Mount Waddington': return 'mt_waddington';
+    case 'Oweek’ala': return 'oweekala';
+    case 'Lake Babine Nadot’en': return 'lake_babine_nadoten';
+    case 'Babine-Witsuwit\'en': return 'babine-witsuwiten';
     default: return name.toLowerCase().replace(/\W+/g, '_');
   }
 };
-
 

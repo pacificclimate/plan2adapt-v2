@@ -16,7 +16,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 
 RUN apk add --no-cache git bash && \
     npm install --quiet && \
-    npm install -g serve
+    npm install -g serve@13.0.0
 
 EXPOSE 8080
 
