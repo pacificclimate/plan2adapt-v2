@@ -84,28 +84,28 @@ class DataMapDisplay extends React.Component {
       layerSpec: this.props,
       xy: event.layerPoint,
     })
-    .then(response => {
-      const layerInfo = xml2js(response.data, {
-        compact: true,
+      .then(response => {
+        const layerInfo = xml2js(response.data, {
+          compact: true,
+        });
+        const value = layerInfo.foo;
+        this.props.onPopupChange({
+          ...this.props.popup,
+          value,
+          error: null,
+        });
+      })
+      .catch(error => {
+        console.log('error.response', error.response)
+        console.log('error.request', error.request)
+        console.log('error.message', error.message)
+        console.log('error.config', error.config)
+        this.props.onPopupChange({
+          ...this.props.popup,
+          value: null,
+          error,
+        });
       });
-      const value = layerInfo.foo;
-      this.props.onPopupChange({
-        ...this.props.popup,
-        value,
-        error: null,
-      });
-    })
-    .catch(error => {
-      console.log('error.response', error.response)
-      console.log('error.request', error.request)
-      console.log('error.message', error.message)
-      console.log('error.config', error.config)
-      this.props.onPopupChange({
-        ...this.props.popup,
-        value: null,
-        error,
-      });
-    });
   };
 
   handleClosePopup = () => this.props.onPopupChange({
@@ -125,7 +125,7 @@ class DataMapDisplay extends React.Component {
       this.props
     )) {
       console.log('### DataMap: unsettled props', this.props)
-      return <Loader/>;
+      return <Loader />;
     }
     const {
       children, region, timePeriod, season, variable, popup,
@@ -136,9 +136,9 @@ class DataMapDisplay extends React.Component {
     return (
       <BCBaseMap
         {...baseMapProps}
-        // FIXME: Popups are disabled because the CE ncWMS does not allow
-        //  GetFeatureInfo requests, which are required to fill the popup.
-        // onClick={this.handleClickMap}
+      // FIXME: Popups are disabled because the CE ncWMS does not allow
+      //  GetFeatureInfo requests, which are required to fill the popup.
+      // onClick={this.handleClickMap}
       >
         <ClimateLayer
           fileMetadata={fileMetadata}
@@ -149,10 +149,10 @@ class DataMapDisplay extends React.Component {
         />
         {
           popup.isOpen &&
-          <LayerValuePopup{...popup} onClose={this.handleClosePopup}/>
+          <LayerValuePopup{...popup} onClose={this.handleClosePopup} />
         }
-        <SimpleGeoJSON data={region} fill={false}/>
-        { children }
+        <SimpleGeoJSON data={region} fill={false} color={'#212529'} weight={3.2} />
+        {children}
       </BCBaseMap>
     );
   }
