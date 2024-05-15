@@ -31,7 +31,7 @@ tabs:
     - impacts
     - maps
     - graphs
-    - notes
+    # - notes
     - references
     - about
 
@@ -603,15 +603,15 @@ tabs:
           precision: 2
           medianUnit: °C
 
-  notes:
-    disabled: false
-    label: Notes
-    content: |
+  # notes:
+  #   disabled: false
+  #   label: Notes
+  #   content: |
 
-      1. ${$$.components.notes.derivedClimateVars}
-      2. ${$$.components.notes.lowBaseline}
-      3. ${$$.components.notes.gcmPeriods}
-      4. ${$$.components.notes.mapTabNote}
+  #     1. ${$$.components.notes.derivedClimateVars}
+  #     2. ${$$.components.notes.lowBaseline}
+  #     3. ${$$.components.notes.gcmPeriods}
+  #     4. ${$$.components.notes.mapTabNote}
 
 
 
