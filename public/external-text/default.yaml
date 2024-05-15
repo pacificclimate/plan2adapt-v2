@@ -58,7 +58,7 @@ tabs:
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
       rows:
         variable: |
-          ${variable.label}${variable.derived ? '*': ''} (${variable.unitsSpec.label})
+          ${variable.label}${variable.derived ? '*' : ''}${variable.label !== 'Precipitation' && variable.label !== 'Precipitation as Snow' ? ' (' + variable.unitsSpec.label + ')' : ''}
 
           ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
