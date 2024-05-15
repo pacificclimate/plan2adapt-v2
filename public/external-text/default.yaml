@@ -124,18 +124,18 @@ tabs:
           seasons:
             - annual
     notes: |
-      #### Thresholds for Degree-Day Indices
-      - Growing Degree-Days: Sum of degree-days during the specified time period above 5°C
-      - Frost-Free Days: Number of days in a year with minimum temperatures above 0°C
-      - Heating Degree-Days: Sum of degree-days during the specified time period below 18°C
-      - Cooling Degree-Days: Sum of degree-days during the specified time period above 18°C
-
-      Notes:
+      #### Notes
 
       1. ${$$.components.notes.derivedClimateVars}
       2. ${$$.components.notes.lowBaseline}
       3. ${$$.components.notes.gcmPeriods}
       4. ${$$.components.notes.mapTabNote}
+      
+      #### Thresholds for Degree-Day Indices
+      - Growing Degree-Days: Sum of degree-days during the specified time period above 5°C
+      - Frost-Free Days: Number of days in a year with minimum temperatures above 0°C
+      - Heating Degree-Days: Sum of degree-days during the specified time period below 18°C
+      - Cooling Degree-Days: Sum of degree-days during the specified time period above 18°C
 
   impacts:
     disabled: false
@@ -514,8 +514,7 @@ tabs:
       This figure shows the range of projected change in
       ${season} ${variable.label} for ${region.properties.english_na}
       over three time periods
-      (2020s, 2050s, and 2080s), according to a PCIC-standard set of
-      GCM projections (see 'Notes' tab for more information).
+      (2020s, 2050s, and 2080s), according to the PCIC12 set of downscaled GCM projections from CanDCS-M6 under the SSP5-8.5 emissions scenario.
 
       The range of change based on this set of climate projections is indicated
       as follows:
