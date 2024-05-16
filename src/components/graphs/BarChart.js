@@ -79,8 +79,11 @@ export default class BarChart extends React.Component {
     // no negative values. It is the (negative of) the most negative value
     // otherwise, rounded to a multiple of 2 so that C3's automatic y-axis
     // tick values are nice.
+    const precision = variableConfig[variableInfo.id].precision;
+    const formatValues = values => values.map(v => parseFloat(displayFormat(precision, v)));
+    const formattedPercentileValuesByTimePeriod = percentileValuesByTimePeriod.map(formatValues);
+    const allPercentileValues = flattenDeep([0, formattedPercentileValuesByTimePeriod]);
 
-    const allPercentileValues = flattenDeep([0, percentileValuesByTimePeriod]);
     const minPercentileValue = min(allPercentileValues);
     const maxPercentileValue = max(allPercentileValues);
 
@@ -341,11 +344,11 @@ export default class BarChart extends React.Component {
               return `${name} %ile`;
             },
             value: (value, ratio, id, index) => {
+              const precision = variableConfig[variableInfo.id].precision
               if (
                 index === 0
                 && id === basePercentileValueNames[0]
               ) {
-                const precision = variableConfig[variableInfo.id].precision
                 const medianUnit = variableConfig[variableInfo.id].medianUnit
                 return `Median Value\n ${baselineFormat(precision, Number.parseFloat(median))} ${medianUnit}`;
               }
@@ -354,7 +357,7 @@ export default class BarChart extends React.Component {
                 includes(id, basePercentileValueNames)
                 && includes(year, futureMiddleYears)
               ) {
-                const displayValue = displayFormat(2, value - offset);
+                const displayValue = displayFormat(precision, value - offset);
                 return `${displayValue} ${variableInfo.unitsSpec.id}`;
               }
             },

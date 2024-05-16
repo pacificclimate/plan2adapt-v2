@@ -72,7 +72,7 @@ tabs:
         - variable: tas
           display: absolute
           displayUnits: °C
-          precision: 2
+          precision: 1
           seasons:
             - annual
             - winter
@@ -83,7 +83,7 @@ tabs:
         - variable: pr
           display: relative
           displayUnits: '%'
-          precision: 2
+          precision: 1
           seasons:
             - annual
             - winter
@@ -93,7 +93,7 @@ tabs:
         - variable: snow
           display: relative
           displayUnits: '%'
-          precision: 2
+          precision: 1
           seasons:
             - annual
             - winter
@@ -102,25 +102,25 @@ tabs:
         - variable: gdd
           display: absolute
           displayUnits: degree-days
-          precision: 3
+          precision: 0
           seasons:
             - annual
         - variable: ffd
           display: absolute
           displayUnits: days
-          precision: 2
+          precision: 0
           seasons:
             - annual
         - variable: hdd
           display: absolute
           displayUnits: degree-days
-          precision: 3
+          precision: 0
           seasons:
             - annual
         - variable: cdd
           display: absolute
           displayUnits: degree-days
-          precision: 3
+          precision: 0
           seasons:
             - annual
     notes: |
@@ -570,37 +570,37 @@ tabs:
         ffd:
           display: absolute
           displayUnits: days
-          precision: 3
+          precision: 0
           medianUnit: days
         gdd:
           display: absolute
           displayUnits: degree-days
-          precision: 3
+          precision: 0
           medianUnit: degree-days
         hdd:
           display: absolute
           displayUnits: degree-days
-          precision: 3
+          precision: 0
           medianUnit: degree-days
         cdd:
           display: absolute
           displayUnits: degree-days
-          precision: 3
+          precision: 0
           medianUnit: degree-days
         pr:
           display: relative
           displayUnits: '%'
-          precision: 2
+          precision: 1
           medianUnit: mm/day
         snow:
           display: relative
           displayUnits: '%'
-          precision: 2
+          precision: 1
           medianUnit: mm/day
         tas:
           display: absolute
           displayUnits: °C
-          precision: 2
+          precision: 1
           medianUnit: °C
 
   # notes:
