@@ -31,7 +31,9 @@ export const fetchSummaryStatistics = (
     .then(response => response.data);
 };
 
-
+// This mapping is used to translate season names to their respective indices in the CSV stats files.
+// "Season" in this case refers to the row-mapping of the summary table,
+// where annual entries will always have a timeidx of 0. 
 const seasonToIndex = {
   'winter': 0,
   'spring': 1,
@@ -39,6 +41,7 @@ const seasonToIndex = {
   'fall': 3,
   'annual': 0
 };
+
 
 // Fetch and parse CSV data
 export const fetchCsvStats = (region, variable, season) => {
@@ -74,8 +77,6 @@ function parseCSV(data) {
   const lines = data.split('\n');
   const result = [];
   const headers = lines[0].split(',').map(header => header.trim());
-
-  //console.log(`CSV headers: ${headers.join(', ')}`);
 
   for (let i = 1; i < lines.length; i++) {
     if (lines[i].trim() === "") {
