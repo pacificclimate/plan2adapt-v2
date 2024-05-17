@@ -49,18 +49,21 @@ Environment variables for configuring the app are:
 `REACT_APP_MODEL_ID`
 - Identifiers of model(s) to be requested from the CE backend.
 - A semicolon-separated list of identifiers; spaces are part of identifiers.
-- Standard value: `REACT_APP_MODEL_ID=PCIC12;anusplin`
+- Standard value: `REACT_APP_MODEL_ID=PCIC12;PCIC_BLEND_v1`
 
 `REACT_APP_EMISSIONS_SCENARIOS`
 - Identifiers of emissions scenarios to request from the CE backend.
 - A semicolon-separated list of identifiers; spaces are part of identifiers.
-- Standard value: `REACT_APP_EMISSIONS_SCENARIOS=historical,rcp85;historical, rcp85;historical`
+- Standard value: `REACT_APP_EMISSIONS_SCENARIOS=historical,ssp585;historical, ssp585;historical`
 
 `REACT_APP_REGIONS_SERVICE_URL`
 - URL of geographic regions service.
 
 `REACT_APP_RULES_ENGINE_URL`
 - URL of rules engine service.
+
+`REACT_APP_STATS_URL`
+- URL of stats service responsible for serving up precalculated regional statistics. 
 
 `REACT_APP_NCWMS_URL`
 - URL of ncWMS instance providing climate layers.
