@@ -32,34 +32,12 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   // This component is wrapped with `withAsyncData` to inject the
   // statistics that are fetched asynchronously, according to the
   // selected region and climatological time period.
-  constructor(props) {
-    super(props);
-    this.state = {
-      median: null
-    };
-  }
-
-  componentDidMount() {
-    this.fetchMedian();
-  }
-
-  fetchMedian = async () => {
-    const { region, variable, season } = this.props;
-    const variableId = variable.representative.variable_id;
-    const seasonPeriod = seasonIndexToPeriod(season);
-    try {
-      const medianResult = await fetchCsvStats(region, variableId, seasonPeriod);
-      this.setState({ median: medianResult });
-    } catch (error) {
-      console.error('Failed to fetch median:', error);
-    }
-  };
 
   static propTypes = {
     region: PropTypes.any,
     season: PropTypes.any,
     variable: PropTypes.any,
-
+    variableInfo: PropTypes.object,
     baselineTimePeriod: PropTypes.object.isRequired,
     // The time period of the historical baseline dataset.
 
@@ -96,7 +74,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //
     // There is one item per element of futureTimePeriods, in corresponding
     // order.
-
+    median: PropTypes.any,
+    // This prop receives the data-fetch responses the backend according
+    // props region, season, variable. (`withAsyncData`
+    // injects this data.)
     graphConfig: PropTypes.object.isRequired,
     // Object mapping variable id to information used to control the appearance
     // of the graph for that variable.
@@ -120,7 +101,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   };
 
   render() {
-    const { median } = this.state;
+    ;
     if (!allDefined(
       [
         'region',
@@ -130,6 +111,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         'baselineTimePeriod',
         'futureTimePeriods[0]',
         'statistics',
+        'median',
         'graphConfig',
         'variableConfig',
         'unitsSpecs',
@@ -140,7 +122,8 @@ class ChangeOverTimeGraphDisplay extends React.Component {
       return <Loader />
     }
     const {
-      baselineTimePeriod, futureTimePeriods, statistics,
+      baselineTimePeriod, futureTimePeriods,
+      statistics, median,
       variableInfo,
       graphConfig, variableConfig, unitsSpecs,
     } = this.props;
@@ -213,6 +196,22 @@ const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
 });
 
 
+const loadMedianData = ({ region, variable, season }) => {
+  const variableId = variable.representative.variable_id;
+  const seasonPeriod = seasonIndexToPeriod(season);
+  return fetchCsvStats(region, variableId, seasonPeriod);
+};
+
+const shouldLoadMedianData = (prevProps, props) =>
+  allDefined(['region', 'variable', 'season'], props) &&
+  !(
+    prevProps &&
+    isEqual(prevProps.region, props.region) &&
+    isEqual(prevProps.variable, props.variable) &&
+    isEqual(prevProps.season, props.season)
+  );
+
+
 const loadSummaryStatistics = (
   { region, variable, season, futureTimePeriods, graphConfig }
 ) =>
@@ -273,7 +272,10 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
 // Wrap the display component with data injection.
 const ChangeOverTimeGraph = withAsyncData(
   loadSummaryStatistics, shouldLoadSummaryStatistics, 'statistics'
-)(ChangeOverTimeGraphDisplay);
-
+)(
+  withAsyncData(
+    loadMedianData, shouldLoadMedianData, 'median'
+  )(ChangeOverTimeGraphDisplay)
+);
 
 export default ChangeOverTimeGraph;
