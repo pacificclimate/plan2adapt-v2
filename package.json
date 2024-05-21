@@ -1,6 +1,6 @@
 {
   "name": "plan2adapt-v2-sketch",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^7.1.0",
