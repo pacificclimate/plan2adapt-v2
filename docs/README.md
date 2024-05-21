@@ -1,4 +1,9 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and customized with [Craco](https://craco.js.org/docs/).
+
+## Why Craco?
+
+We use Craco (Create React App Configuration Override) to customize the Create React App configuration without ejecting. This allows us to extend the configuration with additional Webpack plugins and settings that are not supported by CRA out of the box. Specifically, we needed Craco to handle the configuration changes described in [this pull request](https://github.com/pacificclimate/plan2adapt-v2/pull/258), which includes polyfills for Node.js modules like `path`, `stream`, and `buffer` that are used in the browser.
+
 
 ## Available Scripts
 

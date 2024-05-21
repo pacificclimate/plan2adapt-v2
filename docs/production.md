@@ -6,7 +6,7 @@ We currently deploy all apps using Docker.
 This project contains [Docker infrastructure](docker) and a 
 [GitHub action](.github/workflows/docker-publish.yml) that automatically 
 builds and tags a Docker image on each commit. The image name is
-`pcic/station-data-portal-frontend`.
+`pcic/plan2adapt-v2-frontend`.
 
 ## Configuration, environment variables, and Docker
 
