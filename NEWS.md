@@ -1,5 +1,18 @@
 # News / Release Notes
 
+## 2.3.0
+*2024-May-21*
+- Use CanDCS-M6 future climate scenarios and PCIC-Blend Baseline datasets
+  - [Details 1](https://github.com/pacificclimate/plan2adapt-v2/pull/269/files)
+  - [Details 2](https://github.com/pacificclimate/plan2adapt-v2/pull/268 )
+- [Add new First Nations Territories and Language Families](https://github.com/pacificclimate/plan2adapt-v2/pull/265)
+- [Update Map tab UI](https://github.com/pacificclimate/plan2adapt-v2/pull/266)
+- [Improvements to Stats and graphs tabs](https://github.com/pacificclimate/plan2adapt-v2/pull/269/files)
+- Security, Environment variables, and dependency updates 
+  - [Details 1](https://github.com/pacificclimate/plan2adapt-v2/pull/258)
+  - [Details 2](https://github.com/pacificclimate/plan2adapt-v2/pull/264)
+
+
 ## 2.2.0
 *2021-Oct-18*
 
