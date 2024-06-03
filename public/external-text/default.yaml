@@ -285,7 +285,7 @@ tabs:
         ffd:
           display: absolute
           displayUnits: days
-          palette: x-Occam
+          palette: seq-OrRd
           seasons:
             annual:
               range:
@@ -315,7 +315,7 @@ tabs:
         gdd:
           display: absolute
           displayUnits: degree-days
-          palette: x-Occam
+          palette: seq-YlGn
           seasons:
             annual:
               range:
@@ -345,7 +345,7 @@ tabs:
         hdd:
           display: absolute
           displayUnits: degree-days
-          palette: x-Occam
+          palette: seq-PuBu
           seasons:
             winter:
               range:
@@ -375,7 +375,7 @@ tabs:
         cdd:
           display: absolute
           displayUnits: degree-days
-          palette: x-Occam
+          palette: seq-OrRd
           seasons:
             winter:
               range:
@@ -404,7 +404,7 @@ tabs:
               ticks: [0, 100, 200, 300, 400, 500]
         pr:
           display: absolute
-          palette: x-Occam
+          palette: seq-YlGnBu
           logscale: true
           belowMinColor: white
           aboveMaxColor: black
@@ -441,7 +441,7 @@ tabs:
               ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
         snow:
           display: absolute
-          palette: x-Occam
+          palette: seq-YlGnBu
           logscale: true
           belowMinColor: white
           aboveMaxColor: black
@@ -479,7 +479,7 @@ tabs:
         tas:
           display: absolute
           displayUnits: °C
-          palette: x-Occam
+          palette: div-BuRd2
           seasons:
             winter:
               range:
