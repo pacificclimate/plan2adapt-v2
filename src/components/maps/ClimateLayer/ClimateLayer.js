@@ -87,7 +87,8 @@ export default class ClimateLayer extends React.Component {
         layers={getWmsLayerName(fileMetadata, variableId)}
         time={getWmsTime(fileMetadata, season)}
         styles={getWmsStyle(variableConfig, variableId)}
-        colorscalerange={formatWmsColorScaleRange(rangeInDataUnits)}
+        {...(['snow', 'pr'].includes(variableId) ? { colorscalerange: formatWmsColorScaleRange(rangeInDataUnits) } : {})}
+      // colorscalerange={formatWmsColorScaleRange(rangeInDataUnits)}
       />
     );
   }
