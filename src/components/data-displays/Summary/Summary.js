@@ -34,7 +34,7 @@ const SeasonTds = ({ data }) => {
       <T path='tabs.summary.table.rows.season' data={data} as='string' />
     </td>,
     <td>
-      <T path='tabs.summary.table.rows.baselineMedianVal' data={data} as='string' />
+      <T path='tabs.summary.table.rows.baselineMeanVal' data={data} as='string' />
     </td>,
     <td>
       <T path='tabs.summary.table.rows.ensembleMedianPerc' data={data} as='string' />
@@ -167,7 +167,7 @@ class Summary extends React.Component {
               <T path='tabs.summary.table.heading.season' />
             </th>
             <th rowSpan={2} className='align-middle text-center'>
-              <T path='tabs.summary.table.heading.baselineMedianVal' />
+              <T path='tabs.summary.table.heading.baselineMeanVal' />
             </th>
             <th colSpan={2} className='text-center'>
               <T path='tabs.summary.table.heading.projectedChange'
@@ -220,8 +220,8 @@ class Summary extends React.Component {
                   map(convertData)(displayData.values);
 
                 // Retrieve the season median from the seasonMediansMap
-                const medians = rowSummaryStatistics.summaryStats.seasonMedians;
-                const displayBaselineMedians = baselineFormat(precision, Number.parseFloat([medians[seasonSpec.season]]));
+                const means = rowSummaryStatistics.summaryStats.seasonMeans;
+                const displayBaselineMeans = baselineFormat(precision, Number.parseFloat([means[seasonSpec.season]]));
 
                 // Const `data` is provided as context data to the external text.
                 // The external text implements the formatting of this data for
@@ -235,7 +235,7 @@ class Summary extends React.Component {
                     ...seasonSpec,
                     label: capitalize(seasonSpec.season),
                     percentileValues: displayPercentileValues,
-                    baselineMedianVal: displayBaselineMedians,
+                    baselineMeanVal: displayBaselineMeans,
                   },
                   format: displayFormat(precision),
                   isLong,
@@ -245,7 +245,7 @@ class Summary extends React.Component {
 
                 isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
                 lastVariable = row.variable;
-                data.baselineMedianVal = Number.parseFloat([data.baselineMedianVal])
+                data.baselineMeanVal = Number.parseFloat([data.baselineMeanVal])
 
                 return (
                   <tr className={isStripe ? 'striped-row' : ''} >
@@ -284,20 +284,20 @@ const loadSummaryStatistics = async ({ region, futureTimePeriod, tableContents }
       fetchSummaryStatistics(region, futureTimePeriod, content.variable, percentiles),
       ...content.seasons.map(season =>
         fetchCsvStats(region, content.variable, season)
-          .then(median => ({ season, median }))
+          .then(mean => ({ season, mean }))
           .catch(err => {
-            console.error(`Failed to fetch median for ${content.variable} in ${season}:`, err);
-            return { season, median: null };  // Return null median on error
+            console.error(`Failed to fetch mean for ${content.variable} in ${season}:`, err);
+            return { season, mean: null };  // Return null mean on error
           })
       )
     ])
-      .then(([summaryStats, ...seasonMedians]) => {
-        // Map from season names to median values
-        const seasonMediansMap = seasonMedians.reduce((acc, { season, median }) => {
-          acc[season] = median;
+      .then(([summaryStats, ...seasonMeans]) => {
+        // Map from season names to mean values
+        const seasonMeansMap = seasonMeans.reduce((acc, { season, mean }) => {
+          acc[season] = mean;
           return acc;
         }, {});
-        summaryStats.seasonMedians = seasonMediansMap;
+        summaryStats.seasonMeans = seasonMeansMap;
         return {
           variable: content.variable,
           summaryStats,
