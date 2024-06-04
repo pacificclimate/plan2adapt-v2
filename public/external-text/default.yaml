@@ -52,7 +52,7 @@ tabs:
       heading:
         variable: Climate Variable
         season: Season
-        baselineMedianVal: Baseline Median Value
+        baselineMeanVal: Baseline Mean Value
         projectedChange: Projected Change from ${$$.components.period} Baseline
         ensembleMedianPerc: Ensemble Median
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
@@ -63,7 +63,7 @@ tabs:
           ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
         season: ${season.label}
-        baselineMedianVal: ${(season.baselineMedianVal)} ${(variable.unitsSpec.id =='%') ? 'mm/day':variable.unitsSpec.id}
+        baselineMeanVal: ${(season.baselineMeanVal)} ${(variable.unitsSpec.id =='%') ? 'mm/day':variable.unitsSpec.id}
         ensembleMedianPerc: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
         range: |
           ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
@@ -571,37 +571,37 @@ tabs:
           display: absolute
           displayUnits: days
           precision: 0
-          medianUnit: days
+          meanUnit: days
         gdd:
           display: absolute
           displayUnits: degree-days
           precision: 0
-          medianUnit: degree-days
+          meanUnit: degree-days
         hdd:
           display: absolute
           displayUnits: degree-days
           precision: 0
-          medianUnit: degree-days
+          meanUnit: degree-days
         cdd:
           display: absolute
           displayUnits: degree-days
           precision: 0
-          medianUnit: degree-days
+          meanUnit: degree-days
         pr:
           display: relative
           displayUnits: '%'
           precision: 1
-          medianUnit: mm/day
+          meanUnit: mm/day
         snow:
           display: relative
           displayUnits: '%'
           precision: 1
-          medianUnit: mm/day
+          meanUnit: mm/day
         tas:
           display: absolute
           displayUnits: °C
           precision: 1
-          medianUnit: °C
+          meanUnit: °C
 
   # notes:
   #   disabled: false
