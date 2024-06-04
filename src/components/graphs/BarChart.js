@@ -52,7 +52,7 @@ export default class BarChart extends React.Component {
 
     percentiles: PropTypes.array,
     percentileValuesByTimePeriod: PropTypes.array,
-    median: PropTypes.object,
+    mean: PropTypes.object,
     variableConfig: PropTypes.object
   };
 
@@ -61,7 +61,7 @@ export default class BarChart extends React.Component {
       baselineTimePeriod, futureTimePeriods,
       graphConfig, variableInfo,
       percentiles, percentileValuesByTimePeriod,
-      median, variableConfig,
+      mean, variableConfig,
     } = this.props;
 
     const percentileIndices = range(0, percentiles.length);
@@ -349,8 +349,8 @@ export default class BarChart extends React.Component {
                 index === 0
                 && id === basePercentileValueNames[0]
               ) {
-                const medianUnit = variableConfig[variableInfo.id].medianUnit
-                return `Median Value\n ${baselineFormat(precision, Number.parseFloat(median))} ${medianUnit}`;
+                const meanUnit = variableConfig[variableInfo.id].meanUnit
+                return `Mean Value\n ${baselineFormat(precision, Number.parseFloat(mean))} ${meanUnit}`;
               }
               const year = baseTimes[index];
               if (

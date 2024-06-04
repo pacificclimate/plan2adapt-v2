@@ -55,17 +55,17 @@ export const fetchCsvStats = (region, variable, season) => {
       return parseCSV(response.data);
     })
     .then(data => {
-      const medianEntry = data.find(row =>
+      const meanEntry = data.find(row =>
         row.variable === variable &&
         row.model === "PCIC_BLEND_v1" &&
         row.timescale === periodToTimescale(season) &&
         parseInt(row.timeidx, 10) === seasonToIndex[season]
       );
-      if (!medianEntry) {
+      if (!meanEntry) {
         console.error(`No matching entry found for ${variable} in season ${season}`);
         return null;
       }
-      return medianEntry.median;
+      return meanEntry.mean;
     })
     .catch(error => {
       console.error(`Error fetching or parsing CSV data from ${csvUrl} for ${variable}, season ${season}:`, error);

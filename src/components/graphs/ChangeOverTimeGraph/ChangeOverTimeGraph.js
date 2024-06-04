@@ -74,7 +74,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     //
     // There is one item per element of futureTimePeriods, in corresponding
     // order.
-    median: PropTypes.any,
+    mean: PropTypes.any,
     // This prop receives the data-fetch responses the backend according
     // props region, season, variable. (`withAsyncData`
     // injects this data.)
@@ -111,7 +111,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
         'baselineTimePeriod',
         'futureTimePeriods[0]',
         'statistics',
-        'median',
+        'mean',
         'graphConfig',
         'variableConfig',
         'unitsSpecs',
@@ -123,7 +123,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     }
     const {
       baselineTimePeriod, futureTimePeriods,
-      statistics, median,
+      statistics, mean,
       variableInfo,
       graphConfig, variableConfig, unitsSpecs,
     } = this.props;
@@ -181,7 +181,7 @@ class ChangeOverTimeGraphDisplay extends React.Component {
           variableInfo={variableInfo}
           percentiles={percentiles}
           percentileValuesByTimePeriod={percentileValuesByTimePeriod}
-          median={median}
+          mean={mean}
           variableConfig={variableConfig}
         />
       </React.Fragment>
@@ -196,13 +196,13 @@ const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
 });
 
 
-const loadMedianData = ({ region, variable, season }) => {
+const loadMeanData = ({ region, variable, season }) => {
   const variableId = variable.representative.variable_id;
   const seasonPeriod = seasonIndexToPeriod(season);
   return fetchCsvStats(region, variableId, seasonPeriod);
 };
 
-const shouldLoadMedianData = (prevProps, props) =>
+const shouldLoadMeanData = (prevProps, props) =>
   allDefined(['region', 'variable', 'season'], props) &&
   !(
     prevProps &&
@@ -274,7 +274,7 @@ const ChangeOverTimeGraph = withAsyncData(
   loadSummaryStatistics, shouldLoadSummaryStatistics, 'statistics'
 )(
   withAsyncData(
-    loadMedianData, shouldLoadMedianData, 'median'
+    loadMeanData, shouldLoadMeanData, 'mean'
   )(ChangeOverTimeGraphDisplay)
 );
 
