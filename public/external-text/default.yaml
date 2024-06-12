@@ -41,9 +41,9 @@ tabs:
     # It's tempting to do this content as a Markdown table, but unfortunately
     # MD doesn't let you span table rows or columns.
     prologue: |
-      This table shows projected changes in regional average temperature, 
-      precipitation and derived climate variables from the baseline historical period (${baselineTimePeriod.start_date} - ${baselineTimePeriod.end_date}) to the specified future period under a high emissions scenario (SSP5-8.5). 
-      The results are drawn from an ensemble of 12 global climate models downscaled over Canada (i.e. the PCIC12 subset of CanDCS-M6), characterized by both a median value and a likely range. 
+      This table shows historical values and projected changes in regional average temperature, 
+      precipitation and derived climate variables from the baseline period (${baselineTimePeriod.start_date} - ${baselineTimePeriod.end_date}) to the specified future period under a high emissions scenario (SSP5-8.5). 
+      The projected changes are drawn from an ensemble of 12 global climate models downscaled over Canada (i.e. the PCIC12 subset of CanDCS-M6), characterized by both a median value and a likely range. The baseline values are computed from the PCIC-Blend gridded observational dataset.
       See the Notes below and PCIC's Statistically Downscaled Climate Scenarios page for more information.
 
     lowBaselineWarning: |
