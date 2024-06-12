@@ -519,7 +519,7 @@ tabs:
       The range of change based on this set of climate projections is indicated
       as follows:
 
-      - The black line indicates the mid-point (median) in the set.
+      - The black line indicates the median (mid-point) of the future ensembles in the set.
       - The dark grey shading shows the middle 50% (25th to 75th percentiles),
         of the projections in the set.
       - The light grey shading shows the range of the central 80%
