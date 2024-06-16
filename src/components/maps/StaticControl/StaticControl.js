@@ -1,33 +1,41 @@
-import ReactDom from 'react-dom';
-
-import { MapControl, withLeaflet } from 'react-leaflet';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { useMap } from 'react-leaflet';
 import L from 'leaflet';
-
 import './StaticControl.css';
 
+class StaticControl extends React.Component {
+  createLeafletElement(props) {
+    const leafletElement = L.control({ position: props.position });
 
-class StaticControl extends MapControl {
-    createLeafletElement(props) {
-      const leafletElement = L.control({ position: props && props.position });
+    leafletElement.onAdd = map => {
+      this.container = L.DomUtil.create(
+        'div',
+        'StaticControl leaflet-control'
+      );
+      Object.assign(this.container.style, props.style);
+      this.root = createRoot(this.container);
+      this.root.render(props.children);
+      return this.container;
+    };
 
-      leafletElement.onAdd = map => {
-        this.container = L.DomUtil.create(
-          'div',
-          'StaticControl leaflet-control'
-        );
-        Object.assign(this.container.style, props.style);
-        ReactDom.render(props.children, this.container);
-        return this.container;
-      };
+    return leafletElement;
+  }
 
-      return leafletElement;
+  updateLeafletElement(prevProps, toProps) {
+    if (prevProps.children !== toProps.children) {
+      this.root.render(toProps.children);
     }
+  }
 
-    updateLeafletElement(fromProps, toProps) {
-      if (fromProps.children !== toProps.children) {
-        ReactDom.render(toProps.children, this.container);
-      }
-    }
+  render() {
+    return null;
+  }
 }
 
-export default withLeaflet(StaticControl);
+const StaticControlWithMap = (props) => {
+  const map = useMap();
+  return <StaticControl {...props} map={map} />;
+};
+
+export default StaticControlWithMap;
