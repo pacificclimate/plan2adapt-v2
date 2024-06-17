@@ -27,7 +27,6 @@ import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
-// import NotesTabBody from '../NotesTabBody';
 import ReferencesTabBody from '../ReferencesTabBody';
 import AboutTabBody from '../AboutTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
@@ -232,10 +231,6 @@ export default class App extends Component {
           variableOpt: this.state.variableOpt,
         },
       },
-      // notes: {
-      //   Component: NotesTabBody,
-      //   props: {},
-      // },
       references: {
         Component: ReferencesTabBody,
         props: {},
