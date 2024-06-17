@@ -321,7 +321,7 @@ tabs:
               range:
                 min: 0
                 max: 3500
-              ticks: [0, 1000, 2000, 3000, 4000]
+              ticks: [0, 1000, 2000, 3000, 3500]
             winter:
               range:
                 min: 0
@@ -351,7 +351,7 @@ tabs:
               range:
                 min: 0
                 max: 3500
-              ticks: [0, 1000, 2000, 4000, 3000, 3500]
+              ticks: [0, 1000, 2000, 3000, 3500]
             spring:
               range:
                 min: 0
@@ -414,31 +414,31 @@ tabs:
               range:
                 min: 200
                 max: 6000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000, 4000]
+              ticks: [200, 400, 800, 1000, 2000, 4000, 6000]
             winter:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 2000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
+              ticks: [ 40, 80, 100, 200, 400, 800, 1000, 2000]
             spring:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 1000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000]
+              ticks: [ 40, 80, 100, 200, 400, 800, 1000]
             summer:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 1000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 500]
+              ticks: [ 40, 80, 100, 200, 400, 800, 1000]
             fall:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 2000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
+              ticks: [ 40, 80,  100, 200, 400, 800, 1000, 2000]
         snow:
           display: absolute
           palette: x-Occam
@@ -451,19 +451,19 @@ tabs:
               range:
                 min: 10
                 max: 5000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000]
+              ticks: [10, 20, 40, 100, 200, 400, 1000, 5000]
             winter:
               displayUnits: mm/season (cum)
               range:
                 min: 10
                 max: 2000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 500]
+              ticks: [10, 20, 40, 100, 200, 400, 1000, 2000]
             spring:
               displayUnits: mm/season (cum)
               range:
                 min: 10
                 max: 500
-              ticks: [10, 20, 40, 80, 100, 200]
+              ticks: [10, 20, 40, 100, 200, 500]
             summer:
               displayUnits: mm/season (cum)
               range:
@@ -475,7 +475,7 @@ tabs:
               range:
                 min: 10
                 max: 1000
-              ticks: [10, 20, 40, 80, 100, 200]
+              ticks: [10, 20, 40,  100, 200, 400, 1000]
         tas:
           display: absolute
           displayUnits: °C
