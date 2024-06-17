@@ -769,6 +769,8 @@ tabs:
 
       - label: Team
         cards:
+          - header: 'Trevor Murdock'
+            body: Founding concept designer
           - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
             body: Development team lead.
           - header: '[Charles Curry](https://pacificclimate.org/about-pcic/people/charles-curry)'
