@@ -23,7 +23,7 @@ const getConfigForId = (variableConfig, variableId) => {
 
 export const getVariableLabel = (variableConfig, variableId) => {
   const vc = getConfigForId(variableConfig, variableId);
-  return `${vc.label}${vc.derived ? '*' : ''}`;
+  return `${vc.label}`;
 };
 
 
@@ -77,7 +77,7 @@ export const getVariableInfo = (unitsSpecs, variableConfig, variableId, display)
 };
 
 
-export const getConvertUnits= (unitsSpecs, variableConfig, variableId) => {
+export const getConvertUnits = (unitsSpecs, variableConfig, variableId) => {
   const variableType = getVariableType(variableConfig, variableId);
   if (!variableType) {
     throw new Error(`Unspecified variable type for ${variableId}`);
@@ -99,24 +99,32 @@ export const unitsSuffix = units => {
   return `${units.match(/^[%]/) ? '' : ' '}${units}`;
 };
 
+// No longer used. setting precision with decimal places rather than sigfigs. 
+// export const expToFixed = s => {
+//   // Convert a string representing a number in exponential notation to a string
+//   // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
+//   // returns exponential notation frequently when we do not want it to. So
+//   // we apply this.
+//   const match = s.match(/-?\d\.\d+e[+-]\d+/);
+//   if (!match) {
+//     return s;
+//   }
+//   return Number.parseFloat(match[0]).toString();
+// };
 
-export const expToFixed = s => {
-  // Convert a string representing a number in exponential notation to a string
-  // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
-  // returns exponential notation frequently when we do not want it to. So
-  // we apply this.
-  const match = s.match(/-?\d\.\d+e[+-]\d+/);
-  if (!match) {
-    return s;
-  }
-  return Number.parseFloat(match[0]).toString();
-};
 
-
-export const displayFormat = curry((sigfigs , value) => {
+export const displayFormat = curry((decimalPlaces, value) => {
   // Convert a number value to a string in the display format we prefer.
   if (!isNumber(value)) {
     return '--';
   }
-  return `${value > 0 ? '+' : ''}${expToFixed(value.toPrecision(sigfigs))}`;
+  return `${value > 0 ? '+' : ''}${value.toFixed(decimalPlaces)}`;
 });
+
+
+export const baselineFormat = (decimalPlaces, value) => {
+  if (!isNumber(value)) {
+    return '--';
+  }
+  return value.toFixed(decimalPlaces);
+};

@@ -89,7 +89,8 @@ export default class SimpleLineGraph extends React.Component {
             name: name => `${name} %ile`,
             value: (value, ratio, id) => {
               if (includes(id, ['10th', '25th', '50th', '75th', '90th'])) {
-                return `${displayFormat(2, value)} ${variableInfo.units}`;
+                const precision = variableConfig[variableInfo.id].precision
+                return `${displayFormat(precision, value)} ${variableInfo.units}`;
               }
             },
           },
