@@ -17,7 +17,7 @@ selectors:
     forTabs: ['summary', 'impacts', 'maps']
   variable:
     prefix: with details about
-    default: tasmean
+    default: tas
     forTabs: ['maps', 'graphs']
   season:
     prefix: for a typical
@@ -31,7 +31,7 @@ tabs:
     - impacts
     - maps
     - graphs
-    - notes
+    # - notes
     - references
     - about
 
@@ -41,53 +41,46 @@ tabs:
     # It's tempting to do this content as a Markdown table, but unfortunately
     # MD doesn't let you span table rows or columns.
     prologue: |
-      The table below shows projected changes in average (mean) temperature,
-      precipitation and several derived climate variables from the
-      baseline historical period
-      (${baselineTimePeriod.start_date}-${baselineTimePeriod.end_date})
-      to the
-      ${futureDecade}s (${futureTimePeriod.start_date}-${futureTimePeriod.end_date})
-      for the ${region.properties.english_na} region.
-      The ensemble median is a mid-point value, chosen from a PCIC standard
-      set of Global Climate Model (GCM) projections (see the 'Notes' tab for
-      more information).
-      The range values represent the lowest and highest results within the set.
+      This table shows historical values and projected changes in regional average temperature, 
+      precipitation and derived climate variables from the baseline period (${baselineTimePeriod.start_date} - ${baselineTimePeriod.end_date}) to the specified future period under a high emissions scenario (SSP5-8.5). 
+      The projected changes are drawn from an ensemble of 12 global climate models downscaled over Canada (i.e. the PCIC12 subset of CanDCS-M6), characterized by both a median value and a likely range. The baseline values are computed from the PCIC-Blend gridded observational dataset.
+      See the Notes below and PCIC's Statistically Downscaled Climate Scenarios page for more information.
+
     lowBaselineWarning: |
       *CAUTION: This variable may have a low baseline. See note 2 below. *
     table:
       heading:
         variable: Climate Variable
         season: Season
+        baselineMeanVal: Baseline Mean Value
         projectedChange: Projected Change from ${$$.components.period} Baseline
-        ensembleMedian: Ensemble Median
+        ensembleMedianPerc: Ensemble Median
         range: Range (${percentiles[0]}th to ${percentiles[2]}th percentile)
       rows:
         variable: |
-          ${variable.label}${variable.derived ? '*': ''} (${variable.unitsSpec.label})
+          ${variable.label}${variable.derived ? '*' : ''}${variable.label !== 'Precipitation' && variable.label !== 'Precipitation as Snow' ? ' (' + variable.unitsSpec.label + ')' : ''}
 
           ${variable.possibleLowBaseline && variable.unitsSpec.id =='%' ?
             $$.tabs.summary.lowBaselineWarning : ''}
         season: ${season.label}
-        ensembleMedian: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
+        baselineMeanVal: ${(season.baselineMeanVal)} ${(variable.unitsSpec.id =='%') ? 'mm/day':variable.unitsSpec.id}
+        ensembleMedianPerc: ${format(season.percentileValues[1])}${unitsSuffix(variable.unitsSpec.label)}
         range: |
           ${format(season.percentileValues[0])}${isLong(variable.unitsSpec.label) ? '': unitsSuffix(variable.unitsSpec.label)} to
           ${format(season.percentileValues[2])}${unitsSuffix(variable.unitsSpec.label)}
       contents:
-        - variable: tasmean
+        - variable: tas
           display: absolute
           displayUnits: °C
           precision: 1
           seasons:
             - annual
-        - variable: pr
-          display: relative
-          displayUnits: '%'
-          precision: 1
-          seasons:
-            - annual
-            - summer
             - winter
-        - variable: prsn
+            - spring
+            - summer
+            - fall
+
+        - variable: pr
           display: relative
           displayUnits: '%'
           precision: 1
@@ -95,6 +88,17 @@ tabs:
             - annual
             - winter
             - spring
+            - summer
+            - fall
+        - variable: snow
+          display: relative
+          displayUnits: '%'
+          precision: 1
+          seasons:
+            - annual
+            - winter
+            - spring
+            - fall
         - variable: gdd
           display: absolute
           displayUnits: degree-days
@@ -120,11 +124,18 @@ tabs:
           seasons:
             - annual
     notes: |
-      Notes:
+      #### Notes
 
       1. ${$$.components.notes.derivedClimateVars}
-
-      2. CAUTION: ${$$.components.notes.lowBaseline}
+      2. ${$$.components.notes.lowBaseline}
+      3. ${$$.components.notes.gcmPeriods}
+      4. ${$$.components.notes.mapTabNote}
+      
+      #### Thresholds for Degree-Day Indices
+      - Growing Degree-Days: Sum of degree-days during the specified time period above 5°C
+      - Frost-Free Days: Number of days in a year with minimum temperatures above 0°C
+      - Heating Degree-Days: Sum of degree-days during the specified time period below 18°C
+      - Cooling Degree-Days: Sum of degree-days during the specified time period above 18°C
 
   impacts:
     disabled: false
@@ -247,7 +258,7 @@ tabs:
       title: "#### Projected: ${$$.components.period}"
     colourScale:
       label: |
-        ${ (id === 'pr' || id === 'prsn') ? 'Total' : '' } ${label} (${unitsSpec.label})
+        ${ (id === 'pr' || id === 'snow') ? 'Total' : '' } ${label} (${unitsSpec.label})
       note: |
         ${logscale ? $$.tabs.maps.colourScale.logscaleNote : ''} This colour scale applies to both maps.
       logscaleNote: |
@@ -256,6 +267,7 @@ tabs:
         these are mapped to the below-minimum colour.* <br/>
     config:
       minZoom: 6
+      maxZoom: 13
       maxBounds: [ [65, -150], [45, -100] ]
       variables:
         # NB: range and tick values are in *display* units.
@@ -309,7 +321,7 @@ tabs:
               range:
                 min: 0
                 max: 3500
-              ticks: [0, 1000, 2000, 3000, 4000]
+              ticks: [0, 1000, 2000, 3000, 3500]
             winter:
               range:
                 min: 0
@@ -339,7 +351,7 @@ tabs:
               range:
                 min: 0
                 max: 3500
-              ticks: [0, 1000, 2000, 4000, 3000, 3500]
+              ticks: [0, 1000, 2000, 3000, 3500]
             spring:
               range:
                 min: 0
@@ -400,56 +412,58 @@ tabs:
             annual:
               displayUnits: mm/year (cum)
               range:
-                min: 10
-                max: 4000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000, 4000]
+                min: 200
+                max: 6000
+              ticks: [200, 400, 800, 1000, 2000, 4000, 6000]
             winter:
               displayUnits: mm/season (cum)
               range:
-                min: 10
+                min: 40
                 max: 2000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
+              ticks: [ 40, 80, 100, 200, 400, 800, 1000, 2000]
             spring:
               displayUnits: mm/season (cum)
               range:
-                min: 10
+                min: 40
                 max: 1000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000]
+              ticks: [ 40, 80, 100, 200, 400, 800, 1000]
             summer:
               displayUnits: mm/season (cum)
               range:
-                min: 10
-                max: 500
-              ticks: [10, 20, 40, 80, 100, 200, 400, 500]
+                min: 40
+                max: 1000
+              ticks: [ 40, 80, 100, 200, 400, 800, 1000]
             fall:
               displayUnits: mm/season (cum)
               range:
-                min: 10
+                min: 40
                 max: 2000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000, 2000]
-        prsn:
+              ticks: [ 40, 80,  100, 200, 400, 800, 1000, 2000]
+        snow:
           display: absolute
           palette: div-RdYlBu
           logscale: true
+          belowMinColor: white
+          aboveMaxColor: black
           seasons:
             annual:
               displayUnits: mm/year (cum)
               range:
                 min: 10
-                max: 1000
-              ticks: [10, 20, 40, 80, 100, 200, 400, 800, 1000]
+                max: 5000
+              ticks: [10, 20, 40, 100, 200, 400, 1000, 5000]
             winter:
               displayUnits: mm/season (cum)
               range:
                 min: 10
-                max: 500
-              ticks: [10, 20, 40, 80, 100, 200, 400, 500]
+                max: 2000
+              ticks: [10, 20, 40, 100, 200, 400, 1000, 2000]
             spring:
               displayUnits: mm/season (cum)
               range:
                 min: 10
-                max: 200
-              ticks: [10, 20, 40, 80, 100, 200]
+                max: 500
+              ticks: [10, 20, 40, 100, 200, 500]
             summer:
               displayUnits: mm/season (cum)
               range:
@@ -460,9 +474,9 @@ tabs:
               displayUnits: mm/season (cum)
               range:
                 min: 10
-                max: 200
-              ticks: [10, 20, 40, 80, 100, 200]
-        tasmean:
+                max: 1000
+              ticks: [10, 20, 40,  100, 200, 400, 1000]
+        tas:
           display: absolute
           displayUnits: °C
           palette: div-RdYlBu-inv
@@ -500,13 +514,12 @@ tabs:
       This figure shows the range of projected change in
       ${season} ${variable.label} for ${region.properties.english_na}
       over three time periods
-      (2020s, 2050s, and 2080s), according to a PCIC-standard set of
-      GCM projections (see 'Notes' tab for more information).
+      (2030s, 2050s, and 2080s), according to the PCIC12 set of downscaled GCM projections from CanDCS-M6 under the SSP5-8.5 emissions scenario.
 
       The range of change based on this set of climate projections is indicated
       as follows:
 
-      - The black line indicates the mid-point (median) in the set.
+      - The black line indicates the median (mid-point) of the future ensembles in the set.
       - The dark grey shading shows the middle 50% (25th to 75th percentiles),
         of the projections in the set.
       - The light grey shading shows the range of the central 80%
@@ -526,8 +539,7 @@ tabs:
         $$.tabs.graphs.lowBaselineWarning : ''}
 
     lowBaselineWarning: |
-      2. *CAUTION: This variable may have a low baseline.*
-         ${$$.components.notes.lowBaseline}
+      2. ${$$.components.notes.lowBaseline}
 
     config:
       foo: bar
@@ -548,9 +560,9 @@ tabs:
 
       futureTimePeriods:
         # This may be better obtained from metadata
-        - { start_date: "2010", end_date: "2039" }
-        - { start_date: "2040", end_date: "2069" }
-        - { start_date: "2070", end_date: "2099" }
+        - { start_date: "2021", end_date: "2050" }
+        - { start_date: "2041", end_date: "2070" }
+        - { start_date: "2071", end_date: "2100" }
       variables:
         # TODO: Remove fallback
         fallback:
@@ -559,67 +571,48 @@ tabs:
           display: absolute
           displayUnits: days
           precision: 0
-          medianUnit: days
+          meanUnit: days
         gdd:
           display: absolute
           displayUnits: degree-days
           precision: 0
-          medianUnit: degree-days
+          meanUnit: degree-days
         hdd:
           display: absolute
           displayUnits: degree-days
           precision: 0
-          medianUnit: degree-days
+          meanUnit: degree-days
         cdd:
           display: absolute
           displayUnits: degree-days
           precision: 0
-          medianUnit: degree-days
+          meanUnit: degree-days
         pr:
           display: relative
           displayUnits: '%'
           precision: 1
-          medianUnit: mm/day
+          meanUnit: mm/day
         snow:
           display: relative
           displayUnits: '%'
           precision: 1
-          medianUnit: mm/day
+          meanUnit: mm/day
         tas:
           display: absolute
           displayUnits: °C
           precision: 1
-          medianUnit: °C
+          meanUnit: °C
 
-  notes:
-    disabled: false
-    label: Notes
-    content: |
+  # notes:
+  #   disabled: false
+  #   label: Notes
+  #   content: |
 
-      1. Information for the Summary and Impacts tabs is drawn from a set of
-      projections from 12 different Global Climate Models (GCMs), each using one
-      run of the RCP 8.5 (high emissions) greenhouse gas emissions scenario.
-      This set of projections is referred to as the "ensemble." By the end of
-      the 21st century, the RCP 8.5 scenario includes an atmospheric
-      concentration of greenhouse gases, expressed as carbon dioxide (CO2)
-      equivalent, of approximately 950 ppm Each GCM comes from a different
-      modelling centre (e.g. the Hadley Centre (UK), National Centre for
-      Atmospheric Research (USA), Geophysical Fluid Dynamics Laboratory (USA),
-      and Commonwealth Scientific and Industrial Research Organisation
-      (Australia), etc.).
+  #     1. ${$$.components.notes.derivedClimateVars}
+  #     2. ${$$.components.notes.lowBaseline}
+  #     3. ${$$.components.notes.gcmPeriods}
+  #     4. ${$$.components.notes.mapTabNote}
 
-      1. The Maps tab shows results for the ensemble average value of the
-      selected variable.
-
-      1. The 2020s, 2050s, and 2080s time periods are meant to be used as three
-      representative planning horizons over the 21st century. Results for these
-      three planning horizons are computed by averaging GCM projections over
-      the 2010-2039, 2040-2069, and 2070-2099 periods, respectively.
-
-      1. All variables shown here are computed from daily time series of
-      downscaled climate simulations. Precipitation as snow is an approximation
-      of snowfall based on total precipitation and temperature, and may provide
-      different result than if snowfall was downscaled directly.
 
 
 
@@ -627,7 +620,17 @@ tabs:
     disabled: false
     label: References
     content: |
+      Brunner, L., Pendergrass, A. G., Lehner, F., Merrifield, A. L., Lorenz, R., & Knutti, R., 2020: [Reduced global warming from CMIP6 projections when weighting models by performance and independence](https://esd.copernicus.org/articles/11/995/2020/). Earth System Dynamics, 11, 4, 995-1012, doi:10.5194/esd-11-995-2020. 
+      
+      Cannon, A. J., 2018: [Multivariate quantile mapping bias correction: an N-dimensional probability density function transform for climate model simulations of multiple variables](https://link.springer.com/article/10.1007/s00382-017-3580-6). Climate Dynamics, 50, 31-49, doi:10.1007/s00382-017-3580-6.
+      
       Cannon, A.J., Sobie, S.R., Murdock, T.Q., 2015: _Bias correction of simulated precipitation by quantile mapping: how well do methods preserve relative changes in quantiles and extremes?_ Journal of Climate, 28(17): 6938-6959. https://doi.org/10.1175/jcli-d-14-00754.1
+      
+      Curry, C.L., D. Ouali, S.R. Sobie, and F.W. Zwiers (2023) Downscaled CMIP6 Climate Model Subset Selection, Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
+
+      Dai, A., 2008: Temperature and pressure dependence of the rain-snow phase transition over land and ocean. Geophysical Research Letters, 35 (12), doi:10.1029/2008GL033295.
+
+      Eyring, V., S. Bony, G.A. Meehl, C. Senior, B. Stevens, R.J. Stouffer and K.E. Taylor, 2016: [Overview of the Coupled Model Intercomparison Project Phase 6 (CMIP6) experimental design and organization](https://gmd.copernicus.org/articles/9/1937/2016/). Geoscientific Model Development, 9(5), 1937-1958.
 
       Government of British Columbia. _Climate Change Indicators._ (web page). https://www2.gov.bc.ca/gov/content/environment/research-monitoring-reporting/reporting/environmental-reporting-bc/climate-change-indicators
 
@@ -635,24 +638,31 @@ tabs:
 
       Hamlet A.F., D.P. Lettenmaier. 2007. _Effects of 20th Century Warming and Climate Variability on Flood Risk in the Western U.S._ Water Resources Research, 43: https://doi.org/10.1029/2006wr005099.
 
-      Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
+      Heather MacDonald, Daniel W. McKenney, Xiaolan L. Wang, John Pedlar, Pia Papadopol, Kevin Lawrence, Yang Feng, and Michael F. Hutchinson. (2021) Spatial Models of Adjusted Precipitation for Canada at Varying Time Scales. Journal of Applied Meteorology and Climatology, 60(3):291–304, 1558-8432. doi: 10.1175/JAMC-D-20-0041.1
 
-      Murdock, T.Q. and D.L. Spittlehouse. 2011. _Selecting and Using Climate Change Scenarios for British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
+      MacDonald, H. et al., 2020: [North American historical monthly spatial climate dataset, 1901–2016](https://www.nature.com/articles/s41597-020-00737-2). Scientific Data, 7, 411. doi:10.1038/s41597-020-00737-2. 
+
+      Mote P.W., A.F. Hamlet, M. Clark, D.P. Lettenmaier. 2005. _Declining Mountain Snowpack in Western North America_. Bulletin of the American Meteorological Society, 86(1):39-49.
 
       Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
       https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
 
+      Pacific Climate Impacts Consortium. 2023:  [Downscaled CMIP6 Climate Model Subset Selection](http://pacificclimate.org/sites/default/files/publications/cmip6_gcm_selection_final_report.pdf)
+
       Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
       https://cran.r-project.org/web/packages/climdex.pcic/index.html
+
+      Riahi, K. et al. 2017:  [The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview](https://www.sciencedirect.com/science/article/pii/S0959378016300681). Global Environmental Change, 42, 153-168, doi:10.1016/j.gloenvcha.2016.05.009.
 
       Rodenhuis, D.R., Bennett, K.E., Werner, A.T., Murdock, T.Q., Bronaugh, D. Revised 2009. _Hydro-climatology and future climate impacts in British Columbia_. Pacific Climate Impacts Consortium, University of Victoria, Victoria BC, 132 pp. Provides additional information on future climate projects in British Columbia.
 
       Sobie, S.R. and T.Q. Murdock, 2017: High-Resolution Statistical Downscaling in Southwestern British Columbia. Journal of Applied Meteorology and Climatology, 56, 6, 1625–1641, https://doi.org/10.1175/jamc-d-16-0287.1
 
-      Taylor, K. E., R. J. Stouffer, and G. A. Meehl, 2012: _An overview of CMIP5 and the experiment design._ Bull. Amer. Meteor. Soc., 93, 485–498, https://doi.org/10.1175/bams-d-11-00094.1
+      Sobie, S.R., D. Ouali, C.L. Curry, and F.W. Zwiers. Multivariate Canadian Downscaled Climate Scenarios for CMIP6 (CanDCS-M6). Geoscience Data Journal, Accepted.
 
-      Werner, A. T. and A. J. Cannon, A. J., 2016: _Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods._ Hydrololgy and Earth System Sciences, 20, 1483-1508, https://doi.org/10.5194/hess-20-1483-2016.
-
+      Werner, A. T. and A. J. Cannon, A. J., 2016: _Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods._ Hydrology and Earth System Sciences, 20, 1483-1508, https://doi.org/10.5194/hess-20-1483-2016.
+      
+      Arelia T. Werner, Markus A. Schnorbus, Rajesh R. Shrestha, Alex J. Cannon, Francis W. Zwiers, Gildas Dayon, and Faron Anslow. A long-term, temporally consistent, gridded daily meteorological dataset for northwestern North America. Scientific Data, 6:180299, January 2019. doi: 10.1038/sdata.2018.299
 
   about:
     disabled: false
@@ -684,7 +694,7 @@ tabs:
               data set is subject to the terms of use of each source organization.
               For further details please refer to:
 
-              * [The Coupled Model Intercomparison Project](https://pacificclimate.org/sites/default/files/tou-cmip5-pcmdi_llnl_gov_february-19th-2014.pdf)
+              * [The Coupled Model Intercomparison Project](https://pcmdi.llnl.gov/CMIP6/TermsOfUse/TermsOfUse6-1.html)
               * [National Center for Atmospheric Research Earth System Grid](https://pacificclimate.org/sites/default/files/tou_earthsystemgrid_february-19th-2014.pdf)
 
           - header: No Warranty
@@ -703,8 +713,9 @@ tabs:
             body: |
               Development of the original version of Plan2Adapt was been made possible through funding and
               support provided by the
+              [BC Ministry of Emergency Management and Climate Readiness](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/emergency-management-and-climate-readiness)
               [BC Ministry of Environment & Climate Change Strategy](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/environment-climate-change),
-              [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests-lands-natural-resource-operations-and-rural-development)
+              [BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/forests)
               Forest Science Program,
               [BC Ministry of Municipal Affairs and Housing](https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/ministries/municipal-affairs-housing),
               and
@@ -719,7 +730,7 @@ tabs:
               We thank the Landscape Analysis and Applications section of the
               Canadian Forest Service, Natural Resources Canada, for developing
               and making available the Canada-wide historical daily gridded
-              climate dataset used as the downscaling target.
+              climate dataset used developing the PCIC-Blend downscaling target.
 
               #### [Environment and Climate Change Canada](http://www.ec.gc.ca/)
 
@@ -732,7 +743,7 @@ tabs:
 
               We acknowledge the World Climate Research Programme’s
               Working Group on Coupled Modelling, which is responsible for
-              CMIP5, and we thank the climate modeling groups for producing
+              CMIP6, and we thank the climate modeling groups for producing
               and making available their GCM output.
 
               #### [U.S. Department of Energy](https://www.energy.gov/)
@@ -758,30 +769,41 @@ tabs:
 
       - label: Team
         cards:
-          - header: '[Trevor Murdock](https://pacificclimate.org/about-pcic/people/trevor-murdock)'
-            body: Climate science lead.
+          - header: 'Trevor Murdock'
+            body: Founding concept designer
           - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
             body: Development team lead.
+          - header: '[Charles Curry](https://pacificclimate.org/about-pcic/people/charles-curry)'
+            body: Regional climate impacts lead.
           - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
             body: Backend engineer. Data wrangling.
-          - header: '[Nikola Radoš](https://pacificclimate.org/about-pcic/people/nikola-rados)'
-            body: DevOps specialist. Implementor of Impacts rules engine.
           - header: '[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)'
             body: Front-end engineer. UI design and implementation.
-          - header: '[Matthew Benstead](https://pacificclimate.org/about-pcic/people/matthew-benstead)'
+          - header: '[Tom Kunkel](https://pacificclimate.org/about-pcic/people/tom-kunkel)'
             body: System administrator. Deployment and security.
+          - header: '[Eric Yvorchuk](https://pacificclimate.org/about-pcic/people/eric-yvorchuk-0)'
+            body: Programmer/Analyst
+          - header: '[Stephen Sobie](https://pacificclimate.org/about-pcic/people/stephen-sobie)'
+            body: RCI Analyst
+          - header: '[Quintin Sparks](https://pacificclimate.org/about-pcic/people/quintin-sparks)'
+            body: Programmer/Analyst
 
 components:
   notes:
     derivedClimateVars: |
-      Climate variables marked with &ast; are derived from temperature and/or
-      precipitation values, and are not direct outputs of the climate models.
+      Climate indices are derived from daily temperature and/or precipitation values, 
+      and are not direct outputs of the climate models.
     lowBaseline: |
-      Percent changes from a low baseline value can result in
-      deceptively large percent change values.
-      A small baseline can occur when the season and/or region
-      together naturally make for zero or near-zero values. For example,
-      snowfall in summer in low-lying southern areas.
+      Precipitation as snow is an approximation of snowfall based on total precipitation and temperature, 
+      and may provide a different result than if snowfall was downscaled directly. 
+      CAUTION: Percent changes from a low baseline value can result in deceptively large percent change values. 
+      Low baseline values occur, for example, for snowfall in spring.
+    gcmPeriods:
+      The selectable future time periods are meant to represent possible planning horizons over the 21st century. 
+      Results for these planning horizons are computed by averaging GCM projections 
+      over the 2021-2050, 2041-2070, and 2071-2100 periods, respectively.
+    mapTabNote:
+      The Plan2Adapt Maps tab shows results for the ensemble average value of the selected variable.
   period: ${start_date}-${end_date}
   climdexUrl: https://www.climdex.org/learn/indices
   contacts:
@@ -835,19 +857,19 @@ seasons:
 # in the `units` config, below.
 # TODO: Remove `dataUnits` and supply from metadata.
 variables:
-  tasmean:
+  tas:
     label: Temperature
     type: temperature
     dataUnits: degC
   pr:
     label: Precipitation
     type: precipitation flux
-    dataUnits: kg m-2 d-1
-  prsn:
+    dataUnits: mm d-1
+  snow:
     label: Precipitation as Snow
     derived: true
     type: precipitation flux
-    dataUnits: kg m-2 d-1
+    dataUnits: mm d-1
     possibleLowBaseline: true
   gdd:
     label: Growing Degree-Days
@@ -888,7 +910,7 @@ units:
   'precipitation flux':
     'mm/yr': 1
     'mm/d': 365.25
-    'kg m-2 d-1': mm/d
+    'mm d-1': mm/d
     'mm': mm/yr
     'mm/year': mm/yr
     'mm/season': 4
@@ -902,12 +924,11 @@ units:
     'mm/month (cum)':
       label: 'mm'
       scale: 12
-  'snowfall flux':
-    'mm/yr': 1
-    'mm/d': 365
-    'kg m-2 d-1': 3650    # approximation that converts mass to snow depth
-    'mm': mm/yr
-    'mm/month': 12
+  # 'snowfall flux':
+  #   'mm/yr': 1
+  #   'mm d-1': 365.25
+  #'kg m-2 d-1': 365    # approximation that converts mass to snow depth
+
   temperature:
     degC: 1
     '°C': degC
