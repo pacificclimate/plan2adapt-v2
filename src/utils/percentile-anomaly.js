@@ -112,6 +112,9 @@ export const getDisplayData = (response, period, display) => {
   }
 
   const anomalyValues = getPeriodData(response.anomaly, period);
+  const baselineValue = getPeriodData(response.baseline, period);
+
+
   if (display === 'absolute') {
     return {
       values: anomalyValues,
@@ -120,7 +123,7 @@ export const getDisplayData = (response, period, display) => {
   }
 
   // display === 'relative':
-  const baselineValue = getPeriodData(response.baseline, period);
+
   // TODO: Get zero tolerance from config
   if (nearZero(baselineValue)) {
     return {
@@ -129,7 +132,7 @@ export const getDisplayData = (response, period, display) => {
     }
   }
   return {
-    values: map(x => 100 * x/baselineValue)(anomalyValues),
+    values: map(x => 100 * x / baselineValue)(anomalyValues),
     units: '%',
   };
 };

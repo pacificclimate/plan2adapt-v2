@@ -25,7 +25,7 @@ deployment on a server. To do so:
     - To pull:
 
       ```
-      docker pull pcic/station-data-portal-frontend:<tag>
+      docker pull pcic/plan2adapt-v2-frontend:<tag>
       ```
 
       Typically `<tag>` is your current branch name.
