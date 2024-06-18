@@ -222,7 +222,7 @@ export default class MapsTabBody extends React.PureComponent {
       this.props
     )) {
       console.log('### MapsTabBody: unsettled props', this.props)
-      return <Loader/>;
+      return <Loader />;
     }
 
     const region = this.props.regionOpt.value;
@@ -303,6 +303,7 @@ export default class MapsTabBody extends React.PureComponent {
                   id={'historical'}
                   mapRef={this.handleChangeBaselineMapRef}
                   minZoom={mapsConfig.minZoom}
+                  maxZoom={mapsConfig.maxZoom}
                   maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
@@ -323,11 +324,12 @@ export default class MapsTabBody extends React.PureComponent {
                 <T path='tabs.maps.projected.title' data={{
                   start_date: futureTimePeriod.start_date,
                   end_date: futureTimePeriod.end_date
-                }}/>
+                }} />
                 <DataMap
                   id={'projected'}
                   mapRef={this.handleChangeProjectedMapRef}
                   minZoom={mapsConfig.minZoom}
+                  maxZoom={mapsConfig.maxZoom}
                   maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
                   onViewportChanged={this.handleChangeViewport}
