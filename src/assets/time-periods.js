@@ -1,9 +1,9 @@
 export default [
   {
     value: {
-      shorthand: '2020s',
-      start_date: 2010,
-      end_date: 2039,
+      shorthand: '2030s',
+      start_date: 2020,
+      end_date: 2049,
     },
   },
   {

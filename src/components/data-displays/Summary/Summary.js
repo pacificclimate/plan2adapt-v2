@@ -1,5 +1,3 @@
-// TODO: This module is waaaaayyyy too long. Break it up.
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import Table from 'react-bootstrap/Table';
@@ -16,9 +14,10 @@ import {
   getConvertUnits,
   getVariableInfo,
   unitsSuffix,
+  baselineFormat
 } from '../../../utils/variables-and-units';
 import withAsyncData from '../../../HOCs/withAsyncData';
-import { fetchSummaryStatistics } from '../../../data-services/summary-stats';
+import { fetchSummaryStatistics, fetchCsvStats } from '../../../data-services/summary-stats';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
 import styles from './Summary.module.css';
@@ -35,7 +34,10 @@ const SeasonTds = ({ data }) => {
       <T path='tabs.summary.table.rows.season' data={data} as='string' />
     </td>,
     <td>
-      <T path='tabs.summary.table.rows.ensembleMedian' data={data} as='string' />
+      <T path='tabs.summary.table.rows.baselineMeanVal' data={data} as='string' />
+    </td>,
+    <td>
+      <T path='tabs.summary.table.rows.ensembleMedianPerc' data={data} as='string' />
     </td>,
     <td>
       <T path='tabs.summary.table.rows.range' data={data} as='string' />
@@ -62,7 +64,7 @@ class Summary extends React.Component {
   static propTypes = {
     region: PropTypes.object.isRequired,
     futureTimePeriod: PropTypes.object.isRequired,
-    baselineTimePeriod: PropTypes.object,
+    baselineTimePeriod: PropTypes.object.isRequired,
 
     tableContents: PropTypes.array.isRequired,
     // Abstract specification of the summary table. Data is implicit in the
@@ -130,8 +132,8 @@ class Summary extends React.Component {
 
   static defaultProps = {
     baselineTimePeriod: {
-      start_date: 1961,
-      end_date: 1990,
+      start_date: 1981,
+      end_date: 2010,
     },
   };
 
@@ -164,6 +166,9 @@ class Summary extends React.Component {
             <th rowSpan={2} className='align-middle text-center'>
               <T path='tabs.summary.table.heading.season' />
             </th>
+            <th rowSpan={2} className='align-middle text-center'>
+              <T path='tabs.summary.table.heading.baselineMeanVal' />
+            </th>
             <th colSpan={2} className='text-center'>
               <T path='tabs.summary.table.heading.projectedChange'
                 data={this.props.baselineTimePeriod} />
@@ -171,7 +176,7 @@ class Summary extends React.Component {
           </tr>
           <tr>
             <th>
-              <T path='tabs.summary.table.heading.ensembleMedian' />
+              <T path='tabs.summary.table.heading.ensembleMedianPerc' />
             </th>
             <th>
               <T path='tabs.summary.table.heading.range' data={{ percentiles }} />
@@ -201,10 +206,9 @@ class Summary extends React.Component {
                 const variableInfo = getVariableInfo(
                   unitsSpecs, variableConfig, variable, display
                 );
-
                 // Extract data for this row
                 const displayData = getDisplayData(
-                  rowSummaryStatistics, seasonSpec.season, display
+                  rowSummaryStatistics.summaryStats, seasonSpec.season, display
                 );
 
                 // Convert data to display units
@@ -214,6 +218,10 @@ class Summary extends React.Component {
                   convertUnits(displayData.units, variableInfo.unitsSpec.id);
                 const displayPercentileValues =
                   map(convertData)(displayData.values);
+
+                // Retrieve the season median from the seasonMediansMap
+                const means = rowSummaryStatistics.summaryStats.seasonMeans;
+                const displayBaselineMeans = baselineFormat(precision, Number.parseFloat([means[seasonSpec.season]]));
 
                 // Const `data` is provided as context data to the external text.
                 // The external text implements the formatting of this data for
@@ -227,14 +235,17 @@ class Summary extends React.Component {
                     ...seasonSpec,
                     label: capitalize(seasonSpec.season),
                     percentileValues: displayPercentileValues,
+                    baselineMeanVal: displayBaselineMeans,
                   },
                   format: displayFormat(precision),
                   isLong,
                   unitsSuffix,
                 };
 
+
                 isStripe = row.variable !== lastVariable ? !isStripe : isStripe;
                 lastVariable = row.variable;
+                data.baselineMeanVal = Number.parseFloat([data.baselineMeanVal])
 
                 return (
                   <tr className={isStripe ? 'striped-row' : ''} >
@@ -263,25 +274,39 @@ class Summary extends React.Component {
   }
 }
 
-
-const loadSummaryStatistics = ({ region, futureTimePeriod, tableContents }) =>
+const loadSummaryStatistics = async ({ region, futureTimePeriod, tableContents }) => {
   // Return (a promise for) the summary statistics to be displayed in the
   // Summary tab. This amounts to fetching the data for each variable from the
   // backend, then processing it into the form consumed by Summary via its
   // prop `summary`.
-  Promise.all(
-    map(
-      content => fetchSummaryStatistics(
-        region, futureTimePeriod, content.variable, percentiles
+  const dataFetches = tableContents.map(content =>
+    Promise.all([
+      fetchSummaryStatistics(region, futureTimePeriod, content.variable, percentiles),
+      ...content.seasons.map(season =>
+        fetchCsvStats(region, content.variable, season)
+          .then(mean => ({ season, mean }))
+          .catch(err => {
+            console.error(`Failed to fetch mean for ${content.variable} in ${season}:`, err);
+            return { season, mean: null };  // Return null mean on error
+          })
       )
-        // Unavailable or otherwise problematic fetches are returned as undefined.
-        // Data display elements are responsible for showing a message.
-        .catch(err => {
-          console.error('Failed to fetch summary statistics:\n', err);
-          return undefined;
-        })
-    )(tableContents)
+    ])
+      .then(([summaryStats, ...seasonMeans]) => {
+        // Map from season names to mean values
+        const seasonMeansMap = seasonMeans.reduce((acc, { season, mean }) => {
+          acc[season] = mean;
+          return acc;
+        }, {});
+        summaryStats.seasonMeans = seasonMeansMap;
+        return {
+          variable: content.variable,
+          summaryStats,
+        };
+      })
   );
+
+  return Promise.all(dataFetches);
+};
 
 
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
@@ -291,6 +316,8 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
       'region.geometry',
       'futureTimePeriod.start_date',
       'futureTimePeriod.end_date',
+      'baselineTimePeriod.start_date',
+      'baselineTimePeriod.end_date',
       'tableContents',
     ],
     props
