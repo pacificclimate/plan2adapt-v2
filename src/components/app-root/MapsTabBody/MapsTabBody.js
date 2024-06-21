@@ -98,16 +98,17 @@ import merge from 'lodash/fp/merge';
 import isEqual from 'lodash/fp/isEqual';
 import T from '../../../temporary/external-text';
 import DataMap from '../../maps/DataMap';
-import { BCBaseMap } from 'pcic-react-leaflet-components';
+import { BCBaseMap, StaticControl, SetView, callbackOnMapEvents } from 'pcic-react-leaflet-components';
 import NcwmsColourbar from '../../maps/NcwmsColourbar';
 import { getWmsLogscale, regionBounds, boundsToViewport } from '../../maps/map-utils';
 import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
 import { getVariableInfo, } from '../../../utils/variables-and-units';
 import Button from 'react-bootstrap/Button';
-import StaticControl from '../../maps/StaticControl';
+// import StaticControl from '../../maps/StaticControl';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
+import { bounds } from 'leaflet';
 
 
 export default class MapsTabBody extends React.PureComponent {
@@ -176,10 +177,16 @@ export default class MapsTabBody extends React.PureComponent {
     // The `onViewportChanged` callback fires several times for any given
     // viewport change (presumably because of the interaction between the two
     // maps). This filters out any unnecessary updates.
-    if (!isEqual(viewport, this.state.viewport)) {
-      this.setState({ viewport });
+    const newViewport = {
+      center: viewport.getCenter(),
+      zoom: viewport.getZoom(),
+    };
+    if (!isEqual(newViewport, this.state.viewport)) {
+      this.setState({ viewport: newViewport });
     }
-  }
+  };
+
+
   handleChangePopup = this.handleChangeSimple.bind(this, 'popup');
   handleChangeBaselineMapRef =
     this.handleChangeSimple.bind(this, 'baselineMapRef');
@@ -187,13 +194,13 @@ export default class MapsTabBody extends React.PureComponent {
     this.handleChangeSimple.bind(this, 'projectedMapRef');
 
   // These items handle redrawing the map when the size changes.
-  // The redraw depends on using a Leaflet "private" method `Map._onResize`,
-  // which may be fragile, but Map doesn't expose a public `redraw` method.
+
   redrawMap = mapRef => {
     if (mapRef) {
-      mapRef.leafletElement._onResize();
+      mapRef.leafletElement.invalidateSize();
     }
   };
+
   handleResize = contentRect => {
     if (contentRect.bounds.width !== 0) {
       this.redrawMap(this.state.baselineMapRef);
@@ -209,6 +216,8 @@ export default class MapsTabBody extends React.PureComponent {
       ),
     });
   };
+
+
 
   render() {
     if (!allDefined(
@@ -265,6 +274,7 @@ export default class MapsTabBody extends React.PureComponent {
         </Button>
       </StaticControl>
     );
+    const ViewportUpdater = callbackOnMapEvents(['moveend', 'zoomend'], this.handleChangeViewport);
 
     return (
       <Measure bounds onResize={this.handleResize}>
@@ -306,6 +316,8 @@ export default class MapsTabBody extends React.PureComponent {
                   maxZoom={mapsConfig.maxZoom}
                   maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
+                  zoom={this.state.viewport.zoom}
+                  center={this.state.viewport.center}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
                   onPopupChange={this.handleChangePopup}
@@ -318,6 +330,8 @@ export default class MapsTabBody extends React.PureComponent {
                   unitsSpecs={unitsSpecs}
                 >
                   {zoomButton}
+                  <SetView view={this.state.viewport} />
+                  <ViewportUpdater />
                 </DataMap>
               </Col>
               <Col lg={6}>
@@ -332,6 +346,8 @@ export default class MapsTabBody extends React.PureComponent {
                   maxZoom={mapsConfig.maxZoom}
                   maxBounds={mapsConfig.maxBounds}
                   viewport={this.state.viewport}
+                  zoom={this.state.viewport.zoom}
+                  center={this.state.viewport.center}
                   onViewportChanged={this.handleChangeViewport}
                   popup={this.state.popup}
                   onPopupChange={this.handleChangePopup}
@@ -344,6 +360,8 @@ export default class MapsTabBody extends React.PureComponent {
                   unitsSpecs={unitsSpecs}
                 >
                   {zoomButton}
+                  <SetView view={this.state.viewport} />
+                  <ViewportUpdater />
                 </DataMap>
               </Col>
             </Row>
