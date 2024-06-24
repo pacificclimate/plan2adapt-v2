@@ -109,7 +109,14 @@ import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
 import { bounds } from 'leaflet';
+import { useMap } from 'react-leaflet';
 
+// Component to provide map instances using the useMap hook
+const MapInstanceProvider = ({ setMapInstance }) => {
+  const map = useMap();
+  setMapInstance(map);
+  return null;
+};
 
 export default class MapsTabBody extends React.PureComponent {
   static contextType = T.contextType;
@@ -131,10 +138,31 @@ export default class MapsTabBody extends React.PureComponent {
       isOpen: false,
     },
     resizeCount: 0,
+    baselineMapInstance: null,
     baselineMapRef: undefined,
+    projectedMapInstance: null,
     projectedMapRef: undefined,
   };
 
+  setBaselineMapInstance = (mapInstance) => {
+    if (!this.state.baselineMapInstance) {
+      this.setState({ baselineMapInstance: mapInstance }, () => {
+        if (this.state.bounds) {
+          this.updateViewportFromBounds(this.state.bounds);
+        }
+      });
+    }
+  };
+
+  setProjectedMapInstance = (mapInstance) => {
+    if (!this.state.projectedMapInstance) {
+      this.setState({ projectedMapInstance: mapInstance }, () => {
+        if (this.state.bounds) {
+          this.updateViewportFromBounds(this.state.bounds);
+        }
+      });
+    }
+  };
   static getDerivedStateFromProps(props, state) {
     // Any time the current region changes, reset the bounds to the
     // bounding box of the region. It would be better to set `state.viewport`
@@ -158,13 +186,16 @@ export default class MapsTabBody extends React.PureComponent {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.updateViewportFromBounds(this.state.bounds);
+    if (prevProps.regionOpt !== this.props.regionOpt && this.state.baselineMapInstance) {
+      this.zoomToRegion(); // Zoom to the new region when selected
+    }
   }
 
   updateViewportFromBounds = (bounds) => {
-    if (bounds && this.state.baselineMapRef) {
+    if (bounds && this.state.baselineMapInstance) {
       this.setState({
         viewport: boundsToViewport(
-          this.state.baselineMapRef.leafletElement,
+          this.state.baselineMapInstance,
           bounds,
         ),
         bounds: undefined,
@@ -211,8 +242,8 @@ export default class MapsTabBody extends React.PureComponent {
   zoomToRegion = () => {
     this.setState({
       viewport: boundsToViewport(
-        this.state.baselineMapRef.leafletElement,
-        regionBounds(this.props.regionOpt.value),
+        this.state.baselineMapInstance,
+        regionBounds(this.props.regionOpt.value)
       ),
     });
   };
@@ -329,6 +360,7 @@ export default class MapsTabBody extends React.PureComponent {
                   variableConfig={variableConfig}
                   unitsSpecs={unitsSpecs}
                 >
+                  <MapInstanceProvider setMapInstance={this.setBaselineMapInstance} />
                   {zoomButton}
                   <SetView view={this.state.viewport} />
                   <ViewportUpdater />
@@ -359,6 +391,7 @@ export default class MapsTabBody extends React.PureComponent {
                   variableConfig={variableConfig}
                   unitsSpecs={unitsSpecs}
                 >
+                  <MapInstanceProvider setMapInstance={this.setProjectedMapInstance} />
                   {zoomButton}
                   <SetView view={this.state.viewport} />
                   <ViewportUpdater />
