@@ -301,7 +301,8 @@ export default class App extends Component {
                       title={<T as='string' path={`tabs.${key}.label`} />}
                       disabled={this.getConfig(`tabs.${key}.disabled`)}
                       className='pt-2'
-                      mountOnEnter
+                      mountOnEnter={true}
+                      unmountOnExit={true}
                     >
                       <ErrorBoundary>
                         <TabBody {...tabs[key].props} />
