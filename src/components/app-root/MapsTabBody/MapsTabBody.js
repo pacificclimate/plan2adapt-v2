@@ -108,7 +108,6 @@ import Button from 'react-bootstrap/Button';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
 import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
-import { bounds } from 'leaflet';
 import { useMap } from 'react-leaflet';
 
 // Component to provide map instances using the useMap hook
@@ -346,7 +345,6 @@ export default class MapsTabBody extends React.PureComponent {
                   minZoom={mapsConfig.minZoom}
                   maxZoom={mapsConfig.maxZoom}
                   maxBounds={mapsConfig.maxBounds}
-                  viewport={this.state.viewport}
                   zoom={this.state.viewport.zoom}
                   center={this.state.viewport.center}
                   onViewportChanged={this.handleChangeViewport}
@@ -377,7 +375,6 @@ export default class MapsTabBody extends React.PureComponent {
                   minZoom={mapsConfig.minZoom}
                   maxZoom={mapsConfig.maxZoom}
                   maxBounds={mapsConfig.maxBounds}
-                  viewport={this.state.viewport}
                   zoom={this.state.viewport.zoom}
                   center={this.state.viewport.center}
                   onViewportChanged={this.handleChangeViewport}
