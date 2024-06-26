@@ -20,7 +20,6 @@ const StaticControl = ({ position, style, children }) => {
 
     return () => {
       control.remove();
-      root.unmount();
     };
   }, [map, position, style, children]);
 
