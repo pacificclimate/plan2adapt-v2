@@ -37,7 +37,7 @@
     "xml-js": "^1.6.9"
   },
   "devDependencies": {
-    "jest-each": "^24.7.1",
+    "jest-each": "^28.1.1",
     "prettier": "^1.16.4",
     "react-test-renderer": "^16.8.6"
   },
@@ -53,6 +53,11 @@
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!(url-join|react-leaflet|@react-leaflet/core))"
+    ]
   },
   "browserslist": [
     ">0.2%",
