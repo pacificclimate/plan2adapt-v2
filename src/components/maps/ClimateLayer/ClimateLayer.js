@@ -78,7 +78,7 @@ export default class ClimateLayer extends React.Component {
         logscale={getWmsLogscale(variableConfig, variableId)}
         noWrap={true}
         numcolorbands={wmsNumcolorbands}
-        opacity={0.7}
+        opacity={0.0}
         // srs={"EPSG:3005"}
         transparent={true}
         version={'1.1.1'}
