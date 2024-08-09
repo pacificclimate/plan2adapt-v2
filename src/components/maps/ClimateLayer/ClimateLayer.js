@@ -48,7 +48,7 @@ export default class ClimateLayer extends React.Component {
       this.props
     )) {
       console.log('### ClimateLayer: unsettled props', this.props)
-      return <Loader/>;
+      return <Loader />;
     }
     const {
       fileMetadata, variableSpec, season, variableConfig, unitsSpecs,
