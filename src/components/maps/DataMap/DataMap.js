@@ -10,7 +10,7 @@ import filter from 'lodash/fp/filter';
 import mapValues from 'lodash/fp/mapValues';
 import cond from 'lodash/fp/cond';
 
-import { BCBaseMap } from 'pcic-react-leaflet-components';
+import { BCVectorBaseMap } from 'pcic-react-leaflet-components';
 import ClimateLayer from '../ClimateLayer';
 import LayerValuePopup from '../LayerValuePopup';
 import SimpleGeoJSON from '../SimpleGeoJSON';
@@ -134,7 +134,7 @@ class DataMapDisplay extends React.Component {
     } = this.props;
 
     return (
-      <BCBaseMap
+      <BCVectorBaseMap
         {...baseMapProps}
       // FIXME: Popups are disabled because the CE ncWMS does not allow
       //  GetFeatureInfo requests, which are required to fill the popup.
@@ -153,7 +153,7 @@ class DataMapDisplay extends React.Component {
         }
         <SimpleGeoJSON data={region} fill={false} color={'#212529'} weight={3.2} />
         {children}
-      </BCBaseMap>
+      </BCVectorBaseMap>
     );
   }
 }

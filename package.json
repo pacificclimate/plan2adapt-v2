@@ -16,7 +16,7 @@
     "path-browserify": "^1.0.1",
     "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
     "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
-    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#3.0.1",
+    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#add-BCVectorBaseMap",
     "process": "^0.11.10",
     "proj4": "^2.7.5",
     "proj4leaflet": "^1.0.2",
