@@ -9,7 +9,7 @@ import { loadRulesResults, shouldLoadRulesResults } from '../common';
 import { allDefined } from '../../../../utils/lodash-fp-extras';
 import Loader from 'react-loader';
 import ErrorBoundary from '../../../misc/ErrorBoundary';
-
+import ImpactsHeatmap from '../../../data-displays/Heatmap/ImpactsHeatmap';
 
 class ImpactsTabs extends React.Component {
   // This is a pure (state-free), controlled component that renders the entire
@@ -81,6 +81,15 @@ class ImpactsTabs extends React.Component {
         >
           <ErrorBoundary>
             <Rules{...this.props}/>
+          </ErrorBoundary>
+        </Tab>
+        <Tab
+          eventKey={'impacts-heatmap'}
+          title={'Impacts Heatmap'}
+          className='pt-2'
+        >
+          <ErrorBoundary>
+            <ImpactsHeatmap rulebase={this.props.rulebase} ruleValues={this.props.ruleValues} />
           </ErrorBoundary>
         </Tab>
       </Tabs>

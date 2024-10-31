@@ -1,0 +1,45 @@
+.heatmap-container {
+    padding: 1em;
+}
+
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.sector-cell {
+    font-weight: bold;
+    color: #000;
+}
+
+.sector-cell.high {
+    background-color: #d73027;
+}
+
+.sector-cell.moderate {
+    background-color: #fc8d59;
+}
+
+.sector-cell.low {
+    background-color: #fee08b;
+}
+
+.sector-cell.very-low {
+    background-color: #91bfdb;
+}
+
+.sector-cell.zero-percent {
+    background-color: #f0f0f0;
+    color: #aaa;
+}
