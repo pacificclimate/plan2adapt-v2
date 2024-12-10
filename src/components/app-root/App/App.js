@@ -25,7 +25,6 @@ import VariableSelector from '../../selectors/VariableSelector';
 import ErrorBoundary from '../../misc/ErrorBoundary';
 import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
-import HeatmapTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
 import ReferencesTabBody from '../ReferencesTabBody';
@@ -209,13 +208,6 @@ export default class App extends Component {
           regionOpt: this.state.regionOpt,
           futureTimePeriodOpt: this.state.futureTimePeriodOpt,
           baselineTimePeriod: baselineTimePeriod,
-        },
-      },
-      heatmap: {  // New heatmap tab
-        Component: HeatmapTabBody,
-        props: {
-          rulebase: this.props.rulebase, // Pass the rulebase data
-          ruleValues: this.props.ruleValues, // Pass the rule values
         },
       },
       maps: {

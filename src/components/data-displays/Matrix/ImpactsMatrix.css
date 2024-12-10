@@ -1,4 +1,4 @@
-.heatmap-container {
+.matrix-container {
     padding: 1em;
 }
 
@@ -41,5 +41,18 @@ td {
 
 .sector-cell.zero-percent {
     background-color: #f0f0f0;
+    color: #888;
+}
+
+.sector-cell.no-rules {
+    background-color: #f0f0f0;
     color: #aaa;
+}
+
+
+.sector-label {
+    text-align: center;
+    width: 100px;
+    transform: rotate(-45deg);
+    margin-top: 20px;
 }

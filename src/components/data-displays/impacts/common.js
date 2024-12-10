@@ -3,7 +3,16 @@ import isEqual from 'lodash/fp/isEqual';
 import { allDefined } from '../../../utils/lodash-fp-extras';
 
 export const loadRulesResults = props => {
-  return fetchRulesResults(props.region, props.futureTimePeriod);
+  const { region, futureTimePeriod } = props;
+
+  return Promise.all([
+    fetchRulesResults(region, futureTimePeriod, 'REACT_APP_RULES_ENGINE_URL'),
+    fetchRulesResults(region, futureTimePeriod, 'REACT_APP_CELL_RULES_ENGINE_URL')
+  ]).then(([ruleValues, cellRuleValues]) => {
+    console.log('Fetched ruleValues:', ruleValues);
+    console.log('Fetched cellRuleValues:', cellRuleValues);
+    return { ruleValues, cellRuleValues };
+  });
 };
 
 
