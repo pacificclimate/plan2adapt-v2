@@ -5,10 +5,10 @@ import './ImpactsMatrix.css';
 const getCategorySectorMatrixData = (rulebase, cellRuleValues) => {
   const categorySectorData = {};
 
-  rulebase.forEach((rule) => {
-    const { id, category, sector, effects } = rule;
-    const value = cellRuleValues[id] || 0;
+  rulebase.forEach(({ id, category, sector, effects }) => {
     if (effects === "Internal rule") return;
+
+    const value = cellRuleValues[id] || 0;
 
     if (!categorySectorData[category]) {
       categorySectorData[category] = {};
@@ -17,28 +17,24 @@ const getCategorySectorMatrixData = (rulebase, cellRuleValues) => {
       categorySectorData[category][sector] = { rules: [] };
     }
 
-    // Push each rule's id, percentage and effects
     categorySectorData[category][sector].rules.push({ id, value, effects });
   });
 
+
   const matrixData = {};
-  Object.keys(categorySectorData).forEach((category) => {
+  Object.entries(categorySectorData).forEach(([category, sectorData]) => {
     matrixData[category] = {};
-    Object.keys(categorySectorData[category]).forEach((sector) => {
-      const { rules } = categorySectorData[category][sector];
+
+    Object.entries(sectorData).forEach(([sector, { rules }]) => {
       if (rules.length === 0) {
-        matrixData[category][sector] = { maxValue: 0, rules: [] };
+        matrixData[category][sector] = { maxValue: 0, rules: [], uniqueValues: [] };
         return;
       }
 
-      // Find the rule with the max value
-      const maxRule = rules.reduce((maxR, r) => (r.value > maxR.value ? r : maxR), { value: 0, effects: null });
+      const uniqueValues = [...new Set(rules.map(r => Number(r.value.toFixed(2))))];
+      const maxRule = rules.reduce((maxR, r) => (r.value > maxR.value ? r : maxR), { value: 0 });
 
-      // Store all rules plus the identified max value
-      matrixData[category][sector] = {
-        maxValue: maxRule.value,
-        rules,
-      };
+      matrixData[category][sector] = { maxValue: maxRule.value, rules, uniqueValues };
     });
   });
 
@@ -51,14 +47,12 @@ const ImpactsMatrix = ({ rulebase, cellRuleValues }) => {
     [rulebase, cellRuleValues]
   );
 
-  const sectors = Object.keys(matrixData);
+  const sectors = Object.keys(matrixData).sort();
   const categories = Array.from(
-    new Set(
-      Object.values(matrixData).flatMap(sectorData => Object.keys(sectorData))
-    )
+    new Set(Object.values(matrixData).flatMap(sectorData => Object.keys(sectorData)))
   ).sort();
 
-  const [hoveredCell, setHoveredCell] = React.useState(null);
+  const [selectedCell, setSelectedCell] = React.useState(null);
 
   return (
     <div className="matrix-container">
@@ -76,39 +70,38 @@ const ImpactsMatrix = ({ rulebase, cellRuleValues }) => {
             </tr>
           </thead>
           <tbody>
-            {sectors.map((sector) => (
+            {sectors.map(sector => (
               <tr key={sector}>
-                <td className="p-2 border-r-2 border-gray-300 font-bold text-right">
-                  {sector}
-                </td>
-                {categories.map((category) => {
-                  const data = matrixData[sector]?.[category] || { maxValue: 0, rules: [] };
-                  const { maxValue, rules } = data;
+                <td className="p-2 border-r-2 border-gray-300 font-bold text-right">{sector}</td>
+                {categories.map(category => {
+                  const { rules = [], uniqueValues = [] } = matrixData[sector]?.[category] || {};
 
-                  // Determine cell color class
-                  const proportion = maxValue;
-                  const displayProportion = Math.round(proportion);
-                  const colorClass =
-                    rules.length === 0
-                      ? "no-rules"
-                      : displayProportion < 1
-                        ? "zero-percent"
-                        : displayProportion >= 75
-                          ? "high"
-                          : displayProportion >= 50
-                            ? "moderate"
-                            : displayProportion >= 25
-                              ? "low"
-                              : "very-low";
+                  const isSelected =
+                    selectedCell &&
+                    selectedCell.sector === sector &&
+                    selectedCell.category === category;
 
                   return (
                     <td
                       key={`${sector}-${category}`}
-                      className={`sector-cell ${colorClass}`}
-                      onMouseEnter={() => setHoveredCell({ sector, category, rules })}
-                      onMouseLeave={() => setHoveredCell(null)}
+                      className={`sector-cell ${isSelected ? "selected-cell" : ""}`}
+                      onClick={() => setSelectedCell({ sector, category, rules })}
                     >
-                      {rules.length === 0 ? "—" : `${Math.round(proportion)}%`}
+                      {rules.length === 0 ? (
+                        "—"
+                      ) : (
+                        <div className="partition-container">
+                          {uniqueValues.map((value, index) => (
+                            <div
+                              key={`${value}-${index}`}
+                              className={`partition ${getColorClass(value)}`}
+                              style={{ flex: 1 }}
+                            >
+                              {value.toFixed(1)}%
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </td>
                   );
                 })}
@@ -117,10 +110,11 @@ const ImpactsMatrix = ({ rulebase, cellRuleValues }) => {
           </tbody>
         </table>
       </div>
-
-      {hoveredCell && (
-        <div className="mt-4">
-          <h4>Rules for {hoveredCell.sector} - {hoveredCell.category}:</h4>
+      {selectedCell && (
+        <div className="details-container mt-4">
+          <h4>
+            Details for {selectedCell.sector} - {selectedCell.category}:
+          </h4>
           <table className="w-full border-collapse">
             <thead>
               <tr>
@@ -130,7 +124,7 @@ const ImpactsMatrix = ({ rulebase, cellRuleValues }) => {
               </tr>
             </thead>
             <tbody>
-              {hoveredCell.rules.map((rule, index) => (
+              {selectedCell.rules.map(rule => (
                 <tr key={rule.id}>
                   <td
                     className={`p-2 border-b border-gray-300 sector-cell ${getColorClass(rule.value)}`}
@@ -149,18 +143,12 @@ const ImpactsMatrix = ({ rulebase, cellRuleValues }) => {
   );
 };
 
-const getColorClass = (value) => {
-  if (value < 1) {
-    return 'zero-percent';
-  } else if (value >= 75) {
-    return 'high';
-  } else if (value >= 50) {
-    return 'moderate';
-  } else if (value >= 25) {
-    return 'low';
-  } else {
-    return 'very-low';
-  }
+const getColorClass = value => {
+  if (value < 1) return 'zero-percent';
+  if (value >= 75) return 'high';
+  if (value >= 50) return 'moderate';
+  if (value >= 25) return 'low';
+  return 'very-low';
 };
 
 ImpactsMatrix.propTypes = {
