@@ -82,6 +82,6 @@ td {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    padding: 2px;
     color: #000;
 }
