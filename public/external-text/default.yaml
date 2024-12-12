@@ -10,7 +10,7 @@ selectors:
   region:
     prefix: within the region of
     default: bc
-    forTabs: ['summary', 'impacts', 'maps', 'graphs']
+    forTabs: ['summary', 'impacts', 'maps', 'graphs', 'regional_assessments']
   futureTimePeriod:
     prefix: during the
     default: 2050
@@ -32,6 +32,7 @@ tabs:
     - maps
     - graphs
     # - notes
+    - regional_assessments
     - references
     - about
 
@@ -612,7 +613,12 @@ tabs:
   #     2. ${$$.components.notes.lowBaseline}
   #     3. ${$$.components.notes.gcmPeriods}
   #     4. ${$$.components.notes.mapTabNote}
-
+  
+  regional_assessments:
+    label: Regional Assessments
+    prologue: |
+      Use this page to download regional assessments for specific regions in British Columbia. 
+      Using the most up-to-date climate model projections, these assessments examine how climate change may unfold across local regions in the coming decades.
 
 
 
