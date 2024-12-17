@@ -27,6 +27,7 @@ import SummaryTabBody from '../SummaryTabBody';
 import ImpactsTabBody from '../ImpactsTabBody';
 import MapsTabBody from '../MapsTabBody';
 import GraphsTabBody from '../GraphsTabBody';
+import RegionalAssessmentsTabBody from '../RegionalAssessmentsTabBody';
 import ReferencesTabBody from '../ReferencesTabBody';
 import AboutTabBody from '../AboutTabBody';
 import { getVariableLabel } from '../../../utils/variables-and-units';
@@ -229,6 +230,12 @@ export default class App extends Component {
           baselineTimePeriod: baselineTimePeriod,
           seasonOpt: this.state.seasonOpt,
           variableOpt: this.state.variableOpt,
+        },
+      },
+      regional_assessments: {
+        Component: RegionalAssessmentsTabBody,
+        props: {
+          regionOpt: this.state.regionOpt,
         },
       },
       references: {
