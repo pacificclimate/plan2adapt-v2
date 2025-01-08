@@ -1,18 +1,16 @@
-import axios from 'axios';
-import urljoin from 'url-join';
-import includes from 'lodash/fp/includes';
-import flow from 'lodash/fp/flow';
-import filter from 'lodash/fp/filter';
-import map from 'lodash/fp/map';
-import flatten from 'lodash/fp/flatten';
-import tap from 'lodash/fp/tap';
-import groupBy from 'lodash/fp/groupBy';
-import head from 'lodash/fp/head';
+import axios from "axios";
+import urljoin from "url-join";
+import includes from "lodash/fp/includes";
+import flow from "lodash/fp/flow";
+import filter from "lodash/fp/filter";
+import map from "lodash/fp/map";
+import flatten from "lodash/fp/flatten";
+import tap from "lodash/fp/tap";
+import groupBy from "lodash/fp/groupBy";
+import head from "lodash/fp/head";
 export const mapWithKey = map.convert({ cap: false });
 
-
-const getYear = timestamp => timestamp.substr(0, 4);
-
+const getYear = (timestamp) => timestamp.substr(0, 4);
 
 export const standardizeSummaryMetadata =
   // Unroll the dict returned by backend `/multimeta` endpoint to an array.
@@ -29,64 +27,65 @@ export const standardizeSummaryMetadata =
         variable_name,
         start_date: getYear(start_date),
         end_date: getYear(end_date),
-        ...rest
-      }))(variables)
+        ...rest,
+      }))(variables),
     ),
 
     // And flatten the nested arrays.
     flatten,
   );
 
-
 export function fetchSummaryMetadataForModel(model) {
   // Fetch the summary metadata provided by the backend `/multimeta` endpoint.
 
-  console.log('fetchSummaryMetadataForModel', model)
+  console.log("fetchSummaryMetadataForModel", model);
   const emissionsScenarios =
-    process.env.REACT_APP_EMISSIONS_SCENARIOS.split(';');
-  console.log('### emissionsScenarios', emissionsScenarios)
-  return axios.get(
-    urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'multimeta'),
-    {
+    window.env.REACT_APP_EMISSIONS_SCENARIOS.split(";");
+  console.log("### emissionsScenarios", emissionsScenarios);
+  return axios
+    .get(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "multimeta"), {
       params: {
-        ensemble_name: process.env.REACT_APP_ENSEMBLE_NAME,
+        ensemble_name: window.env.REACT_APP_ENSEMBLE_NAME,
         model: model,
         extras: "filepath",
       },
       // transformResponse: [JSON.parse, standardizeSummaryMetadata],
-    },
-  )
-  .then(response => response.data)
-  .then(standardizeSummaryMetadata)
-  .then(tap(metadata => {
-    console.log('### Metadata loaded for', model)
-    console.log('### Models', groupBy('model_id')(metadata))
-    console.log('### Scenario', groupBy('experiment')(metadata))
-    console.log('### Variables', groupBy('variable_id')(metadata))
-    console.log('### Run', groupBy('ensemble_member')(metadata))
-    console.log('### Period', groupBy(m => `${m.start_date}-${m.end_date}`)(metadata))
-    console.log('### Timescale', groupBy('timescale')(metadata))
-  }))
-  .then(filter(
-    metadatum =>  includes(metadatum.experiment, emissionsScenarios)
-    // metadatum => metadatum.experiment === process.env.REACT_APP_EMISSIONS_SCENARIO
-  ))
+    })
+    .then((response) => response.data)
+    .then(standardizeSummaryMetadata)
+    .then(
+      tap((metadata) => {
+        console.log("### Metadata loaded for", model);
+        console.log("### Models", groupBy("model_id")(metadata));
+        console.log("### Scenario", groupBy("experiment")(metadata));
+        console.log("### Variables", groupBy("variable_id")(metadata));
+        console.log("### Run", groupBy("ensemble_member")(metadata));
+        console.log(
+          "### Period",
+          groupBy((m) => `${m.start_date}-${m.end_date}`)(metadata),
+        );
+        console.log("### Timescale", groupBy("timescale")(metadata));
+      }),
+    )
+    .then(
+      filter(
+        (metadatum) => includes(metadatum.experiment, emissionsScenarios),
+        // metadatum => metadatum.experiment === window.env.REACT_APP_EMISSIONS_SCENARIO
+      ),
+    );
 }
 
-
 export function fetchSummaryMetadata() {
-  const models =
-    process.env.REACT_APP_MODEL_ID.split(';');
-  console.log('### fetchSummaryMetadata: models', models)
+  const models = window.env.REACT_APP_MODEL_ID.split(";");
+  console.log("### fetchSummaryMetadata: models", models);
   return flow(
     map(fetchSummaryMetadataForModel),
     // tap(x => console.log('### fetchSummaryMetadata: promises', x)),
     // Why can't I just say `Promise.all` here?? Goddamn it.
-    promises => Promise.all(promises),
-    promise => promise.then(flatten),
+    (promises) => Promise.all(promises),
+    (promise) => promise.then(flatten),
   )(models);
 }
-
 
 export const normalizeFileMetadata =
   // Transform the unnecessarily nested dict returned by the backend
@@ -106,9 +105,8 @@ export function fetchFileMetadata(unique_id) {
   // Fetch the detailed metadata for a single file identified by `unique_id`
   // from the backend `/metadata` endpoint.
 
-  return axios.get(
-    urljoin(process.env.REACT_APP_CE_BACKEND_URL, 'metadata'),
-    {
+  return axios
+    .get(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "metadata"), {
       params: {
         // Note misleading naming: API param `model_id` should actually be
         // named `unique_id`.
@@ -116,7 +114,6 @@ export function fetchFileMetadata(unique_id) {
         extras: "filepath",
       },
       transformResponse: [JSON.parse, normalizeFileMetadata],
-    },
-  )
-  .then(response => response.data)
+    })
+    .then((response) => response.data);
 }

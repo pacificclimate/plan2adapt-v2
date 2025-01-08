@@ -1,33 +1,18 @@
-# This Dockerfile adapted from https://mherman.org/blog/dockerizing-a-react-app/
+FROM node:22-bookworm-slim
 
-# This Dockerfile can (and should) be used to pass through automatically generated
-# version information to the build which is triggered when the image is run.
-# To do this, issue the following build command:
-#
-# docker build --build-arg REACT_APP_CE_CURRENT_VERSION="$(./generate-commitish.sh)" -t <tag> .
+RUN apt-get -y update &&  \ 
+    apt-get install --no-install-recommends  \
+    -y curl rpl && \
+    rm -rf /var/lib/apt/lists/*
 
-FROM node:22-alpine
+RUN npm install -g serve
 
+COPY --chown=node build /app
+COPY --chown=node docker/entrypoint.sh /app/docker/entrypoint.sh
 WORKDIR /app
-RUN chown node /app
-COPY --chown=node:node . /app
-
-ENV PATH /app/node_modules/.bin:$PATH
-
-RUN apk add --no-cache git bash && \
-    npm install --quiet && \
-    npm install -g serve@13.0.0
-
-RUN mkdir -p /app/node_modules/.cache && \
-    chown -R node:node /app/node_modules/.cache
-
-EXPOSE 8080
-
-# Move the Docker build arg REACT_APP_VERSION into an
-# environment variable of the same name, for consumption
-# by the npm build process in ./entrypoint.sh
-ARG REACT_APP_VERSION
-ENV REACT_APP_VERSION $REACT_APP_VERSION
 
 USER node
-CMD ["/bin/bash", "docker/entrypoint.sh"]
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD [ "curl", "-f", "http://localhost:8080/healthcheck.js" ]
+
+ENTRYPOINT ["docker/entrypoint.sh"]
