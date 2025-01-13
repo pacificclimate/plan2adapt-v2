@@ -14,13 +14,12 @@
 // The fetched data is injected into the base component through a prop passed
 // to it named by `dataProp`.
 
-import React from 'react';
-import Loader from 'react-loader';
-import merge from 'lodash/fp/merge';
+import React from "react";
+import Loader from "../components/misc/Loader";
+import merge from "lodash/fp/merge";
 
-
-const getDisplayName = WrappedComponent =>
-  WrappedComponent.displayName || WrappedComponent.name || 'Component';
+const getDisplayName = (WrappedComponent) =>
+  WrappedComponent.displayName || WrappedComponent.name || "Component";
 
 const defaultHandlers = {
   loading: Loader,
@@ -51,7 +50,7 @@ export default function withAsyncData(
   //  loading: props[dataPropName] === null && !props[errorPropName]
   //  error: props[errorPropName] !== null
 ) {
-  return function(BaseComponent) {
+  return function (BaseComponent) {
     class WithAsyncData extends React.Component {
       state = {
         prevProps: undefined,
@@ -65,7 +64,7 @@ export default function withAsyncData(
         if (shouldLoadData(state.prevProps, props)) {
           return {
             externalData: null,
-            prevProps: props,  // Robust only if props are immutable
+            prevProps: props, // Robust only if props are immutable
           };
         }
 
@@ -95,14 +94,13 @@ export default function withAsyncData(
       }
 
       _loadAsyncData(...args) {
-        console.log(`### ${WithAsyncData.displayName}._loadAsyncData`, ...args)
-        this._asyncRequest =
-          loadAsyncData(...args).then(
-            externalData => {
-              this.setState({ externalData, error: null });
-            }
-          ).catch(error => {
-            this.setState({ externalData: null, error })
+        console.log(`### ${WithAsyncData.displayName}._loadAsyncData`, ...args);
+        this._asyncRequest = loadAsyncData(...args)
+          .then((externalData) => {
+            this.setState({ externalData, error: null });
+          })
+          .catch((error) => {
+            this.setState({ externalData: null, error });
           })
           .finally(() => {
             this._asyncRequest = null;
@@ -113,10 +111,10 @@ export default function withAsyncData(
         const { error, externalData } = this.state;
         const handlers = merge(defaultHandlers, handlerOptions);
         if (error) {
-          return <handlers.error {...this.props} error={error}/>;
+          return <handlers.error {...this.props} error={error} />;
         }
         if (externalData === null) {
-          return <handlers.loading {...this.props}/>;
+          return <handlers.loading {...this.props} loading={true} />;
         }
         return (
           <BaseComponent
@@ -126,8 +124,7 @@ export default function withAsyncData(
         );
       }
     }
-    WithAsyncData.displayName =
-      `WithAsyncData(${getDisplayName(BaseComponent)})`;
+    WithAsyncData.displayName = `WithAsyncData(${getDisplayName(BaseComponent)})`;
     return WithAsyncData;
-  }
+  };
 }

@@ -20,10 +20,8 @@ import {
   getVariableDisplay,
   getVariableDisplayUnits,
 } from "../../../utils/variables-and-units";
-import merge from "lodash/fp/merge";
-import { collectionToCanonicalUnitsSpecs } from "../../../utils/units";
 import { allDefined } from "../../../utils/lodash-fp-extras";
-import Loader from "react-loader";
+import Loader from "../../misc/Loader";
 
 export default class ClimateLayer extends React.Component {
   static contextType = T.contextType;
@@ -51,7 +49,7 @@ export default class ClimateLayer extends React.Component {
       )
     ) {
       console.log("### ClimateLayer: unsettled props", this.props);
-      return <Loader />;
+      return <Loader loading={true} />;
     }
     const { fileMetadata, variableSpec, season, variableConfig, unitsSpecs } =
       this.props;

@@ -4,26 +4,26 @@
 //  - Layout and formatting
 //  - Marshalling data for subsidiary components
 
-import React from 'react';
-import T from '../../temporary/external-text';
-import { allDefined } from '../../utils/lodash-fp-extras';
-import Loader from 'react-loader';
-import PropTypes from 'prop-types';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import get from 'lodash/fp/get';
-import merge from 'lodash/fp/merge';
-import ChangeOverTimeGraph from '../graphs/ChangeOverTimeGraph';
+import React from "react";
+import T from "../../temporary/external-text";
+import { allDefined } from "../../utils/lodash-fp-extras";
+import Loader from "../misc/Loader";
+import PropTypes from "prop-types";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import get from "lodash/fp/get";
+import merge from "lodash/fp/merge";
+import ChangeOverTimeGraph from "../graphs/ChangeOverTimeGraph";
 import {
   getVariableDisplay,
-  getVariableInfo
-} from '../../utils/variables-and-units';
-import { collectionToCanonicalUnitsSpecs } from '../../utils/units';
-import { getSeasonLabel } from '../../utils/seasons';
+  getVariableInfo,
+} from "../../utils/variables-and-units";
+import { collectionToCanonicalUnitsSpecs } from "../../utils/units";
+import { getSeasonLabel } from "../../utils/seasons";
 
 export default class GraphsTabBody extends React.PureComponent {
   static contextType = T.contextType;
-  getConfig = path => T.get(this.context, path, {}, 'raw');
+  getConfig = (path) => T.get(this.context, path, {}, "raw");
 
   static propTypes = {
     regionOpt: PropTypes.object,
@@ -33,17 +33,14 @@ export default class GraphsTabBody extends React.PureComponent {
   };
 
   render() {
-    if (!allDefined(
-      [
-        'regionOpt',
-        'baselineTimePeriod',
-        'variableOpt',
-        'seasonOpt',
-      ],
-      this.props
-    )) {
-      console.log('### GraphsTabBody: unsettled props', this.props)
-      return <Loader/>;
+    if (
+      !allDefined(
+        ["regionOpt", "baselineTimePeriod", "variableOpt", "seasonOpt"],
+        this.props,
+      )
+    ) {
+      console.log("### GraphsTabBody: unsettled props", this.props);
+      return <Loader loading={true} />;
     }
 
     const region = this.props.regionOpt.value;
@@ -51,30 +48,39 @@ export default class GraphsTabBody extends React.PureComponent {
     const season = this.props.seasonOpt.value;
     const variable = this.props.variableOpt.value;
 
-    const graphConfig = this.getConfig('tabs.graphs.config');
+    const graphConfig = this.getConfig("tabs.graphs.config");
     const variableConfig = merge(
-      this.getConfig('variables'),
+      this.getConfig("variables"),
       graphConfig.variables,
     );
 
-    const seasonConfig = this.getConfig('seasons');
-    const unitsSpecs = collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+    const seasonConfig = this.getConfig("seasons");
+    const unitsSpecs = collectionToCanonicalUnitsSpecs(this.getConfig("units"));
 
     const variableId = variable.representative.variable_id;
     const display = getVariableDisplay(variableConfig, variableId);
     const variableInfo = getVariableInfo(
-      unitsSpecs, variableConfig, variableId, display
+      unitsSpecs,
+      variableConfig,
+      variableId,
+      display,
     );
 
     return (
       <React.Fragment>
         <Row>
           <Col lg={12}>
-            <T path='tabs.graphs.prologue' data={{
-              region,
-              variable: variableInfo,
-              season: getSeasonLabel(seasonConfig, this.props.seasonOpt.value),
-            }}/>
+            <T
+              path="tabs.graphs.prologue"
+              data={{
+                region,
+                variable: variableInfo,
+                season: getSeasonLabel(
+                  seasonConfig,
+                  this.props.seasonOpt.value,
+                ),
+              }}
+            />
           </Col>
         </Row>
         <Row>
@@ -83,8 +89,9 @@ export default class GraphsTabBody extends React.PureComponent {
               region={region}
               baselineTimePeriod={baselineTimePeriod}
               // TODO: This may be better obtained from metadata
-              futureTimePeriods={
-                this.getConfig('tabs.graphs.config.futureTimePeriods')}
+              futureTimePeriods={this.getConfig(
+                "tabs.graphs.config.futureTimePeriods",
+              )}
               season={season}
               variable={variable}
               variableInfo={variableInfo}

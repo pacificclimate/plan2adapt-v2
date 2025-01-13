@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
-import Loader from "react-loader";
-
+import Loader from "../../misc/Loader";
 import axios from "axios";
 import { xml2js } from "xml-js";
 import isEqual from "lodash/fp/isEqual";
@@ -125,7 +124,7 @@ class DataMapDisplay extends React.Component {
       )
     ) {
       console.log("### DataMap: unsettled props", this.props);
-      return <Loader />;
+      return <Loader loading={true} />;
     }
     const {
       children,
