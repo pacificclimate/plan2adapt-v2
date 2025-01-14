@@ -15,7 +15,7 @@
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
     "path-browserify": "^1.0.1",
-    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
+    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#2024-jan-package-updates",
     "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#tile-url-as-prop",
     "process": "^0.11.10",
     "proj4": "^2.7.5",
