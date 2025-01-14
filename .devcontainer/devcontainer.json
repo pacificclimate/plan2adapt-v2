@@ -36,7 +36,7 @@
     "--network=host",
     // give a nicer name to the container
     "--name",
-    "${localEnv:USER}_plan2adapt"
+    "plan2adapt_${localEnv:USER}"
   ],
   "customizations": {
     "vscode": {
