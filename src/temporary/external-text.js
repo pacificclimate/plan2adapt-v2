@@ -86,6 +86,7 @@ export function evaluateAsTemplateLiteral(s, context = {}) {
   // backticks). The argument(s) of the returned evaluator are the context
   // values.
   const makeEvaluator = (s) =>
+    // eslint-disable-next-line no-new-func
     new Function(...Object.keys(context), "return `" + s + "`");
 
   // `reevaluate` recursively makes and invokes an evaluator for the string.
@@ -131,6 +132,7 @@ export function get(
   data = {},
   as = "string",
   whenError = "null", // ??
+  // eslint-disable-next-line no-template-curly-in-string
   placeholder = "{{${$path}}}",
   props,
 ) {
@@ -230,6 +232,7 @@ export default class ExternalText extends React.Component {
   static defaultProps = {
     as: "markdown",
     whenError: "render",
+    // eslint-disable-next-line no-template-curly-in-string
     placeholder: "{{${$path}}}",
   };
 

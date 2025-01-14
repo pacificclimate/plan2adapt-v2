@@ -7,7 +7,6 @@ import groupBy from "lodash/fp/groupBy";
 import map from "lodash/fp/map";
 import mapValues from "lodash/fp/mapValues";
 import sortBy from "lodash/fp/sortBy";
-import uniq from "lodash/fp/uniq";
 import toPairs from "lodash/fp/toPairs";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";

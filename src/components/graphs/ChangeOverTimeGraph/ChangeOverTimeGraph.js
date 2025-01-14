@@ -18,7 +18,6 @@ import {
 import {
   getConvertUnits,
   getVariableDisplay,
-  getVariableInfo,
 } from "../../../utils/variables-and-units";
 import "./ChangeOverTimeGraph.css";
 import BarChart from "../BarChart";

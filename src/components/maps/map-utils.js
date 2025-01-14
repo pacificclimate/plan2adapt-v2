@@ -25,6 +25,8 @@ export const geometryPositionDepth = (geometryType) => {
       return geometryPositionDepth("LinearRing") + 1;
     case "MultiPolygon":
       return geometryPositionDepth("Polygon") + 1;
+    default:
+      return 0;
   }
 };
 

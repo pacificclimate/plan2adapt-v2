@@ -153,6 +153,7 @@ export default class NcwmsColourbar extends React.Component {
             imageWidth > 0 && (
               <img
                 className={styles.image}
+                alt="Colour bar showing gradient of colours used to define values on the map"
                 style={{
                   height: imageWidth,
                   top: 5,

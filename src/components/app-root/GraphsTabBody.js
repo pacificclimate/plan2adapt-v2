@@ -11,7 +11,6 @@ import Loader from "../misc/Loader";
 import PropTypes from "prop-types";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import get from "lodash/fp/get";
 import merge from "lodash/fp/merge";
 import ChangeOverTimeGraph from "../graphs/ChangeOverTimeGraph";
 import {
