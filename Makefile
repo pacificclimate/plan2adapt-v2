@@ -5,7 +5,7 @@ port = 30305
 
 image:
 	npm run build
-	@SDP_TAG=$(tag) SDP_PORT=$(port) docker-compose -f docker/docker-compose.yaml build --build-arg REACT_APP_VERSION='$(shell ./generate-commitish.sh)'
+	@SDP_TAG=$(tag) SDP_PORT=$(port) docker-compose -f docker/docker-compose.yaml build
 
 up:
 	@SDP_TAG=$(tag) SDP_PORT=$(port) docker-compose -f docker/docker-compose.yaml up -d

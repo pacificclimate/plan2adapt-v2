@@ -1,5 +1,5 @@
 window.env = {
-  PUBLIC_URL: "http://localhost:30305",
+  PUBLIC_URL: "http://localhost:30667",
   REACT_APP_CE_BACKEND_URL:
     "https://beehive.pacificclimate.org/plan2adapt/pcex-api/",
   REACT_APP_BASE_MAP: "BC",
