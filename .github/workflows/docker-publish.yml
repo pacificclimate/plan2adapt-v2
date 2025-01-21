@@ -29,4 +29,3 @@ jobs:
           dockerfile: docker/Dockerfile
           repository: pcic/plan2adapt-v2-frontend
           tag_with_ref: true
-          build_args: REACT_APP_VERSION=${{ env.REACT_APP_VERSION }}
