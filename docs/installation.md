@@ -4,8 +4,8 @@
 
 Your Node.js tooling must satisfy the following version requirements:
 
-- `npm` >= 8.1.0
-- `node` >= 16
+- `npm` >= 8.1.0 (10+ Reccomended)
+- `node` >= 16 (22+ Reccomended)
 
 ## Install
 

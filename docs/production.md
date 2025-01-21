@@ -6,7 +6,7 @@ We currently deploy all apps using Docker.
 This project contains [Docker infrastructure](docker) and a
 [GitHub action](.github/workflows/docker-publish.yml) that automatically
 builds and tags a Docker image on each commit. The image name is
-`pcic/station-data-portal-frontend`.
+`pcic/plan2adaptv2`.
 
 ### Configuration, environment variables, and Docker
 
@@ -32,8 +32,8 @@ build flow to allow us to inject this configuration.
 
 ### Deployment
 
-See the contents of the [`docker`](docker) directory for an example of how
-to run the SDP Docker image. The [Makefile](Makefile) shows how to run the
+See the contents of the [`docker`](../docker/) directory for an example of how
+to run the P2A Docker image. The [Makefile](../makefile) shows how to run the
 image using `docker-compose`. You may wish to copy and modify
 `docker-compose.yaml` to construct a production deployment.
 
