@@ -27,9 +27,8 @@ with dependencies to generate a docker image.
 
 Running the created docker image can be done via `make up`. This brings up the image based on the
 specification in the [docker-compose.yaml](../../docker/docker-compose.yaml). This specification also
-overrides our local development configuration values by mounting an alternative configuration. Two examples
-are provided `config.bc.js` and `config.ynwt.js` representing our two common production versions. `bc`
-is used by default.
+overrides our local development configuration values by mounting an alternative configuration. A default
+`config.js` is provided in the docker folder.
 
 `PUBLIC_URL` is handled in two steps. During the build process we define a replacement value in `.env.production`
 which is injected into any locations where the public URL is required. When the container starts we replace
@@ -42,10 +41,10 @@ when it starts.
 
 Production docker essentially follows the same steps as above (what good would a local test be otherwise!)
 but is executed via a github workflow. The resulting image is uploaded to our
-[docker hub](https://registry.hub.docker.com/r/pcic/station-data-portal-frontend) for use where desired.
+[docker hub](https://registry.hub.docker.com/r/pcic/plan2adapt-v2-frontend) for use where desired.
 
 Specific steps are defined in the [github workflow](../../.github/workflows/docker-publish.yml) file.
 
 When running in production we need to provide environment specific config, this config will closely
-resemble the templates defined in the `config.bc.js` and `config.ynwt.js` files noted above and should be
+resemble the templates defined in the `config.js` file noted above and should be
 mounted to `/app/config.js` within the container.

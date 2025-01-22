@@ -1,6 +1,6 @@
 # Configuration
 
-Most configuration of the Station Data Portal frontend is done via a YAML
+Most configuration of the Plan2Adapt frontend is done via a js
 file, `public/config.js`. For details, see below.
 
 For technical reasons, a few configuration parameters must be supplied via
