@@ -2,14 +2,13 @@
 #
 # `SDP_TAG`: Image tag
 # `SDP_PORT`: External port to map to
-# `SDP_PUBLIC_URL`: Public URL of app
 #
 # Their values are set appropriately in the Makefile for use on a workstation.
 # For use in a production setting, either set the shell
 # variables appropriately when invoking docker-compose, or modify (a copy of)
 # this file with the desired values.
 
-version: '3.2'
+version: "3.8"
 services:
   plan2adapt-v2-frontend:
     build:
@@ -24,7 +23,4 @@ services:
         source: /storage/data/projects/comp_support/plan2adapt-v2/external-text.yaml
         target: /app/public/external-text/default.yaml
         read_only: true
-    environment:
-      - PUBLIC_URL=${SDP_PUBLIC_URL}
-    env_file:
-      - fe.env
+      - ./config.js:/app/config.js

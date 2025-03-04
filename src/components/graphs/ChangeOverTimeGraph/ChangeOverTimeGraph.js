@@ -1,29 +1,30 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import { fetchSummaryStatistics, fetchCsvStats } from '../../../data-services/summary-stats';
-import isEqual from 'lodash/fp/isEqual';
-import withAsyncData from '../../../HOCs/withAsyncData';
-import curry from 'lodash/fp/curry';
-import map from 'lodash/fp/map';
-import every from 'lodash/fp/every';
-import flow from 'lodash/fp/flow';
-import filter from 'lodash/fp/filter';
+import PropTypes from "prop-types";
+import React from "react";
+import {
+  fetchSummaryStatistics,
+  fetchCsvStats,
+} from "../../../data-services/summary-stats";
+import isEqual from "lodash/fp/isEqual";
+import withAsyncData from "../../../HOCs/withAsyncData";
+import curry from "lodash/fp/curry";
+import map from "lodash/fp/map";
+import every from "lodash/fp/every";
+import flow from "lodash/fp/flow";
+import filter from "lodash/fp/filter";
 import {
   getDisplayData,
-  seasonIndexToPeriod
-} from '../../../utils/percentile-anomaly';
+  seasonIndexToPeriod,
+} from "../../../utils/percentile-anomaly";
 import {
   getConvertUnits,
-  getVariableDisplay, getVariableInfo
-} from '../../../utils/variables-and-units';
-import './ChangeOverTimeGraph.css';
-import BarChart from '../BarChart';
-import { allDefined } from '../../../utils/lodash-fp-extras';
-import Loader from 'react-loader';
-
+  getVariableDisplay,
+} from "../../../utils/variables-and-units";
+import "./ChangeOverTimeGraph.css";
+import BarChart from "../BarChart";
+import { allDefined } from "../../../utils/lodash-fp-extras";
+import Loader from "../../misc/Loader";
 
 const percentiles = [10, 25, 50, 75, 90];
-
 
 class ChangeOverTimeGraphDisplay extends React.Component {
   // This is a pure (state-free), controlled component that renders the entire
@@ -101,31 +102,36 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   };
 
   render() {
-    ;
-    if (!allDefined(
-      [
-        'region',
-        'season',
-        'variable',
-        'variableInfo',
-        'baselineTimePeriod',
-        'futureTimePeriods[0]',
-        'statistics',
-        'mean',
-        'graphConfig',
-        'variableConfig',
-        'unitsSpecs',
-      ],
-      this.props
-    )) {
-      console.log('### COTG: unsettled props', this.props)
-      return <Loader />
+    if (
+      !allDefined(
+        [
+          "region",
+          "season",
+          "variable",
+          "variableInfo",
+          "baselineTimePeriod",
+          "futureTimePeriods[0]",
+          "statistics",
+          "mean",
+          "graphConfig",
+          "variableConfig",
+          "unitsSpecs",
+        ],
+        this.props,
+      )
+    ) {
+      console.log("### COTG: unsettled props", this.props);
+      return <Loader loading={true} />;
     }
     const {
-      baselineTimePeriod, futureTimePeriods,
-      statistics, mean,
+      baselineTimePeriod,
+      futureTimePeriods,
+      statistics,
+      mean,
       variableInfo,
-      graphConfig, variableConfig, unitsSpecs,
+      graphConfig,
+      variableConfig,
+      unitsSpecs,
     } = this.props;
 
     // The data-fetcher always returns a fulfilled promise, but with an array of
@@ -136,23 +142,23 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // case we display a detailed error indicator within the app. This is
     // probably not useful to the user. Instead perhaps we should be cagier and
     // print such detailed error info to the console instead.
-    if (!every({ status: 'fulfilled' })(statistics)) {
+    if (!every({ status: "fulfilled" })(statistics)) {
       return (
         <React.Fragment>
           <p>Could not retrieve data for the following time periods:</p>
           <ul>
-            {
-              flow(
-                filter(s => s.status !== 'fulfilled'),
-                map(s => (
-                  <li>
-                    {s.reason.parameters.futureTimePeriod.start_date}{' - '}
-                    {s.reason.parameters.futureTimePeriod.end_date}{': '}
-                    {s.reason.error.toString()}
-                  </li>)
-                )
-              )(statistics)
-            }
+            {flow(
+              filter((s) => s.status !== "fulfilled"),
+              map((s) => (
+                <li>
+                  {s.reason.parameters.futureTimePeriod.start_date}
+                  {" - "}
+                  {s.reason.parameters.futureTimePeriod.end_date}
+                  {": "}
+                  {s.reason.error.toString()}
+                </li>
+              )),
+            )(statistics)}
           </ul>
         </React.Fragment>
       );
@@ -162,15 +168,17 @@ class ChangeOverTimeGraphDisplay extends React.Component {
     // units.
     const variableId = variableInfo.id;
     const displayUnits = variableInfo.unitsSpec.id;
-    const convertUnits =
-      getConvertUnits(unitsSpecs, variableConfig, variableId);
+    const convertUnits = getConvertUnits(
+      unitsSpecs,
+      variableConfig,
+      variableId,
+    );
     const dataUnits = statistics[0].value.units;
     const convertData = convertUnits(dataUnits, displayUnits);
     const percentileValuesByTimePeriod = flow(
-      map(stat => stat.value.values),
+      map((stat) => stat.value.values),
       map(map(convertData)),
     )(statistics);
-
 
     return (
       <React.Fragment>
@@ -189,12 +197,10 @@ class ChangeOverTimeGraphDisplay extends React.Component {
   }
 }
 
-
 const convertToDisplayData = curry((graphConfig, variableId, season, data) => {
   const display = getVariableDisplay(graphConfig.variables, variableId);
   return getDisplayData(data, seasonIndexToPeriod(season), display);
 });
-
 
 const loadMeanData = ({ region, variable, season }) => {
   const variableId = variable.representative.variable_id;
@@ -203,7 +209,7 @@ const loadMeanData = ({ region, variable, season }) => {
 };
 
 const shouldLoadMeanData = (prevProps, props) =>
-  allDefined(['region', 'variable', 'season'], props) &&
+  allDefined(["region", "variable", "season"], props) &&
   !(
     prevProps &&
     isEqual(prevProps.region, props.region) &&
@@ -211,51 +217,52 @@ const shouldLoadMeanData = (prevProps, props) =>
     isEqual(prevProps.season, props.season)
   );
 
-
-const loadSummaryStatistics = (
-  { region, variable, season, futureTimePeriods, graphConfig }
-) =>
-// Return (a promise for) the statistics to be displayed in the Graphs tab.
-// These are "summary" statistics, which are stats across the ensemble of
-// models driving this app.
-{
-  const variableId = variable.representative.variable_id;
-  // Note use of Promise.allSettled, which always returns a fulfilled promise,
-  // containing an array of values indicating fulfillment or rejection of
-  // each subpromise. We convert raw fetch rejections to a more informative
-  // rejected promise.
-  return Promise.allSettled(
-    map(
-      futureTimePeriod => {
+const loadSummaryStatistics = ({
+  region,
+  variable,
+  season,
+  futureTimePeriods,
+  graphConfig,
+}) =>
+  // Return (a promise for) the statistics to be displayed in the Graphs tab.
+  // These are "summary" statistics, which are stats across the ensemble of
+  // models driving this app.
+  {
+    const variableId = variable.representative.variable_id;
+    // Note use of Promise.allSettled, which always returns a fulfilled promise,
+    // containing an array of values indicating fulfillment or rejection of
+    // each subpromise. We convert raw fetch rejections to a more informative
+    // rejected promise.
+    return Promise.allSettled(
+      map((futureTimePeriod) => {
         return fetchSummaryStatistics(
-          region, futureTimePeriod, variableId, percentiles
+          region,
+          futureTimePeriod,
+          variableId,
+          percentiles,
         )
           .then(convertToDisplayData(graphConfig, variableId, season))
-          .catch(error =>
+          .catch((error) =>
             Promise.reject({
               error,
-              parameters: { region, futureTimePeriod, variable, percentiles }
-            })
-          )
-      }
-    )(futureTimePeriods)
-  );
-}
-  ;
-
-
+              parameters: { region, futureTimePeriod, variable, percentiles },
+            }),
+          );
+      })(futureTimePeriods),
+    );
+  };
 export const shouldLoadSummaryStatistics = (prevProps, props) =>
   // ... relevant props have settled to defined values
   allDefined(
     [
-      'region',
-      'season',
-      'variable',
-      'baselineTimePeriod',
-      'futureTimePeriods[0]',
-      'graphConfig',
+      "region",
+      "season",
+      "variable",
+      "baselineTimePeriod",
+      "futureTimePeriods[0]",
+      "graphConfig",
     ],
-    props
+    props,
   ) &&
   // ... and there are either no previous props, or there is a difference
   // between previous and current relevant props
@@ -268,14 +275,17 @@ export const shouldLoadSummaryStatistics = (prevProps, props) =>
     isEqual(prevProps.futureTimePeriods, props.futureTimePeriods)
   );
 
-
 // Wrap the display component with data injection.
 const ChangeOverTimeGraph = withAsyncData(
-  loadSummaryStatistics, shouldLoadSummaryStatistics, 'statistics'
+  loadSummaryStatistics,
+  shouldLoadSummaryStatistics,
+  "statistics",
 )(
   withAsyncData(
-    loadMeanData, shouldLoadMeanData, 'mean'
-  )(ChangeOverTimeGraphDisplay)
+    loadMeanData,
+    shouldLoadMeanData,
+    "mean",
+  )(ChangeOverTimeGraphDisplay),
 );
 
 export default ChangeOverTimeGraph;

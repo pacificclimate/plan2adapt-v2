@@ -19,14 +19,14 @@
 //    colour variation runs horizontally, and the whole thing is wider than
 //    high.
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import getOr from 'lodash/fp/getOr';
-import identity from 'lodash/fp/identity';
-import map from 'lodash/fp/map';
-import mapValues from 'lodash/fp/mapValues';
-import styles from './NcwmsColourbar.module.css';
-import { makeURI } from '../../../utils/uri';
+import PropTypes from "prop-types";
+import React from "react";
+import getOr from "lodash/fp/getOr";
+import identity from "lodash/fp/identity";
+import map from "lodash/fp/map";
+import mapValues from "lodash/fp/mapValues";
+import styles from "./NcwmsColourbar.module.css";
+import { makeURI } from "../../../utils/uri";
 import {
   getWmsDataRange,
   getWmsLogscale,
@@ -35,23 +35,18 @@ import {
   getWmsTicks,
   getWmsAboveMaxColor,
   getWmsBelowMinColor,
-} from '../map-utils';
-
+} from "../map-utils";
 
 // TODO: Move to data-services.
 const getColorbarURI = (displaySpec, variableId, width, height) =>
-  makeURI(
-    process.env.REACT_APP_NCWMS_URL,
-    {
-      request: 'GetLegendGraphic',
-      colorbaronly: 'true',
-      width,
-      height,
-      palette: getWmsPalette(displaySpec, variableId),
-      numcolorbands: wmsNumcolorbands,
-    }
-  );
-
+  makeURI(window.env.REACT_APP_NCWMS_URL, {
+    request: "GetLegendGraphic",
+    colorbaronly: "true",
+    width,
+    height,
+    palette: getWmsPalette(displaySpec, variableId),
+    numcolorbands: wmsNumcolorbands,
+  });
 
 export default class NcwmsColourbar extends React.Component {
   static propTypes = {
@@ -104,7 +99,7 @@ export default class NcwmsColourbar extends React.Component {
   }
 
   updateWidth = () => {
-    const width = getOr(0, 'current.offsetWidth', this.thing);
+    const width = getOr(0, "current.offsetWidth", this.thing);
     if (width > 0 && width !== this.state.width) {
       this.setState({ width });
     }
@@ -119,10 +114,8 @@ export default class NcwmsColourbar extends React.Component {
   }
 
   render() {
-    const {
-      breadth, length,
-      heading, note, displaySpec, variableSpec,
-    } = this.props;
+    const { breadth, length, heading, note, displaySpec, variableSpec } =
+      this.props;
 
     const variableId = variableSpec.variable_id;
 
@@ -133,24 +126,21 @@ export default class NcwmsColourbar extends React.Component {
     const rangeSpan = rangeScale.max - rangeScale.min;
     const ticks = getWmsTicks(displaySpec, variableId);
 
-    const belowAboveLength = (100 - length) /2;  //%
+    const belowAboveLength = (100 - length) / 2; //%
     const width = this.state.width;
-    const imageWidth = Math.round(width * length / 100);
+    const imageWidth = Math.round((width * length) / 100);
 
     const belowMinColor = getWmsBelowMinColor(displaySpec, variableId);
     const aboveMaxColor = getWmsAboveMaxColor(displaySpec, variableId);
 
     return (
       <div className={styles.all} ref={this.thing}>
-        { heading }
-        <div
-          className={styles.allColours}
-          style={{ height: breadth + 2 }}
-        >
+        {heading}
+        <div className={styles.allColours} style={{ height: breadth + 2 }}>
           <span
             className={styles.belowabove}
             style={{
-              'background-color': belowMinColor,
+              "background-color": belowMinColor,
               height: breadth,
               width: `${belowAboveLength}%`,
             }}
@@ -160,23 +150,30 @@ export default class NcwmsColourbar extends React.Component {
             // Avoid this. It does not suffice to render null from this
             // component if this condition is violated; it has to have a chance
             // to render an actual DOM element: hence this.
-            imageWidth > 0 &&
-            <img
-              className={styles.image}
-              style={{
-                height: imageWidth,
-                top: 5,
-                'margin-top': -imageWidth,
-                'margin-left': -breadth,
-                'margin-right': `${length}%`,
-              }}
-              src={getColorbarURI(displaySpec, variableId, breadth, imageWidth)}
-            />
+            imageWidth > 0 && (
+              <img
+                className={styles.image}
+                alt="Colour bar showing gradient of colours used to define values on the map"
+                style={{
+                  height: imageWidth,
+                  top: 5,
+                  "margin-top": -imageWidth,
+                  "margin-left": -breadth,
+                  "margin-right": `${length}%`,
+                }}
+                src={getColorbarURI(
+                  displaySpec,
+                  variableId,
+                  breadth,
+                  imageWidth,
+                )}
+              />
+            )
           }
           <span
             className={styles.belowabove}
             style={{
-              'background-color': aboveMaxColor,
+              "background-color": aboveMaxColor,
               height: breadth,
               width: `${belowAboveLength}%`,
             }}
@@ -184,38 +181,29 @@ export default class NcwmsColourbar extends React.Component {
         </div>
         <div
           className={styles.belowaboveLabels}
-          style={{ width: `${belowAboveLength}%`}}
+          style={{ width: `${belowAboveLength}%` }}
         >
-          {'<'} {range.min}
+          {"<"} {range.min}
         </div>
-        <div
-          className={styles.ticks}
-          style={{ width: `${length}%` }}
-        >
+        <div className={styles.ticks} style={{ width: `${length}%` }}>
           {
             // <span>s containing tick labels are positioned relative to
             // their enclosing div; a value of `left` in % makes it very
             // easy to place them correctly.
-            map(
-              tick => {
-                const position =
-                  (scaleOperator(tick) - rangeScale.min) / rangeSpan;
-                return (
-                  <span style={{ left: `${position * 100}%` }}>
-                    {tick}
-                  </span>
-                )
-              }
-            )(ticks)
+            map((tick) => {
+              const position =
+                (scaleOperator(tick) - rangeScale.min) / rangeSpan;
+              return <span style={{ left: `${position * 100}%` }}>{tick}</span>;
+            })(ticks)
           }
         </div>
         <div
           className={styles.belowaboveLabels}
-          style={{ width: `${belowAboveLength}%`}}
+          style={{ width: `${belowAboveLength}%` }}
         >
-          {'>'} {range.max}
+          {">"} {range.max}
         </div>
-        { note }
+        {note}
       </div>
     );
   }
