@@ -36,6 +36,7 @@
     "xml-js": "^1.6.9"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "husky": "^9.1.7",
     "jest-each": "^28.1.1",
     "lint-staged": "^15.3.0",

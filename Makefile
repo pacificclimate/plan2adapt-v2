@@ -1,7 +1,7 @@
 # These variables are set to make it convenient to run the docker image locally.
 tag = $(shell git rev-parse --abbrev-ref HEAD)
 # make sure this port matches that configured in the config.js file
-port = 30305
+port = 30667
 
 image:
 	npm run build

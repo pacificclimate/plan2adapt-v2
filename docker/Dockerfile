@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim
+FROM node:22.14-bookworm-slim
 
 RUN apt-get -y update &&  \ 
     apt-get install --no-install-recommends  \
