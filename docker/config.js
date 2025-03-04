@@ -4,7 +4,7 @@ window.env = {
     "https://beehive.pacificclimate.org/plan2adapt/pcex-api/",
   REACT_APP_BASE_MAP: "BC",
   REACT_APP_BC_BASE_MAP_TILES_URL:
-    "https://beehive.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png",
+    "https://swarm.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png",
   REACT_APP_REGIONS_SERVICE_URL:
     "https://beehive.pacificclimate.org/plan2adapt/bc_regions/ows",
   REACT_APP_RULES_ENGINE_URL:
