@@ -9,55 +9,68 @@
     "buffer": "^6.0.3",
     "c3": "^0.7.20",
     "classnames": "^2.2.6",
+    "deepdash": "^4.2.12",
     "js-yaml": "^3.13.1",
-    "leaflet": "^1.4.0",
+    "leaflet": "^1.8.0",
     "lethargy": "^1.0.9",
     "lodash": "^4.17.21",
     "path-browserify": "^1.0.1",
-    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.1.0",
-    "pcic-react-external-text": "git+https://git@github.com/pacificclimate/pcic-react-external-text.git#1.0.0",
-    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#1.2.2",
+    "pcic-react-components": "git+https://git@github.com/pacificclimate/pcic-react-components.git#3.2.0",
+    "pcic-react-leaflet-components": "git+https://git@github.com/pacificclimate/pcic-react-leaflet-components.git#3.2.0",
     "process": "^0.11.10",
     "proj4": "^2.7.5",
     "proj4leaflet": "^1.0.2",
     "prop-types": "^15.6.2",
-    "react": "^16.13.1",
+    "react": "^18.2.0",
     "react-bootstrap": "^1.6.1",
-    "react-dom": "^16.13.1",
+    "react-dom": "^18.2.0",
     "react-icons": "^3.5.0",
-    "react-leaflet": "^2.8.0",
-    "react-loader": "^2.4.5",
-    "react-markdown": "^4.0.6",
-    "react-measure": "^2.3.0",
+    "react-leaflet": "^4.0.0",
+    "react-markdown": "^9.0.0",
     "react-scripts": "^5.0.1",
-    "react-select": "^2.3.0",
+    "react-spinners": "^0.15.0",
+    "rehype-raw": "^7.0.0",
     "stream-browserify": "^3.0.0",
     "url-join": "^4.0.0",
     "wkt": "^0.1.1",
     "xml-js": "^1.6.9"
   },
   "devDependencies": {
-    "jest-each": "^24.7.1",
-    "prettier": "^1.16.4",
-    "react-test-renderer": "^16.8.6"
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "husky": "^9.1.7",
+    "jest-each": "^28.1.1",
+    "lint-staged": "^15.3.0",
+    "prettier": "3.2.2",
+    "serve": "^13.0.2"
   },
   "scripts": {
     "start": "craco start",
-    "start-env": "REACT_APP_VERSION=\"$(./generate-commitish.sh)\" craco start",
-    "build": "craco build",
-    "build-serve": "craco build && serve -s build -l 3001",
+    "start-env": "REACT_APP_APP_VERSION=\"$(./generate-commitish.sh)\" craco start",
+    "build": "REACT_APP_APP_VERSION=$(bash ./generate-commitish.sh) && craco build",
+    "build-serve": "craco build && serve -s build -l 3004",
     "build-update": "cp ./public/external-text/default.yaml ./build/external-text/default.yaml",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "reinstall": "rm -rf ./node_modules && npm install"
+    "reinstall": "rm -rf ./node_modules && npm install",
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "check-format": "prettier --check ."
   },
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!(url-join|react-leaflet|@react-leaflet/core))"
+    ]
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
 }

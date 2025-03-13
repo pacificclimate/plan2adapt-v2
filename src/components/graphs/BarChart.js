@@ -1,35 +1,28 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import C3Chart from './C3Chart';
-import fromPairs from 'lodash/fp/fromPairs';
-import range from 'lodash/fp/range';
-import rangeStep from 'lodash/fp/rangeStep';
-import flattenDeep from 'lodash/fp/flattenDeep';
-import reverse from 'lodash/fp/reverse';
-import min from 'lodash/fp/min';
-import max from 'lodash/fp/max';
-import {
-  ceilMultiple,
-  floorMultiple,
-  linearInterpolator,
-  percentileDatasetName,
-} from './utils';
-import map from 'lodash/fp/map';
-import { concatAll, fromPairsMulti } from '../../utils/lodash-fp-extras';
-import flow from 'lodash/fp/flow';
-import { middleYear } from '../../utils/time-periods';
-import zipAll from 'lodash/fp/zipAll';
-import merge from 'lodash/fp/merge';
-import includes from 'lodash/fp/includes';
-import flatten from 'lodash/fp/flatten';
-import { displayFormat, baselineFormat } from '../../utils/variables-and-units';
-import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
-import styles from './ChangeOverTimeGraph/ChangeOverTimeGraph.module.css';
-
+import React from "react";
+import PropTypes from "prop-types";
+import C3Chart from "./C3Chart";
+import fromPairs from "lodash/fp/fromPairs";
+import range from "lodash/fp/range";
+import rangeStep from "lodash/fp/rangeStep";
+import flattenDeep from "lodash/fp/flattenDeep";
+import reverse from "lodash/fp/reverse";
+import min from "lodash/fp/min";
+import max from "lodash/fp/max";
+import { ceilMultiple, floorMultiple, linearInterpolator } from "./utils";
+import map from "lodash/fp/map";
+import { concatAll, fromPairsMulti } from "../../utils/lodash-fp-extras";
+import flow from "lodash/fp/flow";
+import { middleYear } from "../../utils/time-periods";
+import zipAll from "lodash/fp/zipAll";
+import merge from "lodash/fp/merge";
+import includes from "lodash/fp/includes";
+import flatten from "lodash/fp/flatten";
+import { displayFormat, baselineFormat } from "../../utils/variables-and-units";
+import { mapWithKey } from "pcic-react-components/dist/utils/fp";
+import styles from "./ChangeOverTimeGraph/ChangeOverTimeGraph.module.css";
 
 // zipAll computes the transpose of a 2D matrix.
 const transpose = zipAll;
-
 
 export default class BarChart extends React.Component {
   static propTypes = {
@@ -53,24 +46,27 @@ export default class BarChart extends React.Component {
     percentiles: PropTypes.array,
     percentileValuesByTimePeriod: PropTypes.array,
     mean: PropTypes.object,
-    variableConfig: PropTypes.object
+    variableConfig: PropTypes.object,
   };
 
   render() {
     const {
-      baselineTimePeriod, futureTimePeriods,
-      graphConfig, variableInfo,
-      percentiles, percentileValuesByTimePeriod,
-      mean, variableConfig,
+      baselineTimePeriod,
+      futureTimePeriods,
+      graphConfig,
+      variableInfo,
+      percentiles,
+      percentileValuesByTimePeriod,
+      mean,
+      variableConfig,
     } = this.props;
 
     const percentileIndices = range(0, percentiles.length);
 
-    const basePercentileValueNames =
-      map(p => `${p}th`)(percentiles);
+    const basePercentileValueNames = map((p) => `${p}th`)(percentiles);
 
     const interpPercentileValueDiffNames = map(
-      i => `${i ? percentiles[i - 1] : 0}-${percentiles[i]}th (interp)`
+      (i) => `${i ? percentiles[i - 1] : 0}-${percentiles[i]}th (interp)`,
     )(percentileIndices);
 
     // In order to display negative values as stacked bars, we have to add
@@ -80,15 +76,20 @@ export default class BarChart extends React.Component {
     // otherwise, rounded to a multiple of 2 so that C3's automatic y-axis
     // tick values are nice.
     const precision = variableConfig[variableInfo.id].precision;
-    const formatValues = values => values.map(v => parseFloat(displayFormat(precision, v)));
-    const formattedPercentileValuesByTimePeriod = percentileValuesByTimePeriod.map(formatValues);
-    const allPercentileValues = flattenDeep([0, formattedPercentileValuesByTimePeriod]);
+    const formatValues = (values) =>
+      values.map((v) => parseFloat(displayFormat(precision, v)));
+    const formattedPercentileValuesByTimePeriod =
+      percentileValuesByTimePeriod.map(formatValues);
+    const allPercentileValues = flattenDeep([
+      0,
+      formattedPercentileValuesByTimePeriod,
+    ]);
 
     const minPercentileValue = min(allPercentileValues);
     const maxPercentileValue = max(allPercentileValues);
 
     const offset = ceilMultiple(2, -min([0, minPercentileValue]));
-    const addOffset = v => v + offset;
+    const addOffset = (v) => v + offset;
     const yMin = minPercentileValue + offset;
     const yMax = maxPercentileValue + offset;
 
@@ -114,10 +115,7 @@ export default class BarChart extends React.Component {
 
     //  baseTimes: [t0, t1, ... ]
     //    from input data
-    const baseTimes = concatAll([
-      historicalMiddleYear,
-      futureMiddleYears
-    ]);
+    const baseTimes = concatAll([historicalMiddleYear, futureMiddleYears]);
 
     //  basePercentileValuesByTime: [
     //    [ P0,10; P0,25; P0,50; ... ],  // for t0
@@ -129,8 +127,8 @@ export default class BarChart extends React.Component {
       concatAll,
       map(map(addOffset)),
     )([
-      [map(() => 0)(percentileIndices)],  // zero values for historical time
-      percentileValuesByTimePeriod,       // data points
+      [map(() => 0)(percentileIndices)], // zero values for historical time
+      percentileValuesByTimePeriod, // data points
     ]);
 
     //  basePercentileValuesByPercentile: [  // = transpose(basePercentileValuesByTime)
@@ -138,8 +136,9 @@ export default class BarChart extends React.Component {
     //    [ P0,25; P1,25; P2,25; ... ],  // for p=25
     //    ...
     //  ]
-    const basePercentileValuesByPercentile =
-      transpose(basePercentileValuesByTime);
+    const basePercentileValuesByPercentile = transpose(
+      basePercentileValuesByTime,
+    );
 
     // Note: "interp" = "interpolated"
     //
@@ -171,10 +170,10 @@ export default class BarChart extends React.Component {
 
     // For each percentile, we want to interpolate the basePercentileValues
     // at all the times.
-    const li =
-      linearInterpolator(graphConfig.interpolationInterval, baseTimes);
-    const interpTimesAndValuesByPercentile =
-      map(li)(basePercentileValuesByPercentile);
+    const li = linearInterpolator(graphConfig.interpolationInterval, baseTimes);
+    const interpTimesAndValuesByPercentile = map(li)(
+      basePercentileValuesByPercentile,
+    );
     // Each element in `interpTimesAndValues` is a pair
     //    [interpTimes, interpPercentileValues]
     // one pair for each percentile.
@@ -195,7 +194,7 @@ export default class BarChart extends React.Component {
     )(interpTimesAndValuesByPercentile);
 
     //  GOAL:
-    // 
+    //
     //  interpPercentileValuesByTime: [
     //    [                                   // for t0
     //      P0,0,10; P0,0,25; P0,0,50; ...,   // for t0,0
@@ -211,19 +210,23 @@ export default class BarChart extends React.Component {
     //    ],
     //    ...
     //  ]
-    const interpPercentileValuesByTime =
-      transpose(interpPercentileValuesByPercentile);
-    const diffs = pileValues => map(
-      i => i ? (pileValues[i] - pileValues[i - 1]) : pileValues[i]
-    )(percentileIndices);
-    const interpPercentileValueDiffsByTime =
-      map(diffs)(interpPercentileValuesByTime);
-    const interpPercentileValueDiffsByPercentile =
-      transpose(interpPercentileValueDiffsByTime);
+    const interpPercentileValuesByTime = transpose(
+      interpPercentileValuesByPercentile,
+    );
+    const diffs = (pileValues) =>
+      map((i) => (i ? pileValues[i] - pileValues[i - 1] : pileValues[i]))(
+        percentileIndices,
+      );
+    const interpPercentileValueDiffsByTime = map(diffs)(
+      interpPercentileValuesByTime,
+    );
+    const interpPercentileValueDiffsByPercentile = transpose(
+      interpPercentileValueDiffsByTime,
+    );
 
     const columns = concatAll([
       // Time values for base data
-      [concatAll(['baseTime', baseTimes])],
+      [concatAll(["baseTime", baseTimes])],
 
       // Base percentile values
       flow(
@@ -235,13 +238,16 @@ export default class BarChart extends React.Component {
       )([basePercentileValueNames, basePercentileValuesByPercentile]),
 
       // Time values for interpolated data
-      [concatAll(['interpTime', interpTimes])],
+      [concatAll(["interpTime", interpTimes])],
 
       // Interpolated percentile value differences
       flow(
         zipAll,
         map(concatAll),
-      )([interpPercentileValueDiffNames, interpPercentileValueDiffsByPercentile]),
+      )([
+        interpPercentileValueDiffNames,
+        interpPercentileValueDiffsByPercentile,
+      ]),
     ]);
 
     // Build the full C3 options.
@@ -252,66 +258,69 @@ export default class BarChart extends React.Component {
           height: 600,
         },
         data: {
-          order: null,  // Present (stack bars) in order of declaration
+          order: null, // Present (stack bars) in order of declaration
           xs: {
             // Base data lines use baseTime
-            ...fromPairsMulti([[basePercentileValueNames, 'baseTime']]),
+            ...fromPairsMulti([[basePercentileValueNames, "baseTime"]]),
             // Interp data bars use interpTime
-            ...fromPairsMulti([[interpPercentileValueDiffNames, 'interpTime']]),
+            ...fromPairsMulti([[interpPercentileValueDiffNames, "interpTime"]]),
           },
           types: {
             // Base data presented as lines
-            ...fromPairsMulti([[basePercentileValueNames, 'line']]),
+            ...fromPairsMulti([[basePercentileValueNames, "line"]]),
             // Interp data presented as stacked bar charts of differences
-            ...fromPairsMulti([[interpPercentileValueDiffNames, 'bar']]),
+            ...fromPairsMulti([[interpPercentileValueDiffNames, "bar"]]),
           },
-          groups: [
-            interpPercentileValueDiffNames,
-          ],
+          groups: [interpPercentileValueDiffNames],
           colors: {
             // TODO: Obtain colours from config
-            ...fromPairs(zipAll([
-              basePercentileValueNames,
-              ['#cccccc', '#aaaaaa', 'black', '#aaaaaa', '#cccccc']
-            ])),
-            ...fromPairs(zipAll([
-              interpPercentileValueDiffNames,
-              ['transparent', '#cccccc', '#aaaaaa', '#aaaaaa', '#cccccc']
-            ])),
+            ...fromPairs(
+              zipAll([
+                basePercentileValueNames,
+                ["#cccccc", "#aaaaaa", "black", "#aaaaaa", "#cccccc"],
+              ]),
+            ),
+            ...fromPairs(
+              zipAll([
+                interpPercentileValueDiffNames,
+                ["transparent", "#cccccc", "#aaaaaa", "#aaaaaa", "#cccccc"],
+              ]),
+            ),
           },
           columns,
         },
         point: {
           focus: {
             expand: {
-              r: graphConfig.c3options.point.focus.expand.factor *
+              r:
+                graphConfig.c3options.point.focus.expand.factor *
                 graphConfig.c3options.point.r,
             },
           },
         },
         axis: {
           x: {
-            type: 'indexed',
+            type: "indexed",
             label: {
-              text: 'Year',
-              position: 'outer-center',
+              text: "Year",
+              position: "outer-center",
             },
             min: 1960,
             max: 2100,
             tick: {
-              values: rangeStep(10, 1960, 2101)
+              values: rangeStep(10, 1960, 2101),
             },
           },
           y: {
-            type: 'linear',
+            type: "linear",
             min: yMin,
             max: yMax,
             tick: {
-              format: d => `${d - offset}`,
+              format: (d) => `${d - offset}`,
             },
             label: {
               text: `Change in ${variableInfo.label} (${variableInfo.unitsSpec.label})`,
-              position: 'outer-middle',
+              position: "outer-middle",
             },
           },
         },
@@ -319,7 +328,7 @@ export default class BarChart extends React.Component {
           x: {
             lines: mapWithKey((year, i) => ({
               value: year,
-              text: `${floorMultiple(10, year)}s ${i ? '' : '(baseline)'}`,
+              text: `${floorMultiple(10, year)}s ${i ? "" : "(baseline)"}`,
             }))(baseTimes),
           },
         },
@@ -328,7 +337,7 @@ export default class BarChart extends React.Component {
         },
         tooltip: {
           format: {
-            title: year => {
+            title: (year) => {
               if (year === historicalMiddleYear) {
                 return `${floorMultiple(10, year)}s (baseline)`;
               }
@@ -339,23 +348,20 @@ export default class BarChart extends React.Component {
             },
             name: (name, ratio, id, index) => {
               if (index === 0) {
-                return 'all';
+                return "all";
               }
               return `${name} %ile`;
             },
             value: (value, ratio, id, index) => {
-              const precision = variableConfig[variableInfo.id].precision
-              if (
-                index === 0
-                && id === basePercentileValueNames[0]
-              ) {
-                const meanUnit = variableConfig[variableInfo.id].meanUnit
+              const precision = variableConfig[variableInfo.id].precision;
+              if (index === 0 && id === basePercentileValueNames[0]) {
+                const meanUnit = variableConfig[variableInfo.id].meanUnit;
                 return `Mean Value\n ${baselineFormat(precision, Number.parseFloat(mean))} ${meanUnit}`;
               }
               const year = baseTimes[index];
               if (
-                includes(id, basePercentileValueNames)
-                && includes(year, futureMiddleYears)
+                includes(id, basePercentileValueNames) &&
+                includes(year, futureMiddleYears)
               ) {
                 const displayValue = displayFormat(precision, value - offset);
                 return `${displayValue} ${variableInfo.unitsSpec.id}`;
@@ -363,23 +369,18 @@ export default class BarChart extends React.Component {
             },
           },
         },
-        regions:
-          mapWithKey((tp, index) => ({
-            axis: 'x',
-            start: Number(tp.start_date),
-            end: Number(tp.end_date),
-            class: index ? styles.projected : styles.baseline,
-          }))(concatAll([baselineTimePeriod, futureTimePeriods])),
+        regions: mapWithKey((tp, index) => ({
+          axis: "x",
+          start: Number(tp.start_date),
+          end: Number(tp.end_date),
+          class: index ? styles.projected : styles.baseline,
+        }))(concatAll([baselineTimePeriod, futureTimePeriods])),
       },
 
       graphConfig.c3options,
     );
-    console.log('### BarChart.render: c3options', c3options)
+    console.log("### BarChart.render: c3options", c3options);
 
-    return (
-      <C3Chart
-        {...c3options}
-      />
-    )
+    return <C3Chart {...c3options} />;
   }
 }

@@ -38,37 +38,32 @@
 //
 // Note on map viewport vs bounds.
 //
-// React Leaflet `Map` components accept both `viewport` and `bounds` props.
-// *Most of the time*, `bounds` supersedes `viewport`; the viewport change
+// React Leaflet `MapContainer` components accept `center` and `zoom` props, and `bounds` props.
+// *Most of the time*, `bounds` supersedes `center` and `zoom`; the viewport change
 // caused by setting a `bounds` value is communicated via the `onChangeViewport`
 // callback. Unfortunately, it is not quite consistent, causing buggy behaviour
-// in our maps. Therefore we have to manage bounds and viewport on our own.
+// in our maps. Therefore we have to manage bounds and viewport (center & zoom) on our own.
 //
-// This code passes *only* the `viewport` prop to the maps, and manages the
+// This code passes *only* the center and zoom props to the maps, and manages the
 // coordination between bounds and viewport itself. In particular, a defined
-// value for `state.bounds` causes this component to update `state.viewport`
-// from that value accordingly (and hence re-render), then reset `bounds` to
+// value for `state.bounds` causes this component to update `state.viewport.center`
+// and `state.viewport.zoom` from that value accordingly (and hence re-render), then reset `bounds` to
 // undefined.
 //
-// `state.viewport` is the sole source of truth. `state.bounds` is a transient
+// `state.viewport.center` and state.viewport.zoom are the sole sources of truth. `state.bounds` is a transient
 // value that mediates between the *intention* to update the viewport according
-// to some bounds and the *availability* of the map ref, which is required to
-// convert bounds to a viewport for a given map. Map refs are not always
+// to some bounds and the *availability* of the map instance, which is required to
+// convert bounds to a viewport for a given map. Map instances are not always
 // available when bounds conversions are needed, hence this rather complicated
 // arrangement with transient `state.bounds` values.
 //
-// Note on map refs.
+// Note on map instances.
 //
 // In order to do a couple of key operations, namely bounds conversions and map
-// refreshes, we need to access the underlying Leaflet map object. We can do
-// that with React refs to the components in question. React offers two ways to
-// obtain refs; the shorter `React.createRef()` utility, or the callback method.
-// It turns out that the callback method is the only one that delivers map refs
-// properly up to date with React lifecycle hook calls, which latter we need to
-// use to coordinate certain bounds to viewport updates. *Sigh*.
-//
-// We keep the map refs in state so that their becoming available can trigger
-// an update -- e.g., converting bounds to viewport (see note above).
+// refreshes, we need to access the underlying Leaflet map object.
+// We do that with React Leaflet's `useMap` hook in a functional component (`MapInstanceProvider`).
+// This hook provides the baseline and projected map instances,
+// which are then stored in the state of the parent component.
 //
 // Note on size changes.
 //
@@ -79,40 +74,56 @@
 // again.
 //
 // There are several possible approaches to this problem, but the one that so
-// far has yielded the best results is to monitor the size of an (really any)
-// element in the Maps tab and redraw the maps when the size changes. This may
-// cause some unnecessary redraws when the window size is changed, but that
-// is irrelevant, and may not even be causing Leaflet to do any actual work.
-//
-// To monitor element size, we use React Measure, which has a very convenient
-// `onResize()` callback prop.
+// far has yielded the best results is to mount and unmount the map components
+// with the `mountOnEnter` and `unmountOnExit` props of the `Tab` component in `App.js`.
+// This ensures that the maps are re-rendered correctly when the tab is reselected.
+// Size changes to maps from window resizing are handled by invalidating the map size
+// in MapInstanceProvider.
 
+import PropTypes from "prop-types";
+import React from "react";
+import { Col, Row } from "react-bootstrap";
+import Loader from "../../misc/Loader";
+import mapValues from "lodash/fp/mapValues";
+import merge from "lodash/fp/merge";
+import isEqual from "lodash/fp/isEqual";
+import T from "../../../temporary/external-text";
+import DataMap from "../../maps/DataMap";
+import {
+  BCBaseMap,
+  SetView,
+  callbackOnMapEvents,
+} from "pcic-react-leaflet-components";
+import NcwmsColourbar from "../../maps/NcwmsColourbar";
+import {
+  getWmsLogscale,
+  regionBounds,
+  boundsToViewport,
+} from "../../maps/map-utils";
+import styles from "../../maps/NcwmsColourbar/NcwmsColourbar.module.css";
+import { getVariableInfo } from "../../../utils/variables-and-units";
+import Button from "react-bootstrap/Button";
+import StaticControl from "../../maps/StaticControl";
+import { allDefined } from "../../../utils/lodash-fp-extras";
+import { collectionToCanonicalUnitsSpecs } from "../../../utils/units";
+import { seasonIndexToPeriod } from "../../../utils/percentile-anomaly";
+import { useMap } from "react-leaflet";
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import { Col, Row } from 'react-bootstrap';
-import Loader from 'react-loader';
-import Measure from 'react-measure';
-import mapValues from 'lodash/fp/mapValues';
-import merge from 'lodash/fp/merge';
-import isEqual from 'lodash/fp/isEqual';
-import T from '../../../temporary/external-text';
-import DataMap from '../../maps/DataMap';
-import { BCBaseMap } from 'pcic-react-leaflet-components';
-import NcwmsColourbar from '../../maps/NcwmsColourbar';
-import { getWmsLogscale, regionBounds, boundsToViewport } from '../../maps/map-utils';
-import styles from '../../maps/NcwmsColourbar/NcwmsColourbar.module.css';
-import { getVariableInfo, } from '../../../utils/variables-and-units';
-import Button from 'react-bootstrap/Button';
-import StaticControl from '../../maps/StaticControl';
-import { allDefined } from '../../../utils/lodash-fp-extras';
-import { collectionToCanonicalUnitsSpecs } from '../../../utils/units';
-import { seasonIndexToPeriod } from '../../../utils/percentile-anomaly';
-
+// Component to provide map instances using the useMap hook
+const MapInstanceProvider = ({ setMapInstance }) => {
+  const map = useMap();
+  React.useEffect(() => {
+    if (map && map.invalidateSize) {
+      map.invalidateSize();
+    }
+    setMapInstance(map);
+  }, [map, setMapInstance]);
+  return null;
+};
 
 export default class MapsTabBody extends React.PureComponent {
   static contextType = T.contextType;
-  getConfig = path => T.get(this.context, path, {}, 'raw');
+  getConfig = (path) => T.get(this.context, path, {}, "raw");
 
   static propTypes = {
     regionOpt: PropTypes.string,
@@ -130,10 +141,29 @@ export default class MapsTabBody extends React.PureComponent {
       isOpen: false,
     },
     resizeCount: 0,
-    baselineMapRef: undefined,
-    projectedMapRef: undefined,
+    baselineMapInstance: null,
+    projectedMapInstance: null,
   };
 
+  setBaselineMapInstance = (mapInstance) => {
+    if (!this.state.baselineMapInstance) {
+      this.setState({ baselineMapInstance: mapInstance }, () => {
+        if (this.state.bounds) {
+          this.updateViewportFromBounds(this.state.bounds);
+        }
+      });
+    }
+  };
+
+  setProjectedMapInstance = (mapInstance) => {
+    if (!this.state.projectedMapInstance) {
+      this.setState({ projectedMapInstance: mapInstance }, () => {
+        if (this.state.bounds) {
+          this.updateViewportFromBounds(this.state.bounds);
+        }
+      });
+    }
+  };
   static getDerivedStateFromProps(props, state) {
     // Any time the current region changes, reset the bounds to the
     // bounding box of the region. It would be better to set `state.viewport`
@@ -157,76 +187,66 @@ export default class MapsTabBody extends React.PureComponent {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.updateViewportFromBounds(this.state.bounds);
+    if (
+      prevProps.regionOpt !== this.props.regionOpt &&
+      this.state.baselineMapInstance
+    ) {
+      this.zoomToRegion(); // Zoom to the new region when selected
+    }
   }
 
   updateViewportFromBounds = (bounds) => {
-    if (bounds && this.state.baselineMapRef) {
+    if (bounds && this.state.baselineMapInstance) {
       this.setState({
-        viewport: boundsToViewport(
-          this.state.baselineMapRef.leafletElement,
-          bounds,
-        ),
+        viewport: boundsToViewport(this.state.baselineMapInstance, bounds),
         bounds: undefined,
       });
     }
   };
 
   handleChangeSimple = (name, value) => this.setState({ [name]: value });
-  handleChangeViewport = viewport => {
+  handleChangeViewport = (viewport) => {
     // The `onViewportChanged` callback fires several times for any given
     // viewport change (presumably because of the interaction between the two
     // maps). This filters out any unnecessary updates.
-    if (!isEqual(viewport, this.state.viewport)) {
-      this.setState({ viewport });
-    }
-  }
-  handleChangePopup = this.handleChangeSimple.bind(this, 'popup');
-  handleChangeBaselineMapRef =
-    this.handleChangeSimple.bind(this, 'baselineMapRef');
-  handleChangeProjectedMapRef =
-    this.handleChangeSimple.bind(this, 'projectedMapRef');
-
-  // These items handle redrawing the map when the size changes.
-  // The redraw depends on using a Leaflet "private" method `Map._onResize`,
-  // which may be fragile, but Map doesn't expose a public `redraw` method.
-  redrawMap = mapRef => {
-    if (mapRef) {
-      mapRef.leafletElement._onResize();
-    }
-  };
-  handleResize = contentRect => {
-    if (contentRect.bounds.width !== 0) {
-      this.redrawMap(this.state.baselineMapRef);
-      this.redrawMap(this.state.projectedMapRef);
+    const newViewport = {
+      center: viewport.getCenter(),
+      zoom: viewport.getZoom(),
+    };
+    if (!isEqual(newViewport, this.state.viewport)) {
+      this.setState({ viewport: newViewport });
     }
   };
 
   zoomToRegion = () => {
     this.setState({
       viewport: boundsToViewport(
-        this.state.baselineMapRef.leafletElement,
+        this.state.baselineMapInstance,
         regionBounds(this.props.regionOpt.value),
       ),
     });
   };
 
   render() {
-    if (!allDefined(
-      [
-        'regionOpt',
-        'baselineTimePeriod',
-        'futureTimePeriodOpt',
-        'variableOpt',
-        'seasonOpt',
-      ],
-      this.props
-    )) {
-      console.log('### MapsTabBody: unsettled props', this.props)
-      return <Loader />;
+    if (
+      !allDefined(
+        [
+          "regionOpt",
+          "baselineTimePeriod",
+          "futureTimePeriodOpt",
+          "variableOpt",
+          "seasonOpt",
+        ],
+        this.props,
+      )
+    ) {
+      console.log("### MapsTabBody: unsettled props", this.props);
+      return <Loader loading={true} />;
     }
 
     const region = this.props.regionOpt.value;
-    const futureTimePeriod = this.props.futureTimePeriodOpt.value.representative;
+    const futureTimePeriod =
+      this.props.futureTimePeriodOpt.value.representative;
     const baselineTimePeriod = this.props.baselineTimePeriod;
     const season = this.props.seasonOpt.value;
     const variable = this.props.variableOpt.value;
@@ -234,30 +254,32 @@ export default class MapsTabBody extends React.PureComponent {
     const variableRep = variable.representative;
     const variableId = variableRep.variable_id;
 
-    const mapsConfig = this.getConfig('tabs.maps.config');
+    const mapsConfig = this.getConfig("tabs.maps.config");
     const seasonId = seasonIndexToPeriod(season);
-    const mapsVariableConfigForTimescale = mapValues(
-      value => value.seasons ? merge(value, value.seasons[seasonId]) : value
+    const mapsVariableConfigForTimescale = mapValues((value) =>
+      value.seasons ? merge(value, value.seasons[seasonId]) : value,
     )(mapsConfig.variables);
     const variableConfig = merge(
-      this.getConfig('variables'),
+      this.getConfig("variables"),
       mapsVariableConfigForTimescale,
     );
 
     const logscale = getWmsLogscale(variableConfig, variableId);
 
-    const unitsSpecs =
-      collectionToCanonicalUnitsSpecs(this.getConfig('units'));
+    const unitsSpecs = collectionToCanonicalUnitsSpecs(this.getConfig("units"));
 
     const variableInfo = getVariableInfo(
-      unitsSpecs, variableConfig, variableId, 'absolute'
+      unitsSpecs,
+      variableConfig,
+      variableId,
+      "absolute",
     );
 
     const zoomButton = (
-      <StaticControl position='topright'>
+      <StaticControl position="topright">
         <Button
           variant="outline-primary"
-          size={'sm'}
+          size={"sm"}
           onClick={this.zoomToRegion}
           style={{ zIndex: 99999 }}
         >
@@ -265,91 +287,112 @@ export default class MapsTabBody extends React.PureComponent {
         </Button>
       </StaticControl>
     );
+    const ViewportUpdater = callbackOnMapEvents(
+      ["moveend", "zoomend"],
+      this.handleChangeViewport,
+    );
 
     return (
-      <Measure bounds onResize={this.handleResize}>
-        {({ measureRef }) => (
-          <div ref={measureRef}>
-            <Row>
-              <Col lg={12}>
-                <NcwmsColourbar
-                  breadth={20}
-                  length={80}
-                  heading={<T
-                    path='tabs.maps.colourScale.label'
-                    data={variableInfo}
-                    placeholder={null}
-                    className={styles.label}
-                  />}
-                  note={<T
-                    path={'tabs.maps.colourScale.note'}
-                    placeholder={null}
-                    className={styles.note}
-                    data={{ logscale }}
-                  />}
-                  variableSpec={variableRep}
-                  displaySpec={variableConfig}
+      <div>
+        <Row>
+          <Col lg={12}>
+            <NcwmsColourbar
+              breadth={20}
+              length={80}
+              heading={
+                <T
+                  path="tabs.maps.colourScale.label"
+                  data={variableInfo}
+                  placeholder={null}
+                  className={styles.label}
                 />
-              </Col>
-            </Row>
-            <Row>
-              <Col lg={6}>
-                <T path='tabs.maps.historical.title' data={{
-                  start_date: this.props.baselineTimePeriod.start_date,
-                  end_date: this.props.baselineTimePeriod.end_date
-                }}
+              }
+              note={
+                <T
+                  path={"tabs.maps.colourScale.note"}
+                  placeholder={null}
+                  className={styles.note}
+                  data={{ logscale }}
                 />
-                <DataMap
-                  id={'historical'}
-                  mapRef={this.handleChangeBaselineMapRef}
-                  minZoom={mapsConfig.minZoom}
-                  maxZoom={mapsConfig.maxZoom}
-                  maxBounds={mapsConfig.maxBounds}
-                  viewport={this.state.viewport}
-                  onViewportChanged={this.handleChangeViewport}
-                  popup={this.state.popup}
-                  onPopupChange={this.handleChangePopup}
-                  region={region}
-                  season={season}
-                  variable={variable}
-                  timePeriod={baselineTimePeriod}
-                  metadata={this.props.metadata}
-                  variableConfig={variableConfig}
-                  unitsSpecs={unitsSpecs}
-                >
-                  {zoomButton}
-                </DataMap>
-              </Col>
-              <Col lg={6}>
-                <T path='tabs.maps.projected.title' data={{
-                  start_date: futureTimePeriod.start_date,
-                  end_date: futureTimePeriod.end_date
-                }} />
-                <DataMap
-                  id={'projected'}
-                  mapRef={this.handleChangeProjectedMapRef}
-                  minZoom={mapsConfig.minZoom}
-                  maxZoom={mapsConfig.maxZoom}
-                  maxBounds={mapsConfig.maxBounds}
-                  viewport={this.state.viewport}
-                  onViewportChanged={this.handleChangeViewport}
-                  popup={this.state.popup}
-                  onPopupChange={this.handleChangePopup}
-                  region={region}
-                  season={season}
-                  variable={variable}
-                  timePeriod={futureTimePeriod}
-                  metadata={this.props.metadata}
-                  variableConfig={variableConfig}
-                  unitsSpecs={unitsSpecs}
-                >
-                  {zoomButton}
-                </DataMap>
-              </Col>
-            </Row>
-          </div>
-        )}
-      </Measure>
+              }
+              variableSpec={variableRep}
+              displaySpec={variableConfig}
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={6}>
+            <T
+              path="tabs.maps.historical.title"
+              data={{
+                start_date: this.props.baselineTimePeriod.start_date,
+                end_date: this.props.baselineTimePeriod.end_date,
+              }}
+            />
+            <DataMap
+              id={"historical"}
+              minZoom={mapsConfig.minZoom}
+              maxZoom={mapsConfig.maxZoom}
+              maxBounds={mapsConfig.maxBounds}
+              zoom={this.state.viewport.zoom}
+              center={this.state.viewport.center}
+              onViewportChanged={this.handleChangeViewport}
+              popup={this.state.popup}
+              onPopupChange={this.handleChangePopup}
+              region={region}
+              season={season}
+              variable={variable}
+              timePeriod={baselineTimePeriod}
+              metadata={this.props.metadata}
+              variableConfig={variableConfig}
+              unitsSpecs={unitsSpecs}
+              baseMapTilesUrl={window.env.REACT_APP_BC_BASE_MAP_TILES_URL}
+            >
+              <MapInstanceProvider
+                setMapInstance={this.setBaselineMapInstance}
+              />
+              {zoomButton}
+              <SetView view={this.state.viewport} />
+              <ViewportUpdater />
+            </DataMap>
+          </Col>
+          <Col lg={6}>
+            <T
+              path="tabs.maps.projected.title"
+              data={{
+                start_date: futureTimePeriod.start_date,
+                end_date: futureTimePeriod.end_date,
+              }}
+            />
+            <DataMap
+              id={"projected"}
+              minZoom={mapsConfig.minZoom}
+              maxZoom={mapsConfig.maxZoom}
+              maxBounds={mapsConfig.maxBounds}
+              zoom={this.state.viewport.zoom}
+              center={this.state.viewport.center}
+              onViewportChanged={this.handleChangeViewport}
+              popup={this.state.popup}
+              onPopupChange={this.handleChangePopup}
+              region={region}
+              season={season}
+              variable={variable}
+              timePeriod={futureTimePeriod}
+              metadata={this.props.metadata}
+              variableConfig={variableConfig}
+              unitsSpecs={unitsSpecs}
+              baseMapTilesUrl={window.env.REACT_APP_YNWT_BASE_MAP_TILES_URL}
+            >
+              <MapInstanceProvider
+                setMapInstance={this.setProjectedMapInstance}
+              />
+              {zoomButton}
+              <SetView view={this.state.viewport} />
+              <ViewportUpdater />
+            </DataMap>
+          </Col>
+        </Row>
+      </div>
     );
   }
 }

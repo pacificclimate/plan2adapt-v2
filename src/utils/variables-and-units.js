@@ -1,14 +1,10 @@
 // Utility functions for displaying variables and their values in specified
 // units.
 
-import curry from 'lodash/fp/curry';
-import find from 'lodash/fp/find';
-import flow from 'lodash/fp/flow';
-import isNumber from 'lodash/fp/isNumber';
-import isString from 'lodash/fp/isString';
-import isUndefined from 'lodash/fp/isUndefined';
-import { convertUnitsInGroup } from './units'
-
+import curry from "lodash/fp/curry";
+import isNumber from "lodash/fp/isNumber";
+import isUndefined from "lodash/fp/isUndefined";
+import { convertUnitsInGroup } from "./units";
 
 // Functions that encapsulate knowledge about the structure of variable
 // configuration information.
@@ -26,56 +22,72 @@ export const getVariableLabel = (variableConfig, variableId) => {
   return `${vc.label}`;
 };
 
-
-export const getVariableType = (variableConfig, variableId, display = 'absolute') => {
+export const getVariableType = (
+  variableConfig,
+  variableId,
+  display = "absolute",
+) => {
   const vc = getConfigForId(variableConfig, variableId);
-  if (display === 'relative') {
-    return 'relative';
+  if (display === "relative") {
+    return "relative";
   }
   return vc.type;
 };
-
 
 export const getVariableDisplay = (variableConfig, variableId) => {
   return getConfigForId(variableConfig, variableId).display;
 };
 
+export const getVariableDataUnits = (variableConfig, variableId) => {
+  const vc = getConfigForId(variableConfig, variableId);
+  return vc.dataUnits;
+};
 
-export const getVariableDataUnits =
-  (variableConfig, variableId) => {
-    const vc = getConfigForId(variableConfig, variableId);
-    return vc.dataUnits;
-  };
+export const getVariableDisplayUnits = (
+  variableConfig,
+  variableId,
+  display = "absolute",
+) => {
+  const vc = getConfigForId(variableConfig, variableId);
+  if (display === "relative") {
+    return vc.displayUnits || "%"; // Bombproofing
+  }
+  return vc.displayUnits;
+};
 
+export const getVariableDisplayUnitsSpec = (
+  unitsSpec,
+  variableConfig,
+  variableId,
+  display = "absolute",
+) => {
+  const type = getVariableType(variableConfig, variableId, display);
+  const displayUnits = getVariableDisplayUnits(
+    variableConfig,
+    variableId,
+    display,
+  );
+  return unitsSpec[type][displayUnits];
+};
 
-export const getVariableDisplayUnits =
-  (variableConfig, variableId, display = 'absolute') => {
-    const vc = getConfigForId(variableConfig, variableId);
-    if (display === 'relative') {
-      return vc.displayUnits || '%';  // Bombproofing
-    }
-    return vc.displayUnits;
-  };
-
-
-export const getVariableDisplayUnitsSpec =
-  (unitsSpec, variableConfig, variableId, display = 'absolute') => {
-    const type = getVariableType(variableConfig, variableId, display);
-    const displayUnits =
-      getVariableDisplayUnits(variableConfig, variableId, display);
-    return unitsSpec[type][displayUnits];
-  };
-
-
-export const getVariableInfo = (unitsSpecs, variableConfig, variableId, display) => {
+export const getVariableInfo = (
+  unitsSpecs,
+  variableConfig,
+  variableId,
+  display,
+) => {
   return {
     id: variableId,
     label: getVariableLabel(variableConfig, variableId),
-    unitsSpec: getVariableDisplayUnitsSpec(unitsSpecs, variableConfig, variableId, display),
+    unitsSpec: getVariableDisplayUnitsSpec(
+      unitsSpecs,
+      variableConfig,
+      variableId,
+      display,
+    ),
     possibleLowBaseline: variableConfig[variableId].possibleLowBaseline,
   };
 };
-
 
 export const getConvertUnits = (unitsSpecs, variableConfig, variableId) => {
   const variableType = getVariableType(variableConfig, variableId);
@@ -89,17 +101,16 @@ export const getConvertUnits = (unitsSpecs, variableConfig, variableId) => {
   return convertUnitsInGroup(unitsGroup);
 };
 
-
 // Functions for formatting displayed values.
 
-export const unitsSuffix = units => {
+export const unitsSuffix = (units) => {
   if (isUndefined(units)) {
-    return ' ???';
+    return " ???";
   }
-  return `${units.match(/^[%]/) ? '' : ' '}${units}`;
+  return `${units.match(/^[%]/) ? "" : " "}${units}`;
 };
 
-// No longer used. setting precision with decimal places rather than sigfigs. 
+// No longer used. setting precision with decimal places rather than sigfigs.
 // export const expToFixed = s => {
 //   // Convert a string representing a number in exponential notation to a string
 //   // in (nominally) fixed point notation. Why? Because `Number.toPrecision()`
@@ -112,19 +123,17 @@ export const unitsSuffix = units => {
 //   return Number.parseFloat(match[0]).toString();
 // };
 
-
 export const displayFormat = curry((decimalPlaces, value) => {
   // Convert a number value to a string in the display format we prefer.
   if (!isNumber(value)) {
-    return '--';
+    return "--";
   }
-  return `${value > 0 ? '+' : ''}${value.toFixed(decimalPlaces)}`;
+  return `${value > 0 ? "+" : ""}${value.toFixed(decimalPlaces)}`;
 });
-
 
 export const baselineFormat = (decimalPlaces, value) => {
   if (!isNumber(value)) {
-    return '--';
+    return "--";
   }
   return value.toFixed(decimalPlaces);
 };
