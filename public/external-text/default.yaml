@@ -6,24 +6,24 @@ selectors:
   prologue: |
     I am interested in information about projected climate change in
     British Columbia ...
-  ordering: ['region', 'futureTimePeriod', 'variable', 'season']
+  ordering: ["region", "futureTimePeriod", "variable", "season"]
   region:
     prefix: within the region of
     default: bc
-    forTabs: ['summary', 'impacts', 'maps', 'graphs']
+    forTabs: ["summary", "impacts", "maps", "graphs"]
   futureTimePeriod:
     prefix: during the
     default: 2050
-    forTabs: ['summary', 'impacts', 'maps']
+    forTabs: ["summary", "impacts", "maps"]
   variable:
     prefix: with details about
     default: tas
-    forTabs: ['maps', 'graphs']
+    forTabs: ["maps", "graphs"]
   season:
     prefix: for a typical
     default: 16
     postfix: period
-    forTabs: ['maps', 'graphs']
+    forTabs: ["maps", "graphs"]
 
 tabs:
   ordering:
@@ -82,8 +82,8 @@ tabs:
 
         - variable: pr
           display: relative
-          displayUnits: '%'
-          precision: 1
+          displayUnits: "%"
+          precision: 2
           seasons:
             - annual
             - winter
@@ -92,8 +92,8 @@ tabs:
             - fall
         - variable: snow
           display: relative
-          displayUnits: '%'
-          precision: 1
+          displayUnits: "%"
+          precision: 2
           seasons:
             - annual
             - winter
@@ -130,7 +130,7 @@ tabs:
       2. ${$$.components.notes.lowBaseline}
       3. ${$$.components.notes.gcmPeriods}
       4. ${$$.components.notes.mapTabNote}
-      
+
       #### Thresholds for Degree-Day Indices
       - Growing Degree-Days: Sum of degree-days during the specified time period above 5°C
       - Frost-Free Days: Number of days in a year with minimum temperatures above 0°C
@@ -268,7 +268,7 @@ tabs:
     config:
       minZoom: 6
       maxZoom: 13
-      maxBounds: [ [65, -150], [45, -100] ]
+      maxBounds: [[65, -150], [45, -100]]
       variables:
         # NB: range and tick values are in *display* units.
         fallback:
@@ -420,25 +420,25 @@ tabs:
               range:
                 min: 40
                 max: 2000
-              ticks: [ 40, 80, 100, 200, 400, 800, 1000, 2000]
+              ticks: [40, 80, 100, 200, 400, 800, 1000, 2000]
             spring:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 1000
-              ticks: [ 40, 80, 100, 200, 400, 800, 1000]
+              ticks: [40, 80, 100, 200, 400, 800, 1000]
             summer:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 1000
-              ticks: [ 40, 80, 100, 200, 400, 800, 1000]
+              ticks: [40, 80, 100, 200, 400, 800, 1000]
             fall:
               displayUnits: mm/season (cum)
               range:
                 min: 40
                 max: 2000
-              ticks: [ 40, 80,  100, 200, 400, 800, 1000, 2000]
+              ticks: [40, 80, 100, 200, 400, 800, 1000, 2000]
         snow:
           display: absolute
           palette: div-RdYlBu
@@ -475,7 +475,7 @@ tabs:
               range:
                 min: 10
                 max: 1000
-              ticks: [10, 20, 40,  100, 200, 400, 1000]
+              ticks: [10, 20, 40, 100, 200, 400, 1000]
         tas:
           display: absolute
           displayUnits: °C
@@ -589,12 +589,12 @@ tabs:
           meanUnit: degree-days
         pr:
           display: relative
-          displayUnits: '%'
+          displayUnits: "%"
           precision: 1
           meanUnit: mm/day
         snow:
           display: relative
-          displayUnits: '%'
+          displayUnits: "%"
           precision: 1
           meanUnit: mm/day
         tas:
@@ -613,19 +613,16 @@ tabs:
   #     3. ${$$.components.notes.gcmPeriods}
   #     4. ${$$.components.notes.mapTabNote}
 
-
-
-
   references:
     disabled: false
     label: References
     content: |
       Brunner, L., Pendergrass, A. G., Lehner, F., Merrifield, A. L., Lorenz, R., & Knutti, R., 2020: [Reduced global warming from CMIP6 projections when weighting models by performance and independence](https://esd.copernicus.org/articles/11/995/2020/). Earth System Dynamics, 11, 4, 995-1012, doi:10.5194/esd-11-995-2020. 
-      
+
       Cannon, A. J., 2018: [Multivariate quantile mapping bias correction: an N-dimensional probability density function transform for climate model simulations of multiple variables](https://link.springer.com/article/10.1007/s00382-017-3580-6). Climate Dynamics, 50, 31-49, doi:10.1007/s00382-017-3580-6.
-      
+
       Cannon, A.J., Sobie, S.R., Murdock, T.Q., 2015: _Bias correction of simulated precipitation by quantile mapping: how well do methods preserve relative changes in quantiles and extremes?_ Journal of Climate, 28(17): 6938-6959. https://doi.org/10.1175/jcli-d-14-00754.1
-      
+
       Curry, C.L., D. Ouali, S.R. Sobie, and F.W. Zwiers (2023) Downscaled CMIP6 Climate Model Subset Selection, Pacific Climate Impacts Consortium, University of Victoria, Victoria, BC, 39 pp.
 
       Dai, A., 2008: Temperature and pressure dependence of the rain-snow phase transition over land and ocean. Geophysical Research Letters, 35 (12), doi:10.1029/2008GL033295.
@@ -661,7 +658,7 @@ tabs:
       Sobie, S.R., D. Ouali, C.L. Curry, and F.W. Zwiers. Multivariate Canadian Downscaled Climate Scenarios for CMIP6 (CanDCS-M6). Geoscience Data Journal, Accepted.
 
       Werner, A. T. and A. J. Cannon, A. J., 2016: _Hydrologic extremes – an intercomparison of multiple gridded statistical downscaling methods._ Hydrology and Earth System Sciences, 20, 1483-1508, https://doi.org/10.5194/hess-20-1483-2016.
-      
+
       Arelia T. Werner, Markus A. Schnorbus, Rajesh R. Shrestha, Alex J. Cannon, Francis W. Zwiers, Gildas Dayon, and Faron Anslow. A long-term, temporally consistent, gridded daily meteorological dataset for northwestern North America. Scientific Data, 6:180299, January 2019. doi: 10.1038/sdata.2018.299
 
   about:
@@ -686,7 +683,7 @@ tabs:
             body: ${version}
 
           - header: Author
-            body: '[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)'
+            body: "[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)"
 
           - header: Terms of Use
             body: |
@@ -769,23 +766,23 @@ tabs:
 
       - label: Team
         cards:
-          - header: 'Trevor Murdock'
+          - header: "Trevor Murdock"
             body: Founding concept designer
-          - header: '[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)'
+          - header: "[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)"
             body: Development team lead.
-          - header: '[Charles Curry](https://pacificclimate.org/about-pcic/people/charles-curry)'
+          - header: "[Charles Curry](https://pacificclimate.org/about-pcic/people/charles-curry)"
             body: Regional climate impacts lead.
-          - header: '[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)'
+          - header: "[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)"
             body: Backend engineer. Data wrangling.
-          - header: '[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)'
+          - header: "[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)"
             body: Front-end engineer. UI design and implementation.
-          - header: '[Tom Kunkel](https://pacificclimate.org/about-pcic/people/tom-kunkel)'
+          - header: "[Tom Kunkel](https://pacificclimate.org/about-pcic/people/tom-kunkel)"
             body: System administrator. Deployment and security.
-          - header: '[Eric Yvorchuk](https://pacificclimate.org/about-pcic/people/eric-yvorchuk-0)'
+          - header: "[Eric Yvorchuk](https://pacificclimate.org/about-pcic/people/eric-yvorchuk-0)"
             body: Programmer/Analyst
-          - header: '[Stephen Sobie](https://pacificclimate.org/about-pcic/people/stephen-sobie)'
+          - header: "[Stephen Sobie](https://pacificclimate.org/about-pcic/people/stephen-sobie)"
             body: RCI Analyst
-          - header: '[Quintin Sparks](https://pacificclimate.org/about-pcic/people/quintin-sparks)'
+          - header: "[Quintin Sparks](https://pacificclimate.org/about-pcic/people/quintin-sparks)"
             body: Programmer/Analyst
 
 components:
@@ -799,28 +796,27 @@ components:
       CAUTION: Percent changes from a low baseline value can result in deceptively large percent change values. 
       Low baseline values occur, for example, for snowfall in spring.
     gcmPeriods:
-      The selectable future time periods are meant to represent possible planning horizons over the 21st century. 
-      Results for these planning horizons are computed by averaging GCM projections 
+      The selectable future time periods are meant to represent possible planning horizons over the 21st century.
+      Results for these planning horizons are computed by averaging GCM projections
       over the 2021-2050, 2041-2070, and 2071-2100 periods, respectively.
-    mapTabNote:
-      The Plan2Adapt Maps tab shows results for the ensemble average value of the selected variable.
+    mapTabNote: The Plan2Adapt Maps tab shows results for the ensemble average value of the selected variable.
   period: ${start_date}-${end_date}
   climdexUrl: https://www.climdex.org/learn/indices
   contacts:
     csg:
       name: Computational Support Group
       email: climate@uvic.ca
-      link: '[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})'
+      link: "[${$$.components.contacts.csg.name}](mailto:${$$.components.contacts.csg.email})"
     science:
       # For now, we are directing all inquiries to CSG, and will direct
       # as necessary.
       name: ${$$.components.contacts.csg.name}
       email: ${$$.components.contacts.csg.email}
-      link: '[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})'
+      link: "[${$$.components.contacts.science.name}](mailto:${$$.components.contacts.science.email})"
     support:
       name: PCIC Support
       email: pcic.support@uvic.ca
-      link: '[${$$.components.contacts.support.name}](mailto:${$$.components.contacts.support.email})'
+      link: "[${$$.components.contacts.support.name}](mailto:${$$.components.contacts.support.email})"
   gcmDefn: |
     A [GCM (General Circulation Model)](http://www.ipcc-data.org/guidelines/pages/gcm_guide.html') is
     a numerical model representing
@@ -907,22 +903,22 @@ variables:
 # Note the distinction between precipitation flux and snowfall flux: The
 # conversion from mass flux units to depth flux units differs.
 units:
-  'precipitation flux':
-    'mm/yr': 1
-    'mm/d': 365.25
-    'mm d-1': mm/d
-    'mm': mm/yr
-    'mm/year': mm/yr
-    'mm/season': 4
-    'mm/month': 12
-    'mm/year (cum)':
-      label: 'mm'
+  "precipitation flux":
+    "mm/yr": 1
+    "mm/d": 365.25
+    "mm d-1": mm/d
+    "mm": mm/yr
+    "mm/year": mm/yr
+    "mm/season": 4
+    "mm/month": 12
+    "mm/year (cum)":
+      label: "mm"
       scale: 1
-    'mm/season (cum)':
-      label: 'mm'
+    "mm/season (cum)":
+      label: "mm"
       scale: 4
-    'mm/month (cum)':
-      label: 'mm'
+    "mm/month (cum)":
+      label: "mm"
       scale: 12
   # 'snowfall flux':
   #   'mm/yr': 1
@@ -931,16 +927,16 @@ units:
 
   temperature:
     degC: 1
-    '°C': degC
-    'degF':
+    "°C": degC
+    "degF":
       scale: .55555555555555
       offset: -17.7777777777778
-    '°F': degF
+    "°F": degF
   temperature-time:
-    'degree days': 1
-    'degree-days': 'degree days'
+    "degree days": 1
+    "degree-days": "degree days"
   time:
     days: 1
   relative:
-    '%': 1     # base unit; only relative unit ever used so far
-    ppm: 1e7   # just for lulz
+    "%": 1 # base unit; only relative unit ever used so far
+    ppm: 1e7 # just for lulz
