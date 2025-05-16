@@ -200,7 +200,13 @@ class Summary extends React.Component {
         </thead>
         <tbody>
           {map(([row, rowSummaryStatistics]) => {
-            const { variable, display, precision, seasons } = row;
+            const {
+              variable,
+              display,
+              basePrecision,
+              projectedPrecision,
+              seasons,
+            } = row;
             return map((season) => {
               const seasonSpec = isString(season) ? { season } : season;
 
@@ -244,7 +250,7 @@ class Summary extends React.Component {
               // Retrieve the season median from the seasonMediansMap
               const means = rowSummaryStatistics.summaryStats.seasonMeans;
               const displayBaselineMeans = baselineFormat(
-                precision,
+                basePrecision,
                 Number.parseFloat([means[seasonSpec.season]]),
               );
 
@@ -262,7 +268,7 @@ class Summary extends React.Component {
                   percentileValues: displayPercentileValues,
                   baselineMeanVal: displayBaselineMeans,
                 },
-                format: displayFormat(precision),
+                format: displayFormat(projectedPrecision),
                 isLong,
                 unitsSuffix,
               };
