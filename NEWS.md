@@ -1,5 +1,15 @@
 # News / Release Notes
 
+## 2.4.1
+
+_2025-Mar-13_
+
+- Corrected an incorrect URL used for loading vector basemap tiles.(#283)
+- Precision Handling Updates
+  - Projected Change: Now uses whole number precision for all variables except temperature. (#282)
+  - Baseline Values: Updated to use two-decimal precision for pr and prsn variables. (#279)
+  - Added logic to allow separate precision settings for baseline and projected values per variable.
+
 ## 2.4.0
 
 _2025-Mar-13_
