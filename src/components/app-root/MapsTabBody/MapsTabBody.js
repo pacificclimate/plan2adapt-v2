@@ -381,7 +381,7 @@ export default class MapsTabBody extends React.PureComponent {
               metadata={this.props.metadata}
               variableConfig={variableConfig}
               unitsSpecs={unitsSpecs}
-              baseMapTilesUrl={window.env.REACT_APP_YNWT_BASE_MAP_TILES_URL}
+              baseMapTilesUrl={window.env.REACT_APP_BC_BASE_MAP_TILES_URL}
             >
               <MapInstanceProvider
                 setMapInstance={this.setProjectedMapInstance}
