@@ -72,7 +72,8 @@ tabs:
         - variable: tas
           display: absolute
           displayUnits: °C
-          precision: 1
+          basePrecision: 1
+          projectedPrecision: 1
           seasons:
             - annual
             - winter
@@ -83,7 +84,8 @@ tabs:
         - variable: pr
           display: relative
           displayUnits: "%"
-          precision: 2
+          basePrecision: 2
+          projectedPrecision: 0
           seasons:
             - annual
             - winter
@@ -93,7 +95,8 @@ tabs:
         - variable: snow
           display: relative
           displayUnits: "%"
-          precision: 2
+          basePrecision: 2
+          projectedPrecision: 0
           seasons:
             - annual
             - winter
@@ -102,25 +105,29 @@ tabs:
         - variable: gdd
           display: absolute
           displayUnits: degree-days
-          precision: 0
+          basePrecision: 0
+          projectedPrecision: 0
           seasons:
             - annual
         - variable: ffd
           display: absolute
           displayUnits: days
-          precision: 0
+          basePrecision: 0
+          projectedPrecision: 0
           seasons:
             - annual
         - variable: hdd
           display: absolute
           displayUnits: degree-days
-          precision: 0
+          basePrecision: 0
+          projectedPrecision: 0
           seasons:
             - annual
         - variable: cdd
           display: absolute
           displayUnits: degree-days
-          precision: 0
+          basePrecision: 0
+          projectedPrecision: 0
           seasons:
             - annual
     notes: |
