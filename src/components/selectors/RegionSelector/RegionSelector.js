@@ -7,18 +7,17 @@
 
 // TODO: DRY up selector defaulting; use a common option matcher for all
 //  selectors
-import PropTypes from 'prop-types';
-import React from 'react';
-import { SelectWithValueReplacement as Select } from 'pcic-react-components';
-import { fetchRegions } from '../../../data-services/regions';
-import find from 'lodash/fp/find';
-import flow from 'lodash/fp/flow';
-import map from 'lodash/fp/map';
-import groupBy from 'lodash/fp/groupBy';
-import { mapWithKey } from 'pcic-react-components/dist/utils/fp';
-import { flattenOptions } from 'pcic-react-components/dist/utils/select';
-import { regionId } from '../../../utils/regions';
-
+import PropTypes from "prop-types";
+import React from "react";
+import { SelectWithValueReplacement as Select } from "pcic-react-components";
+import { fetchRegions } from "../../../data-services/regions";
+import find from "lodash/fp/find";
+import flow from "lodash/fp/flow";
+import map from "lodash/fp/map";
+import groupBy from "lodash/fp/groupBy";
+import { mapWithKey } from "pcic-react-components/dist/utils/fp";
+import { flattenOptions } from "pcic-react-components/dist/utils/select";
+import { regionId } from "../../../utils/regions";
 
 export default class RegionSelector extends React.Component {
   static propTypes = {
@@ -34,37 +33,45 @@ export default class RegionSelector extends React.Component {
   };
 
   componentDidMount() {
-    this._asyncRequest = fetchRegions().then(
+    this._asyncRequest = fetchRegions().then((data) => {
       // Transform GeoJSON response to options for React Select.
       // Options are grouped in the selector by the value of each feature's
       // `feature.properties.group`.
       // Option labels (visible to user) are the name of the region.
       // Option values (used by code) are the entire feature for each option.
-      data => {
-        this._asyncRequest = null;
-        const regions = flow(
-          groupBy(feature => feature.properties.group),
-          mapWithKey((features, group) => ({
-            label: group,
-            options: map(
-              feature => ({
-                label: feature.properties.english_na,
-                value: feature,
-              })
-            )(features)
-          })),
-        )(data.features);
-        this.setState({ regions });
-      }
-    )
+      this._asyncRequest = null;
+      // #I284 temporarily exclude certain groups
+      const excludedGroups = [
+        "Territory by Exonym",
+        "First Nations Language Families",
+      ];
+
+      const regions = flow(
+        // Filter out excludedGroups
+        (features) =>
+          features.filter(
+            (feature) => !excludedGroups.includes(feature.properties.group),
+          ),
+        groupBy((feature) => feature.properties.group),
+        mapWithKey((features, group) => ({
+          label: group,
+          options: map((feature) => ({
+            label: feature.properties.english_na,
+            value: feature,
+          }))(features),
+        })),
+      )(data.features);
+
+      this.setState({ regions });
+    });
   }
 
-  isInvalidValue = value => this.state.regions !== null && !value;
+  isInvalidValue = (value) => this.state.regions !== null && !value;
 
-  replaceInvalidValue = value => {
+  replaceInvalidValue = (value) => {
     return flow(
       flattenOptions,
-      find(option => regionId(option.value) === this.props.default),
+      find((option) => regionId(option.value) === this.props.default),
     )(this.state.regions);
   };
 
@@ -73,7 +80,7 @@ export default class RegionSelector extends React.Component {
       <Select
         isSearchable
         isLoading={this.state.regions === null}
-        loadingMessage={'Loading...'}
+        loadingMessage={"Loading..."}
         options={this.state.regions || []}
         value={this.props.value}
         onChange={this.props.onChange}
