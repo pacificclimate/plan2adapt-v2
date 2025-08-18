@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.5.0
+
+_2025-Aug-18_
+
+- Temporarily excluded FNLF region groups from display (#285)
+
 ## 2.4.1
 
 _2025-Mar-13_
