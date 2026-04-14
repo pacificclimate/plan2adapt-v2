@@ -1,6 +1,6 @@
 FROM node:22.14-bookworm-slim
 
-RUN apt-get -y update &&  \ 
+RUN apt-get -y update && \
     apt-get install --no-install-recommends  \
     -y curl rpl && \
     rm -rf /var/lib/apt/lists/*
