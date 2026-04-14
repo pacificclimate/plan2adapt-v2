@@ -2,14 +2,18 @@ name: Node CI
 
 on: push
 
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089 # master
+        with:
+          persist-credentials: false
       - name: Set up Node.js 22.1.0
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 22.14
       - name: Node.js Test Suite

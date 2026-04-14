@@ -7,12 +7,16 @@ on:
     tags:
       - '[0-9]+\.[0-9]+\.[0-9]+'
 
+permissions:
+  contents: read
 jobs:
   publish:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@61b9e3751b92087fd0b06925ba6dd6314e06f089 # master
+        with:
+          persist-credentials: false
       - name: Export REACT_APP_VERSION env var
         run: |
           git fetch --prune --unshallow
@@ -21,11 +25,17 @@ jobs:
         run: |
           npm ci
           npm run build
-      - name: Publish to Registry
-        uses: docker/build-push-action@v1
+      - name: Log in to Docker Hub
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           username: ${{ secrets.pcicdevops_at_dockerhub_username }}
           password: ${{ secrets.pcicdevops_at_dockerhub_password }}
-          dockerfile: docker/Dockerfile
-          repository: pcic/plan2adapt-v2-frontend
-          tag_with_ref: true
+
+      - name: Publish to Registry
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        with:
+          file: docker/Dockerfile
+          push: true
+          tags: |
+            pcic/plan2adapt-v2-frontend:${{ github.ref_name }}
+            ${{ github.ref_name == 'master' && 'pcic/plan2adapt-v2-frontend:latest' || '' }}
