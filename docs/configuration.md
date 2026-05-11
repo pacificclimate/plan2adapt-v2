@@ -45,9 +45,12 @@ Configuration values in `config.js`:
 - A semicolon-separated list of identifiers; spaces are part of identifiers.
 - Standard value: `REACT_APP_EMISSIONS_SCENARIOS=historical,ssp585;historical, ssp585;historical`
 
-`REACT_APP_REGIONS_SERVICE_URL`
+`REACT_APP_REGIONS_GEOJSON_URL`
 
-- URL of geographic regions service.
+- URL of the geographic regions GeoJSON.
+- This may be a relative URL served by the frontend, or an absolute URL on an
+  external file server.
+- Development default: `data/BC-regions-FNLF-84.geojson`
 
 `REACT_APP_RULES_ENGINE_URL`
 

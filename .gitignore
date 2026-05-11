@@ -22,3 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /.idea/
+
+# Region dataset is mounted at runtime.
+/public/data/*.geojson
+!/public/data/.gitkeep

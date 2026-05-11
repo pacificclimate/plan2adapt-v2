@@ -2,6 +2,25 @@
 
 ## Run app locally
 
+The default development config points `REACT_APP_REGIONS_GEOJSON_URL` at
+`data/BC-regions-FNLF-84.geojson`, so the app expects the regions GeoJSON at
+`public/data/BC-regions-FNLF-84.geojson`.
+
+One way to do that is a bind mount:
+
+```bash
+sudo mount --bind /path/to/regions "$(pwd)/public/data"
+```
+
+An easier local-only option is a symlink:
+
+```bash
+ln -sf /path/to/regions/BC-regions-FNLF-84.geojson \
+  public/data/BC-regions-FNLF-84.geojson
+```
+
+After either setup, start the app:
+
 ```bash
 npm start
 ```
@@ -22,25 +41,25 @@ It can be useful to test the Docker infrastructure locally before
 deployment on a server. To do so:
 
 1. Pull or build image.
-    - To pull:
 
-      ```
-      docker pull pcic/plan2adapt-v2-frontend:<tag>
-      ```
+   - To pull:
 
-      Typically `<tag>` is your current branch name.
+     ```
+     docker pull pcic/plan2adapt-v2-frontend:<tag>
+     ```
 
-    - To build:
+     Typically `<tag>` is your current branch name.
 
-      `make image`
+   - To build:
 
-      This automatically builds an image tagged with the current branch name.
+     `make image`
 
-2. Run container: 
-   
+     This automatically builds an image tagged with the current branch name.
+
+2. Run container:
+
    `make up`
 
-3. Stop and remove container:  
-   
-   `make down`
+3. Stop and remove container:
 
+   `make down`

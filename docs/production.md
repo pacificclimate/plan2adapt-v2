@@ -39,3 +39,15 @@ image using `docker-compose`. You may wish to copy and modify
 
 Note: All **deployment environment variables**, except `REACT_APP_APP_VERSION`,
 are provided by `docker/docker-compose.yaml` via the `/app/config.js` file mount.
+
+### Region dataset configuration
+
+The frontend fetches region boundaries from the URL configured by
+`REACT_APP_REGIONS_GEOJSON_URL`.
+
+For production, prefer hosting the GeoJSON on the same external file service
+used for other managed datasets such as impacts, stats, and assessments,
+rather than mounting it into the frontend container.
+
+In Docker deployments, set `REACT_APP_REGIONS_GEOJSON_URL` in `config.js` to
+that hosted file URL.

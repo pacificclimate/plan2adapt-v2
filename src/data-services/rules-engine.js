@@ -1,4 +1,3 @@
-import axios from "axios";
 import urljoin from "url-join";
 import mapKeys from "lodash/fp/mapKeys";
 import { regionId } from "../utils/regions";
@@ -15,13 +14,20 @@ export const fetchRulesResults = (region, timePeriod) => {
   // `timePeriod` is an object of the form {start_date, end_date}
   // Returns a dict keyed by normalized rule names.
 
-  return axios
-    .get(
-      urljoin(
-        window.env.REACT_APP_RULES_ENGINE_URL,
-        `${regionId(region)}_${middleDecade(timePeriod)}.json`,
-      ),
-    )
-    .then((response) => response.data)
+  return fetch(
+    urljoin(
+      window.env.REACT_APP_RULES_ENGINE_URL,
+      `${regionId(region)}_${middleDecade(timePeriod)}.json`,
+    ),
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch rules results: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      return response.json();
+    })
     .then(normalizeRuleNames);
 };

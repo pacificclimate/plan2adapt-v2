@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
 import Loader from "../../misc/Loader";
-import axios from "axios";
 import { xml2js } from "xml-js";
 import isEqual from "lodash/fp/isEqual";
 import flow from "lodash/fp/flow";
@@ -23,17 +22,26 @@ import { allDefined } from "../../../utils/lodash-fp-extras";
 // Popup content getter
 
 const getLayerInfo = ({ layerSpec, layerPoint: xy }) => {
-  return axios.get(window.env.REACT_APP_NCWMS_URL, {
-    params: {
-      request: "GetFeatureInfo",
-      exceptions: "application/vnd.ogc.se_xml",
-      ...xy,
-      info_format: "text/xml", // f**k, only xml is available
-      query_layers: getWmsLayerName(layerSpec),
-      time: getWmsTime(layerSpec),
-      feature_count: 50, // ??
-      version: "1.1.1",
-    },
+  const url = new URL(window.env.REACT_APP_NCWMS_URL);
+  url.search = new URLSearchParams({
+    request: "GetFeatureInfo",
+    exceptions: "application/vnd.ogc.se_xml",
+    ...xy,
+    info_format: "text/xml", // f**k, only xml is available
+    query_layers: getWmsLayerName(layerSpec),
+    time: getWmsTime(layerSpec),
+    feature_count: 50, // ??
+    version: "1.1.1",
+  }).toString();
+
+  return fetch(url).then((response) => {
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch layer info: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return response.text();
   });
 };
 
@@ -78,8 +86,8 @@ class DataMapDisplay extends React.Component {
       layerSpec: this.props,
       xy: event.layerPoint,
     })
-      .then((response) => {
-        const layerInfo = xml2js(response.data, {
+      .then((responseText) => {
+        const layerInfo = xml2js(responseText, {
           compact: true,
         });
         const value = layerInfo.foo;
@@ -90,10 +98,7 @@ class DataMapDisplay extends React.Component {
         });
       })
       .catch((error) => {
-        console.log("error.response", error.response);
-        console.log("error.request", error.request);
         console.log("error.message", error.message);
-        console.log("error.config", error.config);
         this.props.onPopupChange({
           ...this.props.popup,
           value: null,
