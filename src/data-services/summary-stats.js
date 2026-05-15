@@ -1,4 +1,3 @@
-import axios from "axios";
 import urljoin from "url-join";
 import { regionId } from "../utils/regions";
 import { middleDecade } from "../utils/time-periods";
@@ -18,18 +17,27 @@ export const fetchSummaryStatistics = (
   // `percentiles` is an array of percentile values to be computed across
   //    the ensemble
   // Returns a promise for the summary statistics data.
-  return axios
-    .get(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "percentileanomaly"), {
-      params: {
-        region: regionId(region),
-        climatology: middleDecade(timePeriod),
-        variable,
-        percentile: percentiles.join(","),
-        baseline_model: "PCIC_BLEND_v1",
-        baseline_climatology: "8110",
-      },
-    })
-    .then((response) => response.data);
+  const url = new URL(
+    urljoin(window.env.REACT_APP_CE_BACKEND_URL, "percentileanomaly"),
+  );
+  url.search = new URLSearchParams({
+    region: regionId(region),
+    climatology: middleDecade(timePeriod),
+    variable,
+    percentile: percentiles.join(","),
+    baseline_model: "PCIC_BLEND_v1",
+    baseline_climatology: "8110",
+  }).toString();
+
+  return fetch(url).then((response) => {
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch summary statistics: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return response.json();
+  });
 };
 
 // This mapping is used to translate season names to their respective indices in the CSV stats files.
@@ -50,10 +58,18 @@ export const fetchCsvStats = (region, variable, season) => {
     `${regionId(region)}.csv`,
   );
 
-  return axios
-    .get(csvUrl)
+  return fetch(csvUrl)
     .then((response) => {
-      return parseCSV(response.data);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch CSV stats: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      return response.text();
+    })
+    .then((data) => {
+      return parseCSV(data);
     })
     .then((data) => {
       const meanEntry = data.find(

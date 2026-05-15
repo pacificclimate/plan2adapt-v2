@@ -1,4 +1,3 @@
-import axios from "axios";
 import urljoin from "url-join";
 import includes from "lodash/fp/includes";
 import flow from "lodash/fp/flow";
@@ -9,6 +8,21 @@ import tap from "lodash/fp/tap";
 import groupBy from "lodash/fp/groupBy";
 import head from "lodash/fp/head";
 export const mapWithKey = map.convert({ cap: false });
+
+const fetchJson = (url, params) => {
+  const requestUrl = new URL(url);
+  requestUrl.search = new URLSearchParams(params).toString();
+
+  return fetch(requestUrl).then((response) => {
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch ${requestUrl}: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    return response.json();
+  });
+};
 
 const getYear = (timestamp) => timestamp.substr(0, 4);
 
@@ -42,16 +56,11 @@ export function fetchSummaryMetadataForModel(model) {
   const emissionsScenarios =
     window.env.REACT_APP_EMISSIONS_SCENARIOS.split(";");
   console.log("### emissionsScenarios", emissionsScenarios);
-  return axios
-    .get(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "multimeta"), {
-      params: {
-        ensemble_name: window.env.REACT_APP_ENSEMBLE_NAME,
-        model: model,
-        extras: "filepath",
-      },
-      // transformResponse: [JSON.parse, standardizeSummaryMetadata],
-    })
-    .then((response) => response.data)
+  return fetchJson(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "multimeta"), {
+    ensemble_name: window.env.REACT_APP_ENSEMBLE_NAME,
+    model: model,
+    extras: "filepath",
+  })
     .then(standardizeSummaryMetadata)
     .then(
       tap((metadata) => {
@@ -105,15 +114,10 @@ export function fetchFileMetadata(unique_id) {
   // Fetch the detailed metadata for a single file identified by `unique_id`
   // from the backend `/metadata` endpoint.
 
-  return axios
-    .get(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "metadata"), {
-      params: {
-        // Note misleading naming: API param `model_id` should actually be
-        // named `unique_id`.
-        model_id: unique_id,
-        extras: "filepath",
-      },
-      transformResponse: [JSON.parse, normalizeFileMetadata],
-    })
-    .then((response) => response.data);
+  return fetchJson(urljoin(window.env.REACT_APP_CE_BACKEND_URL, "metadata"), {
+    // Note misleading naming: API param `model_id` should actually be
+    // named `unique_id`.
+    model_id: unique_id,
+    extras: "filepath",
+  }).then(normalizeFileMetadata);
 }

@@ -3,15 +3,14 @@ window.env = {
   REACT_APP_CE_BACKEND_URL:
     "https://beehive.pacificclimate.org/plan2adapt/pcex-api/",
   REACT_APP_BASE_MAP: "BC",
-  REACT_APP_BC_VECTOR_BASE_MAP_TILES_URL:
-    "https://beehive.pacificclimate.org/geoserver/gwc/service/wmts?REQUEST=GetTile&TILES=True&SERVICE=WMTS&VERSION=1.0.0&LAYER=OMT-NA-ZF-LG&TILEMATRIXSET=EPSG:3005&TILEMATRIX=EPSG:3005:{z}&TILEROW={y}&TILECOL={x}&FORMAT=application/vnd.mapbox-vector-tile",
-  REACT_APP_LABELS_WMS_URL:
-    "https://beehive.pacificclimate.org/geoserver/gwc/service/wms",
+  // REACT_APP_BC_VECTOR_BASE_MAP_TILES_URL:
+  //   "https://beehive.pacificclimate.org/geoserver/gwc/service/wmts?REQUEST=GetTile&TILES=True&SERVICE=WMTS&VERSION=1.0.0&LAYER=OMT-NA-ZF-LG&TILEMATRIXSET=EPSG:3005&TILEMATRIX=EPSG:3005:{z}&TILEROW={y}&TILECOL={x}&FORMAT=application/vnd.mapbox-vector-tile",
+  // REACT_APP_LABELS_WMS_URL:
+  //   "https://beehive.pacificclimate.org/geoserver/gwc/service/wms",
   REACT_APP_LEGEND_TYPE: "achromatic",
   REACT_APP_BC_BASE_MAP_TILES_URL:
     "https://swarm.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png",
-  REACT_APP_REGIONS_SERVICE_URL:
-    "https://beehive.pacificclimate.org/plan2adapt/bc_regions/ows",
+  REACT_APP_REGIONS_GEOJSON_URL: "data/BC-regions-FNLF-84.geojson",
   REACT_APP_RULES_ENGINE_URL:
     "https://beehive.pacificclimate.org/plan2adapt/files/impacts",
   REACT_APP_CELL_RULES_ENGINE_URL:
