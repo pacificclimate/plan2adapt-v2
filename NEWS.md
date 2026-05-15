@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.6.0
+
+_2026-May-15_
+
+- Use local regions GeoJSON and drop axios (#287)
+
 ## 2.5.0
 
 _2025-Aug-18_
