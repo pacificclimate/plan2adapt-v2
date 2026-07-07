@@ -651,7 +651,7 @@ tabs:
       Pacific Climate Impacts Consortium. 2020. _Data Preparation for Climate Explorer, Precipitation as Snow_ (software).
       https://github.com/pacificclimate/climate-explorer-data-prep#generate_prsn-generate-snowfall-file
 
-      Pacific Climate Impacts Consortium. 2023:  [Downscaled CMIP6 Climate Model Subset Selection](http://pacificclimate.org/sites/default/files/publications/cmip6_gcm_selection_final_report.pdf)
+      Pacific Climate Impacts Consortium. 2023:  [Downscaled CMIP6 Climate Model Subset Selection](https://www.uvic.ca/pcic/_assets/docs/cmip6_gcm_selection_final_report.pdf)
 
       Pacific Climate Impacts Consortium. 2020. _Computation of CLIMDEX indices_ (software).
       https://cran.r-project.org/web/packages/climdex.pcic/index.html
@@ -681,7 +681,7 @@ tabs:
               It is designed to help you assess climate change in your region based on a
               standard set of climate model projections.
 
-              Plan2Adapt is similar to the [PCIC Climate Explorer](https://pacificclimate.org/analysis-tools/pcic-climate-explorer)
+              Plan2Adapt is similar to the [PCIC Climate Explorer](https://www.uvic.ca/pcic/data-analysis-tools/analysis-tools/climate-explorer/index.php)
               and uses the same data to generate its output.
               With a simpler user interface and fewer configurable options Plan2Adapt is designed to
               serve the needs of those involved in local and regional community planning.
@@ -690,11 +690,11 @@ tabs:
             body: ${version}
 
           - header: Author
-            body: "[Pacific Climate Impacts Consortium (PCIC)](https://pacificclimate.org/)"
+            body: "[Pacific Climate Impacts Consortium (PCIC)](https://www.uvic.ca/pcic/)"
 
           - header: Terms of Use
             body: |
-              In addition to PCIC's [terms of use](https://pacificclimate.org/terms-of-use), the data for each individual
+              In addition to PCIC's [terms of use](https://www.uvic.ca/pcic/about/terms-of-use/index.php), the data for each individual
               data set is subject to the terms of use of each source organization.
               For further details please refer to:
 
@@ -769,27 +769,27 @@ tabs:
               Please address questions about science and interpretation of the
               data presented in this tool to ${$$.components.contacts.science.link}.
           - header: Pacific Climate Impacts Consortium
-            body: See [PCIC Contact page](https://pacificclimate.org/contact-us).
+            body: See [PCIC Contact page](https://www.uvic.ca/pcic/about/contact-us/index.php).
 
       - label: Team
         cards:
           - header: "Trevor Murdock"
             body: Founding concept designer
-          - header: "[James Hiebert](https://pacificclimate.org/about-pcic/people/james-hiebert)"
+          - header: "[James Hiebert](https://www.uvic.ca/pcic/about/our-people/profiles/hiebert-james.php)"
             body: Development team lead.
-          - header: "[Charles Curry](https://pacificclimate.org/about-pcic/people/charles-curry)"
+          - header: "[Charles Curry](https://www.uvic.ca/pcic/about/our-people/profiles/curry-charles.php)"
             body: Regional climate impacts lead.
-          - header: "[Lee Zeman](https://pacificclimate.org/about-pcic/people/lee-zeman)"
+          - header: "[Lee Zeman](https://www.uvic.ca/pcic/about/our-people/profiles/zeman-lee.php)"
             body: Backend engineer. Data wrangling.
-          - header: "[Rod Glover](https://pacificclimate.org/about-pcic/people/rod-glover)"
+          - header: "Rod Glover"
             body: Front-end engineer. UI design and implementation.
-          - header: "[Tom Kunkel](https://pacificclimate.org/about-pcic/people/tom-kunkel)"
+          - header: "[Tom Kunkel](https://www.uvic.ca/pcic/about/our-people/profiles/kunkel-tom.php)"
             body: System administrator. Deployment and security.
-          - header: "[Eric Yvorchuk](https://pacificclimate.org/about-pcic/people/eric-yvorchuk-0)"
+          - header: "Eric Yvorchuk"
             body: Programmer/Analyst
-          - header: "[Stephen Sobie](https://pacificclimate.org/about-pcic/people/stephen-sobie)"
+          - header: "[Stephen Sobie](https://www.uvic.ca/pcic/about/our-people/profiles/sobie-stephen.php)"
             body: RCI Analyst
-          - header: "[Quintin Sparks](https://pacificclimate.org/about-pcic/people/quintin-sparks)"
+          - header: "[Quintin Sparks](https://www.uvic.ca/pcic/about/our-people/profiles/sparks-quintin.php)"
             body: Programmer/Analyst
 
 components:
