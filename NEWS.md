@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.7.0
+
+_2026-Aug-28_
+
+- Add npm policy, node 24, pin CI (#290)
+
 ## 2.6.0
 
 _2026-May-15_
