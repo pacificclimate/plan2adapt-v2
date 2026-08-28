@@ -14,4 +14,4 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:${VARIANT}
 # RUN groupadd --gid 1000 vscode \
 #   && useradd --uid 1000 --gid vscode --shell /bin/bash --create-home vscode
 
-ENV NODE_VERSION 18.19.0
+ENV NODE_VERSION 24
