@@ -46,21 +46,32 @@ export default class RegionSelector extends React.Component {
         "First Nations Language Families",
       ];
 
-      const regions = flow(
-        // Filter out excludedGroups
-        (features) =>
-          features.filter(
-            (feature) => !excludedGroups.includes(feature.properties.group),
-          ),
-        groupBy((feature) => feature.properties.group),
-        mapWithKey((features, group) => ({
-          label: group,
-          options: map((feature) => ({
+      const visibleFeatures = data.features.filter(
+        (feature) => !excludedGroups.includes(feature.properties.group),
+      );
+
+      const regions = [
+        // Ungrouped regions (currently British Columbia) are top-level options,
+        // rather than a group with a null label.
+        ...visibleFeatures
+          .filter((feature) => !feature.properties.group)
+          .map((feature) => ({
             label: feature.properties.english_na,
             value: feature,
-          }))(features),
-        })),
-      )(data.features);
+          })),
+        ...flow(
+          (features) =>
+            features.filter((feature) => Boolean(feature.properties.group)),
+          groupBy((feature) => feature.properties.group),
+          mapWithKey((features, group) => ({
+            label: group,
+            options: map((feature) => ({
+              label: feature.properties.english_na,
+              value: feature,
+            }))(features),
+          })),
+        )(visibleFeatures),
+      ];
 
       this.setState({ regions });
     });
