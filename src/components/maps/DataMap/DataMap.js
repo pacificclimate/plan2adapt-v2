@@ -8,7 +8,7 @@ import filter from "lodash/fp/filter";
 import mapValues from "lodash/fp/mapValues";
 import cond from "lodash/fp/cond";
 
-import { BCBaseMap } from "pcic-react-leaflet-components";
+import { BCBaseMap, EEZLayer } from "pcic-react-leaflet-components";
 import ClimateLayer from "../ClimateLayer";
 import LayerValuePopup from "../LayerValuePopup";
 import SimpleGeoJSON from "../SimpleGeoJSON";
@@ -151,6 +151,7 @@ class DataMapDisplay extends React.Component {
         //  GetFeatureInfo requests, which are required to fill the popup.
         // onClick={this.handleClickMap}
       >
+        <EEZLayer url={window.env.REACT_APP_EEZ_GEOJSON_URL} />
         <ClimateLayer
           fileMetadata={fileMetadata}
           variableSpec={variable.representative}
