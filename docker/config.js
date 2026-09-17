@@ -8,7 +8,7 @@ window.env = {
   REACT_APP_REGIONS_GEOJSON_URL:
     "https://beehive.pacificclimate.org/plan2adapt/files/regions/BC-regions-FNLF-84.geojson",
   REACT_APP_EEZ_GEOJSON_URL:
-    "https://beehive.pacificclimate.org/tiles/eez/eez_boundaries_canada_v12.geojson",
+    "https://beehive.pacificclimate.org/tiles/eez/eez_boundaries_bc_v12.geojson",
   REACT_APP_RULES_ENGINE_URL:
     "https://beehive.pacificclimate.org/plan2adapt/files/impacts",
   REACT_APP_STATS_URL:
