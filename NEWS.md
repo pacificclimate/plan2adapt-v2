@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 2.8.0
+
+_2026-Sep-25_
+
+- Add EEZ (#294)
+- Hide null groups in region selectors (#292)
+
 ## 2.7.0
 
 _2026-Aug-28_
