@@ -15,7 +15,7 @@
     "lodash": "^4.17.21",
     "path-browserify": "^1.0.1",
     "pcic-react-components": "git+https://github.com/pacificclimate/pcic-react-components.git#3.4.0",
-    "pcic-react-leaflet-components": "git+https://github.com/pacificclimate/pcic-react-leaflet-components.git#3.3.0",
+    "pcic-react-leaflet-components": "git+https://github.com/pacificclimate/pcic-react-leaflet-components.git#4.0.0",
     "process": "^0.11.10",
     "proj4": "^2.7.5",
     "proj4leaflet": "^1.0.2",
@@ -78,6 +78,8 @@
   },
   "allowScripts": {
     "core-js@3.40.0": true,
-    "core-js-pure@3.40.0": true
+    "core-js-pure@3.40.0": true,
+    "core-js@3.23.2": true,
+    "core-js-pure@3.23.2": true
   }
 }
