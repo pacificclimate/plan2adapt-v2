@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 2.8.1
+
+_2026-Oct-27_
+
+- Upgrade base image OS packages to address CVE-2026-111497
+- Update dependencies lock with `npm audit fix`
+
 ## 2.8.0
 
 _2026-Sep-25_
